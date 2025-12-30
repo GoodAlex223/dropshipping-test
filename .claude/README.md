@@ -155,5 +155,30 @@ Edit `settings.local.json` to add:
 
 ---
 
+## Full Project Structure
+
+This directory fits into the overall project structure:
+
+```
+project/
+├── README.md              # Project overview (for humans)
+├── CLAUDE.md              # Claude Code entry point
+├── PROJECT.md             # Project-specific configuration
+├── docs/                  # Documentation (standard location)
+│   ├── README.md
+│   ├── TODO.md
+│   ├── DONE.md
+│   ├── ARCHITECTURE.md
+│   ├── PROJECT_CONTEXT.md
+│   ├── plans/
+│   └── archive/
+└── .claude/               # This directory (config & policies)
+    ├── POLICIES/
+    ├── LANGUAGES/
+    └── TEMPLATES/
+```
+
+---
+
 *See [../CLAUDE.md](../CLAUDE.md) for core rules.*
 *See [POLICIES/context-management.md](POLICIES/context-management.md) for size guidelines.*

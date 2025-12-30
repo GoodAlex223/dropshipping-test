@@ -288,11 +288,12 @@ See: [.claude/POLICIES/knowledge-sources.md](.claude/POLICIES/knowledge-sources.
 ```
 1. Read CLAUDE.md (this file) — Universal rules
 2. Read PROJECT.md — Project-specific context
-3. Read docs/README.md — Documentation index
-4. Read docs/TODO.md — Active tasks, context
-5. Read relevant domain docs — As identified in index
-6. Read relevant code — Only after understanding context
-7. Search best practices — External resources if needed
+3. Read README.md — Project overview (if unfamiliar)
+4. Read docs/README.md — Documentation index
+5. Read docs/TODO.md — Active tasks, context
+6. Read relevant domain docs — As identified in index
+7. Read relevant code — Only after understanding context
+8. Search best practices — External resources if needed
 ```
 
 ### Required Documentation Structure
@@ -301,7 +302,8 @@ Every project MUST have these files (create if missing):
 
 | Document | Purpose | Location |
 |----------|---------|----------|
-| PROJECT.md | Project-specific info | Root |
+| README.md | Project overview for humans | Root |
+| PROJECT.md | Project-specific config | Root |
 | docs/README.md | Documentation index | docs/ |
 | docs/TODO.md | Active tasks | docs/ |
 | docs/DONE.md | Completed tasks | docs/ |
