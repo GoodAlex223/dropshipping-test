@@ -33,9 +33,13 @@ Move to archive when ALL are true:
 - [ ] Tests passing
 - [ ] "Key Discoveries" filled in
 - [ ] "Future Improvements" has 2+ items
+- [ ] **Improvements extracted to BACKLOG.md** (categorized appropriately)
 - [ ] Summary added to `../planning/DONE.md`
 
-Then:
+**See [../archive/plans/README.md](../archive/plans/README.md) for complete step-by-step archive process.**
+
+Quick reference:
+
 ```bash
 mv docs/plans/YYYY-MM-DD_task.md docs/archive/plans/
 ```
