@@ -1,0 +1,250 @@
+import type { Metadata } from "next";
+
+// Base site configuration
+export const siteConfig = {
+  name: process.env.NEXT_PUBLIC_STORE_NAME || "Store",
+  description:
+    "Your one-stop shop for quality products at great prices. Discover amazing deals and fast shipping.",
+  url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+  ogImage: "/og-image.png",
+  twitterHandle: "@store",
+  locale: "en_US",
+};
+
+// Default metadata configuration
+export function getDefaultMetadata(): Metadata {
+  return {
+    metadataBase: new URL(siteConfig.url),
+    title: {
+      default: siteConfig.name,
+      template: `%s | ${siteConfig.name}`,
+    },
+    description: siteConfig.description,
+    keywords: ["online store", "e-commerce", "shopping", "deals", "products", "fast shipping"],
+    authors: [{ name: siteConfig.name }],
+    creator: siteConfig.name,
+    publisher: siteConfig.name,
+    formatDetection: {
+      email: false,
+      address: false,
+      telephone: false,
+    },
+    openGraph: {
+      type: "website",
+      locale: siteConfig.locale,
+      url: siteConfig.url,
+      siteName: siteConfig.name,
+      title: siteConfig.name,
+      description: siteConfig.description,
+      images: [
+        {
+          url: siteConfig.ogImage,
+          width: 1200,
+          height: 630,
+          alt: siteConfig.name,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: siteConfig.name,
+      description: siteConfig.description,
+      images: [siteConfig.ogImage],
+      creator: siteConfig.twitterHandle,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
+    icons: {
+      icon: "/favicon.ico",
+      shortcut: "/favicon-16x16.png",
+      apple: "/apple-touch-icon.png",
+    },
+    manifest: "/manifest.json",
+  };
+}
+
+// Generate product metadata
+export function getProductMetadata(product: {
+  name: string;
+  slug: string;
+  description?: string | null;
+  shortDesc?: string | null;
+  price: string;
+  comparePrice?: string | null;
+  images?: { url: string; alt?: string | null }[];
+  category?: { name: string; slug: string };
+}): Metadata {
+  const description =
+    product.shortDesc || product.description?.slice(0, 160) || siteConfig.description;
+  const image = product.images?.[0]?.url || siteConfig.ogImage;
+  const url = `${siteConfig.url}/products/${product.slug}`;
+
+  return {
+    title: product.name,
+    description,
+    openGraph: {
+      type: "website",
+      url,
+      title: product.name,
+      description,
+      images: [
+        {
+          url: image,
+          width: 800,
+          height: 800,
+          alt: product.name,
+        },
+      ],
+      siteName: siteConfig.name,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description,
+      images: [image],
+    },
+    alternates: {
+      canonical: url,
+    },
+  };
+}
+
+// Generate category metadata
+export function getCategoryMetadata(category: {
+  name: string;
+  slug: string;
+  description?: string | null;
+  image?: string | null;
+  productCount?: number;
+}): Metadata {
+  const description =
+    category.description ||
+    `Shop ${category.name} products. ${category.productCount || "Browse"} quality items at great prices.`;
+  const image = category.image || siteConfig.ogImage;
+  const url = `${siteConfig.url}/categories/${category.slug}`;
+
+  return {
+    title: category.name,
+    description,
+    openGraph: {
+      type: "website",
+      url,
+      title: `${category.name} | ${siteConfig.name}`,
+      description,
+      images: [
+        {
+          url: image,
+          width: 1200,
+          height: 630,
+          alt: category.name,
+        },
+      ],
+      siteName: siteConfig.name,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${category.name} | ${siteConfig.name}`,
+      description,
+      images: [image],
+    },
+    alternates: {
+      canonical: url,
+    },
+  };
+}
+
+// JSON-LD for Organization
+export function getOrganizationJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: siteConfig.name,
+    url: siteConfig.url,
+    logo: `${siteConfig.url}/logo.png`,
+    sameAs: [],
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer service",
+      availableLanguage: "English",
+    },
+  };
+}
+
+// JSON-LD for WebSite (with SearchAction)
+export function getWebsiteJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: siteConfig.name,
+    url: siteConfig.url,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${siteConfig.url}/products?search={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+}
+
+// JSON-LD for Product
+export function getProductJsonLd(product: {
+  name: string;
+  slug: string;
+  description?: string | null;
+  price: string;
+  comparePrice?: string | null;
+  sku: string;
+  stock: number;
+  images?: { url: string; alt?: string | null }[];
+  category?: { name: string };
+}) {
+  const availability =
+    product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock";
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description || "",
+    sku: product.sku,
+    image: product.images?.map((img) => img.url) || [],
+    category: product.category?.name,
+    url: `${siteConfig.url}/products/${product.slug}`,
+    offers: {
+      "@type": "Offer",
+      price: product.price,
+      priceCurrency: "USD",
+      availability,
+      url: `${siteConfig.url}/products/${product.slug}`,
+      seller: {
+        "@type": "Organization",
+        name: siteConfig.name,
+      },
+    },
+  };
+}
+
+// JSON-LD for BreadcrumbList
+export function getBreadcrumbJsonLd(items: { name: string; url: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  };
+}

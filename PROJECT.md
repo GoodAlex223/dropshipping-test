@@ -2,45 +2,45 @@
 
 Project-specific configuration. Universal rules are in [CLAUDE.md](CLAUDE.md).
 
-**Last Updated**: YYYY-MM-DD
+**Last Updated**: 2026-01-05
 
 ---
 
 ## Project Overview
 
-<!-- 
-Brief description of what this project does.
-Keep it to 2-3 sentences.
--->
-
-[Description of your project]
+Multi-category dropshipping e-commerce website with customer storefront, admin panel, and supplier integrations. Supports product management via API and CSV import, Stripe payments, and automated order forwarding to suppliers.
 
 ### Tech Stack
 
-| Component | Technology |
-|-----------|------------|
-| Language | [e.g., Python 3.11] |
-| Framework | [e.g., aiogram 3.x] |
-| Database | [e.g., SQLite / PostgreSQL] |
-| Testing | [e.g., pytest] |
-| CI/CD | [e.g., GitHub Actions] |
+| Component    | Technology                    |
+| ------------ | ----------------------------- |
+| Language     | TypeScript                    |
+| Framework    | Next.js 14+ (App Router)      |
+| Styling      | Tailwind CSS + shadcn/ui      |
+| Database     | PostgreSQL                    |
+| ORM          | Prisma                        |
+| Auth         | NextAuth.js (Auth.js v5)      |
+| State        | Zustand                       |
+| Forms        | React Hook Form + Zod         |
+| Payments     | Stripe                        |
+| Email        | Resend                        |
+| File Storage | S3-compatible (Cloudflare R2) |
+| Queue        | BullMQ + Redis                |
+| Testing      | Vitest + Playwright           |
 
 ---
 
 ## Project Structure
 
-<!-- 
-Key directories and files. Only include what's important for navigation.
-Update this when structure changes significantly.
--->
-
-| Component | Location | Purpose |
-|-----------|----------|---------|
-| Entry Point | `[path]` | Main application |
-| Core Logic | `[path/]` | Business logic |
-| Database | `[path/]` | Data layer |
-| Tests | `tests/` | Test suites |
-| Config | `[path]` | Configuration files |
+| Component      | Location                 | Purpose                  |
+| -------------- | ------------------------ | ------------------------ |
+| Entry Point    | `src/app/`               | Next.js App Router pages |
+| Components     | `src/components/`        | React components         |
+| Business Logic | `src/services/`          | Service layer            |
+| Database       | `prisma/`                | Schema and migrations    |
+| API Routes     | `src/app/api/`           | Backend API              |
+| Tests          | `tests/`                 | Unit and E2E tests       |
+| Config         | `.env`, `next.config.js` | Configuration files      |
 
 ---
 
@@ -49,27 +49,43 @@ Update this when structure changes significantly.
 ### Development
 
 ```bash
-# Run application
-[command]
+# Install dependencies
+npm install
 
-# Run with auto-restart (if applicable)
-[command]
+# Run database migrations
+npx prisma migrate dev
 
-# Run tests
-[command]
+# Run development server
+npm run dev
 
-# Run specific test file
-[command]
+# Run with database studio
+npx prisma studio
+```
+
+### Testing
+
+```bash
+# Run unit tests
+npm run test
+
+# Run E2E tests
+npm run test:e2e
+
+# Run tests with coverage
+npm run test:coverage
 ```
 
 ### Code Quality
 
 ```bash
 # Linting
-[command]
+npm run lint
 
 # Type checking
-[command]
+npm run typecheck
+
+# Format code
+npm run format
 
 # All pre-commit hooks
 pre-commit run --all-files
@@ -79,17 +95,12 @@ pre-commit run --all-files
 
 ## Critical Systems (Tier Classification)
 
-<!--
-Systems that require extra caution when modifying.
-Claude MUST consult user before modifying Tier 1 systems.
--->
-
-| Tier | Description | Examples | Modification Rules |
-|------|-------------|----------|-------------------|
-| 1 | Critical | [e.g., Auth, payments] | Requires explicit user approval |
-| 2 | Important | [e.g., Core business logic] | Requires plan review |
-| 3 | Standard | [e.g., Utilities, helpers] | Standard workflow |
-| 4 | Low-risk | [e.g., Documentation, tests] | Proceed with normal care |
+| Tier | Description | Examples                                 | Modification Rules              |
+| ---- | ----------- | ---------------------------------------- | ------------------------------- |
+| 1    | Critical    | Payment processing, Order creation, Auth | Requires explicit user approval |
+| 2    | Important   | Cart logic, Product pricing, Inventory   | Requires plan review            |
+| 3    | Standard    | Product display, Search, Filtering       | Standard workflow               |
+| 4    | Low-risk    | Admin UI, Documentation, Tests           | Proceed with normal care        |
 
 ---
 
@@ -97,30 +108,29 @@ Claude MUST consult user before modifying Tier 1 systems.
 
 ### Naming Conventions
 
-<!-- 
-Project-specific naming rules beyond standard language conventions.
--->
-
-| Element | Convention | Example |
-|---------|------------|---------|
-| [Type] | [Rule] | [Example] |
+| Element          | Convention                       | Example                 |
+| ---------------- | -------------------------------- | ----------------------- |
+| Components       | PascalCase                       | `ProductCard.tsx`       |
+| Hooks            | camelCase with `use` prefix      | `useCart.ts`            |
+| Services         | camelCase with `.service` suffix | `order.service.ts`      |
+| API routes       | kebab-case folders               | `api/checkout/route.ts` |
+| Database tables  | PascalCase (Prisma)              | `Product`, `OrderItem`  |
+| Environment vars | SCREAMING_SNAKE_CASE             | `DATABASE_URL`          |
 
 ### Code Patterns
 
-<!--
-Patterns specific to this project that Claude should follow.
--->
-
-- [Pattern 1]: [Description]
-- [Pattern 2]: [Description]
+- **Server Components by default**: Only use `"use client"` when necessary
+- **Server Actions for mutations**: Prefer Server Actions over API routes for forms
+- **Zod for all validation**: Input validation at API boundaries
+- **Service layer**: Business logic in `services/`, not in routes
+- **Optimistic updates**: Use for cart operations
 
 ### Error Handling
 
-<!--
-How errors should be handled in this project.
--->
-
-[Describe error handling approach]
+- Use custom `AppError` class for business logic errors
+- Structured error responses: `{ error: string, code: string, details?: object }`
+- Log errors with context to Sentry
+- User-friendly error messages, no stack traces in production
 
 ---
 
@@ -128,45 +138,37 @@ How errors should be handled in this project.
 
 ### APIs
 
-| Service | Purpose | Docs Location |
-|---------|---------|---------------|
-| [API name] | [What it's used for] | [Link or file path] |
+| Service       | Purpose                        | Docs Location                        |
+| ------------- | ------------------------------ | ------------------------------------ |
+| Stripe        | Payment processing             | https://stripe.com/docs              |
+| Resend        | Transactional emails           | https://resend.com/docs              |
+| Cloudflare R2 | File storage                   | https://developers.cloudflare.com/r2 |
+| Supplier APIs | Product sync, Order forwarding | docs/suppliers/                      |
 
 ### Configuration
 
-| Variable | Purpose | Location |
-|----------|---------|----------|
-| [VAR_NAME] | [What it configures] | [.env / config file] |
+| Variable                | Purpose                     | Location |
+| ----------------------- | --------------------------- | -------- |
+| `DATABASE_URL`          | PostgreSQL connection       | .env     |
+| `NEXTAUTH_SECRET`       | Auth encryption key         | .env     |
+| `STRIPE_SECRET_KEY`     | Stripe API key              | .env     |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook verification | .env     |
+| `RESEND_API_KEY`        | Email service key           | .env     |
+| `R2_ACCESS_KEY_ID`      | R2 storage credentials      | .env     |
+| `R2_SECRET_ACCESS_KEY`  | R2 storage credentials      | .env     |
+| `R2_BUCKET_NAME`        | R2 bucket name              | .env     |
+| `REDIS_URL`             | Redis connection for queues | .env     |
 
 ---
 
 ## Domain-Specific Documentation
 
-<!--
-Links to project-specific documentation beyond the standard structure.
--->
-
-| Document | Purpose |
-|----------|---------|
-| [docs/path/file.md](docs/path/file.md) | [Description] |
-
----
-
-## Localization (if applicable)
-
-<!--
-Remove this section if project doesn't have localization.
--->
-
-| Language | Location | Status |
-|----------|----------|--------|
-| [Lang] | `[path]` | [Complete/Partial] |
-
-### Localization Rules
-
-When adding/modifying features with user-facing text:
-1. [Rule 1]
-2. [Rule 2]
+| Document                                                                                         | Purpose                 |
+| ------------------------------------------------------------------------------------------------ | ----------------------- |
+| [docs/plans/2026-01-05_dropshipping-mvp-plan.md](docs/plans/2026-01-05_dropshipping-mvp-plan.md) | MVP implementation plan |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)                                                     | System architecture     |
+| [docs/database/schema.md](docs/database/schema.md)                                               | Database schema docs    |
+| [docs/api/](docs/api/)                                                                           | API documentation       |
 
 ---
 
@@ -174,40 +176,39 @@ When adding/modifying features with user-facing text:
 
 ### Environments
 
-| Environment | URL/Location | Branch |
-|-------------|--------------|--------|
-| Development | [local/dev URL] | develop |
-| Staging | [staging URL] | staging |
-| Production | [prod URL] | main |
+| Environment | URL/Location   | Branch  |
+| ----------- | -------------- | ------- |
+| Development | localhost:3000 | develop |
+| Staging     | TBD            | staging |
+| Production  | TBD            | main    |
 
 ### Pre-deployment Checklist
 
 - [ ] All tests passing
-- [ ] Version bumped (if applicable)
-- [ ] Changelog updated
-- [ ] [Project-specific checks]
+- [ ] Database migrations applied
+- [ ] Environment variables configured
+- [ ] Stripe webhooks configured
+- [ ] Email templates tested
+- [ ] Performance audit passed
 
 ---
 
 ## Known Limitations
 
-<!--
-Document known issues, technical debt, or limitations that affect development.
--->
-
-1. [Limitation 1]: [Description and workaround]
-2. [Limitation 2]: [Description and workaround]
+1. **Single currency**: USD only initially
+2. **Single language**: English only initially
+3. **No real-time shipping rates**: Flat rate shipping
+4. **Manual supplier sync**: Background jobs only, no real-time
 
 ---
 
 ## Contact / Ownership
 
-| Role | Contact |
-|------|---------|
-| Maintainer | [Name/handle] |
-| [Other role] | [Contact] |
+| Role       | Contact |
+| ---------- | ------- |
+| Maintainer | TBD     |
 
 ---
 
-*For universal Claude Code rules, see [CLAUDE.md](CLAUDE.md).*
-*For documentation index, see [docs/README.md](docs/README.md).*
+_For universal Claude Code rules, see [CLAUDE.md](CLAUDE.md)._
+_For documentation index, see [docs/README.md](docs/README.md)._
