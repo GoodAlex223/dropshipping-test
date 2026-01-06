@@ -7,9 +7,9 @@ test.describe("Navigation", () => {
     // Check page title
     await expect(page).toHaveTitle(/Store/);
 
-    // Check main navigation elements
-    await expect(page.getByRole("link", { name: /products/i })).toBeVisible();
-    await expect(page.getByRole("link", { name: /categories/i })).toBeVisible();
+    // Check main navigation elements (use exact match for nav links)
+    await expect(page.getByRole("link", { name: "Products", exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Categories", exact: true })).toBeVisible();
 
     // Check hero section
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();

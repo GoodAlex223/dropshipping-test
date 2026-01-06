@@ -251,17 +251,18 @@ function ProductsContent() {
 
         <div className="flex gap-2">
           <Select
-            value={categoryId}
+            value={categoryId || "all"}
             onValueChange={(value) => {
-              setCategoryId(value);
-              handleFilterChange("categoryId", value);
+              const newValue = value === "all" ? "" : value;
+              setCategoryId(newValue);
+              handleFilterChange("categoryId", newValue);
             }}
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Categories</SelectItem>
+              <SelectItem value="all">All Categories</SelectItem>
               {categories.map((cat) => (
                 <SelectItem key={cat.id} value={cat.id}>
                   {cat.name}
@@ -271,17 +272,18 @@ function ProductsContent() {
           </Select>
 
           <Select
-            value={status}
+            value={status || "all"}
             onValueChange={(value) => {
-              setStatus(value);
-              handleFilterChange("isActive", value);
+              const newValue = value === "all" ? "" : value;
+              setStatus(newValue);
+              handleFilterChange("isActive", newValue);
             }}
           >
             <SelectTrigger className="w-[140px]">
               <SelectValue placeholder="All Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Status</SelectItem>
+              <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="true">Active</SelectItem>
               <SelectItem value="false">Inactive</SelectItem>
             </SelectContent>

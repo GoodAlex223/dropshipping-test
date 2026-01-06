@@ -44,7 +44,10 @@ export function ProductCard({ product, showCategory = true }: ProductCardProps) 
   const isOutOfStock = product.stock <= 0;
 
   return (
-    <Card className="group overflow-hidden transition-shadow hover:shadow-lg">
+    <Card
+      className="group overflow-hidden transition-shadow hover:shadow-lg"
+      data-testid="product-card"
+    >
       <Link href={`/products/${product.slug}`}>
         <div className="bg-muted relative aspect-square overflow-hidden">
           {product.images[0] ? (

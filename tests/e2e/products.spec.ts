@@ -5,10 +5,10 @@ test.describe("Product Browsing", () => {
     await page.goto("/products");
 
     // Wait for products to load
-    await page.waitForSelector("[data-testid='product-card'], .product-card, article");
+    await page.waitForSelector("[data-testid='product-card']");
 
     // Should have at least one product
-    const products = page.locator("[data-testid='product-card'], .product-card, article").first();
+    const products = page.locator("[data-testid='product-card']").first();
     await expect(products).toBeVisible();
   });
 
@@ -48,10 +48,10 @@ test.describe("Product Browsing", () => {
     await page.goto("/products");
 
     // Wait for products to load
-    await page.waitForSelector("a[href*='/products/']");
+    await page.waitForSelector("[data-testid='product-card']");
 
     // Click on first product link
-    const productLink = page.locator("a[href*='/products/']").first();
+    const productLink = page.locator("[data-testid='product-card'] a").first();
     await productLink.click();
 
     // Should be on product detail page
@@ -65,17 +65,24 @@ test.describe("Product Browsing", () => {
     await page.goto("/products");
 
     // Navigate to first product
-    await page.locator("a[href*='/products/']").first().click();
+    await page.locator("[data-testid='product-card'] a").first().click();
 
-    // Price should be visible (contains $)
-    await expect(page.getByText(/\$\d+/)).toBeVisible();
+    // Wait for product page to load
+    await expect(page).toHaveURL(/\/products\/[^/]+$/);
+
+    // Price should be visible (use first match since there may be multiple prices)
+    await expect(page.getByText(/\$\d+/).first()).toBeVisible();
   });
 
   test("product detail shows add to cart button", async ({ page }) => {
     await page.goto("/products");
 
-    // Navigate to first product
-    await page.locator("a[href*='/products/']").first().click();
+    // Wait for products and navigate to first product
+    await page.waitForSelector("[data-testid='product-card']");
+    await page.locator("[data-testid='product-card'] a").first().click();
+
+    // Wait for product page to load
+    await expect(page).toHaveURL(/\/products\/[^/]+$/);
 
     // Add to cart button should be visible
     const addToCartButton = page.getByRole("button", { name: /add to cart/i });

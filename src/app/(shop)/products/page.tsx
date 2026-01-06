@@ -224,17 +224,18 @@ function ProductsContent() {
                 <div className="space-y-2">
                   <Label>Category</Label>
                   <Select
-                    value={category}
+                    value={category || "all"}
                     onValueChange={(value) => {
-                      setCategory(value);
-                      updateFilters({ category: value || null });
+                      const newValue = value === "all" ? "" : value;
+                      setCategory(newValue);
+                      updateFilters({ category: newValue || null });
                     }}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="All Categories" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Categories</SelectItem>
+                      <SelectItem value="all">All Categories</SelectItem>
                       {categories.map((cat) => (
                         <SelectItem key={cat.id} value={cat.slug}>
                           {cat.name}
@@ -284,14 +285,14 @@ function ProductsContent() {
 
           {/* Desktop Category Filter */}
           <Select
-            value={category}
-            onValueChange={(value) => updateFilters({ category: value || null })}
+            value={category || "all"}
+            onValueChange={(value) => updateFilters({ category: value === "all" ? null : value })}
           >
             <SelectTrigger className="hidden w-[180px] md:flex">
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Categories</SelectItem>
+              <SelectItem value="all">All Categories</SelectItem>
               {categories.map((cat) => (
                 <SelectItem key={cat.id} value={cat.slug}>
                   {cat.name}
