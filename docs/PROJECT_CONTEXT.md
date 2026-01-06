@@ -16,9 +16,9 @@ Accumulated knowledge, decisions, and patterns for this project.
 
 ### Decision Log
 
-| Date | Decision | Rationale | Alternatives Considered |
-|------|----------|-----------|------------------------|
-| YYYY-MM-DD | [Decision] | [Why] | [What else was considered] |
+| Date       | Decision   | Rationale | Alternatives Considered    |
+| ---------- | ---------- | --------- | -------------------------- |
+| YYYY-MM-DD | [Decision] | [Why]     | [What else was considered] |
 
 ### Major Architectural Decisions
 
@@ -38,14 +38,14 @@ Accumulated knowledge, decisions, and patterns for this project.
 
 ### Code Patterns
 
-| Pattern | When to Use | Example |
-|---------|-------------|---------|
+| Pattern        | When to Use | Example                      |
+| -------------- | ----------- | ---------------------------- |
 | [Pattern name] | [Situation] | [Reference or brief example] |
 
 ### Anti-Patterns
 
-| Anti-Pattern | Why Avoid | Better Alternative |
-|--------------|-----------|-------------------|
+| Anti-Pattern   | Why Avoid            | Better Alternative   |
+| -------------- | -------------------- | -------------------- |
 | [Anti-pattern] | [Problems it causes] | [What to do instead] |
 
 ---
@@ -54,9 +54,9 @@ Accumulated knowledge, decisions, and patterns for this project.
 
 ### Naming
 
-| Element | Convention | Example |
-|---------|------------|---------|
-| [Type] | [Rule] | [Example] |
+| Element | Convention | Example   |
+| ------- | ---------- | --------- |
+| [Type]  | [Rule]     | [Example] |
 
 ### File Organization
 
@@ -72,14 +72,14 @@ Accumulated knowledge, decisions, and patterns for this project.
 
 ### Glossary
 
-| Term | Definition |
-|------|------------|
+| Term   | Definition                      |
+| ------ | ------------------------------- |
 | [Term] | [What it means in this project] |
 
 ### Business Rules
 
-| Rule | Description | Implemented In |
-|------|-------------|----------------|
+| Rule   | Description    | Implemented In  |
+| ------ | -------------- | --------------- |
 | [Rule] | [What it does] | [Where in code] |
 
 ---
@@ -88,15 +88,15 @@ Accumulated knowledge, decisions, and patterns for this project.
 
 ### Technical Debt
 
-| Issue | Impact | Remediation Plan | Priority |
-|-------|--------|------------------|----------|
-| [Issue] | [How it affects project] | [Plan to fix] | H/M/L |
+| Issue   | Impact                   | Remediation Plan | Priority |
+| ------- | ------------------------ | ---------------- | -------- |
+| [Issue] | [How it affects project] | [Plan to fix]    | H/M/L    |
 
 ### Workarounds
 
-| Issue | Workaround | Permanent Fix Needed |
-|-------|------------|---------------------|
-| [Issue] | [Current workaround] | Yes/No |
+| Issue   | Workaround           | Permanent Fix Needed |
+| ------- | -------------------- | -------------------- |
+| [Issue] | [Current workaround] | Yes/No               |
 
 ---
 
@@ -108,9 +108,9 @@ Accumulated knowledge, decisions, and patterns for this project.
 
 ### Deprecated Approaches
 
-| What | When Deprecated | Replaced By | Why |
-|------|-----------------|-------------|-----|
-| [Old approach] | YYYY-MM-DD | [New approach] | [Reason] |
+| What           | When Deprecated | Replaced By    | Why      |
+| -------------- | --------------- | -------------- | -------- |
+| [Old approach] | YYYY-MM-DD      | [New approach] | [Reason] |
 
 ---
 
@@ -134,12 +134,12 @@ Accumulated knowledge, decisions, and patterns for this project.
 
 ## References
 
-| Resource | Purpose |
-|----------|---------|
+| Resource   | Purpose                |
+| ---------- | ---------------------- |
 | [Link/Doc] | [What it's useful for] |
 
 ---
 
-*Updated after each significant task completion.*
-*See [ARCHITECTURE.md](ARCHITECTURE.md) for system design.*
-*See [planning/TODO.md](planning/TODO.md) for active tasks.*
+_Updated after each significant task completion._
+_See [ARCHITECTURE.md](ARCHITECTURE.md) for system design._
+_See [planning/TODO.md](planning/TODO.md) for active tasks._

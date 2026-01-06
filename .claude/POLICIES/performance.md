@@ -17,13 +17,13 @@ Standards for writing performant code and identifying optimization opportunities
 
 ### When to Optimize
 
-| Situation | Action |
-|-----------|--------|
-| Writing new code | Write clear code first, profile if slow |
-| Performance complaint | Measure, identify bottleneck, then optimize |
-| Code review | Flag obvious issues, suggest investigation |
-| Known hot path | Optimize proactively |
-| Premature optimization urge | Resist until measured |
+| Situation                   | Action                                      |
+| --------------------------- | ------------------------------------------- |
+| Writing new code            | Write clear code first, profile if slow     |
+| Performance complaint       | Measure, identify bottleneck, then optimize |
+| Code review                 | Flag obvious issues, suggest investigation  |
+| Known hot path              | Optimize proactively                        |
+| Premature optimization urge | Resist until measured                       |
 
 ### Optimization Priority
 
@@ -42,15 +42,15 @@ Standards for writing performant code and identifying optimization opportunities
 
 ### Big O Reference
 
-| Complexity | Name | Example | Scalability |
-|------------|------|---------|-------------|
-| O(1) | Constant | Hash lookup | ✅ Excellent |
-| O(log n) | Logarithmic | Binary search | ✅ Excellent |
-| O(n) | Linear | Array iteration | ✅ Good |
-| O(n log n) | Linearithmic | Efficient sort | ✅ Good |
-| O(n²) | Quadratic | Nested loops | ⚠️ Watch carefully |
-| O(2ⁿ) | Exponential | Naive recursion | ❌ Avoid |
-| O(n!) | Factorial | Permutations | ❌ Avoid |
+| Complexity | Name         | Example         | Scalability        |
+| ---------- | ------------ | --------------- | ------------------ |
+| O(1)       | Constant     | Hash lookup     | ✅ Excellent       |
+| O(log n)   | Logarithmic  | Binary search   | ✅ Excellent       |
+| O(n)       | Linear       | Array iteration | ✅ Good            |
+| O(n log n) | Linearithmic | Efficient sort  | ✅ Good            |
+| O(n²)      | Quadratic    | Nested loops    | ⚠️ Watch carefully |
+| O(2ⁿ)      | Exponential  | Naive recursion | ❌ Avoid           |
+| O(n!)      | Factorial    | Permutations    | ❌ Avoid           |
 
 ### Complexity Red Flags
 
@@ -123,11 +123,11 @@ CREATE INDEX idx_posts_user_date ON posts(user_id, created_at);
 
 ### Query Performance Targets
 
-| Query Type | Target | Warning |
-|------------|--------|---------|
-| Simple lookup | < 10ms | > 50ms |
-| List query | < 50ms | > 200ms |
-| Complex report | < 500ms | > 2s |
+| Query Type     | Target            | Warning |
+| -------------- | ----------------- | ------- |
+| Simple lookup  | < 10ms            | > 50ms  |
+| List query     | < 50ms            | > 200ms |
+| Complex report | < 500ms           | > 2s    |
 | Background job | Context-dependent | Monitor |
 
 ---
@@ -145,12 +145,12 @@ L4: External API - hundreds of milliseconds
 
 ### When to Cache
 
-| Cache When | Don't Cache When |
-|------------|------------------|
-| Data rarely changes | Data changes frequently |
-| Expensive to compute/fetch | Cheap to compute/fetch |
-| Accessed frequently | Accessed rarely |
-| Staleness is acceptable | Must be real-time |
+| Cache When                 | Don't Cache When        |
+| -------------------------- | ----------------------- |
+| Data rarely changes        | Data changes frequently |
+| Expensive to compute/fetch | Cheap to compute/fetch  |
+| Accessed frequently        | Accessed rarely         |
+| Staleness is acceptable    | Must be real-time       |
 
 ### Cache Invalidation Strategies
 
@@ -177,7 +177,7 @@ def get_user(user_id):
     cached = cache.get(f"user:{user_id}")
     if cached:
         return cached
-    
+
     user = db.query(User).get(user_id)
     cache.set(f"user:{user_id}", user, ttl=300)
     return user
@@ -312,12 +312,12 @@ Total budget: 200ms
 
 ### Setting Budgets
 
-| Operation | Fast | Acceptable | Slow |
-|-----------|------|------------|------|
-| API response | < 100ms | < 500ms | > 1s |
-| Page load | < 1s | < 3s | > 5s |
-| Search | < 200ms | < 1s | > 2s |
-| Report generation | < 5s | < 30s | > 1min |
+| Operation         | Fast    | Acceptable | Slow   |
+| ----------------- | ------- | ---------- | ------ |
+| API response      | < 100ms | < 500ms    | > 1s   |
+| Page load         | < 1s    | < 3s       | > 5s   |
+| Search            | < 200ms | < 1s       | > 2s   |
+| Report generation | < 5s    | < 30s      | > 1min |
 
 ---
 
@@ -333,11 +333,11 @@ Total budget: 200ms
 
 ### Profiling Tools
 
-| Language | Tools |
-|----------|-------|
-| Python | cProfile, py-spy, memory_profiler |
-| Node.js | clinic, node --inspect, 0x |
-| General | APM tools (DataDog, New Relic) |
+| Language | Tools                             |
+| -------- | --------------------------------- |
+| Python   | cProfile, py-spy, memory_profiler |
+| Node.js  | clinic, node --inspect, 0x        |
+| General  | APM tools (DataDog, New Relic)    |
 
 ### Profiling Example
 
@@ -416,9 +416,9 @@ user_index = {user.id: user for user in users}
 ```markdown
 ## Performance Baselines
 
-| Endpoint | p50 | p95 | p99 | Date |
-|----------|-----|-----|-----|------|
-| GET /users | 45ms | 120ms | 250ms | 2025-01-15 |
+| Endpoint     | p50  | p95   | p99   | Date       |
+| ------------ | ---- | ----- | ----- | ---------- |
+| GET /users   | 45ms | 120ms | 250ms | 2025-01-15 |
 | POST /orders | 80ms | 200ms | 450ms | 2025-01-15 |
 ```
 
@@ -426,18 +426,18 @@ user_index = {user.id: user for user in users}
 
 ## Anti-Patterns to Avoid
 
-| Anti-Pattern | Problem | Solution |
-|--------------|---------|----------|
-| Premature optimization | Wastes time, adds complexity | Measure first |
-| N+1 queries | Exponential DB calls | Eager loading |
-| Loading all data | Memory exhaustion | Pagination, streaming |
-| Synchronous I/O in hot paths | Blocking | Async I/O |
-| Missing indexes | Slow queries | Analyze and index |
-| No caching | Repeated computation | Strategic caching |
-| String concatenation in loops | O(n²) | StringBuilder/join |
-| Nested loops on large data | O(n²) | Hash-based lookup |
+| Anti-Pattern                  | Problem                      | Solution              |
+| ----------------------------- | ---------------------------- | --------------------- |
+| Premature optimization        | Wastes time, adds complexity | Measure first         |
+| N+1 queries                   | Exponential DB calls         | Eager loading         |
+| Loading all data              | Memory exhaustion            | Pagination, streaming |
+| Synchronous I/O in hot paths  | Blocking                     | Async I/O             |
+| Missing indexes               | Slow queries                 | Analyze and index     |
+| No caching                    | Repeated computation         | Strategic caching     |
+| String concatenation in loops | O(n²)                        | StringBuilder/join    |
+| Nested loops on large data    | O(n²)                        | Hash-based lookup     |
 
 ---
 
-*See [testing.md](testing.md) for performance testing.*
-*See [documentation.md](documentation.md) for documenting performance decisions.*
+_See [testing.md](testing.md) for performance testing._
+_See [documentation.md](documentation.md) for documenting performance decisions._

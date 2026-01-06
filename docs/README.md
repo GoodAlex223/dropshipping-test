@@ -8,16 +8,16 @@ Central index for all project documentation.
 
 ## Quick Navigation
 
-| I need to... | Go to |
-|--------------|-------|
-| See what tasks are pending | [planning/TODO.md](planning/TODO.md) |
-| See what's been completed | [planning/DONE.md](planning/DONE.md) |
-| See the roadmap | [planning/ROADMAP.md](planning/ROADMAP.md) |
-| See active implementation plans | [plans/README.md](plans/README.md) |
-| Understand the architecture | [ARCHITECTURE.md](ARCHITECTURE.md) |
-| Find project patterns/decisions | [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) |
-| See Claude Code rules | [../CLAUDE.md](../CLAUDE.md) |
-| See project-specific config | [../PROJECT.md](../PROJECT.md) |
+| I need to...                    | Go to                                      |
+| ------------------------------- | ------------------------------------------ |
+| See what tasks are pending      | [planning/TODO.md](planning/TODO.md)       |
+| See what's been completed       | [planning/DONE.md](planning/DONE.md)       |
+| See the roadmap                 | [planning/ROADMAP.md](planning/ROADMAP.md) |
+| See active implementation plans | [plans/README.md](plans/README.md)         |
+| Understand the architecture     | [ARCHITECTURE.md](ARCHITECTURE.md)         |
+| Find project patterns/decisions | [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md)   |
+| See Claude Code rules           | [../CLAUDE.md](../CLAUDE.md)               |
+| See project-specific config     | [../PROJECT.md](../PROJECT.md)             |
 
 ---
 
@@ -25,22 +25,22 @@ Central index for all project documentation.
 
 ### Planning & Tasks
 
-| Document | Purpose | Last Updated |
-|----------|---------|--------------|
-| [planning/README.md](planning/README.md) | Planning overview | YYYY-MM-DD |
-| [planning/TODO.md](planning/TODO.md) | Active tasks | YYYY-MM-DD |
-| [planning/DONE.md](planning/DONE.md) | Completed tasks | YYYY-MM-DD |
-| [planning/BACKLOG.md](planning/BACKLOG.md) | Unprioritized ideas | YYYY-MM-DD |
-| [planning/ROADMAP.md](planning/ROADMAP.md) | Long-term vision | YYYY-MM-DD |
-| [planning/GOALS.md](planning/GOALS.md) | Objectives & metrics | YYYY-MM-DD |
-| [planning/MILESTONES.md](planning/MILESTONES.md) | Key targets | YYYY-MM-DD |
+| Document                                         | Purpose              | Last Updated |
+| ------------------------------------------------ | -------------------- | ------------ |
+| [planning/README.md](planning/README.md)         | Planning overview    | YYYY-MM-DD   |
+| [planning/TODO.md](planning/TODO.md)             | Active tasks         | YYYY-MM-DD   |
+| [planning/DONE.md](planning/DONE.md)             | Completed tasks      | YYYY-MM-DD   |
+| [planning/BACKLOG.md](planning/BACKLOG.md)       | Unprioritized ideas  | YYYY-MM-DD   |
+| [planning/ROADMAP.md](planning/ROADMAP.md)       | Long-term vision     | YYYY-MM-DD   |
+| [planning/GOALS.md](planning/GOALS.md)           | Objectives & metrics | YYYY-MM-DD   |
+| [planning/MILESTONES.md](planning/MILESTONES.md) | Key targets          | YYYY-MM-DD   |
 
 ### Architecture & Design
 
-| Document | Purpose | Last Updated |
-|----------|---------|--------------|
-| [ARCHITECTURE.md](ARCHITECTURE.md) | System design, layers, data flow | YYYY-MM-DD |
-| [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) | Decisions, patterns, history | YYYY-MM-DD |
+| Document                                 | Purpose                          | Last Updated |
+| ---------------------------------------- | -------------------------------- | ------------ |
+| [ARCHITECTURE.md](ARCHITECTURE.md)       | System design, layers, data flow | YYYY-MM-DD   |
+| [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) | Decisions, patterns, history     | YYYY-MM-DD   |
 
 ---
 
@@ -48,8 +48,8 @@ Central index for all project documentation.
 
 Active and recent implementation plans.
 
-| Plan | Task | Status | Created |
-|------|------|--------|---------|
+| Plan                                                     | Task          | Status          | Created    |
+| -------------------------------------------------------- | ------------- | --------------- | ---------- |
 | [YYYY-MM-DD_task-name.md](plans/YYYY-MM-DD_task-name.md) | [Description] | Active/Complete | YYYY-MM-DD |
 
 ### Archived Plans
@@ -60,37 +60,37 @@ See [archive/README.md](archive/README.md) for completed historical plans.
 
 ## Domain Documentation
 
-<!-- 
+<!--
 Add sections as needed for your project.
 Remove or rename these examples.
 -->
 
 ### API Documentation
 
-| Document | Purpose | Last Updated |
-|----------|---------|--------------|
-| [api/endpoints.md](api/endpoints.md) | API endpoint reference | YYYY-MM-DD |
+| Document                             | Purpose                | Last Updated |
+| ------------------------------------ | ---------------------- | ------------ |
+| [api/endpoints.md](api/endpoints.md) | API endpoint reference | YYYY-MM-DD   |
 
 ### Database
 
-| Document | Purpose | Last Updated |
-|----------|---------|--------------|
-| [database/schema.md](database/schema.md) | Database schema | YYYY-MM-DD |
-| [database/migrations.md](database/migrations.md) | Migration history | YYYY-MM-DD |
+| Document                                         | Purpose           | Last Updated |
+| ------------------------------------------------ | ----------------- | ------------ |
+| [database/schema.md](database/schema.md)         | Database schema   | YYYY-MM-DD   |
+| [database/migrations.md](database/migrations.md) | Migration history | YYYY-MM-DD   |
 
 ### Deployment
 
-| Document | Purpose | Last Updated |
-|----------|---------|--------------|
-| [deployment/setup.md](deployment/setup.md) | Environment setup | YYYY-MM-DD |
-| [deployment/checklist.md](deployment/checklist.md) | Deployment checklist | YYYY-MM-DD |
+| Document                                           | Purpose              | Last Updated |
+| -------------------------------------------------- | -------------------- | ------------ |
+| [deployment/setup.md](deployment/setup.md)         | Environment setup    | YYYY-MM-DD   |
+| [deployment/checklist.md](deployment/checklist.md) | Deployment checklist | YYYY-MM-DD   |
 
 ### Testing
 
-| Document | Purpose | Last Updated |
-|----------|---------|--------------|
-| [testing/strategy.md](testing/strategy.md) | Testing approach | YYYY-MM-DD |
-| [testing/coverage.md](testing/coverage.md) | Coverage baselines | YYYY-MM-DD |
+| Document                                   | Purpose            | Last Updated |
+| ------------------------------------------ | ------------------ | ------------ |
+| [testing/strategy.md](testing/strategy.md) | Testing approach   | YYYY-MM-DD   |
+| [testing/coverage.md](testing/coverage.md) | Coverage baselines | YYYY-MM-DD   |
 
 ---
 
@@ -170,6 +170,7 @@ docs/
 ### Staleness Indicators
 
 Documents may need attention if:
+
 - Last Updated > 3 months ago
 - References deleted code/features
 - Contradicts current implementation
@@ -177,5 +178,5 @@ Documents may need attention if:
 
 ---
 
-*For Claude Code rules, see [../CLAUDE.md](../CLAUDE.md).*
-*For project-specific configuration, see [../PROJECT.md](../PROJECT.md).*
+_For Claude Code rules, see [../CLAUDE.md](../CLAUDE.md)._
+_For project-specific configuration, see [../PROJECT.md](../PROJECT.md)._

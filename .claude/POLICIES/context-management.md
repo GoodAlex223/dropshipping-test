@@ -7,6 +7,7 @@ Guidelines for managing Claude Code instructions when they become too large or c
 ## Core Problem
 
 Large Language Models have limited effective context windows. When instructions become too long:
+
 - Model attention degrades
 - Important rules may be ignored
 - Quality of output decreases
@@ -18,12 +19,12 @@ This policy defines how to structure and manage instructions to maintain effecti
 
 ## Recommended File Sizes
 
-| File | Target | Maximum | Action if Exceeded |
-|------|--------|---------|-------------------|
-| CLAUDE.md | ~300 lines | 400 lines | Split to POLICIES/ |
-| PROJECT.md | ~150 lines | 200 lines | Split to docs/ |
-| Individual policy | ~200 lines | 300 lines | Split into sub-policies |
-| Total .claude/ | ~1000 lines | 1500 lines | Review and consolidate |
+| File              | Target      | Maximum    | Action if Exceeded      |
+| ----------------- | ----------- | ---------- | ----------------------- |
+| CLAUDE.md         | ~300 lines  | 400 lines  | Split to POLICIES/      |
+| PROJECT.md        | ~150 lines  | 200 lines  | Split to docs/          |
+| Individual policy | ~200 lines  | 300 lines  | Split into sub-policies |
+| Total .claude/    | ~1000 lines | 1500 lines | Review and consolidate  |
 
 **Measurement**: Line counts are approximate guides, not hard limits. The goal is maintaining model attention, not hitting exact numbers.
 
@@ -60,6 +61,7 @@ PRIORITY 4 (Reference Material)
 ### When to Split
 
 Split instructions when:
+
 - File exceeds recommended size
 - Content serves different purposes (rules vs. examples)
 - Some content is rarely needed
@@ -78,20 +80,25 @@ Split instructions when:
 ### Example Split
 
 **Before** (in CLAUDE.md):
+
 ```markdown
 ## Testing Policy
 
 ### TDD Workflow
+
 [50 lines of TDD details]
 
 ### Coverage Requirements
+
 [30 lines of coverage details]
 
 ### Mocking Guidelines
+
 [40 lines of mocking details]
 ```
 
 **After** (in CLAUDE.md):
+
 ```markdown
 ## Testing Policy
 
@@ -104,18 +111,19 @@ Follow TDD workflow. See [.claude/POLICIES/testing.md](.claude/POLICIES/testing.
 
 ### Required Links in CLAUDE.md
 
-| Section | Must Link To |
-|---------|-------------|
+| Section           | Must Link To                          |
+| ----------------- | ------------------------------------- |
 | Thinking Protocol | .claude/POLICIES/critical-thinking.md |
-| Workflow | .claude/WORKFLOW.md |
-| Testing | .claude/POLICIES/testing.md |
-| Documentation | .claude/POLICIES/documentation.md |
+| Workflow          | .claude/WORKFLOW.md                   |
+| Testing           | .claude/POLICIES/testing.md           |
+| Documentation     | .claude/POLICIES/documentation.md     |
 | Knowledge Sources | .claude/POLICIES/knowledge-sources.md |
-| Project Config | PROJECT.md |
+| Project Config    | PROJECT.md                            |
 
 ### Link Format
 
 Always use relative paths:
+
 ```markdown
 See [.claude/POLICIES/testing.md](.claude/POLICIES/testing.md)
 ```
@@ -123,6 +131,7 @@ See [.claude/POLICIES/testing.md](.claude/POLICIES/testing.md)
 ### Broken Link Handling
 
 If Claude encounters a broken link:
+
 1. **STOP** - Do not proceed with assumptions
 2. **Report** - Tell user which file is missing
 3. **Wait** - User must create the file or update the link
@@ -172,6 +181,7 @@ Even under context pressure, Claude MUST always:
 ### When to Consolidate
 
 Consolidate instructions when:
+
 - Multiple files cover overlapping topics
 - Policies contradict each other
 - Navigation becomes confusing
@@ -192,6 +202,7 @@ Consolidate instructions when:
 ### When to Archive
 
 Move to archive when:
+
 - Content is historical only (no active guidance)
 - Document hasn't been referenced in 3+ months
 - Superseded by newer documentation
@@ -199,11 +210,11 @@ Move to archive when:
 
 ### Archive Locations
 
-| Content Type | Archive Location |
-|--------------|------------------|
-| Old policies | .claude/archive/ |
-| Completed plans | docs/archive/ |
-| Historical project docs | docs/archive/ |
+| Content Type            | Archive Location |
+| ----------------------- | ---------------- |
+| Old policies            | .claude/archive/ |
+| Completed plans         | docs/archive/    |
+| Historical project docs | docs/archive/    |
 
 ### Archive Process
 
@@ -300,5 +311,5 @@ Is this detailed guidance?
 
 ---
 
-*This policy ensures Claude Code instructions remain effective and manageable.*
-*See [knowledge-sources.md](knowledge-sources.md) for documentation structure.*
+_This policy ensures Claude Code instructions remain effective and manageable._
+_See [knowledge-sources.md](knowledge-sources.md) for documentation structure._

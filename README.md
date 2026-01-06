@@ -1,6 +1,7 @@
 # [Project Name]
 
 <!-- Brief description of the project -->
+
 [One-line description of what this project does]
 
 ---
@@ -8,6 +9,7 @@
 ## Overview
 
 <!-- Expanded description -->
+
 [2-3 sentences explaining the project's purpose, target users, and key value proposition]
 
 ---
@@ -84,14 +86,14 @@ cp .env.example .env
 
 ## Documentation
 
-| Document | Description |
-|----------|-------------|
-| [docs/README.md](docs/README.md) | Documentation index |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture |
-| [docs/planning/TODO.md](docs/planning/TODO.md) | Current tasks |
-| [docs/planning/ROADMAP.md](docs/planning/ROADMAP.md) | Project roadmap |
-| [CLAUDE.md](CLAUDE.md) | Claude Code rules |
-| [PROJECT.md](PROJECT.md) | Project configuration |
+| Document                                             | Description           |
+| ---------------------------------------------------- | --------------------- |
+| [docs/README.md](docs/README.md)                     | Documentation index   |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)         | System architecture   |
+| [docs/planning/TODO.md](docs/planning/TODO.md)       | Current tasks         |
+| [docs/planning/ROADMAP.md](docs/planning/ROADMAP.md) | Project roadmap       |
+| [CLAUDE.md](CLAUDE.md)                               | Claude Code rules     |
+| [PROJECT.md](PROJECT.md)                             | Project configuration |
 
 ---
 
@@ -114,6 +116,7 @@ pre-commit install
 ### Code Style
 
 This project uses:
+
 - [Formatter, e.g., Black for Python]
 - [Linter, e.g., Ruff]
 - [Type checker, e.g., mypy]
@@ -148,18 +151,18 @@ This project uses:
 
 ### Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
+| Variable     | Description   | Default   |
+| ------------ | ------------- | --------- |
 | `[VAR_NAME]` | [Description] | [Default] |
 | `[VAR_NAME]` | [Description] | [Default] |
 
 ### Configuration Files
 
-| File | Purpose |
-|------|---------|
-| `.env` | Environment variables (gitignored) |
-| `.env.example` | Template for .env |
-| `[config file]` | [Purpose] |
+| File            | Purpose                            |
+| --------------- | ---------------------------------- |
+| `.env`          | Environment variables (gitignored) |
+| `.env.example`  | Template for .env                  |
+| `[config file]` | [Purpose]                          |
 
 ---
 

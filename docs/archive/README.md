@@ -26,21 +26,21 @@ Plans are archived in `plans/` subdirectory after completion.
 
 See: [plans/README.md](plans/README.md)
 
-| Plan | Original Task | Archived Date |
-|------|---------------|---------------|
-| [YYYY-MM-DD_task.md](plans/YYYY-MM-DD_task.md) | [Task description] | YYYY-MM-DD |
+| Plan                                           | Original Task      | Archived Date |
+| ---------------------------------------------- | ------------------ | ------------- |
+| [YYYY-MM-DD_task.md](plans/YYYY-MM-DD_task.md) | [Task description] | YYYY-MM-DD    |
 
 ### Deprecated Documentation
 
-| Document | Superseded By | Archived Date |
-|----------|---------------|---------------|
-| [doc.md](doc.md) | [New document] | YYYY-MM-DD |
+| Document         | Superseded By  | Archived Date |
+| ---------------- | -------------- | ------------- |
+| [doc.md](doc.md) | [New document] | YYYY-MM-DD    |
 
 ### Historical Context
 
-| Document | Purpose | Archived Date |
-|----------|---------|---------------|
-| [doc.md](doc.md) | [What it documented] | YYYY-MM-DD |
+| Document         | Purpose              | Archived Date |
+| ---------------- | -------------------- | ------------- |
+| [doc.md](doc.md) | [What it documented] | YYYY-MM-DD    |
 
 ---
 
@@ -100,4 +100,4 @@ If a document becomes relevant again:
 
 ---
 
-*Parent: [../README.md](../README.md)*
+_Parent: [../README.md](../README.md)_

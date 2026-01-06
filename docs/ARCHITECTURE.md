@@ -35,6 +35,7 @@ System design and technical architecture.
 | [Component] | [What it does] | [path/to/code] |
 
 **Key Interfaces**:
+
 - [Interface/API description]
 
 ### [Layer Name] (e.g., Business Logic Layer)
@@ -76,8 +77,8 @@ System design and technical architecture.
 
 ### Entities
 
-| Entity | Description | Key Fields |
-|--------|-------------|------------|
+| Entity   | Description          | Key Fields         |
+| -------- | -------------------- | ------------------ |
 | [Entity] | [What it represents] | [Important fields] |
 
 ### Relationships
@@ -89,9 +90,9 @@ System design and technical architecture.
 
 ### Storage
 
-| Data Type | Storage | Rationale |
-|-----------|---------|-----------|
-| [Type] | [Where stored] | [Why] |
+| Data Type | Storage        | Rationale |
+| --------- | -------------- | --------- |
+| [Type]    | [Where stored] | [Why]     |
 
 ---
 
@@ -99,14 +100,14 @@ System design and technical architecture.
 
 ### Services
 
-| Service | Purpose | Integration Point |
-|---------|---------|-------------------|
-| [Service] | [What it provides] | [How we connect] |
+| Service   | Purpose            | Integration Point |
+| --------- | ------------------ | ----------------- |
+| [Service] | [What it provides] | [How we connect]  |
 
 ### Libraries
 
-| Library | Version | Purpose |
-|---------|---------|---------|
+| Library   | Version | Purpose              |
+| --------- | ------- | -------------------- |
 | [Library] | [x.y.z] | [What it's used for] |
 
 ---
@@ -115,14 +116,14 @@ System design and technical architecture.
 
 ### Environment Variables
 
-| Variable | Purpose | Required |
-|----------|---------|----------|
-| [VAR] | [What it configures] | Yes/No |
+| Variable | Purpose              | Required |
+| -------- | -------------------- | -------- |
+| [VAR]    | [What it configures] | Yes/No   |
 
 ### Configuration Files
 
-| File | Purpose |
-|------|---------|
+| File             | Purpose              |
+| ---------------- | -------------------- |
 | [path/to/config] | [What it configures] |
 
 ---
@@ -147,9 +148,9 @@ System design and technical architecture.
 
 ### Current Limits
 
-| Resource | Current Capacity | Bottleneck |
-|----------|------------------|------------|
-| [Resource] | [Limit] | [What limits it] |
+| Resource   | Current Capacity | Bottleneck       |
+| ---------- | ---------------- | ---------------- |
+| [Resource] | [Limit]          | [What limits it] |
 
 ### Scaling Strategy
 
@@ -161,9 +162,9 @@ System design and technical architecture.
 
 ### Error Categories
 
-| Category | Handling Strategy | Example |
-|----------|-------------------|---------|
-| [Category] | [How handled] | [Example error] |
+| Category   | Handling Strategy | Example         |
+| ---------- | ----------------- | --------------- |
+| [Category] | [How handled]     | [Example error] |
 
 ### Logging
 
@@ -179,9 +180,9 @@ System design and technical architecture.
 
 ### Layer Boundaries
 
-| From Layer | To Layer | Allowed? | Notes |
-|------------|----------|----------|-------|
-| [A] | [B] | Yes/No | [Constraints] |
+| From Layer | To Layer | Allowed? | Notes         |
+| ---------- | -------- | -------- | ------------- |
+| [A]        | [B]      | Yes/No   | [Constraints] |
 
 ### Adding New Components
 
@@ -192,10 +193,12 @@ System design and technical architecture.
 ### Breaking Changes
 
 **What constitutes a breaking change**:
+
 - [Type of change 1]
 - [Type of change 2]
 
 **Process for breaking changes**:
+
 1. [Step 1]
 2. [Step 2]
 
@@ -205,11 +208,11 @@ System design and technical architecture.
 
 ### Test Levels
 
-| Level | What's Tested | Location |
-|-------|---------------|----------|
-| Unit | [Scope] | tests/unit/ |
-| Integration | [Scope] | tests/integration/ |
-| E2E | [Scope] | tests/e2e/ |
+| Level       | What's Tested | Location           |
+| ----------- | ------------- | ------------------ |
+| Unit        | [Scope]       | tests/unit/        |
+| Integration | [Scope]       | tests/integration/ |
+| E2E         | [Scope]       | tests/e2e/         |
 
 ---
 
@@ -217,11 +220,11 @@ System design and technical architecture.
 
 ### Environments
 
-| Environment | Purpose | Configuration |
-|-------------|---------|---------------|
+| Environment | Purpose   | Configuration      |
+| ----------- | --------- | ------------------ |
 | Development | [Purpose] | [Config reference] |
-| Staging | [Purpose] | [Config reference] |
-| Production | [Purpose] | [Config reference] |
+| Staging     | [Purpose] | [Config reference] |
+| Production  | [Purpose] | [Config reference] |
 
 ### Deployment Process
 
@@ -229,5 +232,5 @@ System design and technical architecture.
 
 ---
 
-*See [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) for decisions and patterns.*
-*See [planning/TODO.md](planning/TODO.md) for planned architectural changes.*
+_See [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) for decisions and patterns._
+_See [planning/TODO.md](planning/TODO.md) for planned architectural changes._

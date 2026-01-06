@@ -51,6 +51,7 @@ MCP configuration is stored in `.mcp.json` at the project root.
 ```
 
 **Setup**:
+
 1. Get API key from https://brave.com/search/api/
 2. Set `BRAVE_API_KEY` environment variable
 3. Add configuration to `.mcp.json`
@@ -66,11 +67,7 @@ MCP configuration is stored in `.mcp.json` at the project root.
   "mcpServers": {
     "filesystem": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@anthropic/mcp-filesystem",
-        "/path/to/allowed/directory"
-      ]
+      "args": ["-y", "@anthropic/mcp-filesystem", "/path/to/allowed/directory"]
     }
   }
 }
@@ -121,6 +118,7 @@ MCP configuration is stored in `.mcp.json` at the project root.
 ```
 
 **Setup**:
+
 1. Create Personal Access Token with required scopes
 2. Set `GITHUB_TOKEN` environment variable
 
@@ -365,11 +363,11 @@ if __name__ == "__main__":
 
 ## Related Files
 
-| File | Purpose |
-|------|---------|
-| `.mcp.json` | MCP server configuration |
-| `.env` | Environment variables (gitignored) |
-| `.env.example` | Template for required variables |
+| File           | Purpose                            |
+| -------------- | ---------------------------------- |
+| `.mcp.json`    | MCP server configuration           |
+| `.env`         | Environment variables (gitignored) |
+| `.env.example` | Template for required variables    |
 
 ### .env.example Template
 
@@ -393,5 +391,5 @@ POSTGRES_DATABASE=
 
 ---
 
-*See Claude Code documentation for latest MCP server options.*
-*See [POLICIES/security.md](POLICIES/security.md) for credential management.*
+_See Claude Code documentation for latest MCP server options._
+_See [POLICIES/security.md](POLICIES/security.md) for credential management._

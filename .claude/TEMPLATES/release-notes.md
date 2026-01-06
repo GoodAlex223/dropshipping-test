@@ -79,15 +79,18 @@
 **What Changed**: [Description]
 
 **Migration Steps**:
+
 1. [Step 1]
 2. [Step 2]
 
 **Before**:
+
 ```
 [Old code/config]
 ```
 
 **After**:
+
 ```
 [New code/config]
 ```
@@ -131,9 +134,9 @@ If you need to rollback:
 
 ### Updated Dependencies
 
-| Package | Old Version | New Version |
-|---------|-------------|-------------|
-| [package] | X.Y.Z | A.B.C |
+| Package   | Old Version | New Version |
+| --------- | ----------- | ----------- |
+| [package] | X.Y.Z       | A.B.C       |
 
 ### New Dependencies
 
@@ -158,20 +161,20 @@ If you need to rollback:
 
 ### Supported Versions
 
-| Component | Minimum | Recommended |
-|-----------|---------|-------------|
-| [Runtime/OS] | [version] | [version] |
-| [Database] | [version] | [version] |
-| [Dependency] | [version] | [version] |
+| Component    | Minimum   | Recommended |
+| ------------ | --------- | ----------- |
+| [Runtime/OS] | [version] | [version]   |
+| [Database]   | [version] | [version]   |
+| [Dependency] | [version] | [version]   |
 
 ### Browser Support (if applicable)
 
 | Browser | Minimum Version |
-|---------|-----------------|
-| Chrome | [version] |
-| Firefox | [version] |
-| Safari | [version] |
-| Edge | [version] |
+| ------- | --------------- |
+| Chrome  | [version]       |
+| Firefox | [version]       |
+| Safari  | [version]       |
+| Edge    | [version]       |
 
 ---
 

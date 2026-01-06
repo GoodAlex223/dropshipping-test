@@ -26,19 +26,19 @@ Examples:
 
 ### Version Components
 
-| Component | When to Increment | Example Change |
-|-----------|-------------------|----------------|
-| **MAJOR** | Breaking changes | API change, removed feature, incompatible schema |
-| **MINOR** | New features (backward compatible) | New endpoint, new optional parameter |
-| **PATCH** | Bug fixes (backward compatible) | Fix bug, security patch, docs fix |
+| Component | When to Increment                  | Example Change                                   |
+| --------- | ---------------------------------- | ------------------------------------------------ |
+| **MAJOR** | Breaking changes                   | API change, removed feature, incompatible schema |
+| **MINOR** | New features (backward compatible) | New endpoint, new optional parameter             |
+| **PATCH** | Bug fixes (backward compatible)    | Fix bug, security patch, docs fix                |
 
 ### Pre-release Versions
 
-| Stage | Format | When to Use |
-|-------|--------|-------------|
-| Alpha | `1.0.0-alpha.1` | Early development, incomplete |
-| Beta | `1.0.0-beta.1` | Feature complete, testing |
-| RC | `1.0.0-rc.1` | Release candidate, final testing |
+| Stage | Format          | When to Use                      |
+| ----- | --------------- | -------------------------------- |
+| Alpha | `1.0.0-alpha.1` | Early development, incomplete    |
+| Beta  | `1.0.0-beta.1`  | Feature complete, testing        |
+| RC    | `1.0.0-rc.1`    | Release candidate, final testing |
 
 ### Version Precedence
 
@@ -83,14 +83,14 @@ Examples:
 
 ### Where to Update Version
 
-| File | Format | Purpose |
-|------|--------|---------|
-| `package.json` | `"version": "1.2.3"` | Node.js projects |
-| `pyproject.toml` | `version = "1.2.3"` | Python projects |
-| `Cargo.toml` | `version = "1.2.3"` | Rust projects |
-| `VERSION` | `1.2.3` | Plain text file |
-| `__version__.py` | `__version__ = "1.2.3"` | Python package |
-| `build.gradle` | `version = '1.2.3'` | Java/Gradle |
+| File             | Format                  | Purpose          |
+| ---------------- | ----------------------- | ---------------- |
+| `package.json`   | `"version": "1.2.3"`    | Node.js projects |
+| `pyproject.toml` | `version = "1.2.3"`     | Python projects  |
+| `Cargo.toml`     | `version = "1.2.3"`     | Rust projects    |
+| `VERSION`        | `1.2.3`                 | Plain text file  |
+| `__version__.py` | `__version__ = "1.2.3"` | Python package   |
+| `build.gradle`   | `version = '1.2.3'`     | Java/Gradle      |
 
 ### Single Source of Truth
 
@@ -125,35 +125,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+
 - New feature X (#123)
 
 ### Changed
+
 - Improved performance of Y
 
 ### Deprecated
+
 - Old API method Z (use W instead)
 
 ### Removed
+
 - Removed legacy feature
 
 ### Fixed
+
 - Bug in authentication flow (#456)
 
 ### Security
+
 - Patched vulnerability CVE-2024-XXXXX
 
 ## [1.2.0] - 2025-01-15
 
 ### Added
+
 - User profile customization
 - Export to PDF feature
 
 ### Fixed
+
 - Memory leak in session handler (#789)
 
 ## [1.1.0] - 2025-01-01
 
 ### Added
+
 - Initial release
 
 [Unreleased]: https://github.com/user/repo/compare/v1.2.0...HEAD
@@ -163,18 +172,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changelog Categories
 
-| Category | What Goes Here |
-|----------|----------------|
-| **Added** | New features |
-| **Changed** | Changes to existing functionality |
-| **Deprecated** | Features to be removed in future |
-| **Removed** | Features removed in this release |
-| **Fixed** | Bug fixes |
-| **Security** | Security fixes |
+| Category       | What Goes Here                    |
+| -------------- | --------------------------------- |
+| **Added**      | New features                      |
+| **Changed**    | Changes to existing functionality |
+| **Deprecated** | Features to be removed in future  |
+| **Removed**    | Features removed in this release  |
+| **Fixed**      | Bug fixes                         |
+| **Security**   | Security fixes                    |
 
 ### Changelog Best Practices
 
 **DO:**
+
 - Write for humans (not machines)
 - Include issue/PR references
 - Group by category
@@ -182,6 +192,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Link to full diff
 
 **DON'T:**
+
 - Include every commit
 - Use commit messages verbatim
 - Skip entries for "small" changes
@@ -197,29 +208,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## Release v1.2.0 Checklist
 
 ### Preparation
+
 - [ ] All planned features complete
 - [ ] All tests passing
 - [ ] No critical bugs open
 - [ ] Documentation updated
 
 ### Version Update
+
 - [ ] Update version in source files
 - [ ] Update CHANGELOG.md
 - [ ] Review CHANGELOG for completeness
 - [ ] Commit: "chore(release): prepare v1.2.0"
 
 ### Testing
+
 - [ ] Full test suite passes
 - [ ] Manual testing completed
 - [ ] Staging deployment verified
 
 ### Release
+
 - [ ] Create git tag: git tag -a v1.2.0 -m "Release v1.2.0"
 - [ ] Push tag: git push origin v1.2.0
 - [ ] Create GitHub/GitLab release
 - [ ] Publish to package registry (if applicable)
 
 ### Post-Release
+
 - [ ] Verify deployment
 - [ ] Announce release (if applicable)
 - [ ] Update documentation site
@@ -245,11 +261,11 @@ git push origin :refs/tags/v1.2.0
 
 ### Release Naming
 
-| Type | Tag Format | Example |
-|------|------------|---------|
-| Standard release | `v1.2.3` | `v1.2.3` |
-| Pre-release | `v1.2.3-beta.1` | `v2.0.0-beta.1` |
-| Date-based (alternative) | `v2025.01.15` | `v2025.01.15` |
+| Type                     | Tag Format      | Example         |
+| ------------------------ | --------------- | --------------- |
+| Standard release         | `v1.2.3`        | `v1.2.3`        |
+| Pre-release              | `v1.2.3-beta.1` | `v2.0.0-beta.1` |
+| Date-based (alternative) | `v2025.01.15`   | `v2025.01.15`   |
 
 ---
 
@@ -310,7 +326,7 @@ import warnings
 
 def old_function():
     """Old function.
-    
+
     .. deprecated:: 1.5.0
        Use :func:`new_function` instead.
     """
@@ -324,10 +340,10 @@ def old_function():
 
 ### Deprecation Timeline
 
-| Severity | Minimum Notice |
-|----------|----------------|
-| Minor feature | 1 minor version |
-| Major feature | 1 major version |
+| Severity         | Minimum Notice   |
+| ---------------- | ---------------- |
+| Minor feature    | 1 minor version  |
+| Major feature    | 1 major version  |
 | Security-related | May be immediate |
 
 ---
@@ -350,22 +366,22 @@ dependencies = [
 // Node.js (package.json)
 {
   "dependencies": {
-    "express": "^4.18.0",  // Compatible with 4.x
-    "lodash": "~4.17.21",  // 4.17.x only
-    "axios": ">=1.0.0"     // 1.0 or higher
+    "express": "^4.18.0", // Compatible with 4.x
+    "lodash": "~4.17.21", // 4.17.x only
+    "axios": ">=1.0.0" // 1.0 or higher
   }
 }
 ```
 
 ### Version Constraint Symbols
 
-| Symbol | Meaning | Example | Matches |
-|--------|---------|---------|---------|
-| `^` | Compatible (minor+patch) | `^1.2.3` | `1.2.3` to `<2.0.0` |
-| `~` | Approximately (patch only) | `~1.2.3` | `1.2.3` to `<1.3.0` |
-| `>=` | Greater or equal | `>=1.2.3` | `1.2.3` and above |
-| `<` | Less than | `<2.0.0` | Below `2.0.0` |
-| `*` | Any version | `*` | All versions |
+| Symbol | Meaning                    | Example   | Matches             |
+| ------ | -------------------------- | --------- | ------------------- |
+| `^`    | Compatible (minor+patch)   | `^1.2.3`  | `1.2.3` to `<2.0.0` |
+| `~`    | Approximately (patch only) | `~1.2.3`  | `1.2.3` to `<1.3.0` |
+| `>=`   | Greater or equal           | `>=1.2.3` | `1.2.3` and above   |
+| `<`    | Less than                  | `<2.0.0`  | Below `2.0.0`       |
+| `*`    | Any version                | `*`       | All versions        |
 
 ---
 
@@ -381,7 +397,7 @@ print(f"Running version {__version__}")
 
 ```typescript
 // TypeScript/Node
-import { version } from './package.json';
+import { version } from "./package.json";
 console.log(`Running version ${version}`);
 ```
 
@@ -458,5 +474,5 @@ BREAKING CHANGE:      → MAJOR bump
 
 ---
 
-*See [git.md](git.md) for tagging and branching.*
-*See [../WORKFLOW.md](../WORKFLOW.md) for release workflow.*
+_See [git.md](git.md) for tagging and branching._
+_See [../WORKFLOW.md](../WORKFLOW.md) for release workflow._

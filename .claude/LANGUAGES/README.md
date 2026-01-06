@@ -6,7 +6,7 @@ Language-specific coding standards and best practices.
 
 ## Overview
 
-This directory contains language-specific policies that supplement the universal policies in `.claude/POLICIES/`. 
+This directory contains language-specific policies that supplement the universal policies in `.claude/POLICIES/`.
 
 **Every project MUST have policies for its primary languages. If missing, Claude MUST create them.**
 
@@ -14,13 +14,13 @@ This directory contains language-specific policies that supplement the universal
 
 ## Available Policies
 
-| Language | File | Status |
-|----------|------|--------|
-| Python | [python.md](python.md) | Available |
-| TypeScript/JavaScript | [typescript.md](typescript.md) | Available |
-| Go | Create from template | Not created |
-| Rust | Create from template | Not created |
-| [Other] | [_template.md](_template.md) | Template |
+| Language              | File                           | Status      |
+| --------------------- | ------------------------------ | ----------- |
+| Python                | [python.md](python.md)         | Available   |
+| TypeScript/JavaScript | [typescript.md](typescript.md) | Available   |
+| Go                    | Create from template           | Not created |
+| Rust                  | Create from template           | Not created |
+| [Other]               | [\_template.md](_template.md)  | Template    |
 
 ---
 
@@ -56,6 +56,7 @@ Claude MUST create a language policy when:
 ### Policy Quality Standards
 
 A language policy MUST include:
+
 - [ ] Formatting tool configuration
 - [ ] Linting configuration
 - [ ] Naming conventions table
@@ -103,6 +104,7 @@ After creating a language policy, add reference in PROJECT.md:
 ## Language Standards
 
 This project follows:
+
 - [Python standards](.claude/LANGUAGES/python.md)
 - [TypeScript standards](.claude/LANGUAGES/typescript.md)
 ```
@@ -121,4 +123,4 @@ This project follows:
 
 ---
 
-*Language policies supplement, don't replace, universal policies.*
+_Language policies supplement, don't replace, universal policies._

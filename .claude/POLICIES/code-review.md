@@ -14,26 +14,28 @@ Standards for reviewing code changes before merge.
 
 ### When Review is Required
 
-| Change Type | Self-Review | Peer Review | Notes |
-|-------------|-------------|-------------|-------|
-| Bug fix | Required | Recommended | Critical bugs require peer review |
-| New feature | Required | Required | All new features need peer review |
-| Refactoring | Required | Required | Architecture changes need review |
-| Configuration | Required | Optional | Security-related config needs review |
-| Documentation | Required | Optional | Technical docs benefit from review |
-| Hotfix | Required | Post-merge | Document and review after deployment |
+| Change Type   | Self-Review | Peer Review | Notes                                |
+| ------------- | ----------- | ----------- | ------------------------------------ |
+| Bug fix       | Required    | Recommended | Critical bugs require peer review    |
+| New feature   | Required    | Required    | All new features need peer review    |
+| Refactoring   | Required    | Required    | Architecture changes need review     |
+| Configuration | Required    | Optional    | Security-related config needs review |
+| Documentation | Required    | Optional    | Technical docs benefit from review   |
+| Hotfix        | Required    | Post-merge  | Document and review after deployment |
 
 ### Self-Review Checklist
 
 Before requesting peer review, verify:
 
 **Functionality**
+
 - [ ] Code does what the task requires
 - [ ] Edge cases are handled
 - [ ] Error conditions are handled gracefully
 - [ ] No debugging code left in (print statements, console.log, etc.)
 
 **Code Quality**
+
 - [ ] Code follows project conventions (see PROJECT.md)
 - [ ] No code duplication (DRY)
 - [ ] Functions/methods are focused (single responsibility)
@@ -41,18 +43,21 @@ Before requesting peer review, verify:
 - [ ] Complex logic has comments explaining "why"
 
 **Testing**
+
 - [ ] Tests exist for new functionality
 - [ ] Tests pass locally
 - [ ] Edge cases have test coverage
 - [ ] No skipped tests without documented reason
 
 **Security**
+
 - [ ] No hardcoded secrets or credentials
 - [ ] User input is validated
 - [ ] SQL/command injection prevented
 - [ ] Sensitive data not logged
 
 **Performance**
+
 - [ ] No obvious performance issues
 - [ ] Database queries are efficient
 - [ ] No unnecessary loops or iterations
@@ -67,45 +72,51 @@ Before requesting peer review, verify:
 1. **Complete self-review** using checklist above
 2. **Ensure CI passes** - All automated checks green
 3. **Write clear description**:
+
    ```markdown
    ## Summary
+
    [What this change does]
-   
+
    ## Changes
+
    - [Change 1]
    - [Change 2]
-   
+
    ## Testing
+
    [How this was tested]
-   
+
    ## Related
+
    - Task: [TODO.md reference or issue]
    - Plan: [Link to plan document]
    ```
+
 4. **Request specific reviewers** if domain expertise needed
 
 ### Conducting Review
 
 #### What to Look For
 
-| Category | Questions to Ask |
-|----------|------------------|
-| **Correctness** | Does this do what it's supposed to? Are there bugs? |
-| **Design** | Is this the right approach? Does it fit the architecture? |
-| **Readability** | Can I understand this code? Will others? |
-| **Maintainability** | Will this be easy to modify in 6 months? |
-| **Testing** | Are tests sufficient? Do they test the right things? |
-| **Security** | Are there vulnerabilities? Is data protected? |
-| **Performance** | Will this scale? Are there bottlenecks? |
+| Category            | Questions to Ask                                          |
+| ------------------- | --------------------------------------------------------- |
+| **Correctness**     | Does this do what it's supposed to? Are there bugs?       |
+| **Design**          | Is this the right approach? Does it fit the architecture? |
+| **Readability**     | Can I understand this code? Will others?                  |
+| **Maintainability** | Will this be easy to modify in 6 months?                  |
+| **Testing**         | Are tests sufficient? Do they test the right things?      |
+| **Security**        | Are there vulnerabilities? Is data protected?             |
+| **Performance**     | Will this scale? Are there bottlenecks?                   |
 
 #### Review Depth by Risk
 
-| Risk Level | Review Depth | Time Budget |
-|------------|--------------|-------------|
-| Low (docs, config) | Quick scan | 5-10 min |
-| Medium (features) | Thorough review | 15-30 min |
-| High (security, data) | Deep review | 30-60 min |
-| Critical (auth, payments) | Multiple reviewers | As needed |
+| Risk Level                | Review Depth       | Time Budget |
+| ------------------------- | ------------------ | ----------- |
+| Low (docs, config)        | Quick scan         | 5-10 min    |
+| Medium (features)         | Thorough review    | 15-30 min   |
+| High (security, data)     | Deep review        | 30-60 min   |
+| Critical (auth, payments) | Multiple reviewers | As needed   |
 
 #### Providing Feedback
 
@@ -123,15 +134,16 @@ Before requesting peer review, verify:
 
 ```markdown
 ❌ Bad: "This is wrong"
-✅ Good: "[MUST] This will throw NullPointerException when user is None. 
-         Consider adding a null check: `if user is not None:`"
+✅ Good: "[MUST] This will throw NullPointerException when user is None.
+Consider adding a null check: `if user is not None:`"
 
 ❌ Bad: "Make this better"
-✅ Good: "[SHOULD] This loop iterates 3 times over the same list. 
-         Consider combining into a single pass for O(n) instead of O(3n)."
+✅ Good: "[SHOULD] This loop iterates 3 times over the same list.
+Consider combining into a single pass for O(n) instead of O(3n)."
 ```
 
 **Acknowledge good work:**
+
 - Point out clever solutions
 - Recognize good test coverage
 - Note improvements to existing code
@@ -228,6 +240,7 @@ Before requesting peer review, verify:
 ### Security-Sensitive Changes
 
 Additional requirements:
+
 - [ ] Reviewed by someone with security knowledge
 - [ ] Threat model considered
 - [ ] Attack vectors evaluated
@@ -236,6 +249,7 @@ Additional requirements:
 ### Database Changes
 
 Additional requirements:
+
 - [ ] Migration tested both directions
 - [ ] Performance impact evaluated
 - [ ] Backward compatibility verified
@@ -244,6 +258,7 @@ Additional requirements:
 ### API Changes
 
 Additional requirements:
+
 - [ ] Breaking changes identified
 - [ ] Versioning considered
 - [ ] Documentation updated
@@ -252,6 +267,7 @@ Additional requirements:
 ### Configuration Changes
 
 Additional requirements:
+
 - [ ] No secrets in code
 - [ ] Environment-specific values externalized
 - [ ] Defaults are safe
@@ -263,12 +279,12 @@ Additional requirements:
 
 ### Healthy Review Indicators
 
-| Metric | Target |
-|--------|--------|
-| Time to first review | < 24 hours |
-| Review iterations | 1-3 rounds |
-| Comments per review | 3-10 (too few = rubber stamp, too many = too large PR) |
-| PR size | < 400 lines changed |
+| Metric               | Target                                                 |
+| -------------------- | ------------------------------------------------------ |
+| Time to first review | < 24 hours                                             |
+| Review iterations    | 1-3 rounds                                             |
+| Comments per review  | 3-10 (too few = rubber stamp, too many = too large PR) |
+| PR size              | < 400 lines changed                                    |
 
 ### Warning Signs
 
@@ -300,5 +316,5 @@ When Claude's code is being reviewed:
 
 ---
 
-*See [../WORKFLOW.md](../WORKFLOW.md) for how reviews fit into development workflow.*
-*See [security.md](security.md) for security-specific review requirements.*
+_See [../WORKFLOW.md](../WORKFLOW.md) for how reviews fit into development workflow._
+_See [security.md](security.md) for security-specific review requirements._

@@ -46,47 +46,47 @@ Configuration files for Claude Code. These files define universal development ru
 
 ### Core Files
 
-| File | Purpose |
-|------|---------|
+| File                | Purpose                                      |
+| ------------------- | -------------------------------------------- |
 | settings.local.json | Claude Code permissions and automation hooks |
-| WORKFLOW.md | Plan-Execute-Verify-Document cycle |
-| mcp-config.md | MCP server configuration guide and templates |
+| WORKFLOW.md         | Plan-Execute-Verify-Document cycle           |
+| mcp-config.md       | MCP server configuration guide and templates |
 
 ### Policies
 
-| File | Purpose |
-|------|---------|
-| POLICIES/critical-thinking.md | Analysis requirements, questioning user assertions |
-| POLICIES/documentation.md | Documentation standards, improvement tracking |
-| POLICIES/testing.md | TDD workflow, coverage requirements |
-| POLICIES/knowledge-sources.md | Document structure, validation, maintenance |
-| POLICIES/context-management.md | Managing instruction size and priority |
-| POLICIES/code-review.md | Code review checklist and process |
-| POLICIES/security.md | Security standards, secrets management |
-| POLICIES/git.md | Git workflow, branching, commit messages |
-| POLICIES/error-handling.md | Error handling patterns and practices |
-| POLICIES/versioning.md | Semantic versioning, changelogs, releases |
-| POLICIES/performance.md | Performance guidelines and optimization |
+| File                           | Purpose                                            |
+| ------------------------------ | -------------------------------------------------- |
+| POLICIES/critical-thinking.md  | Analysis requirements, questioning user assertions |
+| POLICIES/documentation.md      | Documentation standards, improvement tracking      |
+| POLICIES/testing.md            | TDD workflow, coverage requirements                |
+| POLICIES/knowledge-sources.md  | Document structure, validation, maintenance        |
+| POLICIES/context-management.md | Managing instruction size and priority             |
+| POLICIES/code-review.md        | Code review checklist and process                  |
+| POLICIES/security.md           | Security standards, secrets management             |
+| POLICIES/git.md                | Git workflow, branching, commit messages           |
+| POLICIES/error-handling.md     | Error handling patterns and practices              |
+| POLICIES/versioning.md         | Semantic versioning, changelogs, releases          |
+| POLICIES/performance.md        | Performance guidelines and optimization            |
 
 ### Language Standards
 
-| File | Purpose |
-|------|---------|
-| LANGUAGES/python.md | Python coding standards |
-| LANGUAGES/typescript.md | TypeScript/JavaScript standards |
-| LANGUAGES/_template.md | Template for adding new languages |
+| File                    | Purpose                           |
+| ----------------------- | --------------------------------- |
+| LANGUAGES/python.md     | Python coding standards           |
+| LANGUAGES/typescript.md | TypeScript/JavaScript standards   |
+| LANGUAGES/\_template.md | Template for adding new languages |
 
 ### Templates
 
-| File | Purpose |
-|------|---------|
-| TEMPLATES/plan.md | Task implementation plan |
-| TEMPLATES/pull-request.md | Pull request description |
-| TEMPLATES/bug-report.md | Bug report format |
-| TEMPLATES/feature-request.md | Feature request format |
-| TEMPLATES/adr.md | Architecture Decision Record |
-| TEMPLATES/incident-report.md | Post-incident report |
-| TEMPLATES/release-notes.md | Release announcement |
+| File                         | Purpose                      |
+| ---------------------------- | ---------------------------- |
+| TEMPLATES/plan.md            | Task implementation plan     |
+| TEMPLATES/pull-request.md    | Pull request description     |
+| TEMPLATES/bug-report.md      | Bug report format            |
+| TEMPLATES/feature-request.md | Feature request format       |
+| TEMPLATES/adr.md             | Architecture Decision Record |
+| TEMPLATES/incident-report.md | Post-incident report         |
+| TEMPLATES/release-notes.md   | Release announcement         |
 
 ---
 
@@ -112,10 +112,10 @@ Root/
 
 ## Universal vs Project-Specific
 
-| Type | Location | Examples |
-|------|----------|----------|
-| Universal | CLAUDE.md, .claude/ | Thinking protocol, TDD, documentation standards |
-| Project-specific | PROJECT.md, docs/ | Tech stack, commands, deployment |
+| Type             | Location            | Examples                                        |
+| ---------------- | ------------------- | ----------------------------------------------- |
+| Universal        | CLAUDE.md, .claude/ | Thinking protocol, TDD, documentation standards |
+| Project-specific | PROJECT.md, docs/   | Tech stack, commands, deployment                |
 
 ---
 
@@ -134,6 +134,7 @@ Add to `PROJECT.md`, not to files in `.claude/`.
 ### Modifying Hooks
 
 Edit `settings.local.json` to add:
+
 - Automation hooks for common tasks
 - Permission rules for Claude Code
 
@@ -185,5 +186,5 @@ project/
 
 ---
 
-*See [../CLAUDE.md](../CLAUDE.md) for core rules.*
-*See [POLICIES/context-management.md](POLICIES/context-management.md) for size guidelines.*
+_See [../CLAUDE.md](../CLAUDE.md) for core rules._
+_See [POLICIES/context-management.md](POLICIES/context-management.md) for size guidelines._

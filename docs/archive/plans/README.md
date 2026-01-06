@@ -64,12 +64,15 @@ Review the plan's "Future Improvements" and "Key Discoveries" sections:
 [Brief description of what was actually done]
 
 **Key Decisions**:
+
 - [Decision 1]: [Why]
 
 **Lessons Learned**:
+
 - [Lesson from the plan]
 
 **Follow-up Tasks**:
+
 - [Link to any new TODO.md items spawned]
 ```
 
@@ -116,4 +119,4 @@ To find a specific archived plan:
 
 ---
 
-*Archived plans serve as historical reference for decisions and patterns.*
+_Archived plans serve as historical reference for decisions and patterns._

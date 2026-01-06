@@ -17,21 +17,21 @@ Standards for handling errors, exceptions, and failures gracefully.
 
 ### By Recoverability
 
-| Category | Description | Handling | Example |
-|----------|-------------|----------|---------|
-| **Recoverable** | Can continue after handling | Retry, fallback, or skip | Network timeout, missing optional config |
+| Category            | Description                 | Handling                       | Example                                  |
+| ------------------- | --------------------------- | ------------------------------ | ---------------------------------------- |
+| **Recoverable**     | Can continue after handling | Retry, fallback, or skip       | Network timeout, missing optional config |
 | **Non-recoverable** | Must stop current operation | Clean abort, user notification | Invalid input, missing required resource |
-| **Fatal** | System cannot continue | Graceful shutdown, alert | Database connection lost, out of memory |
+| **Fatal**           | System cannot continue      | Graceful shutdown, alert       | Database connection lost, out of memory  |
 
 ### By Source
 
-| Source | Examples | Typical Response |
-|--------|----------|------------------|
-| **User Input** | Invalid format, missing field | Validation error with guidance |
-| **External Service** | API timeout, rate limit | Retry with backoff, fallback |
-| **Internal Logic** | Unexpected state, assertion fail | Log, investigate, possibly recover |
-| **System Resource** | Disk full, memory limit | Alert, graceful degradation |
-| **Configuration** | Missing env var, invalid setting | Fail fast on startup |
+| Source               | Examples                         | Typical Response                   |
+| -------------------- | -------------------------------- | ---------------------------------- |
+| **User Input**       | Invalid format, missing field    | Validation error with guidance     |
+| **External Service** | API timeout, rate limit          | Retry with backoff, fallback       |
+| **Internal Logic**   | Unexpected state, assertion fail | Log, investigate, possibly recover |
+| **System Resource**  | Disk full, memory limit          | Alert, graceful degradation        |
+| **Configuration**    | Missing env var, invalid setting | Fail fast on startup               |
 
 ---
 
@@ -128,20 +128,20 @@ def parse_config(path: str) -> Result[Config, str]:
 def create_user(data: dict) -> User:
     # Validate all input first
     errors = []
-    
+
     if not data.get('email'):
         errors.append("Email is required")
     elif not is_valid_email(data['email']):
         errors.append("Invalid email format")
-    
+
     if not data.get('password'):
         errors.append("Password is required")
     elif len(data['password']) < 8:
         errors.append("Password must be at least 8 characters")
-    
+
     if errors:
         raise ValidationError("Invalid input", details={"errors": errors})
-    
+
     # Now safe to proceed
     return User.create(email=data['email'], password=data['password'])
 ```
@@ -190,11 +190,11 @@ def retry_with_backoff(
         except exceptions as e:
             if attempt == max_retries - 1:
                 raise
-            
+
             delay = min(base_delay * (2 ** attempt), max_delay)
             jitter = random.uniform(0, delay * 0.1)
             time.sleep(delay + jitter)
-            
+
             logger.warning(f"Attempt {attempt + 1} failed: {e}. Retrying in {delay:.1f}s")
 ```
 
@@ -203,21 +203,21 @@ def retry_with_backoff(
 ```python
 class CircuitBreaker:
     """Prevent cascading failures to external services."""
-    
+
     def __init__(self, failure_threshold: int = 5, reset_timeout: float = 60):
         self.failure_threshold = failure_threshold
         self.reset_timeout = reset_timeout
         self.failures = 0
         self.last_failure_time = None
         self.state = "closed"  # closed, open, half-open
-    
+
     def call(self, func):
         if self.state == "open":
             if time.time() - self.last_failure_time > self.reset_timeout:
                 self.state = "half-open"
             else:
                 raise ExternalServiceError("Circuit breaker is open")
-        
+
         try:
             result = func()
             if self.state == "half-open":
@@ -252,18 +252,18 @@ def get_user_preferences(user_id: str) -> dict:
 
 ### HTTP API Errors
 
-| HTTP Status | When to Use | Example |
-|-------------|-------------|---------|
-| 400 Bad Request | Invalid input | Validation errors |
-| 401 Unauthorized | Not authenticated | Missing/invalid token |
-| 403 Forbidden | Not authorized | Insufficient permissions |
-| 404 Not Found | Resource doesn't exist | Unknown ID |
-| 409 Conflict | State conflict | Duplicate entry |
-| 422 Unprocessable | Valid syntax, invalid semantics | Business rule violation |
-| 429 Too Many Requests | Rate limited | Throttled |
-| 500 Internal Server Error | Unexpected server error | Bug, unhandled exception |
-| 502 Bad Gateway | Upstream service error | External API failed |
-| 503 Service Unavailable | Temporarily unavailable | Maintenance, overload |
+| HTTP Status               | When to Use                     | Example                  |
+| ------------------------- | ------------------------------- | ------------------------ |
+| 400 Bad Request           | Invalid input                   | Validation errors        |
+| 401 Unauthorized          | Not authenticated               | Missing/invalid token    |
+| 403 Forbidden             | Not authorized                  | Insufficient permissions |
+| 404 Not Found             | Resource doesn't exist          | Unknown ID               |
+| 409 Conflict              | State conflict                  | Duplicate entry          |
+| 422 Unprocessable         | Valid syntax, invalid semantics | Business rule violation  |
+| 429 Too Many Requests     | Rate limited                    | Throttled                |
+| 500 Internal Server Error | Unexpected server error         | Bug, unhandled exception |
+| 502 Bad Gateway           | Upstream service error          | External API failed      |
+| 503 Service Unavailable   | Temporarily unavailable         | Maintenance, overload    |
 
 ### Error Response Format
 
@@ -287,11 +287,13 @@ def get_user_preferences(user_id: str) -> dict:
 ### User-Facing Error Messages
 
 **DO:**
+
 - Be clear and specific
 - Suggest corrective action
 - Be respectful and helpful
 
 **DON'T:**
+
 - Expose technical details
 - Blame the user
 - Use jargon
@@ -314,13 +316,13 @@ def get_user_preferences(user_id: str) -> dict:
 
 ### What to Log
 
-| Level | When | Example |
-|-------|------|---------|
-| DEBUG | Detailed diagnostic | Variable values, flow tracking |
-| INFO | Normal operations | Request received, operation complete |
-| WARNING | Unexpected but handled | Retry attempt, deprecated usage |
-| ERROR | Operation failed | Exception caught, request failed |
-| CRITICAL | System failure | Database down, data corruption |
+| Level    | When                   | Example                              |
+| -------- | ---------------------- | ------------------------------------ |
+| DEBUG    | Detailed diagnostic    | Variable values, flow tracking       |
+| INFO     | Normal operations      | Request received, operation complete |
+| WARNING  | Unexpected but handled | Retry attempt, deprecated usage      |
+| ERROR    | Operation failed       | Exception caught, request failed     |
+| CRITICAL | System failure         | Database down, data corruption       |
 
 ### Structured Logging
 
@@ -353,6 +355,7 @@ logger.error(
 ### Log Context
 
 Always include:
+
 - Timestamp
 - Request/correlation ID
 - User ID (if applicable)
@@ -360,6 +363,7 @@ Always include:
 - Error type and message
 
 Never include:
+
 - Passwords
 - API keys
 - Credit card numbers
@@ -448,26 +452,26 @@ def test_create_user_invalid_email():
     """Should reject invalid email format."""
     with pytest.raises(ValidationError) as exc:
         create_user({"email": "invalid", "password": "secure123"})
-    
+
     assert "email" in exc.value.details["fields"]
 
 def test_external_service_retry():
     """Should retry on transient failures."""
     mock_service.side_effect = [TimeoutError(), TimeoutError(), {"data": "success"}]
-    
+
     result = fetch_with_retry()
-    
+
     assert result == {"data": "success"}
     assert mock_service.call_count == 3
 
 def test_circuit_breaker_opens():
     """Should open circuit after threshold failures."""
     breaker = CircuitBreaker(failure_threshold=3)
-    
+
     for _ in range(3):
         with pytest.raises(ServiceError):
             breaker.call(failing_function)
-    
+
     with pytest.raises(ExternalServiceError, match="Circuit breaker is open"):
         breaker.call(any_function)
 ```
@@ -499,5 +503,5 @@ def test_circuit_breaker_opens():
 
 ---
 
-*See [security.md](security.md) for secure error handling.*
-*See [testing.md](testing.md) for testing error cases.*
+_See [security.md](security.md) for secure error handling._
+_See [testing.md](testing.md) for testing error cases._

@@ -9,6 +9,7 @@ Key targets with dates.
 ## Overview
 
 Milestones are significant checkpoints that mark progress toward goals. They should be:
+
 - **Specific** — Clear definition of "done"
 - **Measurable** — Objectively verifiable
 - **Time-bound** — Has a target date
@@ -23,15 +24,18 @@ Milestones are significant checkpoints that mark progress toward goals. They sho
 **Status**: 🔴 At Risk / 🟡 On Track / 🟢 Complete
 
 **Definition of Done**:
+
 - [ ] [Criterion 1]
 - [ ] [Criterion 2]
 - [ ] [Criterion 3]
 
 **Dependencies**:
+
 - [Dependency 1]
 - [Dependency 2]
 
 **Risks**:
+
 - [Risk 1]
 
 ---
@@ -42,10 +46,12 @@ Milestones are significant checkpoints that mark progress toward goals. They sho
 **Status**: 🔴 At Risk / 🟡 On Track / 🟢 Complete
 
 **Definition of Done**:
+
 - [ ] [Criterion 1]
 - [ ] [Criterion 2]
 
 **Dependencies**:
+
 - [Dependency 1]
 
 ---
@@ -62,9 +68,9 @@ Jan     Feb     Mar     Apr     May     Jun
  │       │              │              │
 ```
 
-| Milestone | Date | Status |
-|-----------|------|--------|
-| [Milestone 1] | YYYY-MM-DD | 🟡 On Track |
+| Milestone     | Date       | Status         |
+| ------------- | ---------- | -------------- |
+| [Milestone 1] | YYYY-MM-DD | 🟡 On Track    |
 | [Milestone 2] | YYYY-MM-DD | ⬜ Not Started |
 | [Milestone 3] | YYYY-MM-DD | ⬜ Not Started |
 
@@ -78,10 +84,12 @@ Jan     Feb     Mar     Apr     May     Jun
 **Result**: On Time / Early / Late ([X] days)
 
 **What was delivered**:
+
 - [Deliverable 1]
 - [Deliverable 2]
 
 **Lessons Learned**:
+
 - [Lesson 1]
 - [Lesson 2]
 
@@ -107,12 +115,12 @@ Jan     Feb     Mar     Apr     May     Jun
 
 ## Milestone Health Summary
 
-| Status | Count | Milestones |
-|--------|-------|------------|
-| 🟢 Complete | [X] | [List] |
-| 🟡 On Track | [X] | [List] |
-| 🔴 At Risk | [X] | [List] |
-| ⬜ Not Started | [X] | [List] |
+| Status         | Count | Milestones |
+| -------------- | ----- | ---------- |
+| 🟢 Complete    | [X]   | [List]     |
+| 🟡 On Track    | [X]   | [List]     |
+| 🔴 At Risk     | [X]   | [List]     |
+| ⬜ Not Started | [X]   | [List]     |
 
 ---
 
@@ -141,6 +149,7 @@ When creating new milestones:
 ### When to Adjust
 
 Adjust milestones when:
+
 - Scope significantly changed
 - Critical dependency delayed
 - Resources changed
@@ -150,6 +159,6 @@ Document all changes in the milestone entry.
 
 ---
 
-*See [ROADMAP.md](ROADMAP.md) for release context.*
-*See [GOALS.md](GOALS.md) for objectives these support.*
-*See [TODO.md](TODO.md) for tactical tasks toward milestones.*
+_See [ROADMAP.md](ROADMAP.md) for release context._
+_See [GOALS.md](GOALS.md) for objectives these support._
+_See [TODO.md](TODO.md) for tactical tasks toward milestones._

@@ -9,6 +9,7 @@ Long-term vision and major releases.
 ## Vision
 
 <!-- One paragraph describing the end state -->
+
 [What does success look like? Where is this project heading?]
 
 ---
@@ -42,6 +43,7 @@ Q1 2025          Q2 2025          Q3 2025          Q4 2025
 **Theme**: [One-line theme]
 
 **Goals**:
+
 - [ ] [Goal 1]
 - [ ] [Goal 2]
 - [ ] [Goal 3]
@@ -53,6 +55,7 @@ Q1 2025          Q2 2025          Q3 2025          Q4 2025
 | [Feature 2] | Not Started / In Progress / Done | [Notes] |
 
 **Success Criteria**:
+
 - [Measurable criterion 1]
 - [Measurable criterion 2]
 
@@ -63,6 +66,7 @@ Q1 2025          Q2 2025          Q3 2025          Q4 2025
 **Theme**: [One-line theme]
 
 **Goals**:
+
 - [ ] [Goal 1]
 - [ ] [Goal 2]
 
@@ -76,11 +80,13 @@ Q1 2025          Q2 2025          Q3 2025          Q4 2025
 ### Future (v2.0+)
 
 **Potential directions**:
+
 - [Direction 1]
 - [Direction 2]
 - [Direction 3]
 
 **Under consideration**:
+
 - [Idea 1]
 - [Idea 2]
 
@@ -88,11 +94,11 @@ Q1 2025          Q2 2025          Q3 2025          Q4 2025
 
 ## Timeline
 
-| Milestone | Target Date | Status |
-|-----------|-------------|--------|
-| [Milestone 1] | YYYY-MM-DD | ⬜ Not Started |
-| [Milestone 2] | YYYY-MM-DD | 🟡 In Progress |
-| [Milestone 3] | YYYY-MM-DD | ✅ Complete |
+| Milestone     | Target Date | Status         |
+| ------------- | ----------- | -------------- |
+| [Milestone 1] | YYYY-MM-DD  | ⬜ Not Started |
+| [Milestone 2] | YYYY-MM-DD  | 🟡 In Progress |
+| [Milestone 3] | YYYY-MM-DD  | ✅ Complete    |
 
 ---
 
@@ -100,22 +106,22 @@ Q1 2025          Q2 2025          Q3 2025          Q4 2025
 
 ### External Dependencies
 
-| Dependency | Required For | Status |
-|------------|--------------|--------|
+| Dependency     | Required For      | Status   |
+| -------------- | ----------------- | -------- |
 | [Dependency 1] | [Feature/Release] | [Status] |
 
 ### Internal Prerequisites
 
-| Prerequisite | Required For | Status |
-|--------------|--------------|--------|
+| Prerequisite   | Required For      | Status   |
+| -------------- | ----------------- | -------- |
 | [Task/Feature] | [Feature/Release] | [Status] |
 
 ---
 
 ## Risks
 
-| Risk | Impact | Likelihood | Mitigation |
-|------|--------|------------|------------|
+| Risk     | Impact       | Likelihood   | Mitigation            |
+| -------- | ------------ | ------------ | --------------------- |
 | [Risk 1] | High/Med/Low | High/Med/Low | [Mitigation strategy] |
 | [Risk 2] | High/Med/Low | High/Med/Low | [Mitigation strategy] |
 
@@ -123,13 +129,13 @@ Q1 2025          Q2 2025          Q3 2025          Q4 2025
 
 ## Change Log
 
-| Date | Change |
-|------|--------|
+| Date       | Change                  |
+| ---------- | ----------------------- |
 | YYYY-MM-DD | Initial roadmap created |
-| YYYY-MM-DD | [What changed] |
+| YYYY-MM-DD | [What changed]          |
 
 ---
 
-*See [TODO.md](TODO.md) for current tactical tasks.*
-*See [GOALS.md](GOALS.md) for success metrics.*
-*See [MILESTONES.md](MILESTONES.md) for key dates.*
+_See [TODO.md](TODO.md) for current tactical tasks._
+_See [GOALS.md](GOALS.md) for success metrics._
+_See [MILESTONES.md](MILESTONES.md) for key dates._

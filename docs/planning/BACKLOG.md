@@ -9,6 +9,7 @@ Ideas and tasks not yet prioritized for active development.
 ## Overview
 
 This is the holding area for:
+
 - Feature ideas
 - Enhancement suggestions
 - Technical debt items
@@ -23,15 +24,15 @@ Items here are **not committed** — they're candidates for future TODO.md promo
 
 ### [Category 1]
 
-| Idea | Description | Value | Effort | Source |
-|------|-------------|-------|--------|--------|
+| Idea     | Description         | Value        | Effort       | Source                          |
+| -------- | ------------------- | ------------ | ------------ | ------------------------------- |
 | [Idea 1] | [Brief description] | High/Med/Low | High/Med/Low | [User feedback / Team / Claude] |
-| [Idea 2] | [Brief description] | High/Med/Low | High/Med/Low | [Source] |
+| [Idea 2] | [Brief description] | High/Med/Low | High/Med/Low | [Source]                        |
 
 ### [Category 2]
 
-| Idea | Description | Value | Effort | Source |
-|------|-------------|-------|--------|--------|
+| Idea     | Description         | Value        | Effort       | Source   |
+| -------- | ------------------- | ------------ | ------------ | -------- |
 | [Idea 1] | [Brief description] | High/Med/Low | High/Med/Low | [Source] |
 
 ---
@@ -40,8 +41,8 @@ Items here are **not committed** — they're candidates for future TODO.md promo
 
 Improvements to existing functionality.
 
-| Enhancement | Area | Value | Effort | Notes |
-|-------------|------|-------|--------|-------|
+| Enhancement     | Area        | Value        | Effort       | Notes   |
+| --------------- | ----------- | ------------ | ------------ | ------- |
 | [Enhancement 1] | [Component] | High/Med/Low | High/Med/Low | [Notes] |
 | [Enhancement 2] | [Component] | High/Med/Low | High/Med/Low | [Notes] |
 
@@ -51,8 +52,8 @@ Improvements to existing functionality.
 
 Known issues that should be addressed eventually.
 
-| Item | Impact | Effort | Added |
-|------|--------|--------|-------|
+| Item          | Impact               | Effort       | Added      |
+| ------------- | -------------------- | ------------ | ---------- |
 | [Debt item 1] | [Impact description] | High/Med/Low | YYYY-MM-DD |
 | [Debt item 2] | [Impact description] | High/Med/Low | YYYY-MM-DD |
 
@@ -62,8 +63,8 @@ Known issues that should be addressed eventually.
 
 Areas requiring investigation before implementation.
 
-| Topic | Question | Why Important | Added |
-|-------|----------|---------------|-------|
+| Topic     | Question                | Why Important    | Added      |
+| --------- | ----------------------- | ---------------- | ---------- |
 | [Topic 1] | [What we need to learn] | [Why it matters] | YYYY-MM-DD |
 | [Topic 2] | [What we need to learn] | [Why it matters] | YYYY-MM-DD |
 
@@ -83,9 +84,9 @@ Ideas that might be valuable but aren't prioritized.
 
 Ideas considered but decided against (with reasoning).
 
-| Idea | Reason for Rejection | Date |
-|------|---------------------|------|
-| [Idea 1] | [Why not pursuing] | YYYY-MM-DD |
+| Idea     | Reason for Rejection | Date       |
+| -------- | -------------------- | ---------- |
+| [Idea 1] | [Why not pursuing]   | YYYY-MM-DD |
 
 ---
 
@@ -113,6 +114,6 @@ When adding new items:
 
 ---
 
-*Promoted items go to [TODO.md](TODO.md).*
-*Rejected items stay here with reasoning.*
-*See [ROADMAP.md](ROADMAP.md) for strategic direction.*
+_Promoted items go to [TODO.md](TODO.md)._
+_Rejected items stay here with reasoning._
+_See [ROADMAP.md](ROADMAP.md) for strategic direction._

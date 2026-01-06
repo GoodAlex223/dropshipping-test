@@ -32,15 +32,16 @@ Each phase has mandatory checkpoints that must be satisfied before proceeding.
 
 ### Plan Location Rules
 
-| Stage | Location | Action |
-|-------|----------|--------|
-| Creation | `docs/plans/` (preferred) or `/root/.claude/plans/` | Create using template |
-| Active | `docs/plans/` | **Required** - must exist here during execution |
-| Complete | `docs/archive/plans/` | Move after all steps done |
+| Stage    | Location                                            | Action                                          |
+| -------- | --------------------------------------------------- | ----------------------------------------------- |
+| Creation | `docs/plans/` (preferred) or `/root/.claude/plans/` | Create using template                           |
+| Active   | `docs/plans/`                                       | **Required** - must exist here during execution |
+| Complete | `docs/archive/plans/`                               | Move after all steps done                       |
 
 ### If Plan Created in /root/.claude/plans/
 
 **IMMEDIATELY after creation:**
+
 1. Copy to `docs/plans/YYYY-MM-DD_task-name.md`
 2. Both locations must stay synchronized during execution
 3. Update `docs/plans/` version as the source of truth
@@ -81,6 +82,7 @@ docs/
 ### Criteria for Phase Division
 
 A task requires phase division when ANY of these apply:
+
 - Affects 5+ files
 - Requires 3+ distinct implementation steps
 - Involves multiple subsystems
@@ -106,14 +108,17 @@ After completing each phase, provide:
 ### Phase [N] Complete: [Phase Name]
 
 **Accomplished**:
+
 - [What was done]
 
 **Files Modified**:
+
 - [file] - [change description]
 
 **Tests Status**: [Passing/Failing/Pending]
 
 **Discoveries/Deviations**:
+
 - [Any unexpected findings or plan changes]
 
 **Ready for Phase [N+1]**: [Brief description of next phase]
@@ -162,6 +167,7 @@ Required sections:
 **Approach**: [High-level strategy]
 
 **Steps**:
+
 1. [Step 1]
 2. [Step 2]
 3. [Step 3]
@@ -235,11 +241,13 @@ Update plan document during execution:
 ### 2.3 Checkpoints
 
 **Every 50 lines of code:**
+
 - [ ] Still aligned with plan?
 - [ ] Deviations documented?
 - [ ] Partial tests runnable?
 
 **Before any file save:**
+
 - [ ] Addresses actual requirement?
 - [ ] No obvious bugs?
 - [ ] Types correct?
@@ -260,6 +268,7 @@ If stuck after 3 attempts:
 ### 3.1 Automated Verification
 
 Before any commit, run the project's verification commands (defined in PROJECT.md):
+
 - Pre-commit hooks
 - Test suite
 - Type checking
@@ -284,9 +293,11 @@ Before any commit, run the project's verification commands (defined in PROJECT.m
 ## Summary of Changes
 
 **Files Modified**:
+
 - [file] - [what changed]
 
 **New Files**:
+
 - [file] - [purpose]
 
 ---
@@ -294,16 +305,19 @@ Before any commit, run the project's verification commands (defined in PROJECT.m
 ## Testing Checklist
 
 ### Functional Tests
+
 - [ ] **Test 1**: [Description]
   - Steps: [Instructions]
   - Expected: [Result]
 
 ### Edge Cases
+
 - [ ] **Edge 1**: [Description]
   - Trigger: [How]
   - Expected: [Behavior]
 
 ### Regression Tests
+
 - [ ] [Existing feature still works]
 
 ---
@@ -314,9 +328,10 @@ Before any commit, run the project's verification commands (defined in PROJECT.m
 **Date**: YYYY-MM-DD
 
 ### Issues Found
-| # | Description | Severity | Status |
-|---|------------|----------|--------|
-| 1 | [Issue]    | High/Med/Low | Open/Fixed |
+
+| #   | Description | Severity     | Status     |
+| --- | ----------- | ------------ | ---------- |
+| 1   | [Issue]     | High/Med/Low | Open/Fixed |
 
 ---
 
@@ -347,13 +362,13 @@ Before any commit, run the project's verification commands (defined in PROJECT.m
 
 Before marking complete:
 
-| Item | Action |
-|------|--------|
-| TODO.md | Remove task |
-| DONE.md | Add task with implementation details |
-| Plan document | Mark complete, add discoveries |
-| PROJECT_CONTEXT.md | Add architectural decisions |
-| CLAUDE.md | Add new patterns/policies if applicable |
+| Item               | Action                                  |
+| ------------------ | --------------------------------------- |
+| TODO.md            | Remove task                             |
+| DONE.md            | Add task with implementation details    |
+| Plan document      | Mark complete, add discoveries          |
+| PROJECT_CONTEXT.md | Add architectural decisions             |
+| CLAUDE.md          | Add new patterns/policies if applicable |
 
 ### 4.2 Plan Document Completion
 
@@ -365,15 +380,19 @@ Add to plan document:
 ## 4. Key Discoveries
 
 **Technical Insights**:
+
 - [Insight with explanation]
 
 **Architectural Decisions**:
+
 - [Decision: why made, alternatives considered]
 
 **Patterns Identified**:
+
 - [Pattern: where applies, benefits]
 
 **Anti-Patterns Avoided**:
+
 - [Anti-pattern: why problematic]
 
 ---
@@ -382,34 +401,40 @@ Add to plan document:
 
 ### After Each Sub-Item (Record Immediately in Plan File)
 
-| Field | Description |
-|-------|-------------|
-| Results obtained | What was concretely achieved |
-| Lessons learned | Insights gained |
-| Problems encountered | Issues and resolutions |
-| Improvements identified | What could be better (minimum 1) |
-| Technical debt noted | Shortcuts taken |
-| Related code | Other areas needing similar changes |
+| Field                   | Description                         |
+| ----------------------- | ----------------------------------- |
+| Results obtained        | What was concretely achieved        |
+| Lessons learned         | Insights gained                     |
+| Problems encountered    | Issues and resolutions              |
+| Improvements identified | What could be better (minimum 1)    |
+| Technical debt noted    | Shortcuts taken                     |
+| Related code            | Other areas needing similar changes |
 
 ### At Task Completion
 
 **Enhancement Ideas** (minimum 2):
+
 - [Idea 1]: [Rationale, estimated effort, priority]
 - [Idea 2]: [Rationale, estimated effort, priority]
 
 **Technical Debt Identified**:
+
 - [Debt item]: [Why it exists, impact, remediation approach]
 
 **Performance Optimizations**:
+
 - [Optimization]: [Current state, potential improvement, effort]
 
 **Code Quality Improvements**:
+
 - [Improvement]: [Where applies, benefit]
 
 **Related Tasks Spawned**:
+
 - [Task]: [Relationship to this work, add to TODO.md if actionable]
 
 **Questions for Future Investigation**:
+
 - [Question]: [Why it matters, when to revisit]
 ```
 
@@ -425,8 +450,10 @@ After documenting improvements in plan document:
 4. **Prioritize** — Assign priority based on impact/effort
 
 Example TODO.md entry:
+
 ```markdown
 ### [ID] - [Improvement from Task X]
+
 **Origin**: docs/plans/YYYY-MM-DD_original-task.md
 **Priority**: Medium
 **Spawned from**: [Original task description]
@@ -492,6 +519,7 @@ Commit types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
 ### Runtime Validation
 
 For public APIs and external data, use validation libraries appropriate for your language:
+
 - Python: pydantic, attrs
 - TypeScript: zod, io-ts
 - Other: language-appropriate equivalents
@@ -509,6 +537,7 @@ For public APIs and external data, use validation libraries appropriate for your
 ### When to Write New
 
 Only when:
+
 - Thorough search found nothing
 - Existing code too specialized to generalize
 - Reusing would create bad coupling
@@ -542,5 +571,5 @@ For critical production issues:
 
 ---
 
-*See [../CLAUDE.md](../CLAUDE.md) for thinking protocol and analysis requirements.*
-*See [../PROJECT.md](../PROJECT.md) for project-specific commands and configuration.*
+_See [../CLAUDE.md](../CLAUDE.md) for thinking protocol and analysis requirements._
+_See [../PROJECT.md](../PROJECT.md) for project-specific commands and configuration._

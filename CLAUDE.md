@@ -35,6 +35,7 @@ See: [.claude/WORKFLOW.md](.claude/WORKFLOW.md)
 **If any referenced file or document does not exist, STOP and report.**
 
 Before starting any task:
+
 1. Verify PROJECT.md exists and is readable
 2. Verify required documentation structure exists (see Knowledge Sources)
 3. If files are missing → Report what's missing → Wait for user to create them
@@ -68,15 +69,18 @@ Present findings in structured format:
 **Problem**: [Restated problem]
 
 **Approaches Considered**:
+
 1. [Approach A] — Pros: ... / Cons: ...
 2. [Approach B] — Pros: ... / Cons: ...
 3. [Approach C] — Pros: ... / Cons: ...
 
 **Assumptions**:
+
 - [Assumption 1]
 - [Assumption 2]
 
 **Edge Cases**:
+
 - [Case 1]: How handled
 - [Case 2]: How handled
 
@@ -156,16 +160,19 @@ For every task, maintain a running log in the plan document:
 ### Execution Log
 
 #### [YYYY-MM-DD HH:MM] — PHASE: Planning
+
 - Goal understood: [summary]
 - Approach chosen: [brief]
 - Risks identified: [list]
 
 #### [YYYY-MM-DD HH:MM] — PHASE: Implementation
+
 - Step completed: [what]
 - Deviation from plan: [yes/no, why]
 - Unexpected discovery: [if any]
 
 #### [YYYY-MM-DD HH:MM] — PHASE: Sub-Item Complete ⚠️ MANDATORY
+
 - Sub-item: [what was finished]
 - **Results obtained**: [what was achieved]
 - **Lessons learned**: [insights gained]
@@ -175,11 +182,13 @@ For every task, maintain a running log in the plan document:
 - **Related code needing changes**: [if any]
 
 #### [YYYY-MM-DD HH:MM] — PHASE: Blocked
+
 - Blocker: [description]
 - Attempts made: [list]
 - Resolution: [how solved / escalated to user]
 
 #### [YYYY-MM-DD HH:MM] — PHASE: Complete
+
 - Final approach: [summary]
 - Tests passing: [yes/no]
 - Documentation updated: [list]
@@ -197,18 +206,19 @@ For every task, maintain a running log in the plan document:
 
 ### After Each Sub-Item (Record Immediately)
 
-| Question | Must Document |
-|----------|---------------|
-| What results were obtained? | Concrete outcomes achieved |
-| What lessons were learned? | Insights gained during work |
-| What problems were encountered? | Issues faced and resolutions |
-| What could be done better? | Specific improvements identified |
-| What shortcuts were taken? | Technical debt created |
-| What related code needs similar changes? | Follow-up work identified |
+| Question                                 | Must Document                    |
+| ---------------------------------------- | -------------------------------- |
+| What results were obtained?              | Concrete outcomes achieved       |
+| What lessons were learned?               | Insights gained during work      |
+| What problems were encountered?          | Issues faced and resolutions     |
+| What could be done better?               | Specific improvements identified |
+| What shortcuts were taken?               | Technical debt created           |
+| What related code needs similar changes? | Follow-up work identified        |
 
 ### At Task Completion
 
 Document in plan file Section 5:
+
 - Minimum 2 enhancement ideas
 - Technical debt identified
 - Performance opportunities
@@ -230,12 +240,12 @@ Document in plan file Section 5:
 
 ### What to Question
 
-| Area | Questions to Ask |
-|------|------------------|
-| Architecture | Right pattern? Scales? Unnecessary coupling? |
-| Algorithm | Most efficient? Time/space complexity? Edge cases? |
-| Code Structure | SOLID? DRY? Matches codebase patterns? |
-| Types | Properly constrained? Invalid states possible? |
+| Area           | Questions to Ask                                   |
+| -------------- | -------------------------------------------------- |
+| Architecture   | Right pattern? Scales? Unnecessary coupling?       |
+| Algorithm      | Most efficient? Time/space complexity? Edge cases? |
+| Code Structure | SOLID? DRY? Matches codebase patterns?             |
+| Types          | Properly constrained? Invalid states possible?     |
 
 ### Response Pattern for Concerns
 
@@ -245,6 +255,7 @@ Document in plan file Section 5:
 I notice [specific concern]. Here's my analysis:
 
 **Potential Issues:**
+
 - [Issue 1]
 - [Issue 2]
 
@@ -252,6 +263,7 @@ I notice [specific concern]. Here's my analysis:
 [Better solution]
 
 **Trade-offs:**
+
 - Your approach: [pros/cons]
 - Suggested: [pros/cons]
 
@@ -300,33 +312,33 @@ See: [.claude/POLICIES/knowledge-sources.md](.claude/POLICIES/knowledge-sources.
 
 Every project MUST have these files (create if missing):
 
-| Document | Purpose | Location |
-|----------|---------|----------|
-| README.md | Project overview for humans | Root |
-| PROJECT.md | Project-specific config | Root |
-| docs/README.md | Documentation index | docs/ |
-| docs/planning/TODO.md | Active tasks | docs/planning/ |
-| docs/planning/DONE.md | Completed tasks | docs/planning/ |
-| docs/planning/BACKLOG.md | Unprioritized ideas | docs/planning/ |
-| docs/planning/ROADMAP.md | Long-term vision | docs/planning/ |
-| docs/PROJECT_CONTEXT.md | Decisions, patterns | docs/ |
-| docs/ARCHITECTURE.md | System design | docs/ |
-| docs/plans/ | Task plans | docs/plans/ |
-| docs/archive/ | Historical docs | docs/archive/ |
+| Document                 | Purpose                     | Location       |
+| ------------------------ | --------------------------- | -------------- |
+| README.md                | Project overview for humans | Root           |
+| PROJECT.md               | Project-specific config     | Root           |
+| docs/README.md           | Documentation index         | docs/          |
+| docs/planning/TODO.md    | Active tasks                | docs/planning/ |
+| docs/planning/DONE.md    | Completed tasks             | docs/planning/ |
+| docs/planning/BACKLOG.md | Unprioritized ideas         | docs/planning/ |
+| docs/planning/ROADMAP.md | Long-term vision            | docs/planning/ |
+| docs/PROJECT_CONTEXT.md  | Decisions, patterns         | docs/          |
+| docs/ARCHITECTURE.md     | System design               | docs/          |
+| docs/plans/              | Task plans                  | docs/plans/    |
+| docs/archive/            | Historical docs             | docs/archive/  |
 
 ### Document Maintenance Rules
 
 Claude is responsible for keeping documentation current:
 
-| Condition | Action |
-|-----------|--------|
-| Document references deleted code/files | Update or archive the document |
-| Document >3 months without updates | Review for relevance |
-| New patterns/decisions emerge | Update PROJECT_CONTEXT.md |
-| New documentation created | Index in docs/README.md |
-| Document no longer relevant | Move to docs/archive/ |
-| Task completed with learnings | Extract insights to PROJECT_CONTEXT.md |
-| **Documentation contradicts code** | STOP, report discrepancy, wait for resolution |
+| Condition                              | Action                                        |
+| -------------------------------------- | --------------------------------------------- |
+| Document references deleted code/files | Update or archive the document                |
+| Document >3 months without updates     | Review for relevance                          |
+| New patterns/decisions emerge          | Update PROJECT_CONTEXT.md                     |
+| New documentation created              | Index in docs/README.md                       |
+| Document no longer relevant            | Move to docs/archive/                         |
+| Task completed with learnings          | Extract insights to PROJECT_CONTEXT.md        |
+| **Documentation contradicts code**     | STOP, report discrepancy, wait for resolution |
 
 ---
 
@@ -343,15 +355,16 @@ If the total instruction set threatens to exceed effective context limits:
 
 ### Recommended Size Limits
 
-| File | Max Lines | Action if Exceeded |
-|------|-----------|-------------------|
-| CLAUDE.md | ~400 | Split to POLICIES/ |
-| PROJECT.md | ~200 | Split to docs/ |
-| Individual policy | ~300 | Split into sub-policies |
+| File              | Max Lines | Action if Exceeded      |
+| ----------------- | --------- | ----------------------- |
+| CLAUDE.md         | ~400      | Split to POLICIES/      |
+| PROJECT.md        | ~200      | Split to docs/          |
+| Individual policy | ~300      | Split into sub-policies |
 
 ### Priority Order When Context Limited
 
 If you must prioritize, follow this order:
+
 1. Critical Rules (Abort Conditions, Validation)
 2. Thinking Protocol
 3. Execution Checkpoints
@@ -364,34 +377,34 @@ If you must prioritize, follow this order:
 
 ### Core Policies
 
-| Document | Purpose |
-|----------|---------|
-| [PROJECT.md](PROJECT.md) | Project-specific information |
-| [.claude/WORKFLOW.md](.claude/WORKFLOW.md) | Development workflow, TDD, CI/CD |
-| [.claude/POLICIES/critical-thinking.md](.claude/POLICIES/critical-thinking.md) | Deep analysis requirements |
-| [.claude/POLICIES/testing.md](.claude/POLICIES/testing.md) | Testing standards, coverage |
-| [.claude/POLICIES/documentation.md](.claude/POLICIES/documentation.md) | Documentation requirements |
+| Document                                                                       | Purpose                           |
+| ------------------------------------------------------------------------------ | --------------------------------- |
+| [PROJECT.md](PROJECT.md)                                                       | Project-specific information      |
+| [.claude/WORKFLOW.md](.claude/WORKFLOW.md)                                     | Development workflow, TDD, CI/CD  |
+| [.claude/POLICIES/critical-thinking.md](.claude/POLICIES/critical-thinking.md) | Deep analysis requirements        |
+| [.claude/POLICIES/testing.md](.claude/POLICIES/testing.md)                     | Testing standards, coverage       |
+| [.claude/POLICIES/documentation.md](.claude/POLICIES/documentation.md)         | Documentation requirements        |
 | [.claude/POLICIES/knowledge-sources.md](.claude/POLICIES/knowledge-sources.md) | Knowledge sources and maintenance |
 
 ### Extended Policies
 
-| Document | Purpose |
-|----------|---------|
-| [.claude/POLICIES/context-management.md](.claude/POLICIES/context-management.md) | Managing instruction size |
-| [.claude/POLICIES/code-review.md](.claude/POLICIES/code-review.md) | Code review process |
-| [.claude/POLICIES/security.md](.claude/POLICIES/security.md) | Security standards |
-| [.claude/POLICIES/git.md](.claude/POLICIES/git.md) | Git workflow, branching |
-| [.claude/POLICIES/error-handling.md](.claude/POLICIES/error-handling.md) | Error handling patterns |
-| [.claude/POLICIES/versioning.md](.claude/POLICIES/versioning.md) | Version numbering, releases |
-| [.claude/POLICIES/performance.md](.claude/POLICIES/performance.md) | Performance guidelines |
+| Document                                                                         | Purpose                     |
+| -------------------------------------------------------------------------------- | --------------------------- |
+| [.claude/POLICIES/context-management.md](.claude/POLICIES/context-management.md) | Managing instruction size   |
+| [.claude/POLICIES/code-review.md](.claude/POLICIES/code-review.md)               | Code review process         |
+| [.claude/POLICIES/security.md](.claude/POLICIES/security.md)                     | Security standards          |
+| [.claude/POLICIES/git.md](.claude/POLICIES/git.md)                               | Git workflow, branching     |
+| [.claude/POLICIES/error-handling.md](.claude/POLICIES/error-handling.md)         | Error handling patterns     |
+| [.claude/POLICIES/versioning.md](.claude/POLICIES/versioning.md)                 | Version numbering, releases |
+| [.claude/POLICIES/performance.md](.claude/POLICIES/performance.md)               | Performance guidelines      |
 
 ### Language & Templates
 
-| Document | Purpose |
-|----------|---------|
-| [.claude/LANGUAGES/](.claude/LANGUAGES/) | Language-specific standards |
-| [.claude/TEMPLATES/](.claude/TEMPLATES/) | Reusable templates |
-| [.claude/mcp-config.md](.claude/mcp-config.md) | MCP server configuration |
+| Document                                       | Purpose                     |
+| ---------------------------------------------- | --------------------------- |
+| [.claude/LANGUAGES/](.claude/LANGUAGES/)       | Language-specific standards |
+| [.claude/TEMPLATES/](.claude/TEMPLATES/)       | Reusable templates          |
+| [.claude/mcp-config.md](.claude/mcp-config.md) | MCP server configuration    |
 
 ---
 
@@ -412,11 +425,11 @@ Every project MUST have language-specific policies for its primary languages. If
 
 ### Available Languages
 
-| Language | Policy | Status |
-|----------|--------|--------|
-| Python | [.claude/LANGUAGES/python.md](.claude/LANGUAGES/python.md) | Available |
+| Language      | Policy                                                             | Status    |
+| ------------- | ------------------------------------------------------------------ | --------- |
+| Python        | [.claude/LANGUAGES/python.md](.claude/LANGUAGES/python.md)         | Available |
 | TypeScript/JS | [.claude/LANGUAGES/typescript.md](.claude/LANGUAGES/typescript.md) | Available |
-| Other | [.claude/LANGUAGES/_template.md](.claude/LANGUAGES/_template.md) | Template |
+| Other         | [.claude/LANGUAGES/\_template.md](.claude/LANGUAGES/_template.md)  | Template  |
 
 ### Creating Missing Language Policy
 
@@ -437,6 +450,7 @@ Every project MUST have language-specific policies for its primary languages. If
 ### Policy Creation Trigger
 
 Create language policy when:
+
 - Starting work on a new project
 - First code change in a language without policy
 - User asks to set up standards for a language
@@ -476,5 +490,5 @@ Create language policy when:
 
 ---
 
-*For project-specific details, see [PROJECT.md](PROJECT.md).*
-*For detailed policies, see linked documents in `.claude/` directory.*
+_For project-specific details, see [PROJECT.md](PROJECT.md)._
+_For detailed policies, see linked documents in `.claude/` directory._

@@ -12,16 +12,16 @@ Requirements for maintaining project documentation and knowledge preservation.
 
 ## Document Types
 
-| Document | Purpose | Location |
-|----------|---------|----------|
-| Plan documents | Task execution log | `docs/plans/YYYY-MM-DD_task.md` |
-| TODO.md | Pending tasks | `docs/` |
-| DONE.md | Completed tasks | `docs/` |
-| PROJECT_CONTEXT.md | Architecture decisions | `docs/` |
-| CLAUDE.md | AI assistant rules (universal) | Root |
-| PROJECT.md | Project-specific config | Root |
-| ARCHITECTURE.md | System design | `docs/` |
-| README.md | Documentation index | `docs/` |
+| Document           | Purpose                        | Location                        |
+| ------------------ | ------------------------------ | ------------------------------- |
+| Plan documents     | Task execution log             | `docs/plans/YYYY-MM-DD_task.md` |
+| TODO.md            | Pending tasks                  | `docs/`                         |
+| DONE.md            | Completed tasks                | `docs/`                         |
+| PROJECT_CONTEXT.md | Architecture decisions         | `docs/`                         |
+| CLAUDE.md          | AI assistant rules (universal) | Root                            |
+| PROJECT.md         | Project-specific config        | Root                            |
+| ARCHITECTURE.md    | System design                  | `docs/`                         |
+| README.md          | Documentation index            | `docs/`                         |
 
 ---
 
@@ -32,6 +32,7 @@ Requirements for maintaining project documentation and knowledge preservation.
 **Every significant task must have a plan document.**
 
 A task is "significant" if it:
+
 - Modifies more than one file
 - Implements new functionality
 - Fixes a non-trivial bug
@@ -50,23 +51,28 @@ Before starting any significant task:
 **Last Updated**: YYYY-MM-DD
 
 ## 1. Task Overview
+
 **Goal**: [What]
 **Context**: [Why]
 **Success Criteria**: [How we know it's done]
 
 ## 2. Initial Plan
+
 **Approach**: [Strategy]
 **Steps**: [Numbered list]
 **Files Affected**: [List]
 **Risks**: [Potential issues]
 
 ## 3. Implementation Log
+
 [Updated during execution]
 
 ## 4. Key Discoveries
+
 [Filled after completion]
 
 ## 5. Future Improvements
+
 [MANDATORY - filled during and after]
 ```
 
@@ -76,6 +82,7 @@ Log each significant action:
 
 ```markdown
 ### [YYYY-MM-DD HH:MM] - [Activity]
+
 **Done**: [Description]
 **Decisions**: [Choices made]
 **Discoveries**: [New information]
@@ -90,15 +97,19 @@ Add discoveries section:
 ## 4. Key Discoveries
 
 **Technical Insights**:
+
 - [Insight]: [Explanation]
 
 **Architectural Decisions**:
+
 - [Decision]: [Rationale, alternatives considered]
 
 **Patterns Identified**:
+
 - [Pattern]: [When to use]
 
 **Anti-Patterns Avoided**:
+
 - [Anti-pattern]: [Why bad]
 ```
 
@@ -118,18 +129,20 @@ This is not optional. Improvement documentation is as important as the implement
 
 **Stop and update the plan file with:**
 
-| Field | What to Record |
-|-------|----------------|
-| Results obtained | Concrete outcomes achieved |
-| Lessons learned | Insights and knowledge gained |
-| Problems encountered | Issues faced and resolutions |
-| What could be done better? | Specific improvement ideas |
-| What shortcuts were taken? | Technical debt created |
-| What related code needs changes? | Follow-up tasks identified |
+| Field                            | What to Record                |
+| -------------------------------- | ----------------------------- |
+| Results obtained                 | Concrete outcomes achieved    |
+| Lessons learned                  | Insights and knowledge gained |
+| Problems encountered             | Issues faced and resolutions  |
+| What could be done better?       | Specific improvement ideas    |
+| What shortcuts were taken?       | Technical debt created        |
+| What related code needs changes? | Follow-up tasks identified    |
 
 **Format in plan file:**
+
 ```markdown
 #### [YYYY-MM-DD HH:MM] — PHASE: Sub-Item Complete
+
 - Sub-item: [what was finished]
 - **Results obtained**: [achievements]
 - **Lessons learned**: [insights]
@@ -154,24 +167,28 @@ This is not optional. Improvement documentation is as important as the implement
 ## 5. Future Improvements
 
 ### Enhancement Ideas (minimum 2)
+
 | Idea | Rationale | Effort | Priority |
-|------|-----------|--------|----------|
+| ---- | --------- | ------ | -------- |
 | [1]  | [Why]     | H/M/L  | H/M/L    |
 | [2]  | [Why]     | H/M/L  | H/M/L    |
 
 ### Technical Debt
+
 | Item | Why It Exists | Impact | Remediation |
-|------|---------------|--------|-------------|
+| ---- | ------------- | ------ | ----------- |
 | [1]  | [Reason]      | H/M/L  | [Approach]  |
 
 ### Performance Optimizations
+
 | Area | Current State | Potential Gain | Effort |
-|------|---------------|----------------|--------|
+| ---- | ------------- | -------------- | ------ |
 | [1]  | [Now]         | [Improvement]  | H/M/L  |
 
 ### Spawned Tasks
+
 | Task | Origin | Priority | Added to TODO.md |
-|------|--------|----------|------------------|
+| ---- | ------ | -------- | ---------------- |
 | [1]  | [Step] | H/M/L    | [ ] Yes / [ ] No |
 ```
 
@@ -181,6 +198,7 @@ This is not optional. Improvement documentation is as important as the implement
 
 ```markdown
 ### [ID] - [Improvement Title]
+
 **Origin**: docs/plans/YYYY-MM-DD_task.md
 **Spawned from**: [Original task]
 **Priority**: H/M/L
@@ -225,11 +243,13 @@ Before marking ANY task complete:
 ## [Category]
 
 ### [Task ID] - [Task Name]
+
 **Priority**: High | Medium | Low
 **Estimated effort**: [Hours/Days]
 **Dependencies**: [Other tasks]
 **Description**: [What needs to be done]
 **Acceptance criteria**:
+
 - [ ] [Criterion 1]
 - [ ] [Criterion 2]
 ```
@@ -249,12 +269,15 @@ Before marking ANY task complete:
 [Brief description of what was actually done]
 
 **Key Decisions**:
+
 - [Decision 1]: [Why]
 
 **Lessons Learned**:
+
 - [Lesson]
 
 **Follow-up Tasks**:
+
 - [If any spawned new tasks]
 ```
 
@@ -271,29 +294,29 @@ The documentation index MUST list all project documentation:
 
 ## Planning & Tasks
 
-| Document | Purpose | Last Updated |
-|----------|---------|--------------|
-| [planning/TODO.md](planning/TODO.md) | Active tasks | YYYY-MM-DD |
-| [planning/DONE.md](planning/DONE.md) | Completed tasks | YYYY-MM-DD |
-| [planning/ROADMAP.md](planning/ROADMAP.md) | Long-term vision | YYYY-MM-DD |
+| Document                                   | Purpose          | Last Updated |
+| ------------------------------------------ | ---------------- | ------------ |
+| [planning/TODO.md](planning/TODO.md)       | Active tasks     | YYYY-MM-DD   |
+| [planning/DONE.md](planning/DONE.md)       | Completed tasks  | YYYY-MM-DD   |
+| [planning/ROADMAP.md](planning/ROADMAP.md) | Long-term vision | YYYY-MM-DD   |
 
 ## Architecture
 
-| Document | Purpose | Last Updated |
-|----------|---------|--------------|
-| [ARCHITECTURE.md](ARCHITECTURE.md) | System design | YYYY-MM-DD |
-| [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) | Decisions, patterns | YYYY-MM-DD |
+| Document                                 | Purpose             | Last Updated |
+| ---------------------------------------- | ------------------- | ------------ |
+| [ARCHITECTURE.md](ARCHITECTURE.md)       | System design       | YYYY-MM-DD   |
+| [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) | Decisions, patterns | YYYY-MM-DD   |
 
 ## Domain Documentation
 
-| Document | Purpose | Last Updated |
-|----------|---------|--------------|
-| [path/doc.md](path/doc.md) | Description | YYYY-MM-DD |
+| Document                   | Purpose     | Last Updated |
+| -------------------------- | ----------- | ------------ |
+| [path/doc.md](path/doc.md) | Description | YYYY-MM-DD   |
 
 ## Implementation Plans
 
-| Plan | Task | Status |
-|------|------|--------|
+| Plan                                           | Task        | Status          |
+| ---------------------------------------------- | ----------- | --------------- |
 | [YYYY-MM-DD_task.md](plans/YYYY-MM-DD_task.md) | Description | Complete/Active |
 
 ## Archive
@@ -383,6 +406,7 @@ Refs: #[issue] or TODO.md [section]
 ```
 
 Types:
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `refactor`: Code restructuring
@@ -411,13 +435,13 @@ Refs: TODO.md 2.3.1
 
 When completing a task, evaluate what should propagate:
 
-| Discovery Type | Propagate To |
-|---------------|--------------|
-| Architectural decision | PROJECT_CONTEXT.md |
-| New development pattern | CLAUDE.md or PROJECT.md |
-| Reusable code pattern | Code comments + docs |
-| Bug fix pattern | Regression test + docs |
-| Project-specific convention | PROJECT.md |
+| Discovery Type              | Propagate To            |
+| --------------------------- | ----------------------- |
+| Architectural decision      | PROJECT_CONTEXT.md      |
+| New development pattern     | CLAUDE.md or PROJECT.md |
+| Reusable code pattern       | Code comments + docs    |
+| Bug fix pattern             | Regression test + docs  |
+| Project-specific convention | PROJECT.md              |
 
 ---
 
@@ -435,5 +459,5 @@ Format: `YYYY-MM-DD` or `YYYY-MM-DD HH:MM` for precision.
 
 ---
 
-*See [../WORKFLOW.md](../WORKFLOW.md) for how documentation integrates with development phases.*
-*See [knowledge-sources.md](knowledge-sources.md) for document structure and maintenance.*
+_See [../WORKFLOW.md](../WORKFLOW.md) for how documentation integrates with development phases._
+_See [knowledge-sources.md](knowledge-sources.md) for document structure and maintenance._

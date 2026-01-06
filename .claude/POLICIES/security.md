@@ -14,25 +14,25 @@ Security standards and practices for all code changes.
 
 ### Data Sensitivity Levels
 
-| Level | Description | Examples | Handling |
-|-------|-------------|----------|----------|
-| **Critical** | Exposure causes severe harm | Passwords, API keys, payment data | Encrypt, never log, minimal access |
-| **Sensitive** | Exposure causes significant harm | PII, emails, phone numbers | Encrypt at rest, mask in logs |
-| **Internal** | Business-sensitive | Analytics, internal metrics | Access controls, no public exposure |
-| **Public** | No harm from exposure | Marketing content, public docs | Standard handling |
+| Level         | Description                      | Examples                          | Handling                            |
+| ------------- | -------------------------------- | --------------------------------- | ----------------------------------- |
+| **Critical**  | Exposure causes severe harm      | Passwords, API keys, payment data | Encrypt, never log, minimal access  |
+| **Sensitive** | Exposure causes significant harm | PII, emails, phone numbers        | Encrypt at rest, mask in logs       |
+| **Internal**  | Business-sensitive               | Analytics, internal metrics       | Access controls, no public exposure |
+| **Public**    | No harm from exposure            | Marketing content, public docs    | Standard handling                   |
 
 ### Change Risk Assessment
 
 Before implementing, assess security risk:
 
-| Risk Factor | Low | Medium | High |
-|-------------|-----|--------|------|
-| Handles user input | No | Indirect | Direct |
-| Accesses sensitive data | No | Read-only | Read/Write |
-| Authentication/Authorization | None | Uses existing | Modifies |
-| External communication | None | Trusted services | User-provided endpoints |
-| File system access | None | Read-only | Write |
-| Executes commands | None | Fixed commands | Dynamic |
+| Risk Factor                  | Low  | Medium           | High                    |
+| ---------------------------- | ---- | ---------------- | ----------------------- |
+| Handles user input           | No   | Indirect         | Direct                  |
+| Accesses sensitive data      | No   | Read-only        | Read/Write              |
+| Authentication/Authorization | None | Uses existing    | Modifies                |
+| External communication       | None | Trusted services | User-provided endpoints |
+| File system access           | None | Read-only        | Write                   |
+| Executes commands            | None | Fixed commands   | Dynamic                 |
 
 **High risk changes require security review before merge.**
 
@@ -43,6 +43,7 @@ Before implementing, assess security risk:
 ### Never Commit Secrets
 
 **Absolutely forbidden in code:**
+
 - API keys
 - Passwords
 - Database credentials
@@ -84,6 +85,7 @@ Before implementing, assess security risk:
 ### Secret Detection
 
 Pre-commit hooks should scan for:
+
 - High-entropy strings
 - Known secret patterns (AWS keys, etc.)
 - Common credential file names
@@ -95,6 +97,7 @@ Pre-commit hooks should scan for:
 ### Validate All External Input
 
 **External input includes:**
+
 - User form submissions
 - API request parameters
 - File uploads
@@ -119,14 +122,14 @@ if file.content_type in FORBIDDEN_TYPES:  # Incomplete!
 
 ### Common Validation Requirements
 
-| Input Type | Validations |
-|------------|-------------|
-| Strings | Length limits, allowed characters, format |
-| Numbers | Range, type (int/float), sign |
-| Emails | Format, domain allowlist if applicable |
-| URLs | Protocol (https only), domain allowlist |
-| Files | Type, size, content validation |
-| IDs | Format, existence, authorization |
+| Input Type | Validations                               |
+| ---------- | ----------------------------------------- |
+| Strings    | Length limits, allowed characters, format |
+| Numbers    | Range, type (int/float), sign             |
+| Emails     | Format, domain allowlist if applicable    |
+| URLs       | Protocol (https only), domain allowlist   |
+| Files      | Type, size, content validation            |
+| IDs        | Format, existence, authorization          |
 
 ---
 
@@ -236,7 +239,7 @@ def view_document(request, doc_id):
 - Node: crypto (built-in), bcrypt
 - Go: crypto (standard library)
 
-❌ DON'T: 
+❌ DON'T:
 - Implement your own crypto
 - Use deprecated algorithms (MD5, SHA1 for security)
 - Use ECB mode
@@ -245,13 +248,13 @@ def view_document(request, doc_id):
 
 ### Algorithm Recommendations
 
-| Purpose | Recommended | Avoid |
-|---------|-------------|-------|
-| Password hashing | bcrypt, argon2, scrypt | MD5, SHA1, plain SHA256 |
-| Symmetric encryption | AES-256-GCM | DES, 3DES, AES-ECB |
-| Asymmetric encryption | RSA-2048+, ECDSA | RSA-1024, DSA |
-| Hashing (non-password) | SHA-256, SHA-3 | MD5, SHA1 |
-| Random generation | Cryptographic RNG | Math.random, rand() |
+| Purpose                | Recommended            | Avoid                   |
+| ---------------------- | ---------------------- | ----------------------- |
+| Password hashing       | bcrypt, argon2, scrypt | MD5, SHA1, plain SHA256 |
+| Symmetric encryption   | AES-256-GCM            | DES, 3DES, AES-ECB      |
+| Asymmetric encryption  | RSA-2048+, ECDSA       | RSA-1024, DSA           |
+| Hashing (non-password) | SHA-256, SHA-3         | MD5, SHA1               |
+| Random generation      | Cryptographic RNG      | Math.random, rand()     |
 
 ---
 
@@ -373,12 +376,12 @@ Before adding new dependency:
 
 ### Security Issue Severity
 
-| Severity | Description | Response Time |
-|----------|-------------|---------------|
-| Critical | Active exploitation, data breach | Immediate |
-| High | Exploitable vulnerability | 24 hours |
-| Medium | Potential vulnerability | 1 week |
-| Low | Minor security improvement | Next release |
+| Severity | Description                      | Response Time |
+| -------- | -------------------------------- | ------------- |
+| Critical | Active exploitation, data breach | Immediate     |
+| High     | Exploitable vulnerability        | 24 hours      |
+| Medium   | Potential vulnerability          | 1 week        |
+| Low      | Minor security improvement       | Next release  |
 
 ---
 
@@ -403,5 +406,5 @@ When reviewing code:
 
 ---
 
-*See [code-review.md](code-review.md) for security review requirements.*
-*See [error-handling.md](error-handling.md) for secure error handling.*
+_See [code-review.md](code-review.md) for security review requirements._
+_See [error-handling.md](error-handling.md) for secure error handling._

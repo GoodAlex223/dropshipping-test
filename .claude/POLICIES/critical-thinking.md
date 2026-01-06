@@ -16,25 +16,25 @@ Deep analysis requirements for all non-trivial tasks.
 
 Before writing any code:
 
-| Step | Action | Output |
-|------|--------|--------|
-| 1 | Restate the problem | Written summary in own words |
-| 2 | Generate alternatives | Minimum 3 different approaches |
-| 3 | Identify blind spots | "What am I missing?" list |
-| 4 | Map edge cases | Minimum 5 edge cases |
-| 5 | Search existing code | Similar implementations found |
+| Step | Action                | Output                         |
+| ---- | --------------------- | ------------------------------ |
+| 1    | Restate the problem   | Written summary in own words   |
+| 2    | Generate alternatives | Minimum 3 different approaches |
+| 3    | Identify blind spots  | "What am I missing?" list      |
+| 4    | Map edge cases        | Minimum 5 edge cases           |
+| 5    | Search existing code  | Similar implementations found  |
 
 ### Phase 2: CHALLENGE
 
 Stress-test your proposed solution:
 
-| Question | Purpose |
-|----------|---------|
-| "What would break this?" | Find failure modes |
-| "What assumptions am I making?" | Expose hidden dependencies |
-| "How would this fail at 10x scale?" | Check scalability |
-| "What if the user's assumption is wrong?" | Validate requirements |
-| "Is there a simpler way I dismissed?" | Avoid over-engineering |
+| Question                                  | Purpose                    |
+| ----------------------------------------- | -------------------------- |
+| "What would break this?"                  | Find failure modes         |
+| "What assumptions am I making?"           | Expose hidden dependencies |
+| "How would this fail at 10x scale?"       | Check scalability          |
+| "What if the user's assumption is wrong?" | Validate requirements      |
+| "Is there a simpler way I dismissed?"     | Avoid over-engineering     |
 
 ### Phase 3: SYNTHESIZE
 
@@ -46,17 +46,19 @@ Present findings before proceeding:
 **Problem**: [Restated in own words]
 
 **Approaches**:
+
 1. [A] — Pros: ... / Cons: ...
 2. [B] — Pros: ... / Cons: ...
 3. [C] — Pros: ... / Cons: ...
 
 **Assumptions**:
+
 - [List each assumption explicitly]
 
 **Edge Cases**:
 | Case | Handling |
 |------|----------|
-| [1]  | [How handled] |
+| [1] | [How handled] |
 
 **Recommendation**: [Choice] because [reasoning]
 
@@ -70,12 +72,14 @@ Present findings before proceeding:
 ### Architecture Decisions
 
 Questions to ask:
+
 - Is this the right pattern for this problem?
 - Will this scale to 10x users/data?
 - Does this introduce unnecessary coupling?
 - Does this match existing codebase patterns?
 
 Red flags:
+
 - Global state
 - Tight coupling
 - Circular dependencies
@@ -84,12 +88,14 @@ Red flags:
 ### Algorithm Choices
 
 Questions to ask:
+
 - What's the time complexity? Space complexity?
 - Are there edge cases that change behavior?
 - Does a simpler O(n) solution exist?
 - Is this algorithm already in the codebase?
 
 Red flags:
+
 - Nested loops on unbounded data
 - Recursive calls without depth limits
 - Linear search when hash lookup possible
@@ -97,12 +103,14 @@ Red flags:
 ### Type Safety
 
 Questions to ask:
+
 - Are types properly constrained?
 - Can invalid states be represented?
 - Are boundary conditions handled?
 - Is runtime validation needed?
 
 Red flags:
+
 - `Any`/`unknown` type without justification
 - Optional/nullable without null checks
 - Unbounded integers for IDs
@@ -111,12 +119,14 @@ Red flags:
 ### Code Structure
 
 Questions to ask:
+
 - Does this follow SOLID principles?
 - Is this DRY?
 - Is abstraction level appropriate?
 - Will this be maintainable in 6 months?
 
 Red flags:
+
 - Functions > 50 lines
 - Classes with > 7 methods
 - Parameters > 5 per function
@@ -146,6 +156,7 @@ Red flags:
 ### When to Persist
 
 Continue pushing back when:
+
 - Security implications exist
 - Data loss is possible
 - Existing architecture would break
@@ -155,6 +166,7 @@ Continue pushing back when:
 ### When to Yield
 
 Accept user's choice when:
+
 - Trade-off is legitimate
 - Constraints justify deviation
 - Impact is isolated
@@ -167,14 +179,14 @@ Accept user's choice when:
 
 Before finalizing ANY solution, force yourself through these perspectives:
 
-| Perspective | Question |
-|-------------|----------|
-| Pessimist | "How will this fail?" |
-| Maintainer | "Will I understand this in 6 months?" |
-| Reviewer | "What would a senior engineer critique?" |
-| User | "Does this actually solve the problem?" |
-| Ops | "How will this behave in production?" |
-| **Skeptic** | "Is the user's premise correct?" |
+| Perspective | Question                                 |
+| ----------- | ---------------------------------------- |
+| Pessimist   | "How will this fail?"                    |
+| Maintainer  | "Will I understand this in 6 months?"    |
+| Reviewer    | "What would a senior engineer critique?" |
+| User        | "Does this actually solve the problem?"  |
+| Ops         | "How will this behave in production?"    |
+| **Skeptic** | "Is the user's premise correct?"         |
 
 ---
 
@@ -226,16 +238,16 @@ Before finalizing ANY solution, force yourself through these perspectives:
 
 ## Analysis Depth by Task Type
 
-| Task Type | Analysis Depth | Alternatives Required |
-|-----------|---------------|----------------------|
-| Bug fix | Medium | 2 |
-| New feature | High | 3+ |
-| Refactoring | High | 3+ |
-| Configuration | Low | 1 |
-| Documentation | Low | 1 |
-| Architecture change | Very High | 5+ |
-| **Security-related** | Very High | 3+ |
-| **Data migration** | Very High | 3+ |
+| Task Type            | Analysis Depth | Alternatives Required |
+| -------------------- | -------------- | --------------------- |
+| Bug fix              | Medium         | 2                     |
+| New feature          | High           | 3+                    |
+| Refactoring          | High           | 3+                    |
+| Configuration        | Low            | 1                     |
+| Documentation        | Low            | 1                     |
+| Architecture change  | Very High      | 5+                    |
+| **Security-related** | Very High      | 3+                    |
+| **Data migration**   | Very High      | 3+                    |
 
 ---
 
@@ -243,13 +255,13 @@ Before finalizing ANY solution, force yourself through these perspectives:
 
 ### Always Verify
 
-| User Says | Claude Should Check |
-|-----------|-------------------|
-| "This is simple" | Is it actually simple? What's the scope? |
-| "Just do X" | Is X the right approach? Are there better ways? |
-| "It worked before" | Has context changed? Is it still appropriate? |
-| "Everyone does it this way" | Is that actually best practice? |
-| "We don't need tests" | What are the risks? Push back on this. |
+| User Says                   | Claude Should Check                             |
+| --------------------------- | ----------------------------------------------- |
+| "This is simple"            | Is it actually simple? What's the scope?        |
+| "Just do X"                 | Is X the right approach? Are there better ways? |
+| "It worked before"          | Has context changed? Is it still appropriate?   |
+| "Everyone does it this way" | Is that actually best practice?                 |
+| "We don't need tests"       | What are the risks? Push back on this.          |
 
 ### Constructive Challenge Pattern
 
@@ -269,5 +281,5 @@ Would you like to proceed with your original approach, or shall we explore the a
 
 ---
 
-*See [../WORKFLOW.md](../WORKFLOW.md) for how analysis integrates with development workflow.*
-*See [../../CLAUDE.md](../../CLAUDE.md) for critical rules and abort conditions.*
+_See [../WORKFLOW.md](../WORKFLOW.md) for how analysis integrates with development workflow._
+_See [../../CLAUDE.md](../../CLAUDE.md) for critical rules and abort conditions._

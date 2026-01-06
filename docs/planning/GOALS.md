@@ -10,6 +10,7 @@ Project objectives and success metrics.
 ## Mission
 
 <!-- One sentence: Why does this project exist? -->
+
 [Project mission statement]
 
 ---
@@ -51,26 +52,26 @@ Project objectives and success metrics.
 
 ### Product Metrics
 
-| Metric | Definition | Target | Current | Trend |
-|--------|------------|--------|---------|-------|
+| Metric     | Definition     | Target   | Current   | Trend     |
+| ---------- | -------------- | -------- | --------- | --------- |
 | [Metric 1] | [How measured] | [Target] | [Current] | ↑ / → / ↓ |
 | [Metric 2] | [How measured] | [Target] | [Current] | ↑ / → / ↓ |
 
 ### Technical Metrics
 
-| Metric | Definition | Target | Current | Trend |
-|--------|------------|--------|---------|-------|
-| Test Coverage | % of code covered | 80% | [Current]% | ↑ / → / ↓ |
-| Build Time | CI pipeline duration | < 5 min | [Current] | ↑ / → / ↓ |
-| Error Rate | Errors per 1000 requests | < 0.1% | [Current]% | ↑ / → / ↓ |
+| Metric        | Definition               | Target  | Current    | Trend     |
+| ------------- | ------------------------ | ------- | ---------- | --------- |
+| Test Coverage | % of code covered        | 80%     | [Current]% | ↑ / → / ↓ |
+| Build Time    | CI pipeline duration     | < 5 min | [Current]  | ↑ / → / ↓ |
+| Error Rate    | Errors per 1000 requests | < 0.1%  | [Current]% | ↑ / → / ↓ |
 
 ### Quality Metrics
 
-| Metric | Definition | Target | Current | Trend |
-|--------|------------|--------|---------|-------|
-| Bug Count | Open bugs | < 10 | [Current] | ↑ / → / ↓ |
-| Tech Debt | Estimated hours | < 40h | [Current] | ↑ / → / ↓ |
-| Doc Coverage | % APIs documented | 100% | [Current]% | ↑ / → / ↓ |
+| Metric       | Definition        | Target | Current    | Trend     |
+| ------------ | ----------------- | ------ | ---------- | --------- |
+| Bug Count    | Open bugs         | < 10   | [Current]  | ↑ / → / ↓ |
+| Tech Debt    | Estimated hours   | < 40h  | [Current]  | ↑ / → / ↓ |
+| Doc Coverage | % APIs documented | 100%   | [Current]% | ↑ / → / ↓ |
 
 ---
 
@@ -98,8 +99,8 @@ Things we explicitly are NOT trying to do:
 
 Limitations we're working within:
 
-| Constraint | Description | Impact |
-|------------|-------------|--------|
+| Constraint     | Description   | Impact                |
+| -------------- | ------------- | --------------------- |
 | [Constraint 1] | [Description] | [How it affects work] |
 | [Constraint 2] | [Description] | [How it affects work] |
 
@@ -109,16 +110,16 @@ Limitations we're working within:
 
 ### This Quarter
 
-| Objective | Progress | Confidence |
-|-----------|----------|------------|
-| [Objective 1] | [X]% | High / Medium / Low |
-| [Objective 2] | [X]% | High / Medium / Low |
+| Objective     | Progress | Confidence          |
+| ------------- | -------- | ------------------- |
+| [Objective 1] | [X]%     | High / Medium / Low |
+| [Objective 2] | [X]%     | High / Medium / Low |
 
 ### Historical
 
-| Period | Objectives Set | Achieved | Notes |
-|--------|----------------|----------|-------|
-| Q1 2025 | [X] | [Y] | [Notes] |
+| Period  | Objectives Set | Achieved | Notes   |
+| ------- | -------------- | -------- | ------- |
+| Q1 2025 | [X]            | [Y]      | [Notes] |
 
 ---
 
@@ -129,19 +130,22 @@ Limitations we're working within:
 **Attendees**: [Names]
 
 **Discussion**:
+
 - [Key point 1]
 - [Key point 2]
 
 **Decisions**:
+
 - [Decision 1]
 - [Decision 2]
 
 **Action Items**:
+
 - [ ] [Action 1] — [Owner]
 - [ ] [Action 2] — [Owner]
 
 ---
 
-*See [ROADMAP.md](ROADMAP.md) for release planning.*
-*See [MILESTONES.md](MILESTONES.md) for key dates.*
-*See [TODO.md](TODO.md) for tactical execution.*
+_See [ROADMAP.md](ROADMAP.md) for release planning._
+_See [MILESTONES.md](MILESTONES.md) for key dates._
+_See [TODO.md](TODO.md) for tactical execution._

@@ -11,6 +11,7 @@ Active tasks and backlog.
 <!-- Tasks currently being worked on -->
 
 ### [TASK-001] - [Task Name]
+
 **Priority**: High
 **Assigned**: [Name/Claude]
 **Started**: YYYY-MM-DD
@@ -19,6 +20,7 @@ Active tasks and backlog.
 **Description**: [What needs to be done]
 
 **Acceptance Criteria**:
+
 - [ ] [Criterion 1]
 - [ ] [Criterion 2]
 
@@ -29,6 +31,7 @@ Active tasks and backlog.
 <!-- Tasks that should be done soon -->
 
 ### [TASK-002] - [Task Name]
+
 **Priority**: High
 **Estimated effort**: [Hours/Days]
 **Dependencies**: [None / Other tasks]
@@ -36,6 +39,7 @@ Active tasks and backlog.
 **Description**: [What needs to be done]
 
 **Acceptance Criteria**:
+
 - [ ] [Criterion 1]
 - [ ] [Criterion 2]
 
@@ -58,6 +62,7 @@ Active tasks and backlog.
 <!-- Tasks generated from completed work - include origin -->
 
 ### [TASK-XXX] - [Improvement from Task Y]
+
 **Origin**: [docs/plans/YYYY-MM-DD_original-task.md](plans/YYYY-MM-DD_original-task.md)
 **Spawned from**: [Original task description]
 **Priority**: Medium
@@ -70,6 +75,7 @@ Active tasks and backlog.
 <!-- Tasks waiting on external dependencies -->
 
 ### [TASK-XXX] - [Task Name]
+
 **Blocked by**: [What's blocking it]
 **Since**: YYYY-MM-DD
 

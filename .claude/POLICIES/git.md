@@ -14,15 +14,15 @@ Standards for version control, branching, and collaboration.
 
 ### Branch Types
 
-| Branch | Purpose | Naming | Lifetime |
-|--------|---------|--------|----------|
-| `main` | Production-ready code | `main` | Permanent |
-| `develop` | Integration branch | `develop` | Permanent (if used) |
-| `feature/*` | New features | `feature/short-description` | Until merged |
-| `bugfix/*` | Bug fixes | `bugfix/issue-or-description` | Until merged |
-| `hotfix/*` | Production fixes | `hotfix/critical-issue` | Until merged |
-| `release/*` | Release preparation | `release/vX.Y.Z` | Until released |
-| `refactor/*` | Code restructuring | `refactor/what-refactored` | Until merged |
+| Branch       | Purpose               | Naming                        | Lifetime            |
+| ------------ | --------------------- | ----------------------------- | ------------------- |
+| `main`       | Production-ready code | `main`                        | Permanent           |
+| `develop`    | Integration branch    | `develop`                     | Permanent (if used) |
+| `feature/*`  | New features          | `feature/short-description`   | Until merged        |
+| `bugfix/*`   | Bug fixes             | `bugfix/issue-or-description` | Until merged        |
+| `hotfix/*`   | Production fixes      | `hotfix/critical-issue`       | Until merged        |
+| `release/*`  | Release preparation   | `release/vX.Y.Z`              | Until released      |
+| `refactor/*` | Code restructuring    | `refactor/what-refactored`    | Until merged        |
 
 ### Branch Naming Conventions
 
@@ -44,13 +44,13 @@ Feature/UserAuthentication  (case matters in some systems)
 
 ### Branch Rules
 
-| Rule | Main | Develop | Feature |
-|------|------|---------|---------|
-| Direct commits | ❌ No | ❌ No | ✅ Yes |
-| Force push | ❌ Never | ❌ No | ⚠️ Before review |
-| Delete after merge | N/A | N/A | ✅ Yes |
-| Requires review | ✅ Yes | ✅ Yes | Optional |
-| CI must pass | ✅ Yes | ✅ Yes | ✅ Yes |
+| Rule               | Main     | Develop | Feature          |
+| ------------------ | -------- | ------- | ---------------- |
+| Direct commits     | ❌ No    | ❌ No   | ✅ Yes           |
+| Force push         | ❌ Never | ❌ No   | ⚠️ Before review |
+| Delete after merge | N/A      | N/A     | ✅ Yes           |
+| Requires review    | ✅ Yes   | ✅ Yes  | Optional         |
+| CI must pass       | ✅ Yes   | ✅ Yes  | ✅ Yes           |
 
 ---
 
@@ -68,29 +68,29 @@ Feature/UserAuthentication  (case matters in some systems)
 
 **Components:**
 
-| Part | Required | Description |
-|------|----------|-------------|
-| type | Yes | Category of change |
-| scope | No | Component affected |
-| subject | Yes | Brief description (imperative mood) |
-| body | No | Detailed explanation |
-| footer | No | References, breaking changes |
+| Part    | Required | Description                         |
+| ------- | -------- | ----------------------------------- |
+| type    | Yes      | Category of change                  |
+| scope   | No       | Component affected                  |
+| subject | Yes      | Brief description (imperative mood) |
+| body    | No       | Detailed explanation                |
+| footer  | No       | References, breaking changes        |
 
 ### Commit Types
 
-| Type | Description | Example |
-|------|-------------|---------|
-| `feat` | New feature | `feat(auth): add OAuth2 login` |
-| `fix` | Bug fix | `fix(api): handle null response` |
-| `docs` | Documentation only | `docs: update API reference` |
-| `style` | Formatting, no logic change | `style: fix indentation` |
-| `refactor` | Code change, no feature/fix | `refactor: extract validation` |
-| `test` | Adding/updating tests | `test: add login edge cases` |
-| `chore` | Maintenance tasks | `chore: update dependencies` |
-| `perf` | Performance improvement | `perf: optimize query` |
-| `ci` | CI/CD changes | `ci: add coverage report` |
-| `build` | Build system changes | `build: update webpack config` |
-| `revert` | Revert previous commit | `revert: feat(auth): add OAuth2` |
+| Type       | Description                 | Example                          |
+| ---------- | --------------------------- | -------------------------------- |
+| `feat`     | New feature                 | `feat(auth): add OAuth2 login`   |
+| `fix`      | Bug fix                     | `fix(api): handle null response` |
+| `docs`     | Documentation only          | `docs: update API reference`     |
+| `style`    | Formatting, no logic change | `style: fix indentation`         |
+| `refactor` | Code change, no feature/fix | `refactor: extract validation`   |
+| `test`     | Adding/updating tests       | `test: add login edge cases`     |
+| `chore`    | Maintenance tasks           | `chore: update dependencies`     |
+| `perf`     | Performance improvement     | `perf: optimize query`           |
+| `ci`       | CI/CD changes               | `ci: add coverage report`        |
+| `build`    | Build system changes        | `build: update webpack config`   |
+| `revert`   | Revert previous commit      | `revert: feat(auth): add OAuth2` |
 
 ### Commit Message Examples
 
@@ -130,6 +130,7 @@ See migration guide in docs/migrations/v3.md
 ### Commit Best Practices
 
 **DO:**
+
 - Write in imperative mood ("Add feature" not "Added feature")
 - Keep subject line under 50 characters
 - Wrap body at 72 characters
@@ -138,6 +139,7 @@ See migration guide in docs/migrations/v3.md
 - Make atomic commits (one logical change)
 
 **DON'T:**
+
 - Commit generated files (unless intentional)
 - Mix unrelated changes
 - Write vague messages ("fix", "update", "WIP")
@@ -232,25 +234,28 @@ git merge hotfix/security-patch
 
 ### When to Use Each Strategy
 
-| Strategy | When to Use | Result |
-|----------|-------------|--------|
-| Merge commit | Preserving feature history | Merge commit + all feature commits |
-| Squash merge | Clean history, many small commits | Single commit with all changes |
-| Rebase | Linear history, clean commits | Feature commits on top of main |
+| Strategy     | When to Use                       | Result                             |
+| ------------ | --------------------------------- | ---------------------------------- |
+| Merge commit | Preserving feature history        | Merge commit + all feature commits |
+| Squash merge | Clean history, many small commits | Single commit with all changes     |
+| Rebase       | Linear history, clean commits     | Feature commits on top of main     |
 
 ### Team Defaults (Choose One)
 
 **Option A: Squash Merge (Recommended for most)**
+
 - Clean main branch history
 - One commit per feature/fix
 - Detailed PR description becomes commit body
 
 **Option B: Rebase + Merge**
+
 - Linear history
 - Each meaningful commit preserved
 - Requires clean commit discipline
 
 **Option C: Merge Commits**
+
 - Full history preserved
 - Clear feature boundaries
 - Can be noisy
@@ -263,9 +268,11 @@ git merge hotfix/security-patch
 
 ```markdown
 ## Summary
+
 [Brief description of changes]
 
 ## Type of Change
+
 - [ ] Bug fix (non-breaking change fixing an issue)
 - [ ] New feature (non-breaking change adding functionality)
 - [ ] Breaking change (fix or feature causing existing functionality to change)
@@ -273,40 +280,46 @@ git merge hotfix/security-patch
 - [ ] Refactoring (no functional changes)
 
 ## Changes Made
+
 - [Change 1]
 - [Change 2]
 
 ## Testing
+
 - [ ] Unit tests added/updated
 - [ ] Integration tests added/updated
 - [ ] Manual testing performed
 
 ## Checklist
+
 - [ ] Code follows project style guidelines
 - [ ] Self-review completed
 - [ ] Documentation updated
 - [ ] No new warnings introduced
 
 ## Related
+
 - Task: [Reference]
 - Plan: [Link to plan document]
 
 ## Screenshots (if applicable)
+
 [Add screenshots for UI changes]
 ```
 
 ### PR Size Guidelines
 
-| Size | Lines Changed | Review Time | Recommendation |
-|------|---------------|-------------|----------------|
-| Small | < 100 | 15 min | ✅ Ideal |
-| Medium | 100-400 | 30 min | ✅ Acceptable |
-| Large | 400-1000 | 1+ hour | ⚠️ Consider splitting |
-| XL | 1000+ | Several hours | ❌ Split required |
+| Size   | Lines Changed | Review Time   | Recommendation        |
+| ------ | ------------- | ------------- | --------------------- |
+| Small  | < 100         | 15 min        | ✅ Ideal              |
+| Medium | 100-400       | 30 min        | ✅ Acceptable         |
+| Large  | 400-1000      | 1+ hour       | ⚠️ Consider splitting |
+| XL     | 1000+         | Several hours | ❌ Split required     |
 
 ### Handling Large Changes
 
 If change is necessarily large:
+
 1. Add detailed PR description
 2. Organize commits logically
 3. Add inline comments explaining complex parts
@@ -400,6 +413,7 @@ secrets/
 ### Project-Specific
 
 Add in PROJECT.md or project's .gitignore:
+
 ```gitignore
 # Project-specific ignores
 [specific patterns]
@@ -462,22 +476,25 @@ git commit
 ## Claude's Git Responsibilities
 
 **Before commits:**
+
 - Verify changes match task requirements
 - Ensure tests pass
 - Check for secrets or sensitive data
 - Write clear commit messages
 
 **During work:**
+
 - Make atomic, logical commits
 - Keep commits focused
 - Update documentation with code
 
 **After approval:**
+
 - Push only after user confirmation
 - Clean up branches after merge
 - Update task documentation
 
 ---
 
-*See [../WORKFLOW.md](../WORKFLOW.md) for how git integrates with development workflow.*
-*See [code-review.md](code-review.md) for PR review process.*
+_See [../WORKFLOW.md](../WORKFLOW.md) for how git integrates with development workflow._
+_See [code-review.md](code-review.md) for PR review process._

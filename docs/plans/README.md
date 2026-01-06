@@ -48,11 +48,11 @@ mv docs/plans/YYYY-MM-DD_task.md docs/archive/plans/
 
 ## Current Plans
 
-| Plan | Task | Status | Started |
-|------|------|--------|---------|
+| Plan                     | Task               | Status      | Started    |
+| ------------------------ | ------------------ | ----------- | ---------- |
 | [example.md](example.md) | [Task description] | In Progress | YYYY-MM-DD |
 
 ---
 
-*Template: [../../.claude/TEMPLATES/plan.md](../../.claude/TEMPLATES/plan.md)*
-*Archive: [../archive/plans/](../archive/plans/)*
+_Template: [../../.claude/TEMPLATES/plan.md](../../.claude/TEMPLATES/plan.md)_
+_Archive: [../archive/plans/](../archive/plans/)_

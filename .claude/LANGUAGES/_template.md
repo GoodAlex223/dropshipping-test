@@ -15,11 +15,13 @@
 ### Formatting
 
 **Use [Formatter]**:
+
 ```bash
 [formatter command]
 ```
 
 **Configuration**:
+
 ```
 [configuration example]
 ```
@@ -27,11 +29,13 @@
 ### Linting
 
 **Use [Linter]**:
+
 ```bash
 [linter command]
 ```
 
 **Configuration**:
+
 ```
 [configuration example]
 ```
@@ -46,10 +50,10 @@
 
 ## Naming Conventions
 
-| Element | Convention | Example |
-|---------|------------|---------|
-| Files | [convention] | [example] |
-| Classes | [convention] | [example] |
+| Element   | Convention   | Example   |
+| --------- | ------------ | --------- |
+| Files     | [convention] | [example] |
+| Classes   | [convention] | [example] |
 | Functions | [convention] | [example] |
 | Variables | [convention] | [example] |
 | Constants | [convention] | [example] |
@@ -79,6 +83,7 @@
 ### Type Checking
 
 **Use [Type Checker]**:
+
 ```bash
 [type checker command]
 ```
@@ -105,16 +110,17 @@ project/
 ### Package Manager
 
 **Use [Package Manager]**:
+
 ```bash
 [package manager commands]
 ```
 
 ### Version Pinning
 
-| Dependency Type | Strategy | Example |
-|-----------------|----------|---------|
-| Core | [strategy] | [example] |
-| Dev | [strategy] | [example] |
+| Dependency Type | Strategy   | Example   |
+| --------------- | ---------- | --------- |
+| Core            | [strategy] | [example] |
+| Dev             | [strategy] | [example] |
 
 ---
 
@@ -143,6 +149,7 @@ project/
 ### Framework
 
 **Use [Test Framework]**:
+
 ```bash
 [test command]
 ```
@@ -195,17 +202,17 @@ project/
 
 ## Anti-Patterns to Avoid
 
-| Anti-Pattern | Problem | Better Approach |
-|--------------|---------|-----------------|
-| [pattern] | [problem] | [solution] |
-| [pattern] | [problem] | [solution] |
+| Anti-Pattern | Problem   | Better Approach |
+| ------------ | --------- | --------------- |
+| [pattern]    | [problem] | [solution]      |
+| [pattern]    | [problem] | [solution]      |
 
 ---
 
 ## Tools Summary
 
-| Tool | Purpose | Command |
-|------|---------|---------|
+| Tool   | Purpose   | Command   |
+| ------ | --------- | --------- |
 | [Tool] | [Purpose] | [Command] |
 | [Tool] | [Purpose] | [Command] |
 
@@ -229,5 +236,5 @@ project/
 
 ---
 
-*See [../POLICIES/testing.md](../POLICIES/testing.md) for general testing policy.*
-*See [../POLICIES/error-handling.md](../POLICIES/error-handling.md) for error handling patterns.*
+_See [../POLICIES/testing.md](../POLICIES/testing.md) for general testing policy._
+_See [../POLICIES/error-handling.md](../POLICIES/error-handling.md) for error handling patterns._

@@ -1,0 +1,66 @@
+{
+  "name": "Dropshipping Dev",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/dropshipping",
+  "remoteUser": "root",
+
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    },
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "typescript.tsdk": "node_modules/typescript/lib",
+        "typescript.enablePromptUseWorkspaceTsdk": true,
+        "eslint.workingDirectories": [{ "mode": "auto" }],
+        "files.eol": "\n"
+      },
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "Prisma.prisma",
+        "bradlc.vscode-tailwindcss",
+        "ms-azuretools.vscode-docker",
+        "GitHub.copilot",
+        "eamodio.gitlens",
+        "formulahendry.auto-rename-tag",
+        "christian-kohler.path-intellisense",
+        "ms-playwright.playwright"
+      ]
+    }
+  },
+
+  "forwardPorts": [3000, 5432, 6379, 8080, 5555],
+  "portsAttributes": {
+    "3000": { "label": "Next.js App", "onAutoForward": "notify" },
+    "5432": { "label": "PostgreSQL", "onAutoForward": "silent" },
+    "6379": { "label": "Redis", "onAutoForward": "silent" },
+    "8080": { "label": "Adminer", "onAutoForward": "silent" },
+    "5555": { "label": "Prisma Studio", "onAutoForward": "notify" }
+  },
+
+  "postCreateCommand": "npm install && npx prisma generate",
+  "postStartCommand": "npx prisma migrate dev --name init 2>/dev/null || true",
+
+  "remoteEnv": {
+    "DATABASE_URL": "postgresql://postgres:postgres@postgres:5432/dropshipping?schema=public",
+    "REDIS_URL": "redis://redis:6379",
+    "NEXTAUTH_URL": "http://localhost:3000",
+    "NEXTAUTH_SECRET": "dev-secret-change-in-production-min-32-chars"
+  },
+
+  "containerEnv": {
+    "NODE_ENV": "development"
+  }
+}

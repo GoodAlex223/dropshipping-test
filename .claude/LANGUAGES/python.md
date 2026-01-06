@@ -12,11 +12,13 @@ Python-specific coding standards and best practices.
 ### Formatting
 
 **Use Black for formatting**:
+
 ```bash
 black --line-length 88 .
 ```
 
 **Configuration** (pyproject.toml):
+
 ```toml
 [tool.black]
 line-length = 88
@@ -26,11 +28,13 @@ target-version = ['py39', 'py310', 'py311']
 ### Linting
 
 **Use Ruff** (recommended) or flake8:
+
 ```bash
 ruff check .
 ```
 
 **Configuration** (pyproject.toml):
+
 ```toml
 [tool.ruff]
 line-length = 88
@@ -63,16 +67,16 @@ from my_package.models import User
 
 ## Naming Conventions
 
-| Element | Convention | Example |
-|---------|------------|---------|
-| Modules | snake_case | `user_service.py` |
-| Packages | snake_case | `my_package/` |
-| Classes | PascalCase | `UserService` |
-| Functions | snake_case | `get_user_by_id` |
-| Variables | snake_case | `user_count` |
-| Constants | UPPER_SNAKE | `MAX_RETRIES` |
-| Private | _leading_underscore | `_internal_method` |
-| Type variables | PascalCase + T | `UserT`, `ResponseT` |
+| Element        | Convention           | Example              |
+| -------------- | -------------------- | -------------------- |
+| Modules        | snake_case           | `user_service.py`    |
+| Packages       | snake_case           | `my_package/`        |
+| Classes        | PascalCase           | `UserService`        |
+| Functions      | snake_case           | `get_user_by_id`     |
+| Variables      | snake_case           | `user_count`         |
+| Constants      | UPPER_SNAKE          | `MAX_RETRIES`        |
+| Private        | \_leading_underscore | `_internal_method`   |
+| Type variables | PascalCase + T       | `UserT`, `ResponseT` |
 
 ### Naming Guidelines
 
@@ -121,11 +125,13 @@ def process(data: list[str]) -> dict[str, int]:
 ### Type Checking
 
 **Use mypy**:
+
 ```bash
 mypy --strict src/
 ```
 
 **Configuration** (pyproject.toml):
+
 ```toml
 [tool.mypy]
 python_version = "3.11"
@@ -211,11 +217,11 @@ dev = [
 
 ### Version Pinning
 
-| Dependency Type | Strategy | Example |
-|-----------------|----------|---------|
-| Core dependencies | Constrained range | `>=2.0.0,<3.0.0` |
-| Dev dependencies | Minimum version | `>=7.0.0` |
-| Lock file | Exact versions | `requirements.lock` |
+| Dependency Type   | Strategy          | Example             |
+| ----------------- | ----------------- | ------------------- |
+| Core dependencies | Constrained range | `>=2.0.0,<3.0.0`    |
+| Dev dependencies  | Minimum version   | `>=7.0.0`           |
+| Lock file         | Exact versions    | `requirements.lock` |
 
 ---
 
@@ -226,7 +232,7 @@ dev = [
 ```python
 class AppError(Exception):
     """Base application error."""
-    
+
     def __init__(self, message: str, code: str | None = None):
         super().__init__(message)
         self.code = code
@@ -289,24 +295,24 @@ from my_package.services import UserService
 
 class TestUserService:
     """Tests for UserService."""
-    
+
     @pytest.fixture
     def service(self) -> UserService:
         """Create service instance."""
         return UserService()
-    
+
     def test_get_user_returns_user(self, service: UserService) -> None:
         """Should return user when found."""
         # Arrange
         user_id = 123
-        
+
         # Act
         result = service.get_user(user_id)
-        
+
         # Assert
         assert result is not None
         assert result.id == user_id
-    
+
     def test_get_user_not_found_returns_none(self, service: UserService) -> None:
         """Should return None when user not found."""
         result = service.get_user(999)
@@ -334,9 +340,9 @@ def db_session(engine) -> Session:
     connection = engine.connect()
     transaction = connection.begin()
     session = Session(bind=connection)
-    
+
     yield session
-    
+
     session.close()
     transaction.rollback()
     connection.close()
@@ -355,22 +361,22 @@ def calculate_score(
     normalize: bool = True,
 ) -> float:
     """Calculate weighted score for items.
-    
+
     Computes a weighted sum of item values, optionally normalized
     to the range [0, 1].
-    
+
     Args:
         items: List of items to score.
         weights: Mapping of item types to weight values.
         normalize: Whether to normalize the final score.
-    
+
     Returns:
         The calculated score, between 0 and 1 if normalized.
-    
+
     Raises:
         ValueError: If items list is empty.
         KeyError: If item type not found in weights.
-    
+
     Examples:
         >>> items = [Item("a", 10), Item("b", 20)]
         >>> weights = {"a": 0.5, "b": 0.5}
@@ -391,7 +397,7 @@ This module provides user-related functionality including:
 
 Example:
     from my_package.users import UserService
-    
+
     service = UserService()
     user = service.create_user(email="user@example.com")
 """
@@ -434,7 +440,7 @@ class User:
     email: str
     name: str
     created_at: datetime = field(default_factory=datetime.utcnow)
-    
+
     def __post_init__(self) -> None:
         if not self.email:
             raise ValueError("Email is required")
@@ -448,20 +454,20 @@ from pydantic import BaseModel, Field, EmailStr
 
 class UserCreate(BaseModel):
     """User creation request."""
-    
+
     email: EmailStr
     name: str = Field(min_length=1, max_length=100)
-    
+
     model_config = {"strict": True}
 
 
 class UserResponse(BaseModel):
     """User response."""
-    
+
     id: int
     email: str
     name: str
-    
+
     model_config = {"from_attributes": True}
 ```
 
@@ -469,14 +475,14 @@ class UserResponse(BaseModel):
 
 ## Anti-Patterns to Avoid
 
-| Anti-Pattern | Problem | Better Approach |
-|--------------|---------|-----------------|
-| `from module import *` | Pollutes namespace | Import specific names |
-| Mutable default args | Shared state bugs | Use `None` default |
-| Bare `except:` | Catches everything | Catch specific exceptions |
-| Global variables | Hard to test | Dependency injection |
-| String concatenation in loops | O(n²) | Use `join()` |
-| `type()` for type checking | Misses inheritance | Use `isinstance()` |
+| Anti-Pattern                  | Problem            | Better Approach           |
+| ----------------------------- | ------------------ | ------------------------- |
+| `from module import *`        | Pollutes namespace | Import specific names     |
+| Mutable default args          | Shared state bugs  | Use `None` default        |
+| Bare `except:`                | Catches everything | Catch specific exceptions |
+| Global variables              | Hard to test       | Dependency injection      |
+| String concatenation in loops | O(n²)              | Use `join()`              |
+| `type()` for type checking    | Misses inheritance | Use `isinstance()`        |
 
 ### Examples
 
@@ -498,13 +504,13 @@ def add_item(item, items=None):
 
 ## Tools Summary
 
-| Tool | Purpose | Command |
-|------|---------|---------|
-| Black | Formatting | `black .` |
-| Ruff | Linting | `ruff check .` |
-| mypy | Type checking | `mypy --strict .` |
-| pytest | Testing | `pytest` |
-| pip-audit | Security | `pip-audit` |
+| Tool      | Purpose       | Command           |
+| --------- | ------------- | ----------------- |
+| Black     | Formatting    | `black .`         |
+| Ruff      | Linting       | `ruff check .`    |
+| mypy      | Type checking | `mypy --strict .` |
+| pytest    | Testing       | `pytest`          |
+| pip-audit | Security      | `pip-audit`       |
 
 ### Pre-commit Configuration
 
@@ -530,5 +536,5 @@ repos:
 
 ---
 
-*See [../POLICIES/testing.md](../POLICIES/testing.md) for general testing policy.*
-*See [../POLICIES/error-handling.md](../POLICIES/error-handling.md) for error handling patterns.*
+_See [../POLICIES/testing.md](../POLICIES/testing.md) for general testing policy._
+_See [../POLICIES/error-handling.md](../POLICIES/error-handling.md) for error handling patterns._

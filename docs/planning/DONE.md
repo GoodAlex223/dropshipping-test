@@ -18,12 +18,15 @@ Completed tasks with implementation details and learnings.
 [Brief description of what was actually done]
 
 **Key Decisions**:
+
 - [Decision 1]: [Why]
 
 **Lessons Learned**:
+
 - [Lesson]
 
 **Follow-up Tasks**:
+
 - [If any spawned new tasks, link to TODO.md]
 
 ---
@@ -36,9 +39,9 @@ Completed tasks with implementation details and learnings.
 
 ## Statistics
 
-| Month | Tasks Completed | Avg Duration |
-|-------|-----------------|--------------|
-| YYYY-MM | X | X days |
+| Month   | Tasks Completed | Avg Duration |
+| ------- | --------------- | ------------ |
+| YYYY-MM | X               | X days       |
 
 ---
 

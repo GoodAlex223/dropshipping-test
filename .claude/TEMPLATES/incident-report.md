@@ -23,15 +23,15 @@
 
 <!-- Chronological sequence of events (all times in UTC) -->
 
-| Time (UTC) | Event |
-|------------|-------|
-| HH:MM | [First indication of problem] |
-| HH:MM | [Alert triggered / User reported] |
-| HH:MM | [Investigation started] |
-| HH:MM | [Root cause identified] |
-| HH:MM | [Mitigation applied] |
-| HH:MM | [Service restored] |
-| HH:MM | [Incident closed] |
+| Time (UTC) | Event                             |
+| ---------- | --------------------------------- |
+| HH:MM      | [First indication of problem]     |
+| HH:MM      | [Alert triggered / User reported] |
+| HH:MM      | [Investigation started]           |
+| HH:MM      | [Root cause identified]           |
+| HH:MM      | [Mitigation applied]              |
+| HH:MM      | [Service restored]                |
+| HH:MM      | [Incident closed]                 |
 
 ---
 
@@ -57,11 +57,11 @@
 
 ### Metrics
 
-| Metric | Before | During | After |
-|--------|--------|--------|-------|
-| Error Rate | X% | Y% | X% |
-| Response Time | Xms | Yms | Xms |
-| Availability | X% | Y% | X% |
+| Metric        | Before | During | After |
+| ------------- | ------ | ------ | ----- |
+| Error Rate    | X%     | Y%     | X%    |
+| Response Time | Xms    | Yms    | Xms   |
+| Availability  | X%     | Y%     | X%    |
 
 ---
 
@@ -143,24 +143,24 @@
 
 ### Immediate (This Week)
 
-| Action | Owner | Due Date | Status |
-|--------|-------|----------|--------|
-| [Action 1] | [Name] | YYYY-MM-DD | [ ] |
-| [Action 2] | [Name] | YYYY-MM-DD | [ ] |
+| Action     | Owner  | Due Date   | Status |
+| ---------- | ------ | ---------- | ------ |
+| [Action 1] | [Name] | YYYY-MM-DD | [ ]    |
+| [Action 2] | [Name] | YYYY-MM-DD | [ ]    |
 
 ### Short-term (This Month)
 
-| Action | Owner | Due Date | Status |
-|--------|-------|----------|--------|
-| [Action 1] | [Name] | YYYY-MM-DD | [ ] |
-| [Action 2] | [Name] | YYYY-MM-DD | [ ] |
+| Action     | Owner  | Due Date   | Status |
+| ---------- | ------ | ---------- | ------ |
+| [Action 1] | [Name] | YYYY-MM-DD | [ ]    |
+| [Action 2] | [Name] | YYYY-MM-DD | [ ]    |
 
 ### Long-term (This Quarter)
 
-| Action | Owner | Due Date | Status |
-|--------|-------|----------|--------|
-| [Action 1] | [Name] | YYYY-MM-DD | [ ] |
-| [Action 2] | [Name] | YYYY-MM-DD | [ ] |
+| Action     | Owner  | Due Date   | Status |
+| ---------- | ------ | ---------- | ------ |
+| [Action 1] | [Name] | YYYY-MM-DD | [ ]    |
+| [Action 2] | [Name] | YYYY-MM-DD | [ ]    |
 
 ---
 
@@ -195,14 +195,14 @@
 
 ### Internal Communication
 
-| Time | Channel | Message |
-|------|---------|---------|
+| Time  | Channel       | Message              |
+| ----- | ------------- | -------------------- |
 | HH:MM | [Slack/Email] | [Summary of message] |
 
 ### External Communication
 
-| Time | Channel | Message |
-|------|---------|---------|
+| Time  | Channel             | Message              |
+| ----- | ------------------- | -------------------- |
 | HH:MM | [Status page/Email] | [Summary of message] |
 
 ### Communication Review
@@ -239,11 +239,11 @@
 
 ## Participants
 
-| Role | Name |
-|------|------|
-| Incident Commander | [Name] |
-| Technical Lead | [Name] |
-| Communications | [Name] |
+| Role                  | Name   |
+| --------------------- | ------ |
+| Incident Commander    | [Name] |
+| Technical Lead        | [Name] |
+| Communications        | [Name] |
 | Subject Matter Expert | [Name] |
 
 ---
@@ -276,5 +276,5 @@
 
 ---
 
-*Report Author*: [Name]
-*Last Updated*: YYYY-MM-DD
+_Report Author_: [Name]
+_Last Updated_: YYYY-MM-DD

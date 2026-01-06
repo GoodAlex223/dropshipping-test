@@ -25,15 +25,15 @@
 
 ### Task Type → Required Documents
 
-| Task Type | Must Read | Should Read |
-|-----------|-----------|-------------|
-| **New Feature** | TODO.md, docs/ARCHITECTURE.md | PROJECT_CONTEXT.md, related plans |
-| **Bug Fix** | TODO.md, related module docs | Past similar bug fixes |
-| **Refactoring** | ARCHITECTURE.md, PROJECT_CONTEXT.md | Existing refactoring plans |
-| **Database Changes** | ARCHITECTURE.md (data layer), schema docs | Migration history |
-| **Testing** | Testing policy, existing test patterns | Coverage reports |
-| **Documentation** | docs/README.md, style guides | All docs in relevant section |
-| **Deployment** | Deployment docs, environment configs | Previous deployment notes |
+| Task Type            | Must Read                                 | Should Read                       |
+| -------------------- | ----------------------------------------- | --------------------------------- |
+| **New Feature**      | TODO.md, docs/ARCHITECTURE.md             | PROJECT_CONTEXT.md, related plans |
+| **Bug Fix**          | TODO.md, related module docs              | Past similar bug fixes            |
+| **Refactoring**      | ARCHITECTURE.md, PROJECT_CONTEXT.md       | Existing refactoring plans        |
+| **Database Changes** | ARCHITECTURE.md (data layer), schema docs | Migration history                 |
+| **Testing**          | Testing policy, existing test patterns    | Coverage reports                  |
+| **Documentation**    | docs/README.md, style guides              | All docs in relevant section      |
+| **Deployment**       | Deployment docs, environment configs      | Previous deployment notes         |
 
 ---
 
@@ -42,6 +42,7 @@
 ### Step 1: Consult the Index
 
 Always start with `docs/README.md` to find:
+
 - Which documents exist
 - Where they are located
 - What topics they cover
@@ -68,6 +69,7 @@ Documentation should be interconnected. Follow links within documents to discove
 ### Step 4: Validate Currency
 
 Check "Last Updated" dates. If documentation appears stale:
+
 - Verify against actual code
 - Note discrepancies
 - Update documentation as part of task
@@ -78,13 +80,13 @@ Check "Last Updated" dates. If documentation appears stale:
 
 ### During Task Execution
 
-| Event | Required Action |
-|-------|-----------------|
-| Find outdated information | Note in plan file, fix before task completion |
-| Discover undocumented pattern | Add to PROJECT_CONTEXT.md |
-| Create new file/module | Document in relevant docs |
-| Complete a plan | Move insights to PROJECT_CONTEXT.md |
-| **Find contradiction** | STOP, report to user, wait for resolution |
+| Event                         | Required Action                               |
+| ----------------------------- | --------------------------------------------- |
+| Find outdated information     | Note in plan file, fix before task completion |
+| Discover undocumented pattern | Add to PROJECT_CONTEXT.md                     |
+| Create new file/module        | Document in relevant docs                     |
+| Complete a plan               | Move insights to PROJECT_CONTEXT.md           |
+| **Find contradiction**        | STOP, report to user, wait for resolution     |
 
 ### After Task Completion
 
@@ -130,14 +132,14 @@ Does it document completed work only?
 
 Before marking a task complete, extract knowledge to permanent docs:
 
-| Discovery Type | Propagate To |
-|---------------|--------------|
-| Patterns discovered | PROJECT_CONTEXT.md |
+| Discovery Type          | Propagate To                          |
+| ----------------------- | ------------------------------------- |
+| Patterns discovered     | PROJECT_CONTEXT.md                    |
 | Architectural decisions | ARCHITECTURE.md or PROJECT_CONTEXT.md |
-| Bug fix patterns | Relevant docs + regression test |
-| Testing insights | Testing documentation |
-| Workflow improvements | CLAUDE.md or .claude/WORKFLOW.md |
-| Project-specific rules | PROJECT.md |
+| Bug fix patterns        | Relevant docs + regression test       |
+| Testing insights        | Testing documentation                 |
+| Workflow improvements   | CLAUDE.md or .claude/WORKFLOW.md      |
+| Project-specific rules  | PROJECT.md                            |
 
 ### Plan File Lifecycle
 
@@ -156,11 +158,11 @@ Before marking a task complete, extract knowledge to permanent docs:
 
 Every document should have a "Last Updated" date. Documents need attention if:
 
-| Age | Action |
-|-----|--------|
-| < 1 month | Current, no action needed |
-| 1-3 months | Verify still accurate |
-| 3-6 months | Review for updates or archiving |
+| Age        | Action                                       |
+| ---------- | -------------------------------------------- |
+| < 1 month  | Current, no action needed                    |
+| 1-3 months | Verify still accurate                        |
+| 3-6 months | Review for updates or archiving              |
 | > 6 months | Strong candidate for archive or major update |
 
 ### Staleness Signals
@@ -281,17 +283,17 @@ Claude MUST check:
 
 ### Document Locations (Standard)
 
-| Content Type | Location |
-|--------------|----------|
-| Universal rules | CLAUDE.md |
-| Project config | PROJECT.md |
-| Doc index | docs/README.md |
-| Active tasks | docs/planning/TODO.md |
-| Completed tasks | docs/planning/DONE.md |
-| Project patterns | docs/PROJECT_CONTEXT.md |
-| Architecture | docs/ARCHITECTURE.md |
-| Implementation plans | docs/plans/*.md |
-| Historical docs | docs/archive/*.md |
+| Content Type         | Location                |
+| -------------------- | ----------------------- |
+| Universal rules      | CLAUDE.md               |
+| Project config       | PROJECT.md              |
+| Doc index            | docs/README.md          |
+| Active tasks         | docs/planning/TODO.md   |
+| Completed tasks      | docs/planning/DONE.md   |
+| Project patterns     | docs/PROJECT_CONTEXT.md |
+| Architecture         | docs/ARCHITECTURE.md    |
+| Implementation plans | docs/plans/\*.md        |
+| Historical docs      | docs/archive/\*.md      |
 
 ### Commands
 
@@ -311,5 +313,5 @@ ls docs/archive/
 
 ---
 
-*This policy ensures Claude Code maintains accurate, current documentation and uses project knowledge effectively.*
-*For project-specific documentation structure, see [PROJECT.md](../../PROJECT.md).*
+_This policy ensures Claude Code maintains accurate, current documentation and uses project knowledge effectively._
+_For project-specific documentation structure, see [PROJECT.md](../../PROJECT.md)._

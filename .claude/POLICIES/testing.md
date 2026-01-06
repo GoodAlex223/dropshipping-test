@@ -37,12 +37,12 @@ def filter_items_by_category(items, category):
 
 ## Coverage Requirements
 
-| Code Type | Minimum Coverage |
-|-----------|------------------|
-| New features | 80% |
-| Bug fixes | 100% of fix path |
-| Critical paths | 90% |
-| Utility functions | 70% |
+| Code Type         | Minimum Coverage |
+| ----------------- | ---------------- |
+| New features      | 80%              |
+| Bug fixes         | 100% of fix path |
+| Critical paths    | 90%              |
+| Utility functions | 70%              |
 
 ### What Must Be Tested
 
@@ -83,7 +83,7 @@ def test_session_persists_across_handlers():
     """Integration: session + handler interaction."""
     session = create_session(user_id=123)
     handle_action(session, item_id=456)
-    
+
     # Verify session state updated
     assert 456 in session.processed_items
 ```
@@ -133,6 +133,7 @@ def test_[unit]_[scenario]_[expected_outcome]():
 ```
 
 Examples:
+
 - `test_filter_items_empty_list_returns_empty`
 - `test_calculate_score_negative_weights_handled`
 - `test_session_timeout_clears_state`
@@ -144,10 +145,10 @@ def test_something():
     # Arrange: Set up test data and conditions
     user = User(id=1, preferences={"item1": 0.5})
     items = [Item(id="item1", category="A")]
-    
+
     # Act: Execute the code under test
     result = recommend_items(user, items)
-    
+
     # Assert: Verify expected outcome
     assert len(result) == 1
     assert result[0].score > 0
@@ -159,17 +160,17 @@ def test_something():
 
 For every function, consider:
 
-| Category | Examples |
-|----------|----------|
-| Empty input | `[]`, `""`, `None`, `{}` |
-| Single element | List with 1 item |
-| Boundary values | 0, -1, MAX_INT, MIN_INT |
-| Invalid types | String where int expected |
-| Unicode | Emojis, RTL text, special chars |
-| Concurrent access | Race conditions |
-| Resource limits | Very large inputs |
-| **Null/undefined** | Missing optional fields |
-| **Invalid state** | Corrupted or inconsistent data |
+| Category           | Examples                        |
+| ------------------ | ------------------------------- |
+| Empty input        | `[]`, `""`, `None`, `{}`        |
+| Single element     | List with 1 item                |
+| Boundary values    | 0, -1, MAX_INT, MIN_INT         |
+| Invalid types      | String where int expected       |
+| Unicode            | Emojis, RTL text, special chars |
+| Concurrent access  | Race conditions                 |
+| Resource limits    | Very large inputs               |
+| **Null/undefined** | Missing optional fields         |
+| **Invalid state**  | Corrupted or inconsistent data  |
 
 ---
 
@@ -231,9 +232,9 @@ from unittest.mock import Mock, patch
 def test_api_request_handles_timeout():
     with patch('module.requests.get') as mock_get:
         mock_get.side_effect = TimeoutError()
-        
+
         result = fetch_data(endpoint="test")
-        
+
         assert result == []  # Graceful handling
 ```
 
@@ -274,14 +275,14 @@ def test_api_request_handles_timeout():
 
 ### Common Issues
 
-| Symptom | Likely Cause |
-|---------|--------------|
-| Test passes alone, fails in suite | Shared state pollution |
-| Flaky test | Race condition or time dependency |
-| Import error | Missing dependency or circular import |
-| Assertion error on equal objects | `__eq__` not implemented |
-| **Works locally, fails in CI** | Environment difference |
-| **Timeout** | Infinite loop or missing mock |
+| Symptom                           | Likely Cause                          |
+| --------------------------------- | ------------------------------------- |
+| Test passes alone, fails in suite | Shared state pollution                |
+| Flaky test                        | Race condition or time dependency     |
+| Import error                      | Missing dependency or circular import |
+| Assertion error on equal objects  | `__eq__` not implemented              |
+| **Works locally, fails in CI**    | Environment difference                |
+| **Timeout**                       | Infinite loop or missing mock         |
 
 ---
 
@@ -300,13 +301,13 @@ def test_api_request_handles_timeout():
 def test_complex_scenario():
     """
     Test that [specific behavior] works when [condition].
-    
+
     This test covers the case where:
     - [Condition 1]
     - [Condition 2]
-    
+
     Related to: Issue #123, TODO.md 4.2.1
-    
+
     Setup:
     - [Describe any non-obvious setup]
     """
@@ -328,5 +329,5 @@ Document findings in the task's plan file under "Testing Insights".
 
 ---
 
-*See [../WORKFLOW.md](../WORKFLOW.md) for how testing integrates with development phases.*
-*See [documentation.md](documentation.md) for documenting test-related decisions.*
+_See [../WORKFLOW.md](../WORKFLOW.md) for how testing integrates with development phases._
+_See [documentation.md](documentation.md) for documenting test-related decisions._
