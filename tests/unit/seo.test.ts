@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import {
   siteConfig,
   getDefaultMetadata,
@@ -96,6 +96,31 @@ describe("SEO Utilities", () => {
       const metadata = getProductMetadata(productWithoutShortDesc);
       expect(metadata.description).toBe("A test product description");
     });
+
+    it("should fallback to siteConfig description when no shortDesc or description", () => {
+      const productWithoutDescriptions = {
+        ...mockProduct,
+        shortDesc: null,
+        description: null,
+      };
+      const metadata = getProductMetadata(productWithoutDescriptions);
+      expect(metadata.description).toBe(siteConfig.description);
+    });
+
+    it("should use ogImage when product has no images", () => {
+      const productWithoutImages = {
+        ...mockProduct,
+        images: undefined,
+      };
+      const metadata = getProductMetadata(productWithoutImages);
+      expect(metadata.openGraph?.images).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            url: siteConfig.ogImage,
+          }),
+        ])
+      );
+    });
   });
 
   describe("getCategoryMetadata", () => {
@@ -123,6 +148,33 @@ describe("SEO Utilities", () => {
 
       expect(metadata.description).toContain("Electronics");
       expect(metadata.description).toContain("42");
+    });
+
+    it("should use 'Browse' when productCount is undefined", () => {
+      const categoryWithoutCount = {
+        ...mockCategory,
+        description: null,
+        productCount: undefined,
+      };
+      const metadata = getCategoryMetadata(categoryWithoutCount);
+
+      expect(metadata.description).toContain("Browse");
+    });
+
+    it("should use ogImage when category has no image", () => {
+      const categoryWithoutImage = {
+        ...mockCategory,
+        image: null,
+      };
+      const metadata = getCategoryMetadata(categoryWithoutImage);
+
+      expect(metadata.openGraph?.images).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            url: siteConfig.ogImage,
+          }),
+        ])
+      );
     });
   });
 
@@ -193,6 +245,24 @@ describe("SEO Utilities", () => {
       const outOfStockProduct = { ...mockProduct, stock: 0 };
       const jsonLd = getProductJsonLd(outOfStockProduct);
       expect(jsonLd.offers.availability).toBe("https://schema.org/OutOfStock");
+    });
+
+    it("should use empty string when description is null", () => {
+      const productWithoutDesc = { ...mockProduct, description: null };
+      const jsonLd = getProductJsonLd(productWithoutDesc);
+      expect(jsonLd.description).toBe("");
+    });
+
+    it("should use empty array when images is undefined", () => {
+      const productWithoutImages = { ...mockProduct, images: undefined };
+      const jsonLd = getProductJsonLd(productWithoutImages);
+      expect(jsonLd.image).toEqual([]);
+    });
+
+    it("should handle product without category", () => {
+      const productWithoutCategory = { ...mockProduct, category: undefined };
+      const jsonLd = getProductJsonLd(productWithoutCategory);
+      expect(jsonLd.category).toBeUndefined();
     });
   });
 

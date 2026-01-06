@@ -9,7 +9,7 @@ describe("Cart Store", () => {
 
   describe("addItem", () => {
     it("should add a new item to the cart", () => {
-      const { addItem, items } = useCartStore.getState();
+      const { addItem } = useCartStore.getState();
 
       addItem({
         productId: "prod-1",
@@ -86,6 +86,71 @@ describe("Cart Store", () => {
 
       const state = useCartStore.getState();
       expect(state.items).toHaveLength(2);
+    });
+
+    it("should not increment quantity when productId matches but variantId differs", () => {
+      const { addItem } = useCartStore.getState();
+
+      addItem({
+        productId: "prod-1",
+        variantId: "var-1",
+        name: "Test Product - Red",
+        price: 29.99,
+        maxStock: 10,
+        quantity: 2,
+      });
+
+      addItem({
+        productId: "prod-1",
+        variantId: "var-2",
+        name: "Test Product - Blue",
+        price: 29.99,
+        maxStock: 10,
+        quantity: 3,
+      });
+
+      const state = useCartStore.getState();
+      expect(state.items).toHaveLength(2);
+      expect(state.items[0].quantity).toBe(2);
+      expect(state.items[1].quantity).toBe(3);
+    });
+
+    it("should increment correct variant and leave others unchanged", () => {
+      useCartStore.setState({
+        items: [
+          {
+            productId: "prod-1",
+            variantId: "var-1",
+            name: "Test Red",
+            price: 10,
+            quantity: 1,
+            maxStock: 10,
+          },
+          {
+            productId: "prod-1",
+            variantId: "var-2",
+            name: "Test Blue",
+            price: 10,
+            quantity: 1,
+            maxStock: 10,
+          },
+        ],
+      });
+
+      const { addItem } = useCartStore.getState();
+      addItem({
+        productId: "prod-1",
+        variantId: "var-1",
+        name: "Test Red",
+        price: 10,
+        maxStock: 10,
+        quantity: 2,
+      });
+
+      const state = useCartStore.getState();
+      expect(state.items).toHaveLength(2);
+      expect(state.items[0].quantity).toBe(3); // 1 + 2
+      expect(state.items[1].quantity).toBe(1); // unchanged
     });
   });
 
@@ -172,6 +237,36 @@ describe("Cart Store", () => {
 
       const state = useCartStore.getState();
       expect(state.items).toHaveLength(0);
+    });
+
+    it("should only update matching variant when productId is same but variantId differs", () => {
+      useCartStore.setState({
+        items: [
+          {
+            productId: "prod-1",
+            variantId: "var-1",
+            name: "Test Red",
+            price: 10,
+            quantity: 1,
+            maxStock: 10,
+          },
+          {
+            productId: "prod-1",
+            variantId: "var-2",
+            name: "Test Blue",
+            price: 10,
+            quantity: 1,
+            maxStock: 10,
+          },
+        ],
+      });
+
+      const { updateQuantity } = useCartStore.getState();
+      updateQuantity("prod-1", 5, "var-1");
+
+      const state = useCartStore.getState();
+      expect(state.items[0].quantity).toBe(5);
+      expect(state.items[1].quantity).toBe(1);
     });
   });
 
