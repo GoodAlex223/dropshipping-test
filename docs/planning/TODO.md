@@ -8,33 +8,33 @@ Active tasks for Dropshipping Website MVP.
 
 ## In Progress
 
-### [TASK-012] - Deployment Setup
+### [TASK-016] - Demo Deployment (Free Tier)
 
 **Priority**: High
-**Dependencies**: All MVP features complete
+**Dependencies**: Phase 5.3 complete
 **Plan**: [docs/plans/2026-01-05_dropshipping-mvp-plan.md](../plans/2026-01-05_dropshipping-mvp-plan.md)
 
-**Description**: Set up production deployment environment and CI/CD pipeline.
+**Description**: Deploy to free hosting services for demonstration purposes.
 
 **Sub-tasks**:
 
-- [ ] Production environment setup
-- [ ] CI/CD pipeline (GitHub Actions)
-- [ ] Monitoring setup (Sentry, Uptime)
-- [ ] Final documentation updates
+- [ ] Create Neon account and database
+- [ ] Deploy to Vercel
+- [ ] Configure environment variables
+- [ ] Run database migrations and seed
+- [ ] Verify deployment works
 
 **Acceptance Criteria**:
 
-- [ ] Application deploys successfully to production
-- [ ] CI/CD pipeline runs tests and deploys on merge to main
-- [ ] Error monitoring is active
-- [ ] All documentation is complete
+- [ ] Application accessible via public URL
+- [ ] Database connected and seeded
+- [ ] Core features work (browse, cart, checkout)
 
 ---
 
 ## High Priority
 
-<!-- No high priority tasks pending - MVP implementation complete -->
+<!-- No high priority tasks pending -->
 
 ---
 
@@ -98,7 +98,7 @@ Active tasks for Dropshipping Website MVP.
 
 ## Completed
 
-All MVP implementation tasks (TASK-001 through TASK-011) have been completed. See [DONE.md](DONE.md) for details.
+All MVP implementation tasks (TASK-001 through TASK-012) have been completed. See [DONE.md](DONE.md) for details.
 
 **Summary of completed work**:
 
@@ -106,7 +106,9 @@ All MVP implementation tasks (TASK-001 through TASK-011) have been completed. Se
 - Phase 2: Product Catalog (Admin Product Management, Customer Product Display, Category Management)
 - Phase 3: Shopping Cart & Checkout (Cart, Stripe Integration, Order Creation)
 - Phase 4: Order Management (Customer Orders, Admin Orders, Supplier Integration)
-- Phase 5.1-5.2: SEO & Performance, Testing
+- Phase 5.1: SEO & Performance
+- Phase 5.2: Testing
+- Phase 5.3: Deployment (CI/CD, Monitoring, Docker, Documentation)
 
 ---
 
@@ -118,7 +120,7 @@ All MVP implementation tasks (TASK-001 through TASK-011) have been completed. Se
 
 ## Notes
 
-- MVP implementation (Phases 1-5.2) is complete
-- Only deployment (Phase 5.3) remains for MVP launch
+- MVP implementation (Phases 1-5.3) is complete
+- Phase 5.4: Demo Deployment is in progress
 - Post-MVP features are tracked in Backlog section
 - Completed tasks move to [DONE.md](DONE.md)

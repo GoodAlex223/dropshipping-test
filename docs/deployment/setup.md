@@ -94,6 +94,12 @@ REDIS_URL="redis://localhost:6380"
 
 # Application
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
+
+# Monitoring (Sentry)
+SENTRY_DSN="https://..."
+NEXT_PUBLIC_SENTRY_DSN="https://..."
+SENTRY_ORG="your-org"
+SENTRY_PROJECT="your-project"
 ```
 
 ### Generating Secrets
@@ -118,7 +124,11 @@ openssl rand -base64 32
 | CDN        | Cloudflare              | CloudFront        |
 | Monitoring | Sentry                  | Self-hosted       |
 
-### Vercel Deployment
+### Deployment Options
+
+#### Option 1: Vercel Deployment
+
+Best for: Serverless, managed infrastructure, automatic scaling
 
 ```bash
 # 1. Install Vercel CLI
@@ -138,7 +148,61 @@ vercel link
 vercel --prod
 ```
 
-### VPS Deployment
+**Required GitHub Secrets for CI/CD:**
+
+- `VERCEL_TOKEN` - Vercel access token
+- `VERCEL_ORG_ID` - Organization ID
+- `VERCEL_PROJECT_ID` - Project ID
+
+#### Option 2: Docker Deployment
+
+Best for: Self-hosted VPS, full control, consistent environments
+
+```bash
+# Build and run with Docker Compose
+docker-compose -f docker-compose.prod.yml up -d
+
+# Or build manually
+docker build -t dropshipping-app .
+docker run -p 3000:3000 --env-file .env dropshipping-app
+```
+
+**Docker files provided:**
+
+- `Dockerfile` - Main application container
+- `Dockerfile.workers` - Background workers container
+- `docker-compose.prod.yml` - Production compose configuration
+- `.dockerignore` - Build exclusions
+
+#### Option 3: VPS Deployment with PM2
+
+Best for: Traditional VPS hosting with process management
+
+```bash
+# 1. Clone repository
+git clone <repository-url> /var/www/dropshipping
+cd /var/www/dropshipping
+
+# 2. Install dependencies
+npm ci --production
+
+# 3. Build application
+npm run build
+
+# 4. Set up environment
+cp .env.example .env
+# Edit .env with production values
+
+# 5. Run migrations
+npx prisma migrate deploy
+
+# 6. Start with PM2
+pm2 start ecosystem.config.js --env production
+pm2 save
+pm2 startup
+```
+
+### VPS Server Setup
 
 #### Initial Server Setup
 
@@ -161,32 +225,6 @@ sudo apt install -y redis-server
 
 # 6. Install Nginx
 sudo apt install -y nginx
-```
-
-#### Application Deployment
-
-```bash
-# 1. Clone repository
-git clone <repository-url> /var/www/dropshipping
-cd /var/www/dropshipping
-
-# 2. Install dependencies
-npm ci --production
-
-# 3. Build application
-npm run build
-
-# 4. Set up environment
-cp .env.example .env
-# Edit .env with production values
-
-# 5. Run migrations
-npx prisma migrate deploy
-
-# 6. Start with PM2
-pm2 start npm --name "dropshipping" -- start
-pm2 save
-pm2 startup
 ```
 
 #### Nginx Configuration
@@ -331,75 +369,69 @@ npm run workers:sync     # Status sync
 
 ### PM2 Worker Configuration
 
-```javascript
-// ecosystem.config.js
-module.exports = {
-  apps: [
-    {
-      name: "dropshipping-web",
-      script: "npm",
-      args: "start",
-      env: {
-        NODE_ENV: "production",
-      },
-    },
-    {
-      name: "dropshipping-workers",
-      script: "npm",
-      args: "run workers",
-      env: {
-        NODE_ENV: "production",
-      },
-    },
-  ],
-};
-```
+The project includes `ecosystem.config.js` for PM2 process management:
 
 ```bash
-pm2 start ecosystem.config.js
+# Start all services
+pm2 start ecosystem.config.js --env production
+
+# View status
+pm2 status
+
+# View logs
+pm2 logs
+
+# Restart all
+pm2 restart all
 ```
+
+**PM2 processes configured:**
+
+- `dropshipping-web` - Main Next.js application (cluster mode)
+- `dropshipping-workers` - Background job workers (fork mode)
 
 ---
 
 ## CI/CD Pipeline
 
-### GitHub Actions
+The project includes GitHub Actions workflows in `.github/workflows/`:
 
-```yaml
-# .github/workflows/deploy.yml
-name: Deploy
+### CI Workflow (`.github/workflows/ci.yml`)
 
-on:
-  push:
-    branches: [main]
+Runs on all PRs and pushes to main/develop:
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm run test:run
+1. **Lint & Type Check** - ESLint, TypeScript, Prettier
+2. **Unit Tests** - Vitest with coverage
+3. **Build** - Production build verification
+4. **E2E Tests** - Playwright tests with PostgreSQL/Redis services
 
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Deploy to Vercel
-        uses: vercel/actions/cli@v1
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: "--prod"
-```
+### Deploy Workflow (`.github/workflows/deploy.yml`)
+
+Runs on push to main or manual trigger:
+
+1. Runs CI workflow
+2. Deploys to Vercel (default) or VPS via SSH
+3. Runs database migrations
+4. Sends deployment notification
+
+### Required GitHub Secrets
+
+| Secret              | Purpose                 |
+| ------------------- | ----------------------- |
+| `VERCEL_TOKEN`      | Vercel deployment       |
+| `VERCEL_ORG_ID`     | Vercel organization     |
+| `VERCEL_PROJECT_ID` | Vercel project          |
+| `DATABASE_URL`      | Production database     |
+| `VPS_HOST`          | VPS hostname (if using) |
+| `VPS_USERNAME`      | VPS SSH username        |
+| `VPS_SSH_KEY`       | VPS SSH private key     |
+| `CODECOV_TOKEN`     | Coverage reporting      |
+
+### GitHub Variables
+
+| Variable            | Purpose                             |
+| ------------------- | ----------------------------------- |
+| `DEPLOYMENT_TARGET` | `vercel` or `vps` (default: vercel) |
 
 ---
 
@@ -407,29 +439,63 @@ jobs:
 
 ### Sentry (Error Tracking)
 
-```bash
-npm install @sentry/nextjs
+Sentry is pre-configured in the project. To enable:
 
-# Run Sentry wizard
-npx @sentry/wizard@latest -i nextjs
+1. Create project at sentry.io
+2. Get DSN from project settings
+3. Set environment variables:
+
+```bash
+SENTRY_DSN="https://xxx@xxx.ingest.sentry.io/xxx"
+NEXT_PUBLIC_SENTRY_DSN="https://xxx@xxx.ingest.sentry.io/xxx"
+SENTRY_ORG="your-org"
+SENTRY_PROJECT="dropshipping"
 ```
+
+**Configuration files:**
+
+- `sentry.client.config.ts` - Browser error tracking
+- `sentry.server.config.ts` - Server error tracking
+- `sentry.edge.config.ts` - Edge runtime tracking
+- `instrumentation.ts` - Next.js instrumentation
 
 ### Health Check Endpoint
 
-Create `/api/health/route.ts`:
+The application includes a comprehensive health check at `/api/health`:
 
-```typescript
-export async function GET() {
-  return Response.json({ status: "ok", timestamp: new Date().toISOString() });
+```bash
+# Check application health
+curl https://yourdomain.com/api/health
+```
+
+**Response:**
+
+```json
+{
+  "status": "ok",
+  "timestamp": "2026-01-07T12:00:00.000Z",
+  "version": "0.1.0",
+  "uptime": 3600,
+  "checks": {
+    "database": { "status": "ok", "latency": 5 },
+    "redis": { "status": "ok", "latency": 2 }
+  }
 }
 ```
 
+**Status codes:**
+
+- `200` - Healthy or degraded
+- `503` - Critical services down
+
 ### Uptime Monitoring
 
-Configure monitoring service (UptimeRobot, Better Uptime) to check:
+Configure monitoring service (UptimeRobot, Better Uptime, Pingdom) to check:
 
-- `GET /api/health` - Application health
-- `GET /` - Homepage loads
+| Endpoint      | Check Frequency | Alert Threshold |
+| ------------- | --------------- | --------------- |
+| `/api/health` | 1 minute        | 2 failures      |
+| `/`           | 5 minutes       | 3 failures      |
 
 ---
 
@@ -445,10 +511,11 @@ Configure monitoring service (UptimeRobot, Better Uptime) to check:
 
 ### Security
 
-- [ ] NEXTAUTH_SECRET is unique and secure
+- [ ] NEXTAUTH_SECRET is unique and secure (min 32 chars)
 - [ ] Database credentials are secure
 - [ ] Stripe webhook secret configured
 - [ ] CORS configured for storage
+- [ ] SSL certificate installed
 
 ### Database
 
@@ -461,6 +528,7 @@ Configure monitoring service (UptimeRobot, Better Uptime) to check:
 - [ ] Build succeeds (`npm run build`)
 - [ ] Tests pass (`npm run test`)
 - [ ] Type checking passes (`npm run typecheck`)
+- [ ] E2E tests pass (`npm run test:e2e`)
 
 ### External Services
 
@@ -473,6 +541,7 @@ Configure monitoring service (UptimeRobot, Better Uptime) to check:
 - [ ] Error tracking configured (Sentry)
 - [ ] Uptime monitoring configured
 - [ ] Logs accessible
+- [ ] Health check endpoint accessible
 
 ---
 
@@ -485,24 +554,57 @@ Configure monitoring service (UptimeRobot, Better Uptime) to check:
 - Check DATABASE_URL format
 - Verify database server is running
 - Check firewall rules
+- For serverless: use connection pooling
 
 **Stripe webhook errors**:
 
 - Verify webhook secret matches
 - Check webhook URL is accessible
 - Verify events are selected
+- Check for HTTPS requirement in production
 
 **Image upload failures**:
 
 - Check S3 credentials
 - Verify bucket CORS configuration
 - Check bucket permissions
+- Verify S3_ENDPOINT for R2/MinIO
 
 **Build failures**:
 
 - Clear `.next` directory
 - Run `npm ci` (clean install)
 - Check for TypeScript errors
+- Verify all env vars are set
+
+**Sentry not reporting errors**:
+
+- Verify DSN is correct
+- Check that `enabled: true` in config
+- Ensure SENTRY_DSN env var is set
+
+**Health check failing**:
+
+- Check database connection
+- Verify Redis is running (if configured)
+- Check application logs
+
+---
+
+## Deployment File Reference
+
+| File                           | Purpose                   |
+| ------------------------------ | ------------------------- |
+| `.github/workflows/ci.yml`     | CI pipeline configuration |
+| `.github/workflows/deploy.yml` | Deployment pipeline       |
+| `Dockerfile`                   | Application container     |
+| `Dockerfile.workers`           | Workers container         |
+| `docker-compose.yml`           | Development services      |
+| `docker-compose.prod.yml`      | Production deployment     |
+| `.dockerignore`                | Docker build exclusions   |
+| `ecosystem.config.js`          | PM2 process configuration |
+| `sentry.*.config.ts`           | Sentry error tracking     |
+| `instrumentation.ts`           | Next.js instrumentation   |
 
 ---
 

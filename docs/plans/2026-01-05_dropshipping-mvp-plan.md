@@ -3,7 +3,7 @@
 **Created**: 2026-01-05
 **Status**: In Progress
 **Priority**: High
-**Current Phase**: 5.3 Deployment
+**Current Phase**: 5.4 Demo Deployment
 
 ---
 
@@ -583,12 +583,57 @@ dropshipping/
 - [x] E2E tests for critical flows
 - [x] Manual testing checklist
 
-#### 5.3 Deployment
+#### 5.3 Deployment ✅ COMPLETE
 
-- [ ] Production environment setup
-- [ ] CI/CD pipeline
-- [ ] Monitoring setup
-- [ ] Documentation
+- [x] Production environment setup
+- [x] CI/CD pipeline
+- [x] Monitoring setup
+- [x] Documentation
+
+#### 5.4 Demo Deployment (Free Tier)
+
+Deploy to free hosting for demonstration purposes.
+
+**Services (All Free Tier)**:
+
+| Service | Purpose          | Free Tier Limits            |
+| ------- | ---------------- | --------------------------- |
+| Vercel  | App hosting      | 100GB bandwidth/month       |
+| Neon    | PostgreSQL       | 0.5GB storage, auto-suspend |
+| Upstash | Redis (optional) | 10K commands/day            |
+
+**Setup Steps**:
+
+- [ ] Create Neon account and database
+  - Go to [neon.tech](https://neon.tech)
+  - Create new project
+  - Copy connection string
+
+- [ ] Deploy to Vercel
+  - Install Vercel CLI: `npm i -g vercel`
+  - Login: `vercel login`
+  - Deploy: `vercel` (follow prompts)
+  - Or: Connect GitHub repo at [vercel.com](https://vercel.com)
+
+- [ ] Configure environment variables in Vercel Dashboard
+  - `DATABASE_URL` - Neon connection string
+  - `NEXTAUTH_SECRET` - Generate with `openssl rand -base64 32`
+  - `NEXTAUTH_URL` - `https://your-app.vercel.app`
+  - `NEXT_PUBLIC_APP_URL` - `https://your-app.vercel.app`
+  - `STRIPE_SECRET_KEY` - Use test key `sk_test_...`
+  - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` - Use test key `pk_test_...`
+
+- [ ] Run database setup
+  - `npx prisma migrate deploy`
+  - `npx prisma db seed`
+
+- [ ] Verify deployment
+  - Test homepage loads
+  - Test product browsing
+  - Test cart functionality
+  - Test checkout with Stripe test card
+
+**Result**: Shareable URL like `https://your-project.vercel.app`
 
 ---
 
@@ -608,16 +653,16 @@ dropshipping/
 
 ### MVP Launch Requirements
 
-- [ ] Customer can browse products
-- [ ] Customer can search and filter products
-- [ ] Customer can add items to cart
-- [ ] Customer can complete checkout with Stripe
-- [ ] Customer receives order confirmation email
-- [ ] Admin can manage products (CRUD + CSV import)
-- [ ] Admin can view and manage orders
-- [ ] Site is mobile-responsive
-- [ ] Core pages load in < 3 seconds
-- [ ] No critical security vulnerabilities
+- [x] Customer can browse products
+- [x] Customer can search and filter products
+- [x] Customer can add items to cart
+- [x] Customer can complete checkout with Stripe
+- [x] Customer receives order confirmation email
+- [x] Admin can manage products (CRUD + CSV import)
+- [x] Admin can view and manage orders
+- [x] Site is mobile-responsive
+- [x] Core pages load in < 3 seconds
+- [x] No critical security vulnerabilities
 
 ---
 
@@ -1035,6 +1080,61 @@ dropshipping/
     2. Configure database and environment before tests run
     3. Set PORT environment variable (default: 3001)
     4. Consider page pre-warming or increased timeouts in CI
+
+### [2026-01-07] - PHASE 5.3: Deployment ✅ COMPLETE
+
+- Created GitHub Actions CI/CD workflows:
+  - `.github/workflows/ci.yml` - Lint, type check, unit tests, build, E2E tests
+  - `.github/workflows/deploy.yml` - Vercel and VPS deployment options
+  - E2E tests run with PostgreSQL and Redis service containers
+- Set up Sentry error monitoring:
+  - Installed `@sentry/nextjs` package
+  - Created `sentry.client.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts`
+  - Created `instrumentation.ts` for Next.js integration
+  - Updated `next.config.ts` with Sentry webpack plugin
+  - Conditional initialization (only when DSN is provided)
+- Created health check endpoint (`/api/health`):
+  - Database connectivity check with latency
+  - Redis connectivity check (optional)
+  - Returns status: ok, degraded, or error
+  - Proper HTTP status codes (200/503)
+- Created PM2 ecosystem configuration:
+  - `ecosystem.config.js` with web and workers processes
+  - Cluster mode for web, fork mode for workers
+  - Deployment configuration for staging/production
+- Created Docker production files:
+  - `Dockerfile` - Multi-stage build with standalone output
+  - `Dockerfile.workers` - Background workers container
+  - `docker-compose.prod.yml` - Full production stack
+  - `.dockerignore` - Build exclusions
+  - Updated `next.config.ts` with `output: "standalone"`
+- Updated deployment documentation:
+  - Complete setup guide with all deployment options
+  - CI/CD pipeline reference
+  - Monitoring setup instructions
+  - Pre-deployment checklist
+  - Troubleshooting guide
+
+**Files Created:**
+
+- `.github/workflows/ci.yml`
+- `.github/workflows/deploy.yml`
+- `sentry.client.config.ts`
+- `sentry.server.config.ts`
+- `sentry.edge.config.ts`
+- `instrumentation.ts`
+- `src/app/api/health/route.ts`
+- `ecosystem.config.js`
+- `Dockerfile`
+- `Dockerfile.workers`
+- `docker-compose.prod.yml`
+- `.dockerignore`
+
+**Files Updated:**
+
+- `next.config.ts` - Added Sentry and standalone output
+- `.env.example` - Added Sentry variables
+- `docs/deployment/setup.md` - Comprehensive deployment guide
 
 ---
 
