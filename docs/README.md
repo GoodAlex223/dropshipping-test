@@ -2,22 +2,27 @@
 
 Central index for all project documentation.
 
-**Last Updated**: YYYY-MM-DD
+**Last Updated**: 2026-01-07
 
 ---
 
 ## Quick Navigation
 
-| I need to...                    | Go to                                      |
-| ------------------------------- | ------------------------------------------ |
-| See what tasks are pending      | [planning/TODO.md](planning/TODO.md)       |
-| See what's been completed       | [planning/DONE.md](planning/DONE.md)       |
-| See the roadmap                 | [planning/ROADMAP.md](planning/ROADMAP.md) |
-| See active implementation plans | [plans/README.md](plans/README.md)         |
-| Understand the architecture     | [ARCHITECTURE.md](ARCHITECTURE.md)         |
-| Find project patterns/decisions | [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md)   |
-| See Claude Code rules           | [../CLAUDE.md](../CLAUDE.md)               |
-| See project-specific config     | [../PROJECT.md](../PROJECT.md)             |
+| I need to...                    | Go to                                        |
+| ------------------------------- | -------------------------------------------- |
+| See what tasks are pending      | [planning/TODO.md](planning/TODO.md)         |
+| See what's been completed       | [planning/DONE.md](planning/DONE.md)         |
+| See the roadmap                 | [planning/ROADMAP.md](planning/ROADMAP.md)   |
+| See active implementation plans | [plans/README.md](plans/README.md)           |
+| Understand the architecture     | [ARCHITECTURE.md](ARCHITECTURE.md)           |
+| Find project patterns/decisions | [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md)     |
+| See Claude Code rules           | [../CLAUDE.md](../CLAUDE.md)                 |
+| See project-specific config     | [../PROJECT.md](../PROJECT.md)               |
+| View API reference              | [api/endpoints.md](api/endpoints.md)         |
+| View database schema            | [database/schema.md](database/schema.md)     |
+| View testing guide              | [testing/strategy.md](testing/strategy.md)   |
+| View deployment guide           | [deployment/setup.md](deployment/setup.md)   |
+| View manual testing checklist   | [TESTING_CHECKLIST.md](TESTING_CHECKLIST.md) |
 
 ---
 
@@ -27,20 +32,20 @@ Central index for all project documentation.
 
 | Document                                         | Purpose              | Last Updated |
 | ------------------------------------------------ | -------------------- | ------------ |
-| [planning/README.md](planning/README.md)         | Planning overview    | YYYY-MM-DD   |
-| [planning/TODO.md](planning/TODO.md)             | Active tasks         | YYYY-MM-DD   |
-| [planning/DONE.md](planning/DONE.md)             | Completed tasks      | YYYY-MM-DD   |
-| [planning/BACKLOG.md](planning/BACKLOG.md)       | Unprioritized ideas  | YYYY-MM-DD   |
-| [planning/ROADMAP.md](planning/ROADMAP.md)       | Long-term vision     | YYYY-MM-DD   |
-| [planning/GOALS.md](planning/GOALS.md)           | Objectives & metrics | YYYY-MM-DD   |
-| [planning/MILESTONES.md](planning/MILESTONES.md) | Key targets          | YYYY-MM-DD   |
+| [planning/README.md](planning/README.md)         | Planning overview    | 2026-01-05   |
+| [planning/TODO.md](planning/TODO.md)             | Active tasks         | 2026-01-07   |
+| [planning/DONE.md](planning/DONE.md)             | Completed tasks      | 2026-01-07   |
+| [planning/BACKLOG.md](planning/BACKLOG.md)       | Unprioritized ideas  | 2026-01-05   |
+| [planning/ROADMAP.md](planning/ROADMAP.md)       | Long-term vision     | 2026-01-05   |
+| [planning/GOALS.md](planning/GOALS.md)           | Objectives & metrics | 2026-01-05   |
+| [planning/MILESTONES.md](planning/MILESTONES.md) | Key targets          | 2026-01-05   |
 
 ### Architecture & Design
 
 | Document                                 | Purpose                          | Last Updated |
 | ---------------------------------------- | -------------------------------- | ------------ |
-| [ARCHITECTURE.md](ARCHITECTURE.md)       | System design, layers, data flow | YYYY-MM-DD   |
-| [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) | Decisions, patterns, history     | YYYY-MM-DD   |
+| [ARCHITECTURE.md](ARCHITECTURE.md)       | System design, layers, data flow | 2026-01-07   |
+| [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) | Decisions, patterns, history     | 2026-01-07   |
 
 ---
 
@@ -48,9 +53,9 @@ Central index for all project documentation.
 
 Active and recent implementation plans.
 
-| Plan                                                     | Task          | Status          | Created    |
-| -------------------------------------------------------- | ------------- | --------------- | ---------- |
-| [YYYY-MM-DD_task-name.md](plans/YYYY-MM-DD_task-name.md) | [Description] | Active/Complete | YYYY-MM-DD |
+| Plan                                                                             | Task                     | Status      | Created    |
+| -------------------------------------------------------------------------------- | ------------------------ | ----------- | ---------- |
+| [2026-01-05_dropshipping-mvp-plan.md](plans/2026-01-05_dropshipping-mvp-plan.md) | Dropshipping Website MVP | In Progress | 2026-01-05 |
 
 ### Archived Plans
 
@@ -60,37 +65,30 @@ See [archive/README.md](archive/README.md) for completed historical plans.
 
 ## Domain Documentation
 
-<!--
-Add sections as needed for your project.
-Remove or rename these examples.
--->
-
 ### API Documentation
 
 | Document                             | Purpose                | Last Updated |
 | ------------------------------------ | ---------------------- | ------------ |
-| [api/endpoints.md](api/endpoints.md) | API endpoint reference | YYYY-MM-DD   |
+| [api/endpoints.md](api/endpoints.md) | API endpoint reference | 2026-01-07   |
 
 ### Database
 
-| Document                                         | Purpose           | Last Updated |
-| ------------------------------------------------ | ----------------- | ------------ |
-| [database/schema.md](database/schema.md)         | Database schema   | YYYY-MM-DD   |
-| [database/migrations.md](database/migrations.md) | Migration history | YYYY-MM-DD   |
+| Document                                 | Purpose         | Last Updated |
+| ---------------------------------------- | --------------- | ------------ |
+| [database/schema.md](database/schema.md) | Database schema | 2026-01-07   |
 
 ### Deployment
 
-| Document                                           | Purpose              | Last Updated |
-| -------------------------------------------------- | -------------------- | ------------ |
-| [deployment/setup.md](deployment/setup.md)         | Environment setup    | YYYY-MM-DD   |
-| [deployment/checklist.md](deployment/checklist.md) | Deployment checklist | YYYY-MM-DD   |
+| Document                                   | Purpose           | Last Updated |
+| ------------------------------------------ | ----------------- | ------------ |
+| [deployment/setup.md](deployment/setup.md) | Environment setup | 2026-01-07   |
 
 ### Testing
 
-| Document                                   | Purpose            | Last Updated |
-| ------------------------------------------ | ------------------ | ------------ |
-| [testing/strategy.md](testing/strategy.md) | Testing approach   | YYYY-MM-DD   |
-| [testing/coverage.md](testing/coverage.md) | Coverage baselines | YYYY-MM-DD   |
+| Document                                     | Purpose                  | Last Updated |
+| -------------------------------------------- | ------------------------ | ------------ |
+| [testing/strategy.md](testing/strategy.md)   | Testing approach         | 2026-01-07   |
+| [TESTING_CHECKLIST.md](TESTING_CHECKLIST.md) | Manual testing checklist | 2026-01-05   |
 
 ---
 
