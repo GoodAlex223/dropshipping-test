@@ -12,17 +12,30 @@ test.describe("Product Browsing", () => {
     await expect(products).toBeVisible();
   });
 
-  test("can filter products by search", async ({ page }) => {
+  test("can filter products by search", async ({ page, isMobile }) => {
     await page.goto("/products");
 
-    // Find search input
+    // Find search input and search button
     const searchInput = page.getByPlaceholder(/search/i);
 
     if (await searchInput.isVisible()) {
       await searchInput.fill("test");
-      await searchInput.press("Enter");
 
-      // URL should update with search param
+      if (isMobile) {
+        // On mobile, submit the form via keyboard since button may have touch issues
+        await searchInput.press("Enter");
+        // Wait for URL to update with timeout
+        await page.waitForURL(/search=test/, { timeout: 15000 });
+      } else {
+        // On desktop, click the search button
+        const searchButton = page.getByRole("button", { name: "Search", exact: true });
+        await Promise.all([
+          page.waitForURL(/search=test/, { timeout: 10000 }),
+          searchButton.click(),
+        ]);
+      }
+
+      // URL should have updated with search param
       await expect(page).toHaveURL(/search=test/);
     }
   });

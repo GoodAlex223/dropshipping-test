@@ -1,15 +1,17 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Navigation", () => {
-  test("homepage loads successfully", async ({ page }) => {
+  test("homepage loads successfully", async ({ page, isMobile }) => {
     await page.goto("/");
 
     // Check page title
     await expect(page).toHaveTitle(/Store/);
 
-    // Check main navigation elements (use exact match for nav links)
-    await expect(page.getByRole("link", { name: "Products", exact: true })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Categories", exact: true })).toBeVisible();
+    // Check main navigation elements (only on desktop - mobile has hamburger menu)
+    if (!isMobile) {
+      await expect(page.getByRole("link", { name: "Products", exact: true })).toBeVisible();
+      await expect(page.getByRole("link", { name: "Categories", exact: true })).toBeVisible();
+    }
 
     // Check hero section
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
