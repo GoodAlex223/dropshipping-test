@@ -4,6 +4,11 @@ Active tasks for Dropshipping Website MVP.
 
 **Last Updated**: 2026-01-07
 
+## No priority
+
+1. Upload images for demo products for presentability
+2. Develop the most comprehensive plan for manual testing of the website
+
 ---
 
 ## In Progress
