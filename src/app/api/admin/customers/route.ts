@@ -61,9 +61,18 @@ export async function GET(request: NextRequest) {
           _sum: { total: true },
         });
 
+        // Handle Decimal conversion safely
+        const totalValue = totalSpent._sum.total;
+        const totalNumber =
+          totalValue !== null && totalValue !== undefined
+            ? typeof totalValue === "object" && "toNumber" in totalValue
+              ? (totalValue as { toNumber: () => number }).toNumber()
+              : Number(totalValue)
+            : 0;
+
         return {
           ...customer,
-          totalSpent: totalSpent._sum.total?.toNumber() || 0,
+          totalSpent: totalNumber,
           orderCount: customer._count.orders,
         };
       })
@@ -72,6 +81,7 @@ export async function GET(request: NextRequest) {
     return apiSuccess(paginatedResponse(customersWithStats, total, { page, limit, skip }));
   } catch (err) {
     console.error("Error fetching customers:", err);
-    return apiError("Failed to fetch customers", 500);
+    const errorMessage = err instanceof Error ? err.message : "Unknown error";
+    return apiError(`Failed to fetch customers: ${errorMessage}`, 500);
   }
 }
