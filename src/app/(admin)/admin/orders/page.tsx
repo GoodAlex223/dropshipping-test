@@ -99,11 +99,11 @@ function AdminOrdersContent() {
   const [isExporting, setIsExporting] = useState(false);
 
   // Filters
-  const [search, setSearch] = useState(searchParams.get("search") || "");
-  const [status, setStatus] = useState(searchParams.get("status") || "all");
-  const [paymentStatus, setPaymentStatus] = useState(searchParams.get("paymentStatus") || "all");
-  const [dateFrom, setDateFrom] = useState(searchParams.get("dateFrom") || "");
-  const [dateTo, setDateTo] = useState(searchParams.get("dateTo") || "");
+  const [search, setSearch] = useState(searchParams?.get("search") || "");
+  const [status, setStatus] = useState(searchParams?.get("status") || "all");
+  const [paymentStatus, setPaymentStatus] = useState(searchParams?.get("paymentStatus") || "all");
+  const [dateFrom, setDateFrom] = useState(searchParams?.get("dateFrom") || "");
+  const [dateTo, setDateTo] = useState(searchParams?.get("dateTo") || "");
 
   const debouncedSearch = useDebounce(search, 300);
 
@@ -114,7 +114,7 @@ function AdminOrdersContent() {
     if (paymentStatus !== "all") params.set("paymentStatus", paymentStatus);
     if (dateFrom) params.set("dateFrom", dateFrom);
     if (dateTo) params.set("dateTo", dateTo);
-    params.set("page", searchParams.get("page") || "1");
+    params.set("page", searchParams?.get("page") || "1");
     return params.toString();
   }, [debouncedSearch, status, paymentStatus, dateFrom, dateTo, searchParams]);
 
@@ -141,7 +141,7 @@ function AdminOrdersContent() {
 
   const updateUrl = useCallback(
     (newParams: Record<string, string>) => {
-      const params = new URLSearchParams(searchParams.toString());
+      const params = new URLSearchParams(searchParams?.toString() || "");
       Object.entries(newParams).forEach(([key, value]) => {
         if (value && value !== "all") {
           params.set(key, value);
@@ -156,7 +156,7 @@ function AdminOrdersContent() {
   );
 
   const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() || "");
     params.set("page", newPage.toString());
     router.push(`/admin/orders?${params.toString()}`);
   };

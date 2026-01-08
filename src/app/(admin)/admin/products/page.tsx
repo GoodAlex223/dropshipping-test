@@ -107,15 +107,15 @@ function ProductsContent() {
   const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   // Filters
-  const [search, setSearch] = useState(searchParams.get("search") || "");
-  const [categoryId, setCategoryId] = useState(searchParams.get("categoryId") || "");
-  const [status, setStatus] = useState(searchParams.get("isActive") || "");
+  const [search, setSearch] = useState(searchParams?.get("search") || "");
+  const [categoryId, setCategoryId] = useState(searchParams?.get("categoryId") || "");
+  const [status, setStatus] = useState(searchParams?.get("isActive") || "");
 
   const fetchProducts = useCallback(async () => {
     setIsLoading(true);
     try {
       const params = new URLSearchParams();
-      params.set("page", searchParams.get("page") || "1");
+      params.set("page", searchParams?.get("page") || "1");
       params.set("limit", "20");
       if (search) params.set("search", search);
       if (categoryId) params.set("categoryId", categoryId);
@@ -156,7 +156,7 @@ function ProductsContent() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams?.toString() || "");
     params.set("page", "1");
     if (search) params.set("search", search);
     else params.delete("search");
@@ -164,7 +164,7 @@ function ProductsContent() {
   };
 
   const handleFilterChange = (key: string, value: string) => {
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams?.toString() || "");
     params.set("page", "1");
     if (value) params.set(key, value);
     else params.delete(key);
@@ -172,7 +172,7 @@ function ProductsContent() {
   };
 
   const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams?.toString() || "");
     params.set("page", newPage.toString());
     router.push(`/admin/products?${params}`);
   };

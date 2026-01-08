@@ -1,8 +1,9 @@
 "use client";
+export const dynamic = "force-dynamic";
 
 import { useState, useEffect, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
+// Link imported but unused - kept for potential future use
 import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, Package, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -69,10 +70,10 @@ function ProductsContent() {
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   // Filter state
-  const [search, setSearch] = useState(searchParams.get("search") || "");
-  const [category, setCategory] = useState(searchParams.get("category") || "");
-  const [sortBy, setSortBy] = useState(searchParams.get("sortBy") || "createdAt");
-  const [sortOrder, setSortOrder] = useState(searchParams.get("sortOrder") || "desc");
+  const [search, setSearch] = useState(searchParams?.get("search") || "");
+  const [category, setCategory] = useState(searchParams?.get("category") || "");
+  const [sortBy, setSortBy] = useState(searchParams?.get("sortBy") || "createdAt");
+  const [sortOrder, setSortOrder] = useState(searchParams?.get("sortOrder") || "desc");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [maxPriceLimit] = useState(1000);
 
@@ -80,15 +81,20 @@ function ProductsContent() {
     setIsLoading(true);
     try {
       const params = new URLSearchParams();
-      params.set("page", searchParams.get("page") || "1");
+      params.set("page", searchParams?.get("page") || "1");
       params.set("limit", "12");
-      if (searchParams.get("search")) params.set("search", searchParams.get("search")!);
-      if (searchParams.get("category")) params.set("category", searchParams.get("category")!);
-      if (searchParams.get("featured")) params.set("featured", searchParams.get("featured")!);
-      if (searchParams.get("minPrice")) params.set("minPrice", searchParams.get("minPrice")!);
-      if (searchParams.get("maxPrice")) params.set("maxPrice", searchParams.get("maxPrice")!);
-      params.set("sortBy", searchParams.get("sortBy") || "createdAt");
-      params.set("sortOrder", searchParams.get("sortOrder") || "desc");
+      const searchVal = searchParams?.get("search");
+      const categoryVal = searchParams?.get("category");
+      const featuredVal = searchParams?.get("featured");
+      const minPriceVal = searchParams?.get("minPrice");
+      const maxPriceVal = searchParams?.get("maxPrice");
+      if (searchVal) params.set("search", searchVal);
+      if (categoryVal) params.set("category", categoryVal);
+      if (featuredVal) params.set("featured", featuredVal);
+      if (minPriceVal) params.set("minPrice", minPriceVal);
+      if (maxPriceVal) params.set("maxPrice", maxPriceVal);
+      params.set("sortBy", searchParams?.get("sortBy") || "createdAt");
+      params.set("sortOrder", searchParams?.get("sortOrder") || "desc");
 
       const response = await fetch(`/api/products?${params}`);
       if (!response.ok) throw new Error("Failed to fetch products");
@@ -124,14 +130,14 @@ function ProductsContent() {
 
   useEffect(() => {
     // Sync state with URL params
-    setSearch(searchParams.get("search") || "");
-    setCategory(searchParams.get("category") || "");
-    setSortBy(searchParams.get("sortBy") || "createdAt");
-    setSortOrder(searchParams.get("sortOrder") || "desc");
+    setSearch(searchParams?.get("search") || "");
+    setCategory(searchParams?.get("category") || "");
+    setSortBy(searchParams?.get("sortBy") || "createdAt");
+    setSortOrder(searchParams?.get("sortOrder") || "desc");
   }, [searchParams]);
 
   const updateFilters = (updates: Record<string, string | null>) => {
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams?.toString() || "");
     params.set("page", "1"); // Reset to first page on filter change
 
     Object.entries(updates).forEach(([key, value]) => {
@@ -152,7 +158,7 @@ function ProductsContent() {
   };
 
   const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams?.toString() || "");
     params.set("page", newPage.toString());
     router.push(`/products?${params}`);
   };
@@ -165,11 +171,11 @@ function ProductsContent() {
   };
 
   const activeFiltersCount = [
-    searchParams.get("search"),
-    searchParams.get("category"),
-    searchParams.get("minPrice"),
-    searchParams.get("maxPrice"),
-    searchParams.get("featured"),
+    searchParams?.get("search"),
+    searchParams?.get("category"),
+    searchParams?.get("minPrice"),
+    searchParams?.get("maxPrice"),
+    searchParams?.get("featured"),
   ].filter(Boolean).length;
 
   return (
@@ -328,25 +334,26 @@ function ProductsContent() {
       {activeFiltersCount > 0 && (
         <div className="mb-6 flex flex-wrap items-center gap-2">
           <span className="text-muted-foreground text-sm">Active filters:</span>
-          {searchParams.get("search") && (
+          {searchParams?.get("search") && (
             <Badge variant="secondary" className="gap-1">
-              Search: {searchParams.get("search")}
+              Search: {searchParams?.get("search")}
               <button onClick={() => updateFilters({ search: null })}>
                 <X className="h-3 w-3" />
               </button>
             </Badge>
           )}
-          {searchParams.get("category") && (
+          {searchParams?.get("category") && (
             <Badge variant="secondary" className="gap-1">
-              Category: {searchParams.get("category")}
+              Category: {searchParams?.get("category")}
               <button onClick={() => updateFilters({ category: null })}>
                 <X className="h-3 w-3" />
               </button>
             </Badge>
           )}
-          {(searchParams.get("minPrice") || searchParams.get("maxPrice")) && (
+          {(searchParams?.get("minPrice") || searchParams?.get("maxPrice")) && (
             <Badge variant="secondary" className="gap-1">
-              Price: ${searchParams.get("minPrice") || "0"} - ${searchParams.get("maxPrice") || "∞"}
+              Price: ${searchParams?.get("minPrice") || "0"} - $
+              {searchParams?.get("maxPrice") || "∞"}
               <button onClick={() => updateFilters({ minPrice: null, maxPrice: null })}>
                 <X className="h-3 w-3" />
               </button>

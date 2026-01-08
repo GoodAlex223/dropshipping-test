@@ -150,15 +150,15 @@ function SuppliersContent() {
   >({});
 
   // Filters
-  const [search, setSearch] = useState(searchParams.get("search") || "");
-  const [statusFilter, setStatusFilter] = useState(searchParams.get("isActive") || "all");
-  const [apiFilter, setApiFilter] = useState(searchParams.get("hasApi") || "all");
+  const [search, setSearch] = useState(searchParams?.get("search") || "");
+  const [statusFilter, setStatusFilter] = useState(searchParams?.get("isActive") || "all");
+  const [apiFilter, setApiFilter] = useState(searchParams?.get("hasApi") || "all");
 
   const fetchSuppliers = useCallback(async () => {
     setIsLoading(true);
     try {
       const params = new URLSearchParams();
-      params.set("page", searchParams.get("page") || "1");
+      params.set("page", searchParams?.get("page") || "1");
       params.set("limit", "20");
       if (search) params.set("search", search);
       if (statusFilter !== "all") params.set("isActive", statusFilter);
@@ -184,7 +184,7 @@ function SuppliersContent() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams?.toString() || "");
     params.set("page", "1");
     if (search) params.set("search", search);
     else params.delete("search");
@@ -192,7 +192,7 @@ function SuppliersContent() {
   };
 
   const handleFilterChange = (key: string, value: string) => {
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams?.toString() || "");
     params.set("page", "1");
     if (value && value !== "all") params.set(key, value);
     else params.delete(key);
@@ -200,7 +200,7 @@ function SuppliersContent() {
   };
 
   const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams?.toString() || "");
     params.set("page", newPage.toString());
     router.push(`/admin/suppliers?${params}`);
   };

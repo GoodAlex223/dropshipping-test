@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { Suspense } from "react";
 import { CheckCircle2, Package, Mail, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";

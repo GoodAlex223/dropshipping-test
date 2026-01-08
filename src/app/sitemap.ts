@@ -2,6 +2,10 @@ import { MetadataRoute } from "next";
 import { prisma } from "@/lib/db";
 import { siteConfig } from "@/lib/seo";
 
+// Force dynamic rendering - sitemap needs database access
+export const dynamic = "force-dynamic";
+export const revalidate = 3600; // Revalidate every hour
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = siteConfig.url;
 
@@ -33,39 +37,48 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // Product pages
-  const products = await prisma.product.findMany({
-    where: { isActive: true },
-    select: {
-      slug: true,
-      updatedAt: true,
-    },
-    orderBy: { updatedAt: "desc" },
-  });
+  // Try to fetch dynamic pages, with fallback if database unavailable
+  let productPages: MetadataRoute.Sitemap = [];
+  let categoryPages: MetadataRoute.Sitemap = [];
 
-  const productPages: MetadataRoute.Sitemap = products.map((product) => ({
-    url: `${baseUrl}/products/${product.slug}`,
-    lastModified: product.updatedAt,
-    changeFrequency: "weekly",
-    priority: 0.7,
-  }));
+  try {
+    // Product pages
+    const products = await prisma.product.findMany({
+      where: { isActive: true },
+      select: {
+        slug: true,
+        updatedAt: true,
+      },
+      orderBy: { updatedAt: "desc" },
+    });
 
-  // Category pages
-  const categories = await prisma.category.findMany({
-    where: { isActive: true },
-    select: {
-      slug: true,
-      updatedAt: true,
-    },
-    orderBy: { updatedAt: "desc" },
-  });
+    productPages = products.map((product) => ({
+      url: `${baseUrl}/products/${product.slug}`,
+      lastModified: product.updatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    }));
 
-  const categoryPages: MetadataRoute.Sitemap = categories.map((category) => ({
-    url: `${baseUrl}/categories/${category.slug}`,
-    lastModified: category.updatedAt,
-    changeFrequency: "weekly",
-    priority: 0.6,
-  }));
+    // Category pages
+    const categories = await prisma.category.findMany({
+      where: { isActive: true },
+      select: {
+        slug: true,
+        updatedAt: true,
+      },
+      orderBy: { updatedAt: "desc" },
+    });
+
+    categoryPages = categories.map((category) => ({
+      url: `${baseUrl}/categories/${category.slug}`,
+      lastModified: category.updatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    }));
+  } catch (error) {
+    // Database unavailable during build, return static pages only
+    console.warn("Sitemap: Database unavailable, returning static pages only", error);
+  }
 
   return [...staticPages, ...productPages, ...categoryPages];
 }

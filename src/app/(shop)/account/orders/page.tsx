@@ -77,14 +77,14 @@ function OrdersPageContent() {
     totalPages: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState(searchParams.get("status") || "all");
+  const [statusFilter, setStatusFilter] = useState(searchParams?.get("status") || "all");
 
   useEffect(() => {
     const fetchOrders = async () => {
       setIsLoading(true);
       try {
-        const page = searchParams.get("page") || "1";
-        const status = searchParams.get("status") || "all";
+        const page = searchParams?.get("page") || "1";
+        const status = searchParams?.get("status") || "all";
         const params = new URLSearchParams({ page, status });
 
         const response = await fetch(`/api/orders?${params}`);
@@ -105,7 +105,7 @@ function OrdersPageContent() {
 
   const handleStatusChange = (value: string) => {
     setStatusFilter(value);
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString());
     if (value === "all") {
       params.delete("status");
     } else {
@@ -116,7 +116,7 @@ function OrdersPageContent() {
   };
 
   const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString());
     params.set("page", newPage.toString());
     router.push(`/account/orders?${params.toString()}`);
   };
