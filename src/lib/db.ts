@@ -1,3 +1,4 @@
+import { PrismaNeon } from "@prisma/adapter-neon";
 import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis as unknown as {
@@ -5,32 +6,22 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createPrismaClient() {
-  const connectionString = process.env.DATABASE_URL || "";
+  const connectionString = process.env.DATABASE_URL;
 
   if (!connectionString) {
+    console.error("DATABASE_URL is not set");
     return new PrismaClient({
       log: ["error", "warn"],
     });
   }
 
-  // Add Neon-compatible connection parameters
-  const url = appendConnectionParams(connectionString);
+  // Use Neon serverless adapter for better connection handling
+  const adapter = new PrismaNeon({ connectionString });
 
   return new PrismaClient({
+    adapter,
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
-    datasources: {
-      db: { url },
-    },
   });
-}
-
-// Add serverless-friendly connection params for Neon
-function appendConnectionParams(url: string): string {
-  if (!url) return url;
-
-  const separator = url.includes("?") ? "&" : "?";
-  // Optimized for Neon serverless: single connection, extended timeouts
-  return `${url}${separator}connection_limit=1&pool_timeout=30&connect_timeout=30`;
 }
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();
