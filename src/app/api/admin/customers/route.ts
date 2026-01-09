@@ -9,8 +9,6 @@ import {
 } from "@/lib/api-utils";
 import { Prisma } from "@prisma/client";
 
-export const dynamic = "force-dynamic";
-
 // GET /api/admin/customers - List customers
 export async function GET(request: NextRequest) {
   const { error } = await requireAdmin();
