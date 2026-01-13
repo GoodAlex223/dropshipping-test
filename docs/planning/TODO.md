@@ -2,7 +2,7 @@
 
 Active tasks for Dropshipping Website MVP.
 
-**Last Updated**: 2026-01-07
+**Last Updated**: 2026-01-13
 
 ## No priority
 
@@ -13,27 +13,7 @@ Active tasks for Dropshipping Website MVP.
 
 ## In Progress
 
-### [TASK-016] - Demo Deployment (Free Tier)
-
-**Priority**: High
-**Dependencies**: Phase 5.3 complete
-**Plan**: [docs/plans/2026-01-05_dropshipping-mvp-plan.md](../plans/2026-01-05_dropshipping-mvp-plan.md)
-
-**Description**: Deploy to free hosting services for demonstration purposes.
-
-**Sub-tasks**:
-
-- [ ] Create Neon account and database
-- [ ] Deploy to Vercel
-- [ ] Configure environment variables
-- [ ] Run database migrations and seed
-- [ ] Verify deployment works
-
-**Acceptance Criteria**:
-
-- [ ] Application accessible via public URL
-- [ ] Database connected and seeded
-- [ ] Core features work (browse, cart, checkout)
+<!-- No tasks in progress -->
 
 ---
 
@@ -103,7 +83,7 @@ Active tasks for Dropshipping Website MVP.
 
 ## Completed
 
-All MVP implementation tasks (TASK-001 through TASK-012) have been completed. See [DONE.md](DONE.md) for details.
+All MVP implementation tasks (TASK-001 through TASK-016) have been completed. See [DONE.md](DONE.md) for details.
 
 **Summary of completed work**:
 
@@ -114,6 +94,7 @@ All MVP implementation tasks (TASK-001 through TASK-012) have been completed. Se
 - Phase 5.1: SEO & Performance
 - Phase 5.2: Testing
 - Phase 5.3: Deployment (CI/CD, Monitoring, Docker, Documentation)
+- Phase 5.4: Demo Deployment (Vercel + Neon free tier)
 
 ---
 
@@ -125,7 +106,7 @@ All MVP implementation tasks (TASK-001 through TASK-012) have been completed. Se
 
 ## Notes
 
-- MVP implementation (Phases 1-5.3) is complete
-- Phase 5.4: Demo Deployment is in progress
+- MVP implementation (Phases 1-5.4) is **COMPLETE**
+- Demo site deployed to Vercel with Neon database
 - Post-MVP features are tracked in Backlog section
 - Completed tasks move to [DONE.md](DONE.md)

@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: YYYY-MM-DD
+**Last Updated**: 2026-01-13
 
 ---
 
@@ -22,18 +22,24 @@ Items here are **not committed** — they're candidates for future TODO.md promo
 
 ## Feature Ideas
 
-### [Category 1]
+### Authentication & Security
 
-| Idea     | Description         | Value        | Effort       | Source                          |
-| -------- | ------------------- | ------------ | ------------ | ------------------------------- |
-| [Idea 1] | [Brief description] | High/Med/Low | High/Med/Low | [User feedback / Team / Claude] |
-| [Idea 2] | [Brief description] | High/Med/Low | High/Med/Low | [Source]                        |
+| Idea                   | Description                                                     | Value | Effort | Source                  |
+| ---------------------- | --------------------------------------------------------------- | ----- | ------ | ----------------------- |
+| Email verification     | Verify user email addresses before allowing full account access | High  | Med    | Phase 5.4 deployment    |
+| Password reset         | Allow users to reset forgotten passwords via email              | High  | Med    | Phase 5.4 deployment    |
+| OAuth providers        | Add Google, GitHub, etc. social login options                   | Med   | Med    | Phase 5.4 deployment    |
+| Rate limiting          | Protect auth endpoints from brute force attacks                 | High  | Med    | Phase 5.4 deployment    |
+| Session timeout        | Configure explicit session expiration (24h recommended)         | Med   | Low    | Phase 5.4 deployment    |
+| 2FA/MFA support        | Two-factor authentication for enhanced security                 | Med   | High   | Security best practices |
+| Login attempt tracking | Track failed logins, implement account lockout                  | Med   | Med    | Security best practices |
 
-### [Category 2]
+### User Experience
 
-| Idea     | Description         | Value        | Effort       | Source   |
-| -------- | ------------------- | ------------ | ------------ | -------- |
-| [Idea 1] | [Brief description] | High/Med/Low | High/Med/Low | [Source] |
+| Idea                          | Description                                   | Value | Effort | Source               |
+| ----------------------------- | --------------------------------------------- | ----- | ------ | -------------------- |
+| Cart operation error handling | Show toast notifications for cart errors      | Med   | Low    | Phase 5.4 deployment |
+| Better network error messages | Distinguish network errors from server errors | Low   | Low    | Phase 5.4 deployment |
 
 ---
 
@@ -41,10 +47,11 @@ Items here are **not committed** — they're candidates for future TODO.md promo
 
 Improvements to existing functionality.
 
-| Enhancement     | Area        | Value        | Effort       | Notes   |
-| --------------- | ----------- | ------------ | ------------ | ------- |
-| [Enhancement 1] | [Component] | High/Med/Low | High/Med/Low | [Notes] |
-| [Enhancement 2] | [Component] | High/Med/Low | High/Med/Low | [Notes] |
+| Enhancement                           | Area           | Value | Effort | Notes                                    |
+| ------------------------------------- | -------------- | ----- | ------ | ---------------------------------------- |
+| Standardize toast usage               | UI             | Med   | Low    | Use Sonner consistently across all forms |
+| Add loading states to cart operations | Cart           | Med   | Low    | Prevent double-clicks, show feedback     |
+| Improve error boundary UI             | Error handling | Low   | Low    | More helpful error pages                 |
 
 ---
 
@@ -52,10 +59,13 @@ Improvements to existing functionality.
 
 Known issues that should be addressed eventually.
 
-| Item          | Impact               | Effort       | Added      |
-| ------------- | -------------------- | ------------ | ---------- |
-| [Debt item 1] | [Impact description] | High/Med/Low | YYYY-MM-DD |
-| [Debt item 2] | [Impact description] | High/Med/Low | YYYY-MM-DD |
+| Item                          | Impact                              | Effort | Added      |
+| ----------------------------- | ----------------------------------- | ------ | ---------- |
+| Unused Account/Session tables | Minor DB overhead with JWT strategy | Low    | 2026-01-13 |
+| Console.error logging         | Could leak sensitive info in logs   | Low    | 2026-01-13 |
+| Generic 500 error responses   | Users don't know what went wrong    | Med    | 2026-01-13 |
+| S3 cleanup failures silent    | Orphaned files in storage           | Low    | 2026-01-13 |
+| Email send failures silent    | Users don't know email wasn't sent  | Med    | 2026-01-13 |
 
 ---
 
@@ -63,10 +73,10 @@ Known issues that should be addressed eventually.
 
 Areas requiring investigation before implementation.
 
-| Topic     | Question                | Why Important    | Added      |
-| --------- | ----------------------- | ---------------- | ---------- |
-| [Topic 1] | [What we need to learn] | [Why it matters] | YYYY-MM-DD |
-| [Topic 2] | [What we need to learn] | [Why it matters] | YYYY-MM-DD |
+| Topic                   | Question                                      | Why Important | Added      |
+| ----------------------- | --------------------------------------------- | ------------- | ---------- |
+| Callback URL validation | How to prevent open redirect vulnerabilities? | Security      | 2026-01-13 |
+| Structured logging      | What logging solution for production?         | Debugging     | 2026-01-13 |
 
 ---
 
@@ -74,9 +84,13 @@ Areas requiring investigation before implementation.
 
 Ideas that might be valuable but aren't prioritized.
 
-- [ ] [Idea 1] — [Brief note]
-- [ ] [Idea 2] — [Brief note]
-- [ ] [Idea 3] — [Brief note]
+- [ ] Remove unused Prisma Account/Session tables if staying with JWT-only
+- [ ] Add structured logging with error masking (replace console.error)
+- [ ] Email templates for verification/reset flows
+- [ ] User consent/privacy policy flow
+- [ ] Audit logging for auth events
+- [ ] Add JSDoc comments to auth functions
+- [ ] Extract password validation rules to shared schema
 
 ---
 
@@ -84,9 +98,9 @@ Ideas that might be valuable but aren't prioritized.
 
 Ideas considered but decided against (with reasoning).
 
-| Idea     | Reason for Rejection | Date       |
-| -------- | -------------------- | ---------- |
-| [Idea 1] | [Why not pursuing]   | YYYY-MM-DD |
+| Idea                             | Reason for Rejection                               | Date       |
+| -------------------------------- | -------------------------------------------------- | ---------- |
+| Database sessions instead of JWT | JWT is more scalable for serverless, simpler setup | 2026-01-13 |
 
 ---
 

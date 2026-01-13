@@ -2,7 +2,7 @@
 
 Historical documents that are no longer actively used but preserved for reference.
 
-**Last Updated**: YYYY-MM-DD
+**Last Updated**: 2026-01-13
 
 ---
 
@@ -26,9 +26,9 @@ Plans are archived in `plans/` subdirectory after completion.
 
 See: [plans/README.md](plans/README.md)
 
-| Plan                                           | Original Task      | Archived Date |
-| ---------------------------------------------- | ------------------ | ------------- |
-| [YYYY-MM-DD_task.md](plans/YYYY-MM-DD_task.md) | [Task description] | YYYY-MM-DD    |
+| Plan                                                                             | Original Task            | Archived Date |
+| -------------------------------------------------------------------------------- | ------------------------ | ------------- |
+| [2026-01-05_dropshipping-mvp-plan.md](plans/2026-01-05_dropshipping-mvp-plan.md) | Dropshipping Website MVP | 2026-01-13    |
 
 ### Deprecated Documentation
 

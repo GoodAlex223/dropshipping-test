@@ -2,7 +2,7 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-01-07
+**Last Updated**: 2026-01-13
 
 ---
 
@@ -233,17 +233,67 @@ Completed tasks with implementation details and learnings.
 
 ---
 
+### [2026-01-13] - Phase 5.4: Demo Deployment
+
+**Task Reference**: TODO.md TASK-016
+**Plan Document**: [docs/archive/plans/2026-01-05_dropshipping-mvp-plan.md](../archive/plans/2026-01-05_dropshipping-mvp-plan.md)
+
+**Implementation**:
+
+#### 5.4 Demo Deployment (TASK-016)
+
+- Created Neon account and PostgreSQL database (free tier)
+- Deployed application to Vercel (free tier)
+- Configured environment variables:
+  - DATABASE_URL (Neon connection string)
+  - NEXTAUTH_SECRET (secure random value)
+  - NEXTAUTH_URL (Vercel deployment URL)
+  - Stripe test keys
+- Fixed authentication issues:
+  - Added `runtime = "nodejs"` to auth routes for bcrypt compatibility
+  - Fixed db.ts to throw error instead of creating broken client
+  - Added NEXTAUTH_SECRET environment validation
+  - Created global and auth-specific error boundaries
+- Fixed form validation issues:
+  - Added forwardRef to Input component for React Hook Form compatibility
+  - Added forwardRef to Button component for dropdown trigger compatibility
+- Fixed API route static rendering issues:
+  - Added `force-dynamic` to cart/validate, categories, orders, products routes
+- Verified deployment works:
+  - Homepage loads with products
+  - Authentication (login/register) functional
+  - Cart and checkout operational
+
+**Key Learnings**:
+
+- shadcn/ui components need forwardRef for React Hook Form and Radix compatibility
+- API routes using searchParams/headers need `export const dynamic = "force-dynamic"`
+- Auth routes need explicit `runtime = "nodejs"` for bcrypt in serverless environments
+- Environment variable validation should fail fast, not create broken clients
+
+**Issues Identified for Backlog**:
+
+- Email verification not implemented
+- Password reset functionality missing
+- OAuth providers (Google, etc.) not configured
+- Rate limiting on auth endpoints not implemented
+- Session timeout not explicitly configured
+
+---
+
 ## Statistics
 
-| Month   | Tasks Completed | Key Deliverables            |
-| ------- | --------------- | --------------------------- |
-| 2026-01 | 12              | Full MVP + Deployment Ready |
+| Month   | Tasks Completed | Key Deliverables                   |
+| ------- | --------------- | ---------------------------------- |
+| 2026-01 | 16              | Full MVP + Demo Deployed to Vercel |
 
 ---
 
 ## Notes
 
-- **MVP implementation is COMPLETE** (All phases 1-5.3 finished)
-- Application is ready for production deployment
+- **MVP implementation is COMPLETE** (All phases 1-5.4 finished)
+- Demo site deployed to Vercel with Neon PostgreSQL
 - Comprehensive execution log available in MVP plan document
-- Test accounts available for development/testing
+- Test accounts available for development/testing:
+  - Admin: admin@store.com / admin123
+  - Customer: customer@example.com / customer123

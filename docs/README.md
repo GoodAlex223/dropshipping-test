@@ -2,7 +2,7 @@
 
 Central index for all project documentation.
 
-**Last Updated**: 2026-01-07
+**Last Updated**: 2026-01-13
 
 ---
 
@@ -13,7 +13,7 @@ Central index for all project documentation.
 | See what tasks are pending      | [planning/TODO.md](planning/TODO.md)         |
 | See what's been completed       | [planning/DONE.md](planning/DONE.md)         |
 | See the roadmap                 | [planning/ROADMAP.md](planning/ROADMAP.md)   |
-| See active implementation plans | [plans/README.md](plans/README.md)           |
+| See archived plans              | [archive/plans/](archive/plans/)             |
 | Understand the architecture     | [ARCHITECTURE.md](ARCHITECTURE.md)           |
 | Find project patterns/decisions | [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md)     |
 | See Claude Code rules           | [../CLAUDE.md](../CLAUDE.md)                 |
@@ -33,9 +33,9 @@ Central index for all project documentation.
 | Document                                         | Purpose              | Last Updated |
 | ------------------------------------------------ | -------------------- | ------------ |
 | [planning/README.md](planning/README.md)         | Planning overview    | 2026-01-05   |
-| [planning/TODO.md](planning/TODO.md)             | Active tasks         | 2026-01-07   |
-| [planning/DONE.md](planning/DONE.md)             | Completed tasks      | 2026-01-07   |
-| [planning/BACKLOG.md](planning/BACKLOG.md)       | Unprioritized ideas  | 2026-01-05   |
+| [planning/TODO.md](planning/TODO.md)             | Active tasks         | 2026-01-13   |
+| [planning/DONE.md](planning/DONE.md)             | Completed tasks      | 2026-01-13   |
+| [planning/BACKLOG.md](planning/BACKLOG.md)       | Unprioritized ideas  | 2026-01-13   |
 | [planning/ROADMAP.md](planning/ROADMAP.md)       | Long-term vision     | 2026-01-05   |
 | [planning/GOALS.md](planning/GOALS.md)           | Objectives & metrics | 2026-01-05   |
 | [planning/MILESTONES.md](planning/MILESTONES.md) | Key targets          | 2026-01-05   |
@@ -51,15 +51,15 @@ Central index for all project documentation.
 
 ## Implementation Plans
 
-Active and recent implementation plans.
-
-| Plan                                                                             | Task                     | Status      | Created    |
-| -------------------------------------------------------------------------------- | ------------------------ | ----------- | ---------- |
-| [2026-01-05_dropshipping-mvp-plan.md](plans/2026-01-05_dropshipping-mvp-plan.md) | Dropshipping Website MVP | In Progress | 2026-01-05 |
+No active implementation plans.
 
 ### Archived Plans
 
-See [archive/README.md](archive/README.md) for completed historical plans.
+| Plan                                                                                     | Task                     | Status   | Completed  |
+| ---------------------------------------------------------------------------------------- | ------------------------ | -------- | ---------- |
+| [2026-01-05_dropshipping-mvp-plan.md](archive/plans/2026-01-05_dropshipping-mvp-plan.md) | Dropshipping Website MVP | COMPLETE | 2026-01-13 |
+
+See [archive/README.md](archive/README.md) for more historical plans.
 
 ---
 
