@@ -7,6 +7,14 @@ import { loginSchema } from "./validations";
 import type { Role } from "@prisma/client";
 import type { Adapter } from "next-auth/adapters";
 
+// Validate required environment variables
+if (!process.env.NEXTAUTH_SECRET) {
+  throw new Error(
+    "NEXTAUTH_SECRET environment variable is not set. " +
+      "Generate one with: openssl rand -base64 32"
+  );
+}
+
 declare module "next-auth" {
   interface Session {
     user: {

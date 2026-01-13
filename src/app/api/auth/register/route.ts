@@ -3,6 +3,9 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
 import { registerSchema } from "@/lib/validations";
 
+// Force Node.js runtime for bcrypt compatibility
+export const runtime = "nodejs";
+
 const SALT_ROUNDS = 12;
 
 export async function POST(request: Request) {

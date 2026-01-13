@@ -9,10 +9,9 @@ function createPrismaClient() {
   const connectionString = process.env.DATABASE_URL;
 
   if (!connectionString) {
-    console.error("DATABASE_URL is not set");
-    return new PrismaClient({
-      log: ["error", "warn"],
-    });
+    throw new Error(
+      "DATABASE_URL environment variable is not set. " + "Please configure it in your environment."
+    );
   }
 
   // Use Neon serverless adapter for better connection handling

@@ -61,7 +61,8 @@ export default function RegisterPage() {
 
       router.push("/");
       router.refresh();
-    } catch {
+    } catch (error) {
+      console.error("[Register Error]", error);
       setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
