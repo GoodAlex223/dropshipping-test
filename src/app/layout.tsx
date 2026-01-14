@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Playfair_Display, Lora } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { getDefaultMetadata, getOrganizationJsonLd, getWebsiteJsonLd } from "@/lib/seo";
 import "./globals.css";
@@ -14,6 +14,20 @@ const inter = Inter({
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+// Serif font for Luxury theme headings
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+// Serif font for Organic theme headings
+const lora = Lora({
+  variable: "--font-lora",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = getDefaultMetadata();
@@ -52,7 +66,9 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}>
+      <body
+        className={`${inter.variable} ${jetbrainsMono.variable} ${playfair.variable} ${lora.variable} antialiased`}
+      >
         <Providers>{children}</Providers>
       </body>
     </html>
