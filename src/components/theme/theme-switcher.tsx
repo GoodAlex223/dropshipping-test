@@ -2,7 +2,8 @@
 
 import { useTheme } from "next-themes";
 import { useSyncExternalStore } from "react";
-import { Moon, Sun, Monitor, Palette, Check } from "lucide-react";
+import { Moon, Sun, Monitor, Palette, Check, ExternalLink } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -102,6 +103,31 @@ export function ThemeSwitcher() {
             </DropdownMenuItem>
           );
         })}
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuLabel className="flex items-center gap-2">
+          <ExternalLink className="h-4 w-4" />
+          Theme Showcases
+        </DropdownMenuLabel>
+        <DropdownMenuItem asChild className="cursor-pointer">
+          <Link href="/showcase/bold" className="flex items-center gap-3">
+            <div className="h-4 w-4 shrink-0 rounded-full bg-blue-500" />
+            <span>Bold & Vibrant</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild className="cursor-pointer">
+          <Link href="/showcase/luxury" className="flex items-center gap-3">
+            <div className="h-4 w-4 shrink-0 rounded-full bg-amber-600" />
+            <span>Luxury Premium</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild className="cursor-pointer">
+          <Link href="/showcase/organic" className="flex items-center gap-3">
+            <div className="h-4 w-4 shrink-0 rounded-full bg-emerald-600" />
+            <span>Organic Scandinavian</span>
+          </Link>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
