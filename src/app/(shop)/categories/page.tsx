@@ -1,8 +1,13 @@
 export const dynamic = "force-dynamic";
+
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Package } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { prisma } from "@/lib/db";
+import { getCategoriesListingMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = getCategoriesListingMetadata();
 
 async function getCategories() {
   const categories = await prisma.category.findMany({

@@ -69,6 +69,13 @@ export function getDefaultMetadata(): Metadata {
       apple: "/apple-touch-icon.png",
     },
     manifest: "/manifest.json",
+    alternates: {
+      canonical: siteConfig.url,
+      languages: {
+        en: siteConfig.url,
+        "x-default": siteConfig.url,
+      },
+    },
   };
 }
 
@@ -78,23 +85,29 @@ export function getProductMetadata(product: {
   slug: string;
   description?: string | null;
   shortDesc?: string | null;
+  metaTitle?: string | null;
+  metaDesc?: string | null;
   price: string;
   comparePrice?: string | null;
   images?: { url: string; alt?: string | null }[];
   category?: { name: string; slug: string };
 }): Metadata {
+  const title = product.metaTitle || product.name;
   const description =
-    product.shortDesc || product.description?.slice(0, 160) || siteConfig.description;
+    product.metaDesc ||
+    product.shortDesc ||
+    product.description?.slice(0, 160) ||
+    siteConfig.description;
   const image = product.images?.[0]?.url || siteConfig.ogImage;
   const url = `${siteConfig.url}/products/${product.slug}`;
 
   return {
-    title: product.name,
+    title,
     description,
     openGraph: {
       type: "website",
       url,
-      title: product.name,
+      title,
       description,
       images: [
         {
@@ -108,7 +121,7 @@ export function getProductMetadata(product: {
     },
     twitter: {
       card: "summary_large_image",
-      title: product.name,
+      title,
       description,
       images: [image],
     },
@@ -158,6 +171,75 @@ export function getCategoryMetadata(category: {
     },
     alternates: {
       canonical: url,
+    },
+  };
+}
+
+// Generate home page metadata
+export function getHomeMetadata(): Metadata {
+  return {
+    title: {
+      absolute: `${siteConfig.name} | Quality Products, Great Prices`,
+    },
+    description: siteConfig.description,
+    alternates: {
+      canonical: siteConfig.url,
+    },
+  };
+}
+
+// Generate products listing page metadata
+export function getProductsListingMetadata(): Metadata {
+  const url = `${siteConfig.url}/products`;
+  return {
+    title: "All Products",
+    description:
+      "Browse our complete collection of quality products. Find great deals and fast shipping on everything you need.",
+    alternates: {
+      canonical: url,
+    },
+    openGraph: {
+      title: `All Products | ${siteConfig.name}`,
+      description: "Browse our complete collection of quality products.",
+      url,
+    },
+  };
+}
+
+// Generate categories listing page metadata
+export function getCategoriesListingMetadata(): Metadata {
+  const url = `${siteConfig.url}/categories`;
+  return {
+    title: "Shop by Category",
+    description:
+      "Browse products by category. Find exactly what you're looking for in our organized collection.",
+    alternates: {
+      canonical: url,
+    },
+    openGraph: {
+      title: `Categories | ${siteConfig.name}`,
+      description: "Browse products by category.",
+      url,
+    },
+  };
+}
+
+// Generate auth page metadata (login/register)
+export function getAuthMetadata(type: "login" | "register"): Metadata {
+  const titles = {
+    login: "Sign In",
+    register: "Create Account",
+  };
+  const descriptions = {
+    login: `Sign in to your ${siteConfig.name} account to access your orders, saved items, and more.`,
+    register: `Create a ${siteConfig.name} account to save your favorites, track orders, and checkout faster.`,
+  };
+  return {
+    title: titles[type],
+    description: descriptions[type],
+    robots: {
+      index: false,
+      follow: false,
     },
   };
 }

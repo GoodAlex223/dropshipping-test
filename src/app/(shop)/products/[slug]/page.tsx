@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getProductMetadata, getProductJsonLd, getBreadcrumbJsonLd, siteConfig } from "@/lib/seo";
 import { ProductDetailClient, ProductNotFound, type Product } from "./product-detail-client";
@@ -17,6 +16,8 @@ async function getProduct(slug: string): Promise<Product | null> {
       slug: true,
       description: true,
       shortDesc: true,
+      metaTitle: true,
+      metaDesc: true,
       price: true,
       comparePrice: true,
       stock: true,
@@ -119,6 +120,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     slug: product.slug,
     description: product.description,
     shortDesc: product.shortDesc,
+    metaTitle: product.metaTitle,
+    metaDesc: product.metaDesc,
     price: product.price,
     comparePrice: product.comparePrice,
     images: product.images,

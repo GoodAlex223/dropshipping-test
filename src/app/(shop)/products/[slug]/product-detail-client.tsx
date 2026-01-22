@@ -43,6 +43,8 @@ export interface Product {
   slug: string;
   description: string | null;
   shortDesc: string | null;
+  metaTitle?: string | null;
+  metaDesc?: string | null;
   price: string;
   comparePrice: string | null;
   stock: number;

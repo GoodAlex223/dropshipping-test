@@ -1,6 +1,10 @@
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
 import Link from "next/link";
+import { getHomeMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = getHomeMetadata();
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Package, Truck, Shield, CreditCard } from "lucide-react";
