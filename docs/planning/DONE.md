@@ -2,7 +2,7 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-01-13
+**Last Updated**: 2026-01-22
 
 ---
 
@@ -281,11 +281,31 @@ Completed tasks with implementation details and learnings.
 
 ---
 
+### [2026-01-22] - TASK-017: SEO Technical Setup
+
+**Plan Document**: [docs/archive/plans/2026-01-22_seo-technical-setup.md](../archive/plans/2026-01-22_seo-technical-setup.md)
+
+**Summary**: Completed SEO technical foundation by adding metadata to all public pages, implementing hreflang tags, wiring up unused metaTitle/metaDesc database fields, and creating missing asset files.
+
+**Key Changes**:
+
+- Extended `src/lib/seo.ts` with 4 new metadata helpers + hreflang support
+- Added custom metadata exports to home, products listing, categories listing, login, register pages
+- Refactored products listing and auth pages to server component wrappers (for `generateMetadata` support)
+- Wired up `metaTitle` and `metaDesc` Product fields in product detail page
+- Created placeholder asset files: `og-image.png`, `manifest.json`, `favicon-16x16.png`, `apple-touch-icon.png`
+
+**Files Modified**: 8 | **Files Created**: 7
+
+**Spawned Tasks**: None
+
+---
+
 ## Statistics
 
-| Month   | Tasks Completed | Key Deliverables                   |
-| ------- | --------------- | ---------------------------------- |
-| 2026-01 | 16              | Full MVP + Demo Deployed to Vercel |
+| Month   | Tasks Completed | Key Deliverables                               |
+| ------- | --------------- | ---------------------------------------------- |
+| 2026-01 | 17              | Full MVP + Demo Deployed + SEO Technical Setup |
 
 ---
 
