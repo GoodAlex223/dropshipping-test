@@ -1,16 +1,12 @@
-# [Project Name]
+# Dropshipping E-commerce Platform
 
-<!-- Brief description of the project -->
-
-[One-line description of what this project does]
+Multi-category dropshipping e-commerce website with customer storefront, admin panel, and supplier integrations.
 
 ---
 
 ## Overview
 
-<!-- Expanded description -->
-
-[2-3 sentences explaining the project's purpose, target users, and key value proposition]
+A full-featured dropshipping platform built with Next.js 14+ App Router. Supports product management via API and CSV import, Stripe payments, and automated order forwarding to suppliers. Designed for multi-category product catalogs with hierarchical categories, inventory tracking, and background job processing.
 
 ---
 
@@ -18,46 +14,60 @@
 
 ### Prerequisites
 
-- [Requirement 1, e.g., Python 3.11+]
-- [Requirement 2, e.g., PostgreSQL 15+]
-- [Requirement 3]
+- Node.js 18+
+- PostgreSQL 15+ (or Docker)
+- Redis (for background jobs)
+- Stripe account (for payments)
 
 ### Installation
 
 ```bash
 # Clone the repository
-git clone [repository-url]
-cd [project-name]
+git clone <repository-url>
+cd dropshipping
 
 # Install dependencies
-[installation command, e.g., pip install -e ".[dev]"]
+npm install
 
 # Set up environment
 cp .env.example .env
 # Edit .env with your configuration
 
-# Run initial setup
-[setup command if any]
+# Start database services (Docker)
+docker-compose up -d
+
+# Run database migrations
+npx prisma migrate dev
+
+# Seed the database with test data
+npm run db:seed
 ```
 
 ### Running
 
 ```bash
 # Development
-[dev run command]
+npm run dev
 
-# Production
-[prod run command]
+# Production build
+npm run build
+npm run start
+
+# Background workers (separate terminal)
+npm run workers
 ```
 
 ### Testing
 
 ```bash
-# Run all tests
-[test command]
+# Run unit tests
+npm run test
+
+# Run E2E tests
+npm run test:e2e
 
 # Run with coverage
-[coverage command]
+npm run test:coverage
 ```
 
 ---
@@ -65,35 +75,70 @@ cp .env.example .env
 ## Project Structure
 
 ```
-[project-name]/
-├── src/                   # Source code
-│   └── [package]/
-├── tests/                 # Test files
-├── docs/                  # Documentation
-│   ├── README.md          # Documentation index
-│   ├── planning/          # Task management & strategy
-│   │   ├── TODO.md        # Active tasks
-│   │   ├── DONE.md        # Completed tasks
-│   │   ├── ROADMAP.md     # Long-term vision
-│   │   └── ...
-│   └── ARCHITECTURE.md    # System design
-├── CLAUDE.md              # Claude Code configuration
-├── PROJECT.md             # Project-specific config
-└── README.md              # This file
+dropshipping/
+├── src/                      # Source code
+│   ├── app/                  # Next.js App Router
+│   │   ├── (shop)/           # Customer storefront pages
+│   │   ├── (admin)/admin/    # Admin dashboard pages
+│   │   ├── (auth)/           # Authentication pages
+│   │   └── api/              # API routes
+│   ├── components/           # React components
+│   │   ├── ui/               # shadcn/ui base components
+│   │   ├── shop/             # Shop-specific components
+│   │   ├── admin/            # Admin-specific components
+│   │   └── common/           # Shared components
+│   ├── lib/                  # Utilities, clients, configs
+│   ├── services/             # Business logic services
+│   └── stores/               # Zustand state stores
+├── prisma/                   # Database schema & migrations
+├── tests/                    # Test files
+│   ├── unit/                 # Vitest unit tests
+│   └── e2e/                  # Playwright E2E tests
+├── docs/                     # Documentation
+│   ├── README.md             # Documentation index
+│   ├── ARCHITECTURE.md       # System design
+│   ├── planning/             # Task management
+│   │   ├── TODO.md           # Active tasks
+│   │   ├── DONE.md           # Completed tasks
+│   │   └── ROADMAP.md        # Long-term vision
+│   └── archive/              # Historical documents
+├── CLAUDE.md                 # Claude Code configuration
+├── PROJECT.md                # Project-specific config
+└── README.md                 # This file
 ```
 
 ---
 
 ## Documentation
 
-| Document                                             | Description           |
-| ---------------------------------------------------- | --------------------- |
-| [docs/README.md](docs/README.md)                     | Documentation index   |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)         | System architecture   |
-| [docs/planning/TODO.md](docs/planning/TODO.md)       | Current tasks         |
-| [docs/planning/ROADMAP.md](docs/planning/ROADMAP.md) | Project roadmap       |
-| [CLAUDE.md](CLAUDE.md)                               | Claude Code rules     |
-| [PROJECT.md](PROJECT.md)                             | Project configuration |
+| Document                                             | Description                  |
+| ---------------------------------------------------- | ---------------------------- |
+| [docs/README.md](docs/README.md)                     | Documentation index          |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)         | System architecture          |
+| [docs/PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md)   | Decisions, patterns, history |
+| [docs/planning/TODO.md](docs/planning/TODO.md)       | Current tasks                |
+| [docs/planning/ROADMAP.md](docs/planning/ROADMAP.md) | Project roadmap              |
+| [CLAUDE.md](CLAUDE.md)                               | Claude Code rules            |
+| [PROJECT.md](PROJECT.md)                             | Project configuration        |
+
+---
+
+## Tech Stack
+
+| Component    | Technology                         |
+| ------------ | ---------------------------------- |
+| Language     | TypeScript                         |
+| Framework    | Next.js 16 (App Router)            |
+| Styling      | Tailwind CSS 4 + shadcn/ui + Radix |
+| Database     | PostgreSQL with Prisma 7           |
+| Auth         | NextAuth.js v5 (Auth.js)           |
+| State        | Zustand                            |
+| Forms        | React Hook Form + Zod              |
+| Payments     | Stripe                             |
+| Email        | Resend                             |
+| File Storage | S3-compatible (Cloudflare R2)      |
+| Queue        | BullMQ + Redis                     |
+| Testing      | Vitest (unit) + Playwright (E2E)   |
 
 ---
 
@@ -102,47 +147,54 @@ cp .env.example .env
 ### Setup Development Environment
 
 ```bash
-# Create virtual environment (Python example)
-python -m venv venv
-source venv/bin/activate  # or `venv\Scripts\activate` on Windows
+# Start local services (PostgreSQL, Redis, Adminer)
+docker-compose up -d
 
-# Install dev dependencies
-[dev install command]
+# Services available:
+# - PostgreSQL: localhost:5433
+# - Redis: localhost:6380
+# - Adminer (DB GUI): localhost:8080
 
-# Install pre-commit hooks
-pre-commit install
+# Install dependencies
+npm install
+
+# Run database migrations
+npx prisma migrate dev
+
+# Open Prisma Studio (DB GUI)
+npx prisma studio
 ```
 
-### Code Style
-
-This project uses:
-
-- [Formatter, e.g., Black for Python]
-- [Linter, e.g., Ruff]
-- [Type checker, e.g., mypy]
+### Code Quality
 
 ```bash
 # Format code
-[format command]
+npm run format
 
 # Lint
-[lint command]
+npm run lint
 
 # Type check
-[type check command]
+npm run typecheck
+
+# All pre-commit hooks
+pre-commit run --all-files
 ```
 
 ### Running Tests
 
 ```bash
-# Unit tests
-[unit test command]
+# Unit tests (Vitest)
+npm run test
 
-# Integration tests
-[integration test command]
+# Unit tests with watch mode
+npm run test:watch
+
+# E2E tests (Playwright)
+npm run test:e2e
 
 # All tests with coverage
-[coverage command]
+npm run test:coverage
 ```
 
 ---
@@ -151,46 +203,75 @@ This project uses:
 
 ### Environment Variables
 
-| Variable     | Description   | Default   |
-| ------------ | ------------- | --------- |
-| `[VAR_NAME]` | [Description] | [Default] |
-| `[VAR_NAME]` | [Description] | [Default] |
+| Variable                             | Description                 | Required |
+| ------------------------------------ | --------------------------- | -------- |
+| `DATABASE_URL`                       | PostgreSQL connection       | Yes      |
+| `NEXTAUTH_SECRET`                    | Auth encryption key         | Yes      |
+| `NEXTAUTH_URL`                       | Auth callback URL           | Yes      |
+| `STRIPE_SECRET_KEY`                  | Stripe API key              | Yes      |
+| `STRIPE_WEBHOOK_SECRET`              | Stripe webhook verification | Yes      |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe client key           | Yes      |
+| `RESEND_API_KEY`                     | Email service key           | No       |
+| `REDIS_URL`                          | Redis connection for queues | No       |
+| `AWS_ACCESS_KEY_ID`                  | S3 credentials              | No       |
+| `AWS_SECRET_ACCESS_KEY`              | S3 credentials              | No       |
+| `S3_BUCKET_NAME`                     | S3 bucket name              | No       |
 
-### Configuration Files
+### Test Accounts (Development)
 
-| File            | Purpose                            |
-| --------------- | ---------------------------------- |
-| `.env`          | Environment variables (gitignored) |
-| `.env.example`  | Template for .env                  |
-| `[config file]` | [Purpose]                          |
+After running `npm run db:seed`:
+
+| Role     | Email                | Password    |
+| -------- | -------------------- | ----------- |
+| Admin    | admin@store.com      | admin123    |
+| Customer | customer@example.com | customer123 |
 
 ---
 
-## API Reference
+## Features
 
-<!-- If applicable -->
+### Customer Storefront
 
-See [docs/api/](docs/api/) for full API documentation.
+- Product browsing with search and filters
+- Hierarchical category navigation
+- Shopping cart with localStorage persistence
+- Multi-step checkout with Stripe payments
+- Order history and tracking
+- User account management
 
-### Quick Examples
+### Admin Panel
 
-```python
-# Example usage
-[code example]
-```
+- Product management (CRUD, CSV import, image upload)
+- Category management (hierarchical)
+- Order management with status updates
+- Supplier management and order forwarding
+- Dashboard with statistics
+
+### Technical Features
+
+- Server-side rendering for SEO
+- Optimized images with Next.js Image
+- Background job processing with BullMQ
+- Transactional emails with Resend
+- Comprehensive test coverage
 
 ---
 
 ## Deployment
 
-<!-- If applicable -->
+See [docs/deployment/setup.md](docs/deployment/setup.md) for deployment guides.
 
-See [docs/deployment/](docs/deployment/) for deployment guides.
+### Quick Deploy (Vercel)
 
-### Quick Deploy
+1. Connect repository to Vercel
+2. Configure environment variables
+3. Deploy
+
+### Docker Deployment
 
 ```bash
-[deployment command]
+# Build and run production stack
+docker-compose -f docker-compose.prod.yml up -d
 ```
 
 ---
@@ -199,33 +280,17 @@ See [docs/deployment/](docs/deployment/) for deployment guides.
 
 1. Check [docs/planning/TODO.md](docs/planning/TODO.md) for open tasks
 2. Create a feature branch: `git checkout -b feature/your-feature`
-3. Make changes following the [code style](#code-style)
+3. Follow code style (see [PROJECT.md](PROJECT.md))
 4. Write tests for new functionality
 5. Submit a pull request
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ---
 
 ## License
 
-[License type, e.g., MIT License] - see [LICENSE](LICENSE) for details.
+MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-## Acknowledgments
-
-<!-- Optional -->
-
-- [Acknowledgment 1]
-- [Acknowledgment 2]
-
----
-
-## Contact
-
-<!-- Optional -->
-
-- **Maintainer**: [Name] ([email])
-- **Issues**: [Issue tracker URL]
-- **Discussions**: [Discussions URL]
+_For Claude Code rules, see [CLAUDE.md](CLAUDE.md)._
+_For project-specific configuration, see [PROJECT.md](PROJECT.md)._

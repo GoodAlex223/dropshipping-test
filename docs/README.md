@@ -2,7 +2,7 @@
 
 Central index for all project documentation.
 
-**Last Updated**: 2026-01-13
+**Last Updated**: 2026-01-26
 
 ---
 
@@ -33,12 +33,12 @@ Central index for all project documentation.
 | Document                                         | Purpose              | Last Updated |
 | ------------------------------------------------ | -------------------- | ------------ |
 | [planning/README.md](planning/README.md)         | Planning overview    | 2026-01-05   |
-| [planning/TODO.md](planning/TODO.md)             | Active tasks         | 2026-01-13   |
-| [planning/DONE.md](planning/DONE.md)             | Completed tasks      | 2026-01-13   |
-| [planning/BACKLOG.md](planning/BACKLOG.md)       | Unprioritized ideas  | 2026-01-13   |
-| [planning/ROADMAP.md](planning/ROADMAP.md)       | Long-term vision     | 2026-01-05   |
-| [planning/GOALS.md](planning/GOALS.md)           | Objectives & metrics | 2026-01-05   |
-| [planning/MILESTONES.md](planning/MILESTONES.md) | Key targets          | 2026-01-05   |
+| [planning/TODO.md](planning/TODO.md)             | Active tasks         | 2026-01-22   |
+| [planning/DONE.md](planning/DONE.md)             | Completed tasks      | 2026-01-22   |
+| [planning/BACKLOG.md](planning/BACKLOG.md)       | Unprioritized ideas  | 2026-01-22   |
+| [planning/ROADMAP.md](planning/ROADMAP.md)       | Long-term vision     | 2026-01-26   |
+| [planning/GOALS.md](planning/GOALS.md)           | Objectives & metrics | 2026-01-26   |
+| [planning/MILESTONES.md](planning/MILESTONES.md) | Key targets          | 2026-01-26   |
 
 ### Architecture & Design
 
@@ -58,6 +58,7 @@ No active implementation plans.
 | Plan                                                                                     | Task                     | Status   | Completed  |
 | ---------------------------------------------------------------------------------------- | ------------------------ | -------- | ---------- |
 | [2026-01-05_dropshipping-mvp-plan.md](archive/plans/2026-01-05_dropshipping-mvp-plan.md) | Dropshipping Website MVP | COMPLETE | 2026-01-13 |
+| [2026-01-22_seo-technical-setup.md](archive/plans/2026-01-22_seo-technical-setup.md)     | SEO Technical Setup      | COMPLETE | 2026-01-22 |
 
 See [archive/README.md](archive/README.md) for more historical plans.
 

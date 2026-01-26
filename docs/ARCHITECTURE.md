@@ -2,13 +2,13 @@
 
 System design and technical architecture for the Dropshipping E-commerce Platform.
 
-**Last Updated**: 2026-01-07
+**Last Updated**: 2026-01-26
 
 ---
 
 ## Overview
 
-A multi-category dropshipping e-commerce website built with Next.js 14+ App Router. The system supports customer product browsing, shopping cart, Stripe checkout, and admin management for products, orders, and suppliers.
+A multi-category dropshipping e-commerce website built with Next.js 16 App Router. The system supports customer product browsing, shopping cart, Stripe checkout, and admin management for products, orders, and suppliers.
 
 ### System Diagram
 

@@ -2,7 +2,7 @@
 
 Project-specific configuration. Universal rules are in [CLAUDE.md](CLAUDE.md).
 
-**Last Updated**: 2026-01-05
+**Last Updated**: 2026-01-26
 
 ---
 
@@ -12,21 +12,21 @@ Multi-category dropshipping e-commerce website with customer storefront, admin p
 
 ### Tech Stack
 
-| Component    | Technology                    |
-| ------------ | ----------------------------- |
-| Language     | TypeScript                    |
-| Framework    | Next.js 14+ (App Router)      |
-| Styling      | Tailwind CSS + shadcn/ui      |
-| Database     | PostgreSQL                    |
-| ORM          | Prisma                        |
-| Auth         | NextAuth.js (Auth.js v5)      |
-| State        | Zustand                       |
-| Forms        | React Hook Form + Zod         |
-| Payments     | Stripe                        |
-| Email        | Resend                        |
-| File Storage | S3-compatible (Cloudflare R2) |
-| Queue        | BullMQ + Redis                |
-| Testing      | Vitest + Playwright           |
+| Component    | Technology                         |
+| ------------ | ---------------------------------- |
+| Language     | TypeScript                         |
+| Framework    | Next.js 16 (App Router)            |
+| Styling      | Tailwind CSS 4 + shadcn/ui + Radix |
+| Database     | PostgreSQL                         |
+| ORM          | Prisma 7                           |
+| Auth         | NextAuth.js (Auth.js v5)           |
+| State        | Zustand                            |
+| Forms        | React Hook Form + Zod              |
+| Payments     | Stripe                             |
+| Email        | Resend                             |
+| File Storage | S3-compatible (Cloudflare R2)      |
+| Queue        | BullMQ + Redis                     |
+| Testing      | Vitest (unit) + Playwright (E2E)   |
 
 ---
 
@@ -163,12 +163,13 @@ pre-commit run --all-files
 
 ## Domain-Specific Documentation
 
-| Document                                                                                         | Purpose                 |
-| ------------------------------------------------------------------------------------------------ | ----------------------- |
-| [docs/plans/2026-01-05_dropshipping-mvp-plan.md](docs/plans/2026-01-05_dropshipping-mvp-plan.md) | MVP implementation plan |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)                                                     | System architecture     |
-| [docs/database/schema.md](docs/database/schema.md)                                               | Database schema docs    |
-| [docs/api/](docs/api/)                                                                           | API documentation       |
+| Document                                                                                                         | Purpose                            |
+| ---------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| [docs/archive/plans/2026-01-05_dropshipping-mvp-plan.md](docs/archive/plans/2026-01-05_dropshipping-mvp-plan.md) | MVP implementation plan (complete) |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)                                                                     | System architecture                |
+| [docs/database/schema.md](docs/database/schema.md)                                                               | Database schema docs               |
+| [docs/api/endpoints.md](docs/api/endpoints.md)                                                                   | API endpoint reference             |
+| [docs/deployment/setup.md](docs/deployment/setup.md)                                                             | Deployment guide                   |
 
 ---
 
@@ -176,11 +177,11 @@ pre-commit run --all-files
 
 ### Environments
 
-| Environment | URL/Location   | Branch  |
-| ----------- | -------------- | ------- |
-| Development | localhost:3000 | develop |
-| Staging     | TBD            | staging |
-| Production  | TBD            | main    |
+| Environment | URL/Location     | Branch  | Status      |
+| ----------- | ---------------- | ------- | ----------- |
+| Development | localhost:3000   | develop | Active      |
+| Demo        | Vercel (Neon DB) | main    | Deployed    |
+| Production  | TBD              | main    | Not Started |
 
 ### Pre-deployment Checklist
 

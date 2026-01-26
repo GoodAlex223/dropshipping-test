@@ -2,17 +2,17 @@
 
 Accumulated knowledge, decisions, and patterns for the Dropshipping E-commerce Platform.
 
-**Last Updated**: 2026-01-07
+**Last Updated**: 2026-01-26
 
 ---
 
 ## Overview
 
-Multi-category dropshipping e-commerce website built with Next.js 14+ App Router. Supports product management via API and CSV import, Stripe payments, and automated order forwarding to suppliers.
+Multi-category dropshipping e-commerce website built with Next.js 16 App Router. Supports product management via API and CSV import, Stripe payments, and automated order forwarding to suppliers.
 
 **Project Start**: 2026-01-05
-**Current Status**: MVP Implementation Complete (Phases 1-5.2)
-**Remaining**: Deployment (Phase 5.3)
+**Current Status**: MVP Complete & Demo Deployed
+**Current Phase**: Post-MVP (SEO, Analytics, Marketing Preparation)
 
 ---
 
@@ -275,8 +275,12 @@ src/
 ### Project Evolution
 
 - **2026-01-05**: Project initialized with Next.js 16, TypeScript, Prisma
-- **2026-01-05**: Completed all MVP phases (1-5.2)
+- **2026-01-05**: Completed all MVP phases (1-5.2: Foundation, Catalog, Cart, Orders, SEO, Testing)
+- **2026-01-07**: Phase 5.3 Deployment infrastructure complete (CI/CD, Docker, Sentry)
 - **2026-01-07**: Documentation completion
+- **2026-01-13**: Phase 5.4 Demo deployment to Vercel with Neon PostgreSQL
+- **2026-01-13**: MVP plan archived
+- **2026-01-22**: TASK-017 SEO Technical Setup complete
 
 ### Deprecated Approaches
 

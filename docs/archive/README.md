@@ -2,7 +2,7 @@
 
 Historical documents that are no longer actively used but preserved for reference.
 
-**Last Updated**: 2026-01-13
+**Last Updated**: 2026-01-26
 
 ---
 
@@ -29,18 +29,15 @@ See: [plans/README.md](plans/README.md)
 | Plan                                                                             | Original Task            | Archived Date |
 | -------------------------------------------------------------------------------- | ------------------------ | ------------- |
 | [2026-01-05_dropshipping-mvp-plan.md](plans/2026-01-05_dropshipping-mvp-plan.md) | Dropshipping Website MVP | 2026-01-13    |
+| [2026-01-22_seo-technical-setup.md](plans/2026-01-22_seo-technical-setup.md)     | SEO Technical Setup      | 2026-01-22    |
 
 ### Deprecated Documentation
 
-| Document         | Superseded By  | Archived Date |
-| ---------------- | -------------- | ------------- |
-| [doc.md](doc.md) | [New document] | YYYY-MM-DD    |
+_No deprecated documentation yet._
 
 ### Historical Context
 
-| Document         | Purpose              | Archived Date |
-| ---------------- | -------------------- | ------------- |
-| [doc.md](doc.md) | [What it documented] | YYYY-MM-DD    |
+_No historical context documents yet._
 
 ---
 

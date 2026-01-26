@@ -48,9 +48,12 @@ mv docs/plans/YYYY-MM-DD_task.md docs/archive/plans/
 
 ## Current Plans
 
-| Plan                     | Task               | Status      | Started    |
-| ------------------------ | ------------------ | ----------- | ---------- |
-| [example.md](example.md) | [Task description] | In Progress | YYYY-MM-DD |
+_No active implementation plans._
+
+| Plan | Task | Status | Started |
+| ---- | ---- | ------ | ------- |
+
+<!-- Add active plans here when created -->
 
 ---
 

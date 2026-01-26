@@ -34,20 +34,22 @@ Active tasks for Dropshipping Website MVP.
 
 ## Medium Priority
 
-### [TASK-019] - Social Sharing & Open Graph
+### [TASK-019] - Social Sharing Enhancement
 
 **Priority**: Medium
 **Dependencies**: None (TASK-017 complete)
 **Estimated Effort**: Low
 
-**Description**: Enable rich previews when sharing links on social media platforms.
+**Description**: Enhance social sharing with dynamic OG images and share buttons. (Basic OG/Twitter meta tags already implemented in TASK-017)
 
 **Sub-tasks**:
 
-- [ ] Add Open Graph meta tags (og:title, og:description, og:image)
-- [ ] Add Twitter Card meta tags
-- [ ] Generate dynamic OG images for products
-- [ ] Add social share buttons to product pages
+- [x] ~~Add Open Graph meta tags~~ (Done in TASK-017)
+- [x] ~~Add Twitter Card meta tags~~ (Done in TASK-017)
+- [ ] Generate dynamic OG images for products using `@vercel/og` (full template: branded background + product image + name + price)
+- [ ] Add social share buttons component to product pages (inline placement, below title/price)
+  - Platforms: Facebook, X/Twitter, Pinterest, WhatsApp, Telegram, Copy Link
+  - Mobile: Web Share API button for native share sheet
 - [ ] Test previews on Facebook, Twitter, LinkedIn debuggers
 
 ---
