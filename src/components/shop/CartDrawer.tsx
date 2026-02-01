@@ -9,6 +9,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/com
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useCartStore } from "@/stores/cart.store";
+import { trackViewCart } from "@/lib/analytics";
 
 export function CartDrawer() {
   const router = useRouter();
@@ -20,6 +21,21 @@ export function CartDrawer() {
   useEffect(() => {
     setMounted(true); // eslint-disable-line react-hooks/set-state-in-effect
   }, []);
+
+  // GA4: Track cart view when drawer opens
+  useEffect(() => {
+    if (isOpen && items.length > 0) {
+      trackViewCart(
+        items.map((item) => ({
+          item_id: item.productId,
+          item_name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+        })),
+        getTotalPrice()
+      );
+    }
+  }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const subtotal = getTotalPrice();
   const totalItems = getTotalItems();

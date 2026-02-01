@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useCartStore, CartItem } from "@/stores/cart.store";
 import { cn } from "@/lib/utils";
+import { trackViewCart } from "@/lib/analytics";
 
 interface StockInfo {
   productId: string;
@@ -48,6 +49,21 @@ export default function CartPage() {
   useEffect(() => {
     setMounted(true); // eslint-disable-line react-hooks/set-state-in-effect
   }, []);
+
+  // GA4: Track cart page view
+  useEffect(() => {
+    if (mounted && items.length > 0) {
+      trackViewCart(
+        items.map((item) => ({
+          item_id: item.productId,
+          item_name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+        })),
+        getTotalPrice()
+      );
+    }
+  }, [mounted]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Validate stock for all items
   useEffect(() => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, Suspense } from "react";
+import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, Package, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ProductCard } from "@/components/products";
+import { trackViewItemList, trackSelectItem, type GA4Item } from "@/lib/analytics";
 
 interface Product {
   id: string;
@@ -133,6 +134,31 @@ function ProductsContentInner() {
     setSortBy(searchParams?.get("sortBy") || "createdAt");
     setSortOrder(searchParams?.get("sortOrder") || "desc");
   }, [searchParams]);
+
+  // GA4: Track product list view (once per product set)
+  const listTracked = useRef(false);
+  useEffect(() => {
+    listTracked.current = false;
+  }, [searchParams]);
+  useEffect(() => {
+    if (products.length > 0 && !isLoading && !listTracked.current) {
+      listTracked.current = true;
+      const categorySlug = searchParams?.get("category");
+      const ga4Items: GA4Item[] = products.map((p, index) => ({
+        item_id: p.id,
+        item_name: p.name,
+        item_category: p.category?.name,
+        price: parseFloat(p.price),
+        quantity: 1,
+        index,
+      }));
+      trackViewItemList(
+        ga4Items,
+        categorySlug || "all_products",
+        categorySlug ? `Category: ${categorySlug}` : "All Products"
+      );
+    }
+  }, [products, isLoading, searchParams]);
 
   const updateFilters = (updates: Record<string, string | null>) => {
     const params = new URLSearchParams(searchParams?.toString() || "");
@@ -390,8 +416,28 @@ function ProductsContentInner() {
         </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+          {products.map((product, index) => (
+            <div
+              key={product.id}
+              onClick={() =>
+                trackSelectItem(
+                  {
+                    item_id: product.id,
+                    item_name: product.name,
+                    item_category: product.category?.name,
+                    price: parseFloat(product.price),
+                    quantity: 1,
+                    index,
+                  },
+                  searchParams?.get("category") || "all_products",
+                  searchParams?.get("category")
+                    ? `Category: ${searchParams.get("category")}`
+                    : "All Products"
+                )
+              }
+            >
+              <ProductCard product={product} />
+            </div>
           ))}
         </div>
       )}

@@ -1,7 +1,7 @@
 "use client";
 export const dynamic = "force-dynamic";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
@@ -34,6 +34,7 @@ import { useCartStore } from "@/stores/cart.store";
 import { checkoutSchema, type CheckoutInput } from "@/lib/validations";
 import { getStripe } from "@/lib/stripe-client";
 import { PaymentForm } from "@/components/checkout/PaymentForm";
+import { trackBeginCheckout, trackAddShippingInfo, trackAddPaymentInfo } from "@/lib/analytics";
 
 const SHIPPING_METHODS = [
   {
@@ -112,6 +113,23 @@ export default function CheckoutPage() {
     }
   }, [session, form]);
 
+  // GA4: Track begin checkout (once)
+  const checkoutTracked = useRef(false);
+  useEffect(() => {
+    if (items.length > 0 && !checkoutTracked.current) {
+      checkoutTracked.current = true;
+      trackBeginCheckout(
+        items.map((item) => ({
+          item_id: item.productId,
+          item_name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+        })),
+        getTotalPrice()
+      );
+    }
+  }, [items]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const subtotal = getTotalPrice();
   const selectedShipping = SHIPPING_METHODS.find((m) => m.id === form.watch("shippingMethod"));
   const shippingCost = selectedShipping?.price || 0;
@@ -134,6 +152,19 @@ export default function CheckoutPage() {
   const handleContinueToPayment = async () => {
     const isValid = await form.trigger("shippingMethod");
     if (!isValid) return;
+
+    // GA4: Track shipping info
+    const shippingMethod = SHIPPING_METHODS.find((m) => m.id === form.getValues("shippingMethod"));
+    trackAddShippingInfo(
+      items.map((item) => ({
+        item_id: item.productId,
+        item_name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+      })),
+      getTotalPrice(),
+      shippingMethod?.name || "Standard Shipping"
+    );
 
     setIsProcessing(true);
     setError(null);
@@ -163,6 +194,18 @@ export default function CheckoutPage() {
       setPaymentIntentId(data.paymentIntentId);
       setOrderNumber(data.orderNumber);
       setCurrentStep("payment");
+
+      // GA4: Track payment info step reached
+      trackAddPaymentInfo(
+        items.map((item) => ({
+          item_id: item.productId,
+          item_name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+        })),
+        getTotalPrice(),
+        "card"
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
