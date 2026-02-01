@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -19,6 +19,7 @@ import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { ProductCard } from "@/components/products";
+import { trackViewItemList, trackSelectItem, type GA4Item } from "@/lib/analytics";
 
 interface Product {
   id: string;
@@ -118,6 +119,26 @@ export function CategoryClient({ category }: CategoryClientProps) {
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
+
+  // GA4: Track category product list view (once per product set)
+  const listTracked = useRef(false);
+  useEffect(() => {
+    listTracked.current = false;
+  }, [currentPage, sortBy, sortOrder, appliedPriceRange, selectedSubcategory]);
+  useEffect(() => {
+    if (products.length > 0 && !isLoading && !listTracked.current) {
+      listTracked.current = true;
+      const ga4Items: GA4Item[] = products.map((p, index) => ({
+        item_id: p.id,
+        item_name: p.name,
+        item_category: category.name,
+        price: parseFloat(p.price),
+        quantity: 1,
+        index,
+      }));
+      trackViewItemList(ga4Items, `category_${category.slug}`, category.name);
+    }
+  }, [products, isLoading, category.slug, category.name]);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -340,8 +361,26 @@ export function CategoryClient({ category }: CategoryClientProps) {
         </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+          {products.map((product, index) => (
+            <div
+              key={product.id}
+              onClick={() =>
+                trackSelectItem(
+                  {
+                    item_id: product.id,
+                    item_name: product.name,
+                    item_category: category.name,
+                    price: parseFloat(product.price),
+                    quantity: 1,
+                    index,
+                  },
+                  `category_${category.slug}`,
+                  category.name
+                )
+              }
+            >
+              <ProductCard product={product} />
+            </div>
           ))}
         </div>
       )}

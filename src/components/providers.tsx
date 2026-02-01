@@ -3,6 +3,7 @@
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
+import { CookieConsent } from "@/components/common/CookieConsent";
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -31,6 +32,7 @@ export function Providers({ children }: ProvidersProps) {
       >
         {children}
         <Toaster position="top-right" />
+        <CookieConsent />
       </ThemeProvider>
     </SessionProvider>
   );

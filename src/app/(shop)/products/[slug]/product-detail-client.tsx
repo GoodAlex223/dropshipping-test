@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -21,6 +21,7 @@ import { Separator } from "@/components/ui/separator";
 import { ProductCard } from "@/components/products";
 import { useCartStore } from "@/stores/cart.store";
 import { cn } from "@/lib/utils";
+import { trackViewItem, trackAddToCart } from "@/lib/analytics";
 
 interface ProductImage {
   id: string;
@@ -83,6 +84,20 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
   const { addItem, openCart } = useCartStore();
 
+  // GA4: Track product view (once per page load)
+  const viewTracked = useRef(false);
+  useEffect(() => {
+    if (viewTracked.current) return;
+    viewTracked.current = true;
+    trackViewItem({
+      item_id: product.id,
+      item_name: product.name,
+      item_category: product.category.name,
+      price: parseFloat(product.price),
+      quantity: 1,
+    });
+  }, [product]);
+
   const currentPrice = selectedVariant
     ? parseFloat(selectedVariant.price)
     : parseFloat(product.price);
@@ -114,6 +129,16 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
       price: currentPrice,
       image: product.images[0]?.url,
       maxStock: currentStock,
+      quantity,
+    });
+
+    // GA4: Track add to cart
+    trackAddToCart({
+      item_id: product.id,
+      item_name: selectedVariant ? `${product.name} - ${selectedVariant.name}` : product.name,
+      item_category: product.category.name,
+      item_variant: selectedVariant?.name,
+      price: currentPrice,
       quantity,
     });
 

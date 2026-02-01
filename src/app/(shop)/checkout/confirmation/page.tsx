@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
+import { PurchaseTracker } from "@/components/analytics/PurchaseTracker";
 
 interface ConfirmationPageProps {
   searchParams: Promise<{ order?: string }>;
@@ -37,6 +38,19 @@ async function OrderConfirmation({ orderNumber }: { orderNumber: string }) {
 
   return (
     <div className="container py-12">
+      <PurchaseTracker
+        orderNumber={order.orderNumber}
+        total={Number(order.total)}
+        tax={Number(order.tax)}
+        shippingCost={Number(order.shippingCost)}
+        items={order.items.map((item) => ({
+          productId: item.productId,
+          productName: item.productName,
+          unitPrice: Number(item.unitPrice),
+          quantity: item.quantity,
+          variantInfo: item.variantInfo,
+        }))}
+      />
       <div className="mx-auto max-w-2xl">
         <div className="text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
