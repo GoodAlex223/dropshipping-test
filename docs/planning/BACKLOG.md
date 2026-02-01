@@ -187,6 +187,15 @@ Improvements to existing functionality.
 - [ ] Add category metaTitle/metaDesc fields — Similar to Product model, for category SEO
 - [ ] Implement proper i18n with hreflang — Current setup is preparation only (`en`)
 
+### [2026-02-01] From: TASK-018 Analytics Integration
+
+**Origin**: docs/archive/plans/2026-02-01_analytics-integration.md
+
+- [ ] Extract hardcoded `"USD"` currency to `NEXT_PUBLIC_CURRENCY` env var for multi-currency support
+- [ ] Add additional e-commerce events: `remove_from_cart`, `view_promotion`, `select_promotion`
+- [ ] Implement GA4 Measurement Protocol for server-side purchase validation
+- [ ] Build admin analytics dashboard showing conversion funnel from GTM data
+
 ---
 
 ## Technical Debt

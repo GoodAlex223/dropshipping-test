@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Shared React components organized by domain: admin panel, checkout flow, common layout, product display, shop interactions, multi-theme showcase, theme configuration, and shadcn/ui primitives.
+Shared React components organized by domain: admin panel, analytics tracking, checkout flow, common layout, product display, shop interactions, multi-theme showcase, theme configuration, and shadcn/ui primitives.
 
 <!-- END AUTO-MANAGED -->
 
@@ -20,18 +20,21 @@ components/
 │   ├── ProductForm.tsx    # Product create/edit form (react-hook-form + zod)
 │   ├── ProductImportDialog.tsx  # CSV import dialog
 │   └── index.ts           # Barrel exports
+├── analytics/             # Analytics tracking components
+│   └── PurchaseTracker.tsx  # One-time purchase event tracker (useRef pattern)
 ├── checkout/
 │   ├── PaymentForm.tsx    # Stripe Elements payment form
 │   └── index.ts
 ├── common/
 │   ├── Header.tsx         # Site header with nav, cart, auth
 │   ├── Footer.tsx         # Site footer
+│   ├── CookieConsent.tsx  # GDPR cookie consent banner + GTM loader (Zustand persisted)
 │   └── index.ts
 ├── products/
 │   ├── ProductCard.tsx    # Product card (used in grids)
 │   └── index.ts
 ├── shop/
-│   ├── CartDrawer.tsx     # Slide-out cart drawer (Sheet)
+│   ├── CartDrawer.tsx     # Slide-out cart drawer (Sheet) with view_cart tracking
 │   └── index.ts
 ├── showcase/              # Multi-theme showcase system
 │   ├── bold/              # Bold theme components (Hero, Features, Categories, ProductGrid, CTA)
@@ -47,7 +50,7 @@ components/
 ├── ui/                    # shadcn/ui primitives (DO NOT modify directly)
 │   ├── button.tsx, card.tsx, dialog.tsx, form.tsx, input.tsx, ...
 │   └── (20+ Radix-based components with Tailwind styling)
-└── providers.tsx          # App-wide context providers (theme, auth, toast)
+└── providers.tsx          # App-wide context providers (theme, auth, toast, cookie consent)
 ```
 
 <!-- END AUTO-MANAGED -->
@@ -65,6 +68,8 @@ components/
 - **Forms**: react-hook-form + @hookform/resolvers/zod for form state and validation
 - **Icons**: lucide-react for all iconography
 - **Showcase pattern**: Each theme variant (bold, luxury, organic) has identical component structure: Hero, Features, Categories, ProductGrid, CTA
+- **Analytics tracking**: Use `useRef` to track events once (prevent re-render duplication), call tracking functions from `@/lib/analytics`
+- **Cookie consent**: Zustand store with `persist` middleware, GTM loads conditionally when consent status is "accepted"
 
 <!-- END AUTO-MANAGED -->
 
@@ -78,11 +83,12 @@ components/
 - `clsx` + `tailwind-merge` — Conditional class composition
 - `lucide-react` — Icon library
 - `react-hook-form` + `@hookform/resolvers` — Form management
-- `zustand` — Cart state (consumed by CartDrawer, Header)
+- `zustand` — Cart state (CartDrawer, Header), cookie consent state (CookieConsent)
 - `@stripe/react-stripe-js` — Payment form elements
 - `react-dropzone` — File upload (ImageUploader)
 - `sonner` — Toast notifications
 - `next-themes` — Dark/light theme switching
+- `next/script` — Script component for GTM loading (CookieConsent)
 
 <!-- END AUTO-MANAGED -->
 

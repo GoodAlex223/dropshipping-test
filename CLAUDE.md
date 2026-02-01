@@ -17,6 +17,7 @@ Key capabilities:
 - CSV product import, S3 image storage, email notifications (Resend)
 - Multi-theme showcase system (bold, luxury, organic design variants)
 - SEO with dynamic sitemap and robots.txt
+- GA4 e-commerce analytics via Google Tag Manager with GDPR-compliant cookie consent
 
 <!-- END AUTO-MANAGED -->
 
@@ -90,14 +91,15 @@ src/
 │   └── sitemap.ts          # SEO dynamic sitemap
 ├── components/
 │   ├── admin/              # Admin panel components (sidebar, forms, dialogs)
+│   ├── analytics/          # Analytics tracking components (PurchaseTracker)
 │   ├── checkout/           # Payment form components
-│   ├── common/             # Header, Footer
+│   ├── common/             # Header, Footer, CookieConsent
 │   ├── products/           # ProductCard
 │   ├── shop/               # CartDrawer
 │   ├── showcase/           # Multi-theme showcase components (bold/, luxury/, organic/)
 │   ├── theme/              # Theme switcher & config
 │   ├── ui/                 # shadcn/ui primitives (button, card, dialog, etc.)
-│   └── providers.tsx       # Context providers wrapper
+│   └── providers.tsx       # Context providers wrapper (auth, theme, toast, cookie consent)
 ├── hooks/                  # Custom React hooks (use-debounce, use-toast)
 ├── lib/                    # Core utilities
 │   ├── auth.ts             # NextAuth v5 config (JWT + Prisma adapter)
@@ -110,6 +112,7 @@ src/
 │   ├── redis.ts            # Redis/ioredis connection
 │   ├── s3.ts               # AWS S3 image storage
 │   ├── seo.ts              # SEO utilities
+│   ├── analytics.ts        # GA4 e-commerce event tracking (GTM dataLayer)
 │   ├── utils.ts            # General utils (cn, etc.)
 │   └── validations/        # Zod schemas for all entities
 ├── services/               # Business logic services
@@ -133,6 +136,8 @@ prisma/
 **Auth flow**: NextAuth v5 with JWT strategy. Middleware protects `/account`, `/checkout` (auth required) and `/admin` (ADMIN role required). API routes use `requireAdmin()` / `requireAuth()` guards from `api-utils.ts`.
 
 **Database**: PostgreSQL via Prisma. Local dev uses standard connection; production uses Neon serverless adapter. Global singleton pattern in `db.ts`.
+
+**Analytics flow**: Cookie consent banner (Zustand persisted) -> User accepts -> GTM script loads -> Client-side events pushed to `window.dataLayer` -> GA4 receives e-commerce events (view_item_list, select_item, view_item, add_to_cart, view_cart, begin_checkout, add_shipping_info, add_payment_info, purchase).
 
 <!-- END AUTO-MANAGED -->
 
@@ -173,6 +178,10 @@ prisma/
 - **Showcase pattern**: Three theme variants (bold, luxury, organic) with parallel component structures
 - **Worker separation**: Individual worker files for each job type, orchestrated by `index.ts`
 - **Env validation**: Runtime checks for required env vars (NEXTAUTH_SECRET, DATABASE_URL) with descriptive errors
+- **Analytics tracking pattern**: `useEffect` with `useRef` to prevent duplicate events on re-renders (cart, checkout, purchase)
+- **GTM conditional loading**: GTM script only loads after user accepts cookies; regex validation for GTM_ID format
+- **DataLayer clearing**: Push `{ ecommerce: null }` before each event to prevent GA4 data leakage between events
+- **Cookie consent persistence**: Zustand store with localStorage persistence for consent status (pending/accepted/declined)
 
 <!-- END AUTO-MANAGED -->
 
