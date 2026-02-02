@@ -342,12 +342,31 @@ Completed tasks with implementation details and learnings.
 
 ---
 
+### [2026-02-02] - TASK-020: Google Shopping Feed Preparation
+
+**Summary**: Created a public Google Shopping XML product feed endpoint with Zod validation, added brand/MPN product identifier fields to the schema, and updated admin forms and CSV import to support the new fields.
+
+**Key Changes**:
+
+- Created `/feed/google-shopping.xml` route generating RSS 2.0 XML with Google Shopping `g:` namespace
+- Created `src/lib/validations/google-shopping.ts` with strict Zod schema (price format, GTIN, availability enums)
+- Added `brand` and `mpn` fields to Product model with Prisma migration
+- Updated admin ProductForm with "Product Identifiers" card (brand, barcode/GTIN, MPN)
+- Updated product API routes (create, update) and CSV import to handle new fields
+- Added 38 unit tests for feed validation
+
+**Files Created**: 4 | **Files Modified**: 8
+
+**Spawned Tasks**: 5 items added to BACKLOG.md (seed demo data, validate with Merchant Center, additional feed formats, google_product_category mapping, comparePrice validation)
+
+---
+
 ## Statistics
 
-| Month   | Tasks Completed | Key Deliverables                               |
-| ------- | --------------- | ---------------------------------------------- |
-| 2026-01 | 17              | Full MVP + Demo Deployed + SEO Technical Setup |
-| 2026-02 | 2               | GA4 Analytics Integration, Social Sharing      |
+| Month   | Tasks Completed | Key Deliverables                                    |
+| ------- | --------------- | --------------------------------------------------- |
+| 2026-01 | 17              | Full MVP + Demo Deployed + SEO Technical Setup      |
+| 2026-02 | 3               | GA4 Analytics, Social Sharing, Google Shopping Feed |
 
 ---
 

@@ -17,6 +17,9 @@ interface Product {
   comparePrice: string | null;
   costPrice: string | null;
   sku: string;
+  barcode: string | null;
+  brand: string | null;
+  mpn: string | null;
   stock: number;
   categoryId: string;
   isActive: boolean;

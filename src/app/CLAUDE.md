@@ -47,6 +47,8 @@ app/
 │   ├── health/            # Health check endpoint
 │   ├── orders/            # Customer order API
 │   └── products/          # Public product API
+├── feed/                  # Product feeds for external services
+│   └── google-shopping.xml/  # Google Shopping RSS 2.0 feed (hourly revalidation)
 ├── layout.tsx             # Root layout (providers, metadata)
 ├── error.tsx              # Global error boundary
 ├── not-found.tsx          # 404 page
@@ -73,6 +75,9 @@ app/
 - **List page structure**: Admin list pages follow pattern: Suspense wrapper → filters/search → debounced fetch → table/grid → pagination
 - **OG image generation**: Use `opengraph-image.tsx` file convention for dynamic Open Graph images (exports `alt`, `size`, `contentType`, and default `Image` function returning `ImageResponse`)
 - **OG image text truncation**: Server-side text truncation instead of CSS line clamp (Satori rendering engine limitations)
+- **Feed routes**: XML/RSS feeds in `feed/` directory; use `export const dynamic = "force-dynamic"` and `export const revalidate = 3600` for hourly updates
+- **XML escaping**: Feed routes must escape special characters (&, <, >, ", ') using dedicated `escapeXml()` helper to prevent malformed XML
+- **Feed validation**: Use strict Zod schemas (e.g., `google-shopping.ts`) to validate feed items before XML serialization; enforce title/description length limits, price format, GTIN format, and enum values
 
 <!-- END AUTO-MANAGED -->
 

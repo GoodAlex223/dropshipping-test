@@ -11,6 +11,9 @@ interface CSVRow {
   comparePrice?: string;
   costPrice?: string;
   sku: string;
+  barcode?: string;
+  brand?: string;
+  mpn?: string;
   stock?: string;
   category?: string;
   categoryId?: string;
@@ -133,6 +136,9 @@ export async function POST(request: NextRequest) {
                 price,
                 comparePrice: row.comparePrice ? parseFloat(row.comparePrice) : undefined,
                 costPrice: row.costPrice ? parseFloat(row.costPrice) : undefined,
+                barcode: row.barcode?.trim() || undefined,
+                brand: row.brand?.trim() || undefined,
+                mpn: row.mpn?.trim() || undefined,
                 stock: row.stock ? parseInt(row.stock) : undefined,
                 categoryId,
                 isActive: row.isActive ? row.isActive.toLowerCase() === "true" : undefined,
@@ -164,6 +170,9 @@ export async function POST(request: NextRequest) {
               comparePrice: row.comparePrice ? parseFloat(row.comparePrice) : null,
               costPrice: row.costPrice ? parseFloat(row.costPrice) : null,
               sku,
+              barcode: row.barcode?.trim() || null,
+              brand: row.brand?.trim() || null,
+              mpn: row.mpn?.trim() || null,
               stock: row.stock ? parseInt(row.stock) : 0,
               categoryId,
               isActive: row.isActive ? row.isActive.toLowerCase() === "true" : true,
@@ -209,8 +218,8 @@ export async function GET() {
   const { error } = await requireAdmin();
   if (error) return error;
 
-  const template = `name,sku,price,comparePrice,costPrice,stock,category,description,shortDesc,isActive,isFeatured,imageUrl
-"Example Product","SKU-001","29.99","39.99","15.00","100","Electronics","Full product description here","Short description","true","false","https://example.com/image.jpg"`;
+  const template = `name,sku,price,comparePrice,costPrice,stock,category,brand,barcode,mpn,description,shortDesc,isActive,isFeatured,imageUrl
+"Example Product","SKU-001","29.99","39.99","15.00","100","Electronics","BrandName","0123456789012","MPN-001","Full product description here","Short description","true","false","https://example.com/image.jpg"`;
 
   return new Response(template, {
     headers: {

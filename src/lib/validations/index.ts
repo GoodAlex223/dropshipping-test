@@ -29,6 +29,9 @@ export const productSchema = z.object({
   costPrice: z.number().positive().optional().nullable(),
   sku: z.string().min(1, "SKU is required"),
   stock: z.number().int().min(0, "Stock cannot be negative"),
+  barcode: z.string().max(14).optional().nullable(),
+  brand: z.string().max(70).optional().nullable(),
+  mpn: z.string().max(70).optional().nullable(),
   categoryId: z.string().min(1, "Category is required"),
   isActive: z.boolean().default(true),
   isFeatured: z.boolean().default(false),
@@ -105,6 +108,14 @@ export const supplierSchema = z.object({
   isActive: z.boolean().default(true),
   notes: z.string().optional().nullable(),
 });
+
+// Google Shopping feed validations
+export {
+  googleShoppingItemSchema,
+  validateFeedItem,
+  validateFeedItemSafe,
+} from "./google-shopping";
+export type { GoogleShoppingItem } from "./google-shopping";
 
 // Type exports
 export type LoginInput = z.infer<typeof loginSchema>;

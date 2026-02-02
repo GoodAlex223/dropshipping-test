@@ -16,7 +16,7 @@ Key capabilities:
 - Automated order forwarding to suppliers via background workers (BullMQ)
 - CSV product import, S3 image storage, email notifications (Resend)
 - Multi-theme showcase system (bold, luxury, organic design variants)
-- SEO with dynamic sitemap, robots.txt, and dynamic Open Graph images
+- SEO with dynamic sitemap, robots.txt, dynamic Open Graph images, and Google Shopping XML feed
 - Social sharing with platform-specific share buttons and Web Share API support
 - GA4 e-commerce analytics via Google Tag Manager with GDPR-compliant cookie consent
 
@@ -86,6 +86,8 @@ src/
 │   │   ├── health/         # Health check
 │   │   ├── orders/         # Customer order endpoints
 │   │   └── products/       # Public product endpoints
+│   ├── feed/               # Product feeds
+│   │   └── google-shopping.xml/  # Google Shopping RSS 2.0 feed
 │   ├── layout.tsx          # Root layout
 │   ├── middleware.ts       # Auth middleware (route protection)
 │   ├── robots.ts           # SEO robots.txt
@@ -117,6 +119,8 @@ src/
 │   ├── share-utils.ts      # Social sharing URL builders, Web Share API
 │   ├── utils.ts            # General utils (cn, etc.)
 │   └── validations/        # Zod schemas for all entities
+│       ├── index.ts        # Product, category, order, user schemas
+│       └── google-shopping.ts  # Google Shopping feed item schema
 ├── services/               # Business logic services
 │   └── supplier.service.ts # Supplier order forwarding
 ├── stores/                 # Zustand stores
@@ -190,6 +194,8 @@ prisma/
 - **Social sharing pattern**: Platform-specific URL builders (`buildShareUrl`) with proper URI encoding; Web Share API detection (`canUseNativeShare`) with graceful fallback to clipboard copy on failure
 - **OG image file convention**: Product pages use `opengraph-image.tsx` file-based generation (exports `alt`, `size`, `contentType`, and default `Image` function returning `ImageResponse`); Next.js automatically wires images into meta tags
 - **Native share visibility**: Native share button rendered with CSS hiding (`sm:hidden`) instead of conditional rendering to avoid hydration mismatch
+- **Google Shopping feed pattern**: RSS 2.0 XML with Google Shopping namespace; strict Zod validation for title (max 150 chars), description (max 5000 chars), price format (`/^\d+\.\d{2} [A-Z]{3}$/`), GTIN (8/12/13/14 digits), and enum values; XML escaping for special characters; hourly revalidation with stale-while-revalidate
+- **Product identifier fields**: Schema includes optional `brand` and `mpn` (Manufacturer Part Number) fields for Google Shopping compliance and product catalog enrichment
 
 <!-- END AUTO-MANAGED -->
 
@@ -199,9 +205,10 @@ prisma/
 
 - **Commit style**: Conventional commits (`feat:`, `fix:`, `docs:`, `chore:`) with optional scope (`feat(seo):`)
 - **Branch naming**: `feat/task-NNN-description` pattern
-- **Recent focus**: CI/CD hardening (workflow_call trigger for reusable workflows), code quality enforcement (lint-staged covering all file types)
+- **Recent focus**: Product feed generation (Google Shopping XML), code quality enforcement (lint-staged), analytics integration (GA4 via GTM)
 - **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability
 - **CI improvements**: Added workflow_call trigger for deploy.yml integration; JS files now auto-formatted on commit via lint-staged
+- **Latest completion**: TASK-020 Google Shopping feed with strict validation, brand/MPN product identifiers added to schema
 
 <!-- END AUTO-MANAGED -->
 

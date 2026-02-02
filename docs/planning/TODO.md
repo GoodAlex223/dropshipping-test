@@ -20,24 +20,6 @@ Active tasks for Dropshipping Website MVP.
 
 ## Medium Priority
 
-### [TASK-020] - Google Shopping Feed Preparation
-
-**Priority**: Medium
-**Dependencies**: None (TASK-017 complete)
-**Estimated Effort**: Medium
-
-**Description**: Generate product feed in Google Shopping format (technical preparation for when real products are available).
-
-**Sub-tasks**:
-
-- [ ] Create XML product feed endpoint (`/feed/google-shopping.xml`)
-- [ ] Implement required Google Shopping attributes (id, title, description, link, image_link, price, availability)
-- [ ] Add product identifiers fields to schema (GTIN, MPN, brand)
-- [ ] Create feed validation utility
-- [ ] Document Merchant Center setup process
-
----
-
 ### [TASK-021] - Performance Optimization
 
 **Priority**: Medium
@@ -124,7 +106,7 @@ Active tasks for Dropshipping Website MVP.
 
 ## Completed
 
-All MVP implementation tasks (TASK-001 through TASK-016), TASK-017 (SEO Technical Setup), TASK-018 (Analytics Integration), and TASK-019 (Social Sharing Enhancement) have been completed. See [DONE.md](DONE.md) for details.
+All MVP implementation tasks (TASK-001 through TASK-016), TASK-017 (SEO Technical Setup), TASK-018 (Analytics Integration), TASK-019 (Social Sharing Enhancement), and TASK-020 (Google Shopping Feed) have been completed. See [DONE.md](DONE.md) for details.
 
 ---
 
