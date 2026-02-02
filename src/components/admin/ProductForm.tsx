@@ -33,6 +33,9 @@ const productFormSchema = z.object({
   comparePrice: z.string().optional(),
   costPrice: z.string().optional(),
   sku: z.string().min(1, "SKU is required"),
+  barcode: z.string().optional(),
+  brand: z.string().optional(),
+  mpn: z.string().optional(),
   stock: z.string().refine((val) => !isNaN(parseInt(val)) && parseInt(val) >= 0, {
     message: "Stock must be a non-negative integer",
   }),
@@ -59,6 +62,9 @@ interface Product {
   comparePrice: string | null;
   costPrice: string | null;
   sku: string;
+  barcode: string | null;
+  brand: string | null;
+  mpn: string | null;
   stock: number;
   categoryId: string;
   isActive: boolean;
@@ -93,6 +99,9 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
       comparePrice: product?.comparePrice || "",
       costPrice: product?.costPrice || "",
       sku: product?.sku || "",
+      barcode: product?.barcode || "",
+      brand: product?.brand || "",
+      mpn: product?.mpn || "",
       stock: product?.stock?.toString() || "0",
       categoryId: product?.categoryId || "",
       isActive: product?.isActive ?? true,
@@ -135,6 +144,9 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
         comparePrice: data.comparePrice ? parseFloat(data.comparePrice) : null,
         costPrice: data.costPrice ? parseFloat(data.costPrice) : null,
         sku: data.sku,
+        barcode: data.barcode || null,
+        brand: data.brand || null,
+        mpn: data.mpn || null,
         stock: parseInt(data.stock),
         categoryId: data.categoryId,
         isActive: data.isActive,
@@ -356,6 +368,47 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
                   {errors.stock && (
                     <p className="text-destructive text-sm">{errors.stock.message}</p>
                   )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Product Identifiers</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground text-sm">
+                Used for Google Shopping feed and product identification.
+              </p>
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div className="space-y-2">
+                  <Label htmlFor="brand">Brand</Label>
+                  <Input
+                    id="brand"
+                    {...register("brand")}
+                    placeholder="e.g. Nike"
+                    disabled={isLoading}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="barcode">GTIN / Barcode</Label>
+                  <Input
+                    id="barcode"
+                    {...register("barcode")}
+                    placeholder="e.g. 0123456789012"
+                    disabled={isLoading}
+                  />
+                  <p className="text-muted-foreground text-xs">UPC, EAN, ISBN, or JAN</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="mpn">MPN</Label>
+                  <Input
+                    id="mpn"
+                    {...register("mpn")}
+                    placeholder="Manufacturer Part Number"
+                    disabled={isLoading}
+                  />
                 </div>
               </div>
             </CardContent>
