@@ -71,7 +71,8 @@ app/
 - **Error handling**: Wrap API handlers in try/catch, return standardized error responses via `apiError()`
 - **Async params**: Dynamic route params are Promise-based in Next.js 14; unwrap with `const { id } = use(params)` from `react`
 - **List page structure**: Admin list pages follow pattern: Suspense wrapper → filters/search → debounced fetch → table/grid → pagination
-- **OG image generation**: Use `opengraph-image.tsx` file convention for dynamic Open Graph images (exports `Image` component returning `ImageResponse`)
+- **OG image generation**: Use `opengraph-image.tsx` file convention for dynamic Open Graph images (exports `alt`, `size`, `contentType`, and default `Image` function returning `ImageResponse`)
+- **OG image text truncation**: Server-side text truncation instead of CSS line clamp (Satori rendering engine limitations)
 
 <!-- END AUTO-MANAGED -->
 
@@ -85,6 +86,7 @@ app/
 - `stripe` — Server-side payment processing
 - `zod` — Request validation in API routes
 - `bullmq` — Queue job creation in checkout flow
+- `next/og` — Open Graph image generation (`ImageResponse`)
 
 <!-- END AUTO-MANAGED -->
 
