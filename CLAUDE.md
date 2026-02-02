@@ -149,7 +149,7 @@ prisma/
 - **Path aliases**: `@/*` maps to `./src/*`
 - **Formatting**: Prettier with double quotes, semicolons, 2-space indent, 100 char print width, trailing commas (es5), tailwindcss plugin
 - **Linting**: ESLint with next/core-web-vitals + next/typescript configs
-- **Pre-commit**: Husky + lint-staged (eslint --fix + prettier --write on _.ts/_.tsx)
+- **Pre-commit**: Husky + lint-staged (eslint --fix + prettier --write on TypeScript files; prettier --write on JS/JSON/MD files)
 - **Components**: PascalCase filenames for React components (e.g., `AdminSidebar.tsx`, `ProductCard.tsx`)
 - **Non-component files**: kebab-case (e.g., `api-utils.ts`, `cart.store.ts`, `use-debounce.ts`)
 - **UI primitives**: shadcn/ui components in `src/components/ui/` (Radix UI + Tailwind + CVA)
@@ -194,8 +194,9 @@ prisma/
 
 - **Commit style**: Conventional commits (`feat:`, `fix:`, `docs:`, `chore:`) with optional scope (`feat(seo):`)
 - **Branch naming**: `feat/task-NNN-description` pattern
-- **Recent focus**: SEO setup, multi-theme showcase system, Vercel deployment fixes (Neon adapter, Prisma compatibility)
+- **Recent focus**: CI/CD hardening (workflow_call trigger for reusable workflows), code quality enforcement (lint-staged covering all file types)
 - **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability
+- **CI improvements**: Added workflow_call trigger for deploy.yml integration; JS files now auto-formatted on commit via lint-staged
 
 <!-- END AUTO-MANAGED -->
 
@@ -205,12 +206,14 @@ prisma/
 
 - Run `npm run typecheck` before committing to catch type errors early
 - Run `npm run lint:fix` to auto-fix linting issues
+- Run `npm run format:check` to verify formatting before CI (matches CI job)
 - Use `npm run test:run` for a single test pass (CI-style)
 - When modifying Prisma schema, run `npm run db:migrate` to create migration, then `npm run db:generate`
 - Always add Zod validation schemas for new API endpoints in `src/lib/validations/index.ts`
 - Use `requireAdmin()` or `requireAuth()` for protected API routes, never roll custom auth checks
 - Keep UI primitives in `src/components/ui/` unchanged (shadcn/ui managed)
 - Environment variables: never commit `.env` files; use `.env.example` as reference
+- Use `next/image` for all images; avoid native `<img>` tags (ESLint enforced)
 
 <!-- END AUTO-MANAGED -->
 
