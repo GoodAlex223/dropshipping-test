@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -187,7 +188,7 @@ export default function AdminOrderDetailPage({ params }: AdminOrderDetailPagePro
         setNewStatus(data.status);
         setTrackingNumber(data.trackingNumber || "");
         setTrackingUrl(data.trackingUrl || "");
-      } catch (err) {
+      } catch {
         setError("Failed to load order");
       } finally {
         setIsLoading(false);
@@ -228,7 +229,7 @@ export default function AdminOrderDetailPage({ params }: AdminOrderDetailPagePro
       setIsDialogOpen(false);
       setUpdateNotes("");
       toast.success("Order updated successfully");
-    } catch (err) {
+    } catch {
       toast.error("Failed to update order");
     } finally {
       setIsUpdating(false);
@@ -524,9 +525,11 @@ export default function AdminOrderDetailPage({ params }: AdminOrderDetailPagePro
                 <div key={item.id} className="flex gap-4 border-b pb-4 last:border-0 last:pb-0">
                   <Link href={`/admin/products/${item.productId}`}>
                     {item.image ? (
-                      <img
+                      <Image
                         src={item.image}
                         alt={item.productName}
+                        width={80}
+                        height={80}
                         className="h-20 w-20 rounded-md object-cover"
                       />
                     ) : (

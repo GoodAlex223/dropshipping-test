@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Package,
-  Loader2,
   ArrowLeft,
   Truck,
   CheckCircle2,
@@ -124,7 +124,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
         }
         const data = await response.json();
         setOrder(data);
-      } catch (err) {
+      } catch {
         setError("Failed to load order");
       } finally {
         setIsLoading(false);
@@ -286,9 +286,11 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
                 <div key={item.id} className="flex gap-4 border-b pb-4 last:border-0 last:pb-0">
                   <Link href={`/products/${item.productSlug}`}>
                     {item.image ? (
-                      <img
+                      <Image
                         src={item.image}
                         alt={item.productName}
+                        width={80}
+                        height={80}
                         className="h-20 w-20 rounded-md object-cover"
                       />
                     ) : (

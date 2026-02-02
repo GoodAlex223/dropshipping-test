@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import {
   Plus,
   Search,
@@ -406,9 +407,11 @@ export default function AdminCategoriesPage() {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       {category.image ? (
-                        <img
+                        <Image
                           src={category.image}
                           alt={category.name}
+                          width={40}
+                          height={40}
                           className="h-10 w-10 rounded-md object-cover"
                         />
                       ) : (

@@ -182,6 +182,9 @@ prisma/
 - **GTM conditional loading**: GTM script only loads after user accepts cookies; regex validation for GTM_ID format
 - **DataLayer clearing**: Push `{ ecommerce: null }` before each event to prevent GA4 data leakage between events
 - **Cookie consent persistence**: Zustand store with localStorage persistence for consent status (pending/accepted/declined)
+- **Async params unwrapping**: Next.js 14 dynamic routes use `use(params)` to unwrap Promise-based params in client components
+- **Search debouncing**: Admin list pages debounce search input (300ms) via `useDebounce` hook to reduce API calls
+- **Suspense-wrapped list pages**: Admin list pages wrap content in `<Suspense>` with loading skeleton fallbacks
 
 <!-- END AUTO-MANAGED -->
 

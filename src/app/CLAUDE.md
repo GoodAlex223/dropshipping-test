@@ -68,6 +68,8 @@ app/
 - **Dynamic segments**: `[id]` for admin resources, `[slug]` for public-facing pages
 - **Static export control**: Use `export const dynamic = "force-dynamic"` when routes need runtime data
 - **Error handling**: Wrap API handlers in try/catch, return standardized error responses via `apiError()`
+- **Async params**: Dynamic route params are Promise-based in Next.js 14; unwrap with `const { id } = use(params)` from `react`
+- **List page structure**: Admin list pages follow pattern: Suspense wrapper → filters/search → debounced fetch → table/grid → pagination
 
 <!-- END AUTO-MANAGED -->
 
