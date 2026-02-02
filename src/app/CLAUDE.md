@@ -35,7 +35,8 @@ app/
 │   ├── cart/              # Cart page
 │   ├── categories/        # Category listing + detail (with [slug])
 │   ├── checkout/          # Checkout + confirmation page
-│   └── products/          # Product listing + detail (with [slug])
+│   └── products/          # Product listing + detail
+│       └── [slug]/        # Product detail page, client component, opengraph-image.tsx
 ├── showcase/              # Theme demo pages (bold, luxury, organic)
 ├── api/                   # API route handlers
 │   ├── admin/             # Admin-only endpoints (guarded by requireAdmin)
@@ -70,6 +71,7 @@ app/
 - **Error handling**: Wrap API handlers in try/catch, return standardized error responses via `apiError()`
 - **Async params**: Dynamic route params are Promise-based in Next.js 14; unwrap with `const { id } = use(params)` from `react`
 - **List page structure**: Admin list pages follow pattern: Suspense wrapper → filters/search → debounced fetch → table/grid → pagination
+- **OG image generation**: Use `opengraph-image.tsx` file convention for dynamic Open Graph images (exports `Image` component returning `ImageResponse`)
 
 <!-- END AUTO-MANAGED -->
 

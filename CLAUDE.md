@@ -94,7 +94,7 @@ src/
 │   ├── analytics/          # Analytics tracking components (PurchaseTracker)
 │   ├── checkout/           # Payment form components
 │   ├── common/             # Header, Footer, CookieConsent
-│   ├── products/           # ProductCard
+│   ├── products/           # ProductCard, SocialShareButtons
 │   ├── shop/               # CartDrawer
 │   ├── showcase/           # Multi-theme showcase components (bold/, luxury/, organic/)
 │   ├── theme/              # Theme switcher & config
@@ -111,8 +111,9 @@ src/
 │   ├── queue.ts            # BullMQ queue setup
 │   ├── redis.ts            # Redis/ioredis connection
 │   ├── s3.ts               # AWS S3 image storage
-│   ├── seo.ts              # SEO utilities
+│   ├── seo.ts              # SEO utilities (metadata, JSON-LD)
 │   ├── analytics.ts        # GA4 e-commerce event tracking (GTM dataLayer)
+│   ├── share-utils.ts      # Social sharing URL builders, Web Share API
 │   ├── utils.ts            # General utils (cn, etc.)
 │   └── validations/        # Zod schemas for all entities
 ├── services/               # Business logic services
@@ -185,6 +186,8 @@ prisma/
 - **Async params unwrapping**: Next.js 14 dynamic routes use `use(params)` to unwrap Promise-based params in client components
 - **Search debouncing**: Admin list pages debounce search input (300ms) via `useDebounce` hook to reduce API calls
 - **Suspense-wrapped list pages**: Admin list pages wrap content in `<Suspense>` with loading skeleton fallbacks
+- **Social sharing pattern**: Platform-specific URL builders (`buildShareUrl`) with Web Share API detection and graceful fallback to clipboard copy
+- **OG image file convention**: Product pages use `opengraph-image.tsx` file-based generation instead of programmatic metadata (Next.js automatically wires images into meta tags)
 
 <!-- END AUTO-MANAGED -->
 

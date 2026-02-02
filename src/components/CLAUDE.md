@@ -32,6 +32,7 @@ components/
 │   └── index.ts
 ├── products/
 │   ├── ProductCard.tsx    # Product card (used in grids)
+│   ├── SocialShareButtons.tsx  # Social media sharing buttons (Facebook, Twitter, Pinterest, WhatsApp, Telegram, copy link, native share)
 │   └── index.ts
 ├── shop/
 │   ├── CartDrawer.tsx     # Slide-out cart drawer (Sheet) with view_cart tracking
