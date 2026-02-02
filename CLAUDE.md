@@ -160,7 +160,7 @@ prisma/
 - **Non-component files**: kebab-case (e.g., `api-utils.ts`, `cart.store.ts`, `use-debounce.ts`)
 - **UI primitives**: shadcn/ui components in `src/components/ui/` (Radix UI + Tailwind + CVA)
 - **State management**: Zustand with `persist` middleware, stores in `src/stores/*.store.ts`
-- **Validation**: Zod schemas in `src/lib/validations/index.ts`, shared between client and server
+- **Validation**: Zod schemas in `src/lib/validations/` (index.ts for core entities, google-shopping.ts for feed items), shared between client and server
 - **API routes**: Export named functions (`GET`, `POST`, `PUT`, `DELETE`), use `try/catch`, return `NextResponse.json()`
 - **API auth**: Use `requireAdmin()` / `requireAuth()` from `api-utils.ts` at top of handlers
 - **Types**: Re-export Prisma types from `src/types/index.ts`, add custom interfaces there
@@ -195,6 +195,7 @@ prisma/
 - **OG image file convention**: Product pages use `opengraph-image.tsx` file-based generation (exports `alt`, `size`, `contentType`, and default `Image` function returning `ImageResponse`); Next.js automatically wires images into meta tags
 - **Native share visibility**: Native share button rendered with CSS hiding (`sm:hidden`) instead of conditional rendering to avoid hydration mismatch
 - **Google Shopping feed pattern**: RSS 2.0 XML with Google Shopping namespace; strict Zod validation for title (max 150 chars), description (max 5000 chars), price format (`/^\d+\.\d{2} [A-Z]{3}$/`), GTIN (8/12/13/14 digits), and enum values; XML escaping for special characters; hourly revalidation with stale-while-revalidate
+- **Feed validation filtering**: Use `validateFeedItemSafe()` with `.filter()` after `.map()` to exclude invalid items from feeds instead of breaking serialization; prevents malformed data (e.g., non-numeric GTINs) from corrupting XML output
 - **Product identifier fields**: Schema includes optional `brand` and `mpn` (Manufacturer Part Number) fields for Google Shopping compliance and product catalog enrichment
 
 <!-- END AUTO-MANAGED -->
@@ -221,7 +222,7 @@ prisma/
 - Run `npm run format:check` to verify formatting before CI (matches CI job)
 - Use `npm run test:run` for a single test pass (CI-style)
 - When modifying Prisma schema, run `npm run db:migrate` to create migration, then `npm run db:generate`
-- Always add Zod validation schemas for new API endpoints in `src/lib/validations/index.ts`
+- Always add Zod validation schemas for new API endpoints in `src/lib/validations/` (index.ts for core schemas, separate files for specialized domains like google-shopping.ts)
 - Use `requireAdmin()` or `requireAuth()` for protected API routes, never roll custom auth checks
 - Keep UI primitives in `src/components/ui/` unchanged (shadcn/ui managed)
 - Environment variables: never commit `.env` files; use `.env.example` as reference
