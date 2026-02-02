@@ -17,8 +17,8 @@ components/
 ├── admin/                 # Admin panel components
 │   ├── AdminSidebar.tsx   # Navigation sidebar (collapsible)
 │   ├── ImageUploader.tsx  # S3 image upload with drag-and-drop
-│   ├── ProductForm.tsx    # Product create/edit form (react-hook-form + zod, includes brand/MPN fields)
-│   ├── ProductImportDialog.tsx  # CSV import dialog (supports brand/MPN columns)
+│   ├── ProductForm.tsx    # Product create/edit form (react-hook-form + zod, includes "Product Identifiers" card with brand/barcode/MPN fields)
+│   ├── ProductImportDialog.tsx  # CSV import dialog (supports brand/barcode/MPN columns)
 │   └── index.ts           # Barrel exports
 ├── analytics/             # Analytics tracking components
 │   └── PurchaseTracker.tsx  # One-time purchase event tracker (useRef pattern)

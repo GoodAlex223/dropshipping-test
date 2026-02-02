@@ -77,6 +77,7 @@ app/
 - **OG image text truncation**: Server-side text truncation instead of CSS line clamp (Satori rendering engine limitations)
 - **Feed routes**: XML/RSS feeds in `feed/` directory; use `export const dynamic = "force-dynamic"` and `export const revalidate = 3600` for hourly updates
 - **XML escaping**: Feed routes must escape special characters (&, <, >, ", ') using dedicated `escapeXml()` helper to prevent malformed XML
+- **Feed validation**: Use strict Zod schemas (e.g., `google-shopping.ts`) to validate feed items before XML serialization; enforce title/description length limits, price format, GTIN format, and enum values
 
 <!-- END AUTO-MANAGED -->
 
