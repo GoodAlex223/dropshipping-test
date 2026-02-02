@@ -71,16 +71,12 @@ describe("SEO Utilities", () => {
       expect(metadata.twitter).toBeDefined();
     });
 
-    it("should use product image in OpenGraph", () => {
+    it("should not set OG images (handled by opengraph-image.tsx convention)", () => {
       const metadata = getProductMetadata(mockProduct);
 
-      expect(metadata.openGraph?.images).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            url: "https://example.com/image.jpg",
-          }),
-        ])
-      );
+      // OG images are generated dynamically by opengraph-image.tsx (file convention),
+      // so getProductMetadata should not set images directly.
+      expect(metadata.openGraph?.images).toBeUndefined();
     });
 
     it("should use shortDesc as description when available", () => {
@@ -107,19 +103,14 @@ describe("SEO Utilities", () => {
       expect(metadata.description).toBe(siteConfig.description);
     });
 
-    it("should use ogImage when product has no images", () => {
+    it("should not set OG images even without product images", () => {
       const productWithoutImages = {
         ...mockProduct,
         images: undefined,
       };
       const metadata = getProductMetadata(productWithoutImages);
-      expect(metadata.openGraph?.images).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            url: siteConfig.ogImage,
-          }),
-        ])
-      );
+      // OG images handled by opengraph-image.tsx file convention
+      expect(metadata.openGraph?.images).toBeUndefined();
     });
   });
 

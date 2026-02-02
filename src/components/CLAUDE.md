@@ -32,6 +32,7 @@ components/
 │   └── index.ts
 ├── products/
 │   ├── ProductCard.tsx    # Product card (used in grids)
+│   ├── SocialShareButtons.tsx  # Social media sharing buttons (Facebook, Twitter, Pinterest, WhatsApp, Telegram, copy link, native share)
 │   └── index.ts
 ├── shop/
 │   ├── CartDrawer.tsx     # Slide-out cart drawer (Sheet) with view_cart tracking
@@ -70,6 +71,8 @@ components/
 - **Showcase pattern**: Each theme variant (bold, luxury, organic) has identical component structure: Hero, Features, Categories, ProductGrid, CTA
 - **Analytics tracking**: Use `useRef` to track events once (prevent re-render duplication), call tracking functions from `@/lib/analytics`
 - **Cookie consent**: Zustand store with `persist` middleware, GTM loads conditionally when consent status is "accepted"
+- **Social sharing**: Platform-specific URL builders in `share-utils.ts`, Web Share API detection with fallback to clipboard copy, native share button uses CSS hiding (`sm:hidden`) to avoid hydration mismatch
+- **Custom icons**: Use lucide-react for icons; for platforms without lucide support (e.g., Pinterest), create custom SVG components
 
 <!-- END AUTO-MANAGED -->
 

@@ -16,7 +16,8 @@ Key capabilities:
 - Automated order forwarding to suppliers via background workers (BullMQ)
 - CSV product import, S3 image storage, email notifications (Resend)
 - Multi-theme showcase system (bold, luxury, organic design variants)
-- SEO with dynamic sitemap and robots.txt
+- SEO with dynamic sitemap, robots.txt, and dynamic Open Graph images
+- Social sharing with platform-specific share buttons and Web Share API support
 - GA4 e-commerce analytics via Google Tag Manager with GDPR-compliant cookie consent
 
 <!-- END AUTO-MANAGED -->
@@ -94,7 +95,7 @@ src/
 │   ├── analytics/          # Analytics tracking components (PurchaseTracker)
 │   ├── checkout/           # Payment form components
 │   ├── common/             # Header, Footer, CookieConsent
-│   ├── products/           # ProductCard
+│   ├── products/           # ProductCard, SocialShareButtons
 │   ├── shop/               # CartDrawer
 │   ├── showcase/           # Multi-theme showcase components (bold/, luxury/, organic/)
 │   ├── theme/              # Theme switcher & config
@@ -111,8 +112,9 @@ src/
 │   ├── queue.ts            # BullMQ queue setup
 │   ├── redis.ts            # Redis/ioredis connection
 │   ├── s3.ts               # AWS S3 image storage
-│   ├── seo.ts              # SEO utilities
-│   ├── analytics.ts        # GA4 e-commerce event tracking (GTM dataLayer)
+│   ├── seo.ts              # SEO utilities (metadata, JSON-LD)
+│   ├── analytics.ts        # GA4 e-commerce + share event tracking (GTM dataLayer)
+│   ├── share-utils.ts      # Social sharing URL builders, Web Share API
 │   ├── utils.ts            # General utils (cn, etc.)
 │   └── validations/        # Zod schemas for all entities
 ├── services/               # Business logic services
@@ -178,13 +180,16 @@ prisma/
 - **Showcase pattern**: Three theme variants (bold, luxury, organic) with parallel component structures
 - **Worker separation**: Individual worker files for each job type, orchestrated by `index.ts`
 - **Env validation**: Runtime checks for required env vars (NEXTAUTH_SECRET, DATABASE_URL) with descriptive errors
-- **Analytics tracking pattern**: `useEffect` with `useRef` to prevent duplicate events on re-renders (cart, checkout, purchase)
+- **Analytics tracking pattern**: `useEffect` with `useRef` to prevent duplicate events on re-renders (cart, checkout, purchase, share)
 - **GTM conditional loading**: GTM script only loads after user accepts cookies; regex validation for GTM_ID format
 - **DataLayer clearing**: Push `{ ecommerce: null }` before each event to prevent GA4 data leakage between events
 - **Cookie consent persistence**: Zustand store with localStorage persistence for consent status (pending/accepted/declined)
 - **Async params unwrapping**: Next.js 14 dynamic routes use `use(params)` to unwrap Promise-based params in client components
 - **Search debouncing**: Admin list pages debounce search input (300ms) via `useDebounce` hook to reduce API calls
 - **Suspense-wrapped list pages**: Admin list pages wrap content in `<Suspense>` with loading skeleton fallbacks
+- **Social sharing pattern**: Platform-specific URL builders (`buildShareUrl`) with proper URI encoding; Web Share API detection (`canUseNativeShare`) with graceful fallback to clipboard copy on failure
+- **OG image file convention**: Product pages use `opengraph-image.tsx` file-based generation (exports `alt`, `size`, `contentType`, and default `Image` function returning `ImageResponse`); Next.js automatically wires images into meta tags
+- **Native share visibility**: Native share button rendered with CSS hiding (`sm:hidden`) instead of conditional rendering to avoid hydration mismatch
 
 <!-- END AUTO-MANAGED -->
 

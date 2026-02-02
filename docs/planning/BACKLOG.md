@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-01-22
+**Last Updated**: 2026-02-02
 
 ---
 
@@ -195,6 +195,16 @@ Improvements to existing functionality.
 - [ ] Add additional e-commerce events: `remove_from_cart`, `view_promotion`, `select_promotion`
 - [ ] Implement GA4 Measurement Protocol for server-side purchase validation
 - [ ] Build admin analytics dashboard showing conversion funnel from GTM data
+
+### [2026-02-02] From: TASK-019 Social Sharing Enhancement
+
+**Origin**: docs/archive/plans/2026-02-02_task-019-social-sharing.md
+
+- [ ] Add dynamic OG images for category pages — branded images with category name and product count
+- [ ] Add share count tracking/display — track shares per platform, optionally show social proof
+- [ ] Add email sharing option — `mailto:` link with pre-filled subject and body
+- [ ] Preview OG images in admin panel — show social preview on product edit page
+- [ ] Replace site-level placeholder OG image — products now have dynamic OG, but default is still placeholder
 
 ---
 
