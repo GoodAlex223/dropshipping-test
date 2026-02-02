@@ -89,7 +89,6 @@ export function getProductMetadata(product: {
   metaDesc?: string | null;
   price: string;
   comparePrice?: string | null;
-  images?: { url: string; alt?: string | null }[];
   category?: { name: string; slug: string };
 }): Metadata {
   const title = product.metaTitle || product.name;
@@ -98,9 +97,10 @@ export function getProductMetadata(product: {
     product.shortDesc ||
     product.description?.slice(0, 160) ||
     siteConfig.description;
-  const image = product.images?.[0]?.url || siteConfig.ogImage;
   const url = `${siteConfig.url}/products/${product.slug}`;
 
+  // Note: OG images are generated dynamically by opengraph-image.tsx (file convention).
+  // Next.js automatically wires the generated image into og:image and twitter:image meta tags.
   return {
     title,
     description,
@@ -109,21 +109,12 @@ export function getProductMetadata(product: {
       url,
       title,
       description,
-      images: [
-        {
-          url: image,
-          width: 800,
-          height: 800,
-          alt: product.name,
-        },
-      ],
       siteName: siteConfig.name,
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [image],
     },
     alternates: {
       canonical: url,

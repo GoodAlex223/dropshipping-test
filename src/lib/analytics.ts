@@ -145,3 +145,17 @@ export function trackPurchase(
     },
   });
 }
+
+/**
+ * Track social share event.
+ * Uses GA4 built-in 'share' event type.
+ * @see https://developers.google.com/analytics/devguides/collection/ga4/reference/events#share
+ */
+export function trackShare(method: string, contentType: string, itemId: string): void {
+  pushDataLayer({
+    event: "share",
+    method,
+    content_type: contentType,
+    item_id: itemId,
+  });
+}

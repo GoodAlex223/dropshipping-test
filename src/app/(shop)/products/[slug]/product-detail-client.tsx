@@ -18,7 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ProductCard } from "@/components/products";
+import { ProductCard, SocialShareButtons } from "@/components/products";
 import { useCartStore } from "@/stores/cart.store";
 import { cn } from "@/lib/utils";
 import { trackViewItem, trackAddToCart } from "@/lib/analytics";
@@ -280,6 +280,14 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               </span>
             )}
           </div>
+
+          {/* Social Share */}
+          <SocialShareButtons
+            productId={product.id}
+            productName={product.name}
+            productSlug={product.slug}
+            productImage={product.images[0]?.url}
+          />
 
           {/* Short Description */}
           {product.shortDesc && <p className="text-muted-foreground">{product.shortDesc}</p>}

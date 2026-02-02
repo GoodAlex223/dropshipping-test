@@ -124,7 +124,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     metaDesc: product.metaDesc,
     price: product.price,
     comparePrice: product.comparePrice,
-    images: product.images,
     category: product.category,
   });
 }
