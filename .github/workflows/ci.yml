@@ -155,6 +155,7 @@ jobs:
           NEXTAUTH_SECRET: "test-secret-for-e2e-tests-min-32-chars"
           NEXTAUTH_URL: "http://localhost:3000"
           NEXT_PUBLIC_APP_URL: "http://localhost:3000"
+          AUTH_TRUST_HOST: "true"
 
       - name: Run E2E tests
         run: npm run test:e2e -- --project=chromium
@@ -163,6 +164,7 @@ jobs:
           NEXTAUTH_SECRET: "test-secret-for-e2e-tests-min-32-chars"
           NEXTAUTH_URL: "http://localhost:3000"
           NEXT_PUBLIC_APP_URL: "http://localhost:3000"
+          AUTH_TRUST_HOST: "true"
           REDIS_URL: "redis://localhost:6379"
 
       - name: Upload Playwright report

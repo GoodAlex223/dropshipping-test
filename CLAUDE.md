@@ -207,8 +207,8 @@ prisma/
 - **Commit style**: Conventional commits (`feat:`, `fix:`, `docs:`, `chore:`) with optional scope (`feat(seo):`)
 - **Branch naming**: `feat/task-NNN-description` pattern
 - **Recent focus**: Product feed generation (Google Shopping XML), code quality enforcement (lint-staged), analytics integration (GA4 via GTM)
-- **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability
-- **CI improvements**: Added workflow_call trigger for deploy.yml integration; JS files now auto-formatted on commit via lint-staged
+- **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability; NextAuth requires `AUTH_TRUST_HOST=true` in CI E2E tests
+- **CI improvements**: Added workflow_call trigger for deploy.yml integration; JS files now auto-formatted on commit via lint-staged; E2E tests fixed with AUTH_TRUST_HOST env var
 - **Latest completion**: TASK-020 Google Shopping feed with strict validation, brand/MPN product identifiers added to schema
 
 <!-- END AUTO-MANAGED -->
