@@ -16,7 +16,7 @@ Key capabilities:
 - Automated order forwarding to suppliers via background workers (BullMQ)
 - CSV product import, S3 image storage, email notifications (Resend)
 - Multi-theme showcase system (bold, luxury, organic design variants)
-- SEO with dynamic sitemap, robots.txt, and dynamic Open Graph images
+- SEO with dynamic sitemap, robots.txt, dynamic Open Graph images, and Google Shopping XML feed
 - Social sharing with platform-specific share buttons and Web Share API support
 - GA4 e-commerce analytics via Google Tag Manager with GDPR-compliant cookie consent
 
@@ -86,6 +86,8 @@ src/
 │   │   ├── health/         # Health check
 │   │   ├── orders/         # Customer order endpoints
 │   │   └── products/       # Public product endpoints
+│   ├── feed/               # Product feeds
+│   │   └── google-shopping.xml/  # Google Shopping RSS 2.0 feed
 │   ├── layout.tsx          # Root layout
 │   ├── middleware.ts       # Auth middleware (route protection)
 │   ├── robots.ts           # SEO robots.txt
@@ -117,6 +119,8 @@ src/
 │   ├── share-utils.ts      # Social sharing URL builders, Web Share API
 │   ├── utils.ts            # General utils (cn, etc.)
 │   └── validations/        # Zod schemas for all entities
+│       ├── index.ts        # Product, category, order, user schemas
+│       └── google-shopping.ts  # Google Shopping feed item schema
 ├── services/               # Business logic services
 │   └── supplier.service.ts # Supplier order forwarding
 ├── stores/                 # Zustand stores
@@ -190,6 +194,8 @@ prisma/
 - **Social sharing pattern**: Platform-specific URL builders (`buildShareUrl`) with proper URI encoding; Web Share API detection (`canUseNativeShare`) with graceful fallback to clipboard copy on failure
 - **OG image file convention**: Product pages use `opengraph-image.tsx` file-based generation (exports `alt`, `size`, `contentType`, and default `Image` function returning `ImageResponse`); Next.js automatically wires images into meta tags
 - **Native share visibility**: Native share button rendered with CSS hiding (`sm:hidden`) instead of conditional rendering to avoid hydration mismatch
+- **Google Shopping feed pattern**: RSS 2.0 XML with Google Shopping namespace; strict Zod validation for title (max 150 chars), description (max 5000 chars), price format (`/^\d+\.\d{2} [A-Z]{3}$/`), GTIN (8/12/13/14 digits), and enum values; XML escaping for special characters; hourly revalidation with stale-while-revalidate
+- **Product identifier fields**: Schema includes optional `brand` and `mpn` (Manufacturer Part Number) fields for Google Shopping compliance and product catalog enrichment
 
 <!-- END AUTO-MANAGED -->
 

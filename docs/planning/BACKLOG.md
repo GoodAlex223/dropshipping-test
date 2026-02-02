@@ -196,6 +196,16 @@ Improvements to existing functionality.
 - [ ] Implement GA4 Measurement Protocol for server-side purchase validation
 - [ ] Build admin analytics dashboard showing conversion funnel from GTM data
 
+### [2026-02-02] From: TASK-020 Google Shopping Feed Preparation
+
+**Origin**: TASK-020 implementation on feat/task-020-google-shopping-feed branch
+
+- [ ] Seed demo products with brand/barcode/MPN data to test feed with realistic content
+- [ ] Validate feed output with Google Merchant Center feed validation tool
+- [ ] Add additional feed formats (Facebook Catalog, Pinterest) if needed — current architecture is easy to extend
+- [ ] Add `google_product_category` field mapping to Google's product taxonomy
+- [ ] Add cross-field validation for comparePrice > price in admin ProductForm
+
 ### [2026-02-02] From: TASK-019 Social Sharing Enhancement
 
 **Origin**: docs/archive/plans/2026-02-02_task-019-social-sharing.md
