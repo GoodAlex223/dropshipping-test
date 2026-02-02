@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { siteConfig } from "@/lib/seo";
-import type { GoogleShoppingItem } from "@/lib/validations/google-shopping";
+import { validateFeedItemSafe, type GoogleShoppingItem } from "@/lib/validations/google-shopping";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600; // Revalidate every hour
@@ -136,7 +136,9 @@ export async function GET(): Promise<Response> {
     });
 
     const baseUrl = siteConfig.url;
-    const feedItems = products.map((p) => transformProduct(p, baseUrl));
+    const feedItems = products
+      .map((p) => transformProduct(p, baseUrl))
+      .filter((item) => validateFeedItemSafe(item).success);
     const itemsXml = feedItems.map(itemToXml).join("\n");
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
