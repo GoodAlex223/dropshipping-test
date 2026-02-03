@@ -43,6 +43,10 @@ export function reportWebVitalsToGA4(metric: WebVitalsMetric): void {
     // Initialize dataLayer if not present
     window.dataLayer = window.dataLayer || [];
 
+    // Clear previous event data to prevent GA4 data leakage
+    // Follows pattern from analytics.ts
+    window.dataLayer.push({ ecommerce: null });
+
     // Push Web Vitals event to dataLayer
     // Uses same pattern as analytics.ts for consistency
     window.dataLayer.push({
