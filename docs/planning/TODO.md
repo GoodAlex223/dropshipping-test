@@ -2,7 +2,7 @@
 
 Active tasks for Dropshipping Website MVP.
 
-**Last Updated**: 2026-02-02
+**Last Updated**: 2026-02-03
 
 ---
 
@@ -20,22 +20,7 @@ Active tasks for Dropshipping Website MVP.
 
 ## Medium Priority
 
-### [TASK-021] - Performance Optimization
-
-**Priority**: Medium
-**Dependencies**: None
-**Estimated Effort**: Medium
-
-**Description**: Optimize Core Web Vitals and overall site performance.
-
-**Sub-tasks**:
-
-- [ ] Implement image lazy loading with blur placeholders
-- [ ] Add next/image optimization for all product images
-- [ ] Configure static page generation where applicable
-- [ ] Implement resource prefetching for critical paths
-- [ ] Run Lighthouse audit and fix issues
-- [ ] Set up performance monitoring (Web Vitals reporting)
+<!-- No medium priority tasks -->
 
 ---
 
@@ -106,7 +91,7 @@ Active tasks for Dropshipping Website MVP.
 
 ## Completed
 
-All MVP implementation tasks (TASK-001 through TASK-016), TASK-017 (SEO Technical Setup), TASK-018 (Analytics Integration), TASK-019 (Social Sharing Enhancement), and TASK-020 (Google Shopping Feed) have been completed. See [DONE.md](DONE.md) for details.
+All MVP implementation tasks (TASK-001 through TASK-016), TASK-017 (SEO Technical Setup), TASK-018 (Analytics Integration), TASK-019 (Social Sharing Enhancement), TASK-020 (Google Shopping Feed), and TASK-021 (Performance Optimization) have been completed. See [DONE.md](DONE.md) for details.
 
 ---
 

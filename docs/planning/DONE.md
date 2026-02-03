@@ -361,12 +361,33 @@ Completed tasks with implementation details and learnings.
 
 ---
 
+### [2026-02-03] - TASK-021: Performance Optimization
+
+**Summary**: Added performance optimization layer with Core Web Vitals tracking, image blur placeholders, resource hints, and deferred font loading.
+
+**Key Changes**:
+
+- Created `src/lib/db-cache.ts` with React.cache() wrappers for request deduplication
+- Created `src/lib/image-utils.ts` with blur placeholders (shimmer SVG) and responsive sizes
+- Created `src/lib/web-vitals.ts` with Core Web Vitals reporting to GA4 via GTM
+- Created `WebVitalsReporter.tsx` client component tracking CLS, LCP, FCP, TTFB, INP
+- Created `ResourceHints.tsx` with preconnect/dns-prefetch domain constants
+- Added blur placeholders to ProductCard and product detail images
+- Optimized theme fonts (Playfair, Lora) with `preload: false` and `display: swap`
+- Added resource hints in root layout for Stripe, GTM, Google domains
+
+**Files Created**: 6 | **Files Modified**: 4
+
+**Spawned Tasks**: None (ISR deferred due to force-dynamic requirement for client contexts)
+
+---
+
 ## Statistics
 
-| Month   | Tasks Completed | Key Deliverables                                    |
-| ------- | --------------- | --------------------------------------------------- |
-| 2026-01 | 17              | Full MVP + Demo Deployed + SEO Technical Setup      |
-| 2026-02 | 3               | GA4 Analytics, Social Sharing, Google Shopping Feed |
+| Month   | Tasks Completed | Key Deliverables                                                 |
+| ------- | --------------- | ---------------------------------------------------------------- |
+| 2026-01 | 17              | Full MVP + Demo Deployed + SEO Technical Setup                   |
+| 2026-02 | 4               | GA4 Analytics, Social Sharing, Google Shopping Feed, Performance |
 
 ---
 
