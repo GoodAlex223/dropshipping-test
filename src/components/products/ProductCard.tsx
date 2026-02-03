@@ -4,6 +4,7 @@ import { Package } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { DEFAULT_BLUR_DATA_URL, IMAGE_SIZES } from "@/lib/image-utils";
 
 interface ProductCardProps {
   product: {
@@ -56,7 +57,9 @@ export function ProductCard({ product, showCategory = true }: ProductCardProps) 
               alt={product.images[0].alt || product.name}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              sizes={IMAGE_SIZES.productCard}
+              placeholder="blur"
+              blurDataURL={DEFAULT_BLUR_DATA_URL}
             />
           ) : (
             <div className="flex h-full items-center justify-center">

@@ -22,6 +22,7 @@ import { ProductCard, SocialShareButtons } from "@/components/products";
 import { useCartStore } from "@/stores/cart.store";
 import { cn } from "@/lib/utils";
 import { trackViewItem, trackAddToCart } from "@/lib/analytics";
+import { DEFAULT_BLUR_DATA_URL, IMAGE_SIZES } from "@/lib/image-utils";
 
 interface ProductImage {
   id: string;
@@ -193,8 +194,10 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                   alt={product.images[selectedImageIndex]?.alt || product.name}
                   fill
                   className="object-contain"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  sizes={IMAGE_SIZES.productDetail}
                   priority
+                  placeholder="blur"
+                  blurDataURL={DEFAULT_BLUR_DATA_URL}
                 />
                 {product.images.length > 1 && (
                   <>
@@ -250,7 +253,9 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                     alt={image.alt || `${product.name} thumbnail ${index + 1}`}
                     fill
                     className="object-cover"
-                    sizes="80px"
+                    sizes={IMAGE_SIZES.thumbnail}
+                    placeholder="blur"
+                    blurDataURL={DEFAULT_BLUR_DATA_URL}
                   />
                 </button>
               ))}
