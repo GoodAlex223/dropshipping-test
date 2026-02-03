@@ -49,7 +49,6 @@ components/
 ├── theme/
 │   ├── theme-config.ts    # Theme configuration and variants
 │   ├── theme-switcher.tsx # Theme toggle component
-│   ├── ThemeFontsLoader.tsx  # Placeholder for future conditional font loading (currently no-op)
 │   └── index.ts
 ├── ui/                    # shadcn/ui primitives (DO NOT modify directly)
 │   ├── button.tsx, card.tsx, dialog.tsx, form.tsx, input.tsx, ...
@@ -76,10 +75,10 @@ components/
 - **Cookie consent**: Zustand store with `persist` middleware, GTM loads conditionally when consent status is "accepted"
 - **Social sharing**: Platform-specific URL builders in `share-utils.ts`, Web Share API detection with fallback to clipboard copy, native share button uses CSS hiding (`sm:hidden`) to avoid hydration mismatch
 - **Custom icons**: Use lucide-react for icons; for platforms without lucide support (e.g., Pinterest), create custom SVG components
-- **Web Vitals**: `WebVitalsReporter` uses dynamic import (`ssr: false`) to ensure client-only execution; captures CLS, LCP, FCP, TTFB, INP via `web-vitals` library; reports to GA4 via GTM dataLayer; console logs in development
+- **Web Vitals**: `WebVitalsReporter` uses dynamic import (`ssr: false`) to ensure client-only execution; captures CLS, LCP, FCP, TTFB, INP via `web-vitals` library; reports to GA4 via GTM dataLayer with dataLayer clearing pattern (`{ ecommerce: null }`) for consistency; console logs in development
 - **Resource hints**: `ResourceHints` component exports `PRECONNECT_DOMAINS` (Stripe, GTM), `DNS_PREFETCH_DOMAINS` (Google Analytics, Google Fonts), and helper function `getResourceHintTags()` for server-side rendering
 - **Image optimization**: `ProductCard` uses `DEFAULT_BLUR_DATA_URL` and `IMAGE_SIZES.productCard` from `@/lib/image-utils` for optimized loading with blur placeholders
-- **Deferred font loading**: `ThemeFontsLoader` is placeholder component (currently no-op); actual fonts loaded in root layout with `preload: false` and `display: swap` for optimal performance
+- **Deferred font loading**: Theme-specific fonts (Playfair Display, Lora) loaded in root layout with `preload: false` and `display: swap` for optimal performance; saves ~60-80KB on initial load for users on default theme
 
 <!-- END AUTO-MANAGED -->
 

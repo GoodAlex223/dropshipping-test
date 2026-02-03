@@ -93,7 +93,6 @@ app/
 - `zod` — Request validation in API routes
 - `bullmq` — Queue job creation in checkout flow
 - `next/og` — Open Graph image generation (`ImageResponse`)
-- `react` — React.cache() for request deduplication (used in page metadata generation)
 
 <!-- END AUTO-MANAGED -->
 

@@ -100,14 +100,13 @@ src/
 │   ├── products/           # ProductCard, SocialShareButtons
 │   ├── shop/               # CartDrawer
 │   ├── showcase/           # Multi-theme showcase components (bold/, luxury/, organic/)
-│   ├── theme/              # Theme switcher & config, ThemeFontsLoader (placeholder)
+│   ├── theme/              # Theme switcher & config
 │   ├── ui/                 # shadcn/ui primitives (button, card, dialog, etc.)
 │   └── providers.tsx       # Context providers wrapper (auth, theme, toast, cookie consent, web vitals)
 ├── hooks/                  # Custom React hooks (use-debounce, use-toast)
 ├── lib/                    # Core utilities
 │   ├── auth.ts             # NextAuth v5 config (JWT + Prisma adapter)
 │   ├── db.ts               # Prisma client (Neon adapter for prod)
-│   ├── db-cache.ts         # React.cache() wrappers for request deduplication
 │   ├── api-utils.ts        # API response helpers, auth guards
 │   ├── stripe.ts           # Stripe server-side
 │   ├── stripe-client.ts    # Stripe client-side
@@ -148,7 +147,7 @@ prisma/
 
 **Analytics flow**: Cookie consent banner (Zustand persisted) -> User accepts -> GTM script loads -> Client-side events pushed to `window.dataLayer` -> GA4 receives e-commerce events (view_item_list, select_item, view_item, add_to_cart, view_cart, begin_checkout, add_shipping_info, add_payment_info, purchase).
 
-**Performance optimizations**: Resource hints (preconnect to Stripe/GTM, dns-prefetch to Google Analytics/Fonts) in root layout; Web Vitals (CLS, LCP, FCP, TTFB, INP) reported to GA4 via GTM dataLayer; React.cache() wrappers for request deduplication (eliminates redundant queries between generateMetadata() and page components); blur placeholders for next/image (shimmer effect, no external dependencies); deferred theme font loading (preload: false, display: swap saves ~60-80KB on initial load).
+**Performance optimizations**: Resource hints (preconnect to Stripe/GTM, dns-prefetch to Google Analytics/Fonts) in root layout; Web Vitals (CLS, LCP, FCP, TTFB, INP) reported to GA4 via GTM dataLayer; blur placeholders for next/image (shimmer effect, no external dependencies); deferred theme font loading (preload: false, display: swap saves ~60-80KB on initial load).
 
 <!-- END AUTO-MANAGED -->
 
@@ -202,10 +201,9 @@ prisma/
 - **Google Shopping feed pattern**: RSS 2.0 XML with Google Shopping namespace; strict Zod validation for title (max 150 chars), description (max 5000 chars), price format (`/^\d+\.\d{2} [A-Z]{3}$/`), GTIN (8/12/13/14 digits), and enum values; XML escaping for special characters; hourly revalidation with stale-while-revalidate
 - **Feed validation filtering**: Use `validateFeedItemSafe()` with `.filter()` after `.map()` to exclude invalid items from feeds instead of breaking serialization; prevents malformed data (e.g., non-numeric GTINs) from corrupting XML output
 - **Product identifier fields**: Schema includes optional `brand` and `mpn` (Manufacturer Part Number) fields for Google Shopping compliance and product catalog enrichment
-- **React.cache() deduplication**: Database queries wrapped in `React.cache()` to deduplicate identical calls within same request; eliminates redundant queries between `generateMetadata()` and page components (exports: `getCachedProduct`, `getCachedCategory`, `getCachedFeaturedProducts`, `getCachedCategories`)
 - **Image blur placeholders**: SVG-based shimmer effect for `next/image` placeholder="blur"; `DEFAULT_BLUR_DATA_URL` constant provides lightweight gradient animation; `IMAGE_SIZES` const defines responsive sizes for productCard, productDetail, thumbnail, categoryCard, hero
 - **Resource hints pattern**: `preconnect` for critical third-party domains (Stripe, GTM) enables early connection establishment; `dns-prefetch` for secondary domains (Google Analytics, Google Fonts) reduces DNS lookup latency; hints added in root layout `<head>`
-- **Web Vitals tracking**: Core Web Vitals (CLS, LCP, FCP, TTFB, INP) captured via `web-vitals` library and reported to GTM dataLayer; `WebVitalsReporter` component dynamically imports metrics library, runs client-side only; console logging in development mode
+- **Web Vitals tracking**: Core Web Vitals (CLS, LCP, FCP, TTFB, INP) captured via `web-vitals` library and reported to GTM dataLayer; `WebVitalsReporter` component dynamically imports metrics library, runs client-side only; dataLayer clearing (`{ ecommerce: null }`) applied before events for consistency with analytics.ts pattern
 - **Deferred font loading**: Theme-specific fonts (Playfair Display, Lora) loaded with `preload: false` and `display: swap` to defer loading until CSS actually uses them; saves ~60-80KB on initial load for users on default theme
 
 <!-- END AUTO-MANAGED -->
@@ -216,10 +214,10 @@ prisma/
 
 - **Commit style**: Conventional commits (`feat:`, `fix:`, `docs:`, `chore:`) with optional scope (`feat(seo):`, `feat(perf):`)
 - **Branch naming**: `feat/task-NNN-description` pattern
-- **Recent focus**: Performance optimization (Web Vitals tracking, resource hints, image optimization, request deduplication), product feed generation (Google Shopping XML), analytics integration (GA4 via GTM)
-- **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability; NextAuth requires `AUTH_TRUST_HOST=true` in CI E2E tests
+- **Recent focus**: Performance optimization (Web Vitals tracking, resource hints, image optimization), product feed generation (Google Shopping XML), analytics integration (GA4 via GTM)
+- **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability (React.cache not available in React 18); NextAuth requires `AUTH_TRUST_HOST=true` in CI E2E tests
 - **CI improvements**: Added workflow_call trigger for deploy.yml integration; JS files now auto-formatted on commit via lint-staged; E2E tests fixed with AUTH_TRUST_HOST env var
-- **Latest completion**: Performance optimization layer with Core Web Vitals tracking, resource hints, React.cache() deduplication, and image optimization utilities
+- **Latest completion**: Code review cleanup removing unused db-cache.ts and ThemeFontsLoader.tsx placeholder; improved Web Vitals dataLayer consistency
 
 <!-- END AUTO-MANAGED -->
 
@@ -237,7 +235,7 @@ prisma/
 - Keep UI primitives in `src/components/ui/` unchanged (shadcn/ui managed)
 - Environment variables: never commit `.env` files; use `.env.example` as reference
 - Use `next/image` for all images; avoid native `<img>` tags (ESLint enforced)
-- **Performance**: Use `React.cache()` wrappers from `db-cache.ts` for queries used in both metadata and page components; add blur placeholders to all product/category images using `DEFAULT_BLUR_DATA_URL` and `IMAGE_SIZES` from `image-utils.ts`; Web Vitals are automatically tracked via `WebVitalsReporter` in providers
+- **Performance**: Add blur placeholders to all product/category images using `DEFAULT_BLUR_DATA_URL` and `IMAGE_SIZES` from `image-utils.ts`; Web Vitals are automatically tracked via `WebVitalsReporter` in providers
 
 <!-- END AUTO-MANAGED -->
 
