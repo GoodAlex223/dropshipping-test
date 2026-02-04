@@ -214,6 +214,7 @@ prisma/
 - **E2E test setup pattern**: Playwright config uses `globalSetup` hook (tests/global-setup.ts) to validate infrastructure before tests run; checks database connection via Prisma `$queryRaw`, verifies seed data exists (categories and active products), throws error if data missing; prevents test failures from infrastructure issues
 - **CI E2E configuration**: Port management via `IS_CI` flag (port 3000 in CI, 3001 local); CI uses pre-built app with `npm start` (build happens in separate job); PostgreSQL 16 and Redis 7 as GitHub Actions services with health checks; requires AUTH_TRUST_HOST=true for NextAuth in CI environment
 - **E2E timeout tuning**: Test timeout 30s in CI (60s local), navigation timeout 15s in CI (45s local); 2 retries in CI (0 local); chromium-only in CI for speed (all browsers local); webServer stdout/stderr piped for debugging
+- **Mobile-responsive E2E tests**: Tests use Playwright's `isMobile` context property for viewport-aware assertions; navigation tests conditionally check desktop menu visibility (`if (!isMobile)`) while always testing mobile-specific elements; flexible selectors (`.first()`, regex matching) handle multiple matching elements across viewport sizes
 
 <!-- END AUTO-MANAGED -->
 
@@ -221,12 +222,12 @@ prisma/
 
 ## Git Insights
 
-- **Commit style**: Conventional commits (`feat:`, `fix:`, `docs:`, `chore:`) with optional scope (`feat(seo):`, `feat(perf):`, `fix(ci):`)
+- **Commit style**: Conventional commits (`feat:`, `fix:`, `docs:`, `chore:`) with optional scope (`feat(seo):`, `feat(perf):`, `fix(ci):`, `fix(e2e):`)
 - **Branch naming**: `feat/task-NNN-description` pattern
-- **Recent focus**: E2E test infrastructure improvements (global setup validation, CI reliability), performance optimization (Web Vitals tracking, resource hints, image optimization), product feed generation (Google Shopping XML)
+- **Recent focus**: E2E test infrastructure improvements (global setup validation, CI reliability, mobile-responsive tests), performance optimization (Web Vitals tracking, resource hints, image optimization), product feed generation (Google Shopping XML)
 - **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability (React.cache not available in React 18); NextAuth requires `AUTH_TRUST_HOST=true` in CI E2E tests; E2E tests need seeded database with categories and active products
-- **CI improvements**: E2E infrastructure overhaul with global setup validation, separated build and test jobs, PostgreSQL 16 + Redis 7 services with health checks; added workflow_call trigger for deploy.yml integration; JS files auto-formatted on commit via lint-staged
-- **Latest completion**: E2E test infrastructure validation with global setup hook (ae6d7e3); created TASK-025 to address remaining CI E2E failures
+- **CI improvements**: E2E infrastructure overhaul with global setup validation, separated build and test jobs, PostgreSQL 16 + Redis 7 services with health checks; added workflow_call trigger for deploy.yml integration; JS files auto-formatted on commit via lint-staged; E2E tests run chromium-only in CI with port 3000, pre-built app, and optimized timeouts
+- **Latest completion**: TASK-025 E2E test infrastructure fix (e198eb9) - added mobile-responsive navigation tests, global setup validation, CI-optimized Playwright config, database seeding in CI workflow
 
 <!-- END AUTO-MANAGED -->
 
