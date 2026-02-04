@@ -224,10 +224,11 @@ prisma/
 
 - **Commit style**: Conventional commits (`feat:`, `fix:`, `docs:`, `chore:`) with optional scope (`feat(seo):`, `feat(perf):`, `fix(ci):`, `fix(e2e):`)
 - **Branch naming**: `feat/task-NNN-description` pattern
-- **Recent focus**: E2E test infrastructure improvements (global setup validation, CI reliability, mobile-responsive tests), performance optimization (Web Vitals tracking, resource hints, image optimization), product feed generation (Google Shopping XML)
-- **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability (React.cache not available in React 18); NextAuth requires `AUTH_TRUST_HOST=true` in CI E2E tests; E2E tests need seeded database with categories and active products
+- **Recent focus**: CI/CD reliability (Vercel deploy issues in GitHub Actions), E2E test infrastructure improvements (global setup validation, CI reliability, mobile-responsive tests), performance optimization (Web Vitals tracking, resource hints, image optimization)
+- **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability (React.cache not available in React 18); NextAuth requires `AUTH_TRUST_HOST=true` in CI E2E tests; E2E tests need seeded database with categories and active products; Vercel deploy job failing in CI (likely missing VERCEL_TOKEN, VERCEL_ORG_ID, or VERCEL_PROJECT_ID secrets)
 - **CI improvements**: E2E infrastructure overhaul with global setup validation, separated build and test jobs, PostgreSQL 16 + Redis 7 services with health checks; added workflow_call trigger for deploy.yml integration; JS files auto-formatted on commit via lint-staged; E2E tests run chromium-only in CI with port 3000, pre-built app, and optimized timeouts
 - **Latest completion**: TASK-025 E2E test infrastructure fix (e198eb9) - added mobile-responsive navigation tests, global setup validation, CI-optimized Playwright config, database seeding in CI workflow
+- **Active tasks**: TASK-026 Fix Vercel Deploy in CI (high priority) - diagnose deploy job failure, update GitHub Actions secrets, verify deploy succeeds
 
 <!-- END AUTO-MANAGED -->
 
