@@ -2,7 +2,7 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-02-02
+**Last Updated**: 2026-02-04
 
 ---
 
@@ -382,12 +382,31 @@ Completed tasks with implementation details and learnings.
 
 ---
 
+### [2026-02-04] - TASK-025: Fix E2E Test Infrastructure
+
+**Summary**: Fixed E2E tests failing in CI due to missing `prisma.seed` configuration in package.json. Also eliminated duplicate build, fixed port mismatch, added pre-test database validation, and fixed categories test selector.
+
+**Key Changes**:
+
+- Added `prisma.seed` config to package.json (root cause — `npx prisma db seed` was a no-op without it)
+- Removed duplicate `npm run build` from Playwright webServer command in CI
+- Created `tests/global-setup.ts` to validate seed data exists before tests run
+- Fixed categories heading selector in navigation.spec.ts (`level: 1` for strict mode)
+- Added `PORT: "3000"` to CI env vars to align with NEXTAUTH_URL
+- Added stdout/stderr piping to Playwright webServer for debugging
+
+**Files Created**: 1 | **Files Modified**: 4
+
+**Spawned Tasks**: 2 items added to BACKLOG.md (Prisma 7 config migration, E2E test database isolation)
+
+---
+
 ## Statistics
 
-| Month   | Tasks Completed | Key Deliverables                                                 |
-| ------- | --------------- | ---------------------------------------------------------------- |
-| 2026-01 | 17              | Full MVP + Demo Deployed + SEO Technical Setup                   |
-| 2026-02 | 4               | GA4 Analytics, Social Sharing, Google Shopping Feed, Performance |
+| Month   | Tasks Completed | Key Deliverables                                                          |
+| ------- | --------------- | ------------------------------------------------------------------------- |
+| 2026-01 | 17              | Full MVP + Demo Deployed + SEO Technical Setup                            |
+| 2026-02 | 5               | GA4 Analytics, Social Sharing, Google Shopping Feed, Performance, E2E Fix |
 
 ---
 

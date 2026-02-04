@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-02-02
+**Last Updated**: 2026-02-04
 
 ---
 
@@ -215,6 +215,13 @@ Improvements to existing functionality.
 - [ ] Add email sharing option — `mailto:` link with pre-filled subject and body
 - [ ] Preview OG images in admin panel — show social preview on product edit page
 - [ ] Replace site-level placeholder OG image — products now have dynamic OG, but default is still placeholder
+
+### [2026-02-04] From: TASK-025 Fix E2E Test Infrastructure
+
+**Origin**: TASK-025 implementation on feat/task-025-fix-e2e-tests branch
+
+- [ ] Migrate `package.json#prisma.seed` to `prisma.config.ts` — deprecated in Prisma 7 (currently on 6.x)
+- [ ] Add per-worker database isolation for E2E tests — use `$TEST_WORKER_INDEX` for parallel test isolation
 
 ---
 

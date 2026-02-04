@@ -38,7 +38,7 @@ test.describe("Navigation", () => {
       .click();
 
     await expect(page).toHaveURL(/\/categories/);
-    await expect(page.getByRole("heading", { name: /categories/i })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /categories/i })).toBeVisible();
   });
 
   test("cart icon is visible in header", async ({ page }) => {
