@@ -14,19 +14,7 @@ Active tasks for Dropshipping Website MVP.
 
 ## High Priority
 
-### [TASK-026] - Fix Vercel Deploy in CI
-
-**Priority**: High
-**Dependencies**: None
-**Estimated Effort**: Low
-
-**Description**: The "Deploy to Vercel" job in the CI workflow is failing on every push to main. Likely missing `VERCEL_TOKEN`, `VERCEL_ORG_ID`, or `VERCEL_PROJECT_ID` in GitHub Actions secrets, or the deploy workflow configuration needs updating.
-
-**Sub-tasks**:
-
-- [ ] Diagnose deploy job failure (check logs for missing secrets/config)
-- [ ] Add or update required Vercel secrets in GitHub Actions
-- [ ] Verify deploy succeeds on next push to main
+<!-- No high priority tasks -->
 
 ---
 
@@ -103,7 +91,7 @@ Active tasks for Dropshipping Website MVP.
 
 ## Completed
 
-All MVP implementation tasks (TASK-001 through TASK-016), TASK-017 (SEO Technical Setup), TASK-018 (Analytics Integration), TASK-019 (Social Sharing Enhancement), TASK-020 (Google Shopping Feed), TASK-021 (Performance Optimization), and TASK-025 (Fix E2E Test Infrastructure) have been completed. See [DONE.md](DONE.md) for details.
+All MVP implementation tasks (TASK-001 through TASK-016), TASK-017 (SEO Technical Setup), TASK-018 (Analytics Integration), TASK-019 (Social Sharing Enhancement), TASK-020 (Google Shopping Feed), TASK-021 (Performance Optimization), TASK-025 (Fix E2E Test Infrastructure), and TASK-026 (Fix Vercel Deploy in CI) have been completed. See [DONE.md](DONE.md) for details.
 
 ---
 
