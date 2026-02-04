@@ -216,6 +216,14 @@ Improvements to existing functionality.
 - [ ] Preview OG images in admin panel — show social preview on product edit page
 - [ ] Replace site-level placeholder OG image — products now have dynamic OG, but default is still placeholder
 
+### [2026-02-04] From: TASK-026 Fix Vercel Deploy in CI
+
+**Origin**: docs/archive/plans/2026-02-04_task-026-fix-vercel-deploy-ci.md
+
+- [ ] Add Vercel deploy preview on PRs — deploy preview for pull requests (separate from production deploy on main)
+- [ ] Add deploy status badge to README.md — workflow status badge for deployment visibility
+- [ ] Implement Slack/Discord notifications in deploy notify job — currently just echo, add real delivery
+
 ### [2026-02-04] From: TASK-025 Fix E2E Test Infrastructure
 
 **Origin**: TASK-025 implementation on feat/task-025-fix-e2e-tests branch

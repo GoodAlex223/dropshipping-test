@@ -401,12 +401,33 @@ Completed tasks with implementation details and learnings.
 
 ---
 
+### [2026-02-04] - TASK-026: Fix Vercel Deploy in CI
+
+**Plan**: [docs/archive/plans/2026-02-04_task-026-fix-vercel-deploy-ci.md](../archive/plans/2026-02-04_task-026-fix-vercel-deploy-ci.md)
+
+**Summary**: Fixed deploy workflow failing on every push to main by adding secret validation with graceful skip/fail behavior, VERCEL_ORG_ID/VERCEL_PROJECT_ID env vars per Vercel's recommended CI pattern, and improved notify job.
+
+**Key Changes**:
+
+- Added validation step checking 4 required secrets before Vercel deployment
+- Graceful skip when secrets missing and DEPLOYMENT_TARGET unset (CI stays green)
+- Hard fail with clear error when DEPLOYMENT_TARGET=vercel but secrets missing
+- Added VPS secret validation for consistency
+- Improved notify job to distinguish real deployment from graceful skip
+- Updated deployment documentation with validation behavior and troubleshooting
+
+**Files Modified**: 3 (deploy.yml, setup.md, CLAUDE.md)
+
+**Spawned Tasks**: 3 items added to BACKLOG.md (PR deploy preview, status badge, Slack notifications)
+
+---
+
 ## Statistics
 
-| Month   | Tasks Completed | Key Deliverables                                                          |
-| ------- | --------------- | ------------------------------------------------------------------------- |
-| 2026-01 | 17              | Full MVP + Demo Deployed + SEO Technical Setup                            |
-| 2026-02 | 5               | GA4 Analytics, Social Sharing, Google Shopping Feed, Performance, E2E Fix |
+| Month   | Tasks Completed | Key Deliverables                                                                      |
+| ------- | --------------- | ------------------------------------------------------------------------------------- |
+| 2026-01 | 17              | Full MVP + Demo Deployed + SEO Technical Setup                                        |
+| 2026-02 | 6               | GA4 Analytics, Social Sharing, Google Shopping Feed, Performance, E2E Fix, Deploy Fix |
 
 ---
 
