@@ -89,6 +89,8 @@ jobs:
       - name: Build project artifacts
         if: steps.validate.outputs.skip != 'true'
         run: vercel build ${{ github.event.inputs.environment == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Deploy to Vercel
         if: steps.validate.outputs.skip != 'true'
