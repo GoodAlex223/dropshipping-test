@@ -150,9 +150,15 @@ vercel --prod
 
 **Required GitHub Secrets for CI/CD:**
 
-- `VERCEL_TOKEN` - Vercel access token
-- `VERCEL_ORG_ID` - Organization ID
-- `VERCEL_PROJECT_ID` - Project ID
+| Secret              | How to Get                                                               |
+| ------------------- | ------------------------------------------------------------------------ |
+| `VERCEL_TOKEN`      | [Vercel Tokens page](https://vercel.com/account/tokens)                  |
+| `VERCEL_ORG_ID`     | Run `vercel link` locally, then `cat .vercel/project.json` → `orgId`     |
+| `VERCEL_PROJECT_ID` | Run `vercel link` locally, then `cat .vercel/project.json` → `projectId` |
+| `DATABASE_URL`      | Your production database connection string (for migrations)              |
+
+> **Note**: If secrets are not configured, the deploy job will **skip gracefully** with a notice instead of failing.
+> If `DEPLOYMENT_TARGET` is explicitly set to `vercel` but secrets are missing, the job will **fail** with an error.
 
 #### Option 2: Docker Deployment
 
@@ -416,22 +422,34 @@ Runs on push to main or manual trigger:
 
 ### Required GitHub Secrets
 
-| Secret              | Purpose                 |
-| ------------------- | ----------------------- |
-| `VERCEL_TOKEN`      | Vercel deployment       |
-| `VERCEL_ORG_ID`     | Vercel organization     |
-| `VERCEL_PROJECT_ID` | Vercel project          |
-| `DATABASE_URL`      | Production database     |
-| `VPS_HOST`          | VPS hostname (if using) |
-| `VPS_USERNAME`      | VPS SSH username        |
-| `VPS_SSH_KEY`       | VPS SSH private key     |
-| `CODECOV_TOKEN`     | Coverage reporting      |
+| Secret              | Purpose                               | Required For |
+| ------------------- | ------------------------------------- | ------------ |
+| `VERCEL_TOKEN`      | Vercel API access token               | Vercel       |
+| `VERCEL_ORG_ID`     | Vercel organization/team ID           | Vercel       |
+| `VERCEL_PROJECT_ID` | Vercel project ID                     | Vercel       |
+| `DATABASE_URL`      | Production database connection string | Vercel       |
+| `VPS_HOST`          | VPS hostname or IP address            | VPS          |
+| `VPS_USERNAME`      | VPS SSH username                      | VPS          |
+| `VPS_SSH_KEY`       | VPS SSH private key                   | VPS          |
+| `CODECOV_TOKEN`     | Coverage reporting (optional)         | CI           |
 
 ### GitHub Variables
 
 | Variable            | Purpose                             |
 | ------------------- | ----------------------------------- |
 | `DEPLOYMENT_TARGET` | `vercel` or `vps` (default: vercel) |
+
+### Deployment Validation
+
+The deploy workflow validates that required secrets are configured before running:
+
+- **Vercel (default)**: Checks `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `DATABASE_URL`
+  - If `DEPLOYMENT_TARGET` is unset/empty and secrets are missing → **skips gracefully** with a notice
+  - If `DEPLOYMENT_TARGET` is `vercel` and secrets are missing → **fails** with an error
+- **VPS**: Checks `VPS_HOST`, `VPS_USERNAME`, `VPS_SSH_KEY`
+  - If any secret is missing → **fails** with an error (VPS deployment is always explicit)
+
+This means CI stays green even when deployment is not yet configured.
 
 ---
 
@@ -588,6 +606,18 @@ Configure monitoring service (UptimeRobot, Better Uptime, Pingdom) to check:
 - Check database connection
 - Verify Redis is running (if configured)
 - Check application logs
+
+**Vercel deployment skipped in CI**:
+
+- This means Vercel secrets are not configured (expected if deployment not set up yet)
+- To enable: add `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` to GitHub secrets
+- Get IDs by running `vercel link` locally, then `cat .vercel/project.json`
+- Get token from https://vercel.com/account/tokens
+
+**Vercel deployment failing with "missing secrets" error**:
+
+- This happens when `DEPLOYMENT_TARGET` is set to `vercel` but secrets are missing
+- Either add the missing secrets or remove the `DEPLOYMENT_TARGET` variable
 
 ---
 

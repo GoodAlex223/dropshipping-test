@@ -29,35 +29,76 @@ jobs:
     runs-on: ubuntu-latest
     needs: ci
     if: ${{ vars.DEPLOYMENT_TARGET == 'vercel' || vars.DEPLOYMENT_TARGET == '' }}
+    outputs:
+      deployed: ${{ steps.validate.outputs.skip != 'true' }}
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     environment:
       name: ${{ github.event.inputs.environment || 'production' }}
       url: ${{ steps.deploy.outputs.url }}
     steps:
+      - name: Validate Vercel configuration
+        id: validate
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DEPLOYMENT_TARGET: ${{ vars.DEPLOYMENT_TARGET }}
+        run: |
+          missing=""
+          [ -z "$VERCEL_TOKEN" ] && missing="$missing VERCEL_TOKEN"
+          [ -z "$VERCEL_ORG_ID" ] && missing="$missing VERCEL_ORG_ID"
+          [ -z "$VERCEL_PROJECT_ID" ] && missing="$missing VERCEL_PROJECT_ID"
+          [ -z "$DATABASE_URL" ] && missing="$missing DATABASE_URL"
+
+          if [ -n "$missing" ]; then
+            if [ "$DEPLOYMENT_TARGET" = "vercel" ]; then
+              echo "::error::Vercel deployment is enabled but required secrets are missing:$missing"
+              echo "::error::Add them in GitHub Settings > Secrets and variables > Actions"
+              echo "::error::See docs/deployment/setup.md for instructions"
+              exit 1
+            fi
+            echo "::notice::Vercel deployment skipped — required secrets not configured:$missing"
+            echo "::notice::To enable, add VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, and DATABASE_URL to GitHub secrets"
+            echo "::notice::See docs/deployment/setup.md for setup instructions"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "Vercel configuration validated"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Checkout code
+        if: steps.validate.outputs.skip != 'true'
         uses: actions/checkout@v4
 
       - name: Setup Node.js
+        if: steps.validate.outputs.skip != 'true'
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
 
       - name: Install Vercel CLI
+        if: steps.validate.outputs.skip != 'true'
         run: npm install --global vercel@latest
 
-      - name: Pull Vercel Environment Information
+      - name: Pull Vercel environment information
+        if: steps.validate.outputs.skip != 'true'
         run: vercel pull --yes --environment=${{ github.event.inputs.environment || 'production' }} --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Build Project Artifacts
+      - name: Build project artifacts
+        if: steps.validate.outputs.skip != 'true'
         run: vercel build ${{ github.event.inputs.environment == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy to Vercel
+        if: steps.validate.outputs.skip != 'true'
         id: deploy
         run: |
           url=$(vercel deploy --prebuilt ${{ github.event.inputs.environment == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }})
           echo "url=$url" >> $GITHUB_OUTPUT
 
       - name: Run database migrations
+        if: steps.validate.outputs.skip != 'true'
         run: |
           npm ci
           npx prisma migrate deploy
@@ -73,6 +114,25 @@ jobs:
     environment:
       name: ${{ github.event.inputs.environment || 'production' }}
     steps:
+      - name: Validate VPS configuration
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+        run: |
+          missing=""
+          [ -z "$VPS_HOST" ] && missing="$missing VPS_HOST"
+          [ -z "$VPS_USERNAME" ] && missing="$missing VPS_USERNAME"
+          [ -z "$VPS_SSH_KEY" ] && missing="$missing VPS_SSH_KEY"
+
+          if [ -n "$missing" ]; then
+            echo "::error::VPS deployment is enabled but required secrets are missing:$missing"
+            echo "::error::Add them in GitHub Settings > Secrets and variables > Actions"
+            echo "::error::See docs/deployment/setup.md for instructions"
+            exit 1
+          fi
+          echo "VPS configuration validated"
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -93,11 +153,28 @@ jobs:
     name: Notify
     runs-on: ubuntu-latest
     needs: [deploy-vercel, deploy-vps]
-    if: always() && (needs.deploy-vercel.result == 'success' || needs.deploy-vps.result == 'success')
+    if: always()
     steps:
-      - name: Send deployment notification
+      - name: Deployment status
         run: |
-          echo "Deployment completed successfully!"
-          echo "Environment: ${{ github.event.inputs.environment || 'production' }}"
-          echo "Commit: ${{ github.sha }}"
+          vercel_status="${{ needs.deploy-vercel.result }}"
+          vps_status="${{ needs.deploy-vps.result }}"
+          vercel_deployed="${{ needs.deploy-vercel.outputs.deployed }}"
+
+          if [ "$vercel_deployed" = "true" ] && [ "$vercel_status" = "success" ]; then
+            echo "Deployment completed successfully!"
+            echo "Platform: Vercel"
+            echo "Environment: ${{ github.event.inputs.environment || 'production' }}"
+            echo "Commit: ${{ github.sha }}"
+          elif [ "$vps_status" = "success" ]; then
+            echo "Deployment completed successfully!"
+            echo "Platform: VPS"
+            echo "Environment: ${{ github.event.inputs.environment || 'production' }}"
+            echo "Commit: ${{ github.sha }}"
+          elif [ "$vercel_status" = "failure" ] || [ "$vps_status" = "failure" ]; then
+            echo "::error::Deployment failed — Vercel: $vercel_status, VPS: $vps_status"
+          else
+            echo "::notice::No deployment executed (secrets not configured or DEPLOYMENT_TARGET not set)"
+            echo "::notice::See docs/deployment/setup.md for setup instructions"
+          fi
           # Add Slack/Discord notification here if needed

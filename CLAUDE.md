@@ -155,6 +155,8 @@ prisma/
 
 **E2E test infrastructure**: Playwright with global setup hook validates database connectivity and seed data before tests run. CI runs E2E tests with pre-built app (PostgreSQL 16 + Redis 7 services), requires AUTH_TRUST_HOST=true for NextAuth. Local dev uses port 3001, CI uses port 3000. Tests include navigation, mobile responsiveness, and cart interactions.
 
+**Deployment pipeline**: GitHub Actions workflow supports dual deployment targets (Vercel serverless, VPS/PM2) controlled by `DEPLOYMENT_TARGET` variable. CI job runs first (lint, typecheck, tests), then deploy job validates required secrets before execution. Vercel path: secret validation → vercel pull → vercel build → vercel deploy → prisma migrate. VPS path: secret validation → SSH deploy → git pull → npm ci → prisma migrate → npm build → pm2 restart. Graceful degradation: missing secrets skip deployment with notice unless `DEPLOYMENT_TARGET` explicitly set, then fails with error.
+
 <!-- END AUTO-MANAGED -->
 
 <!-- AUTO-MANAGED: conventions -->
@@ -215,6 +217,8 @@ prisma/
 - **CI E2E configuration**: Port management via `IS_CI` flag (port 3000 in CI, 3001 local); CI uses pre-built app with `npm start` (build happens in separate job); PostgreSQL 16 and Redis 7 as GitHub Actions services with health checks; requires AUTH_TRUST_HOST=true for NextAuth in CI environment
 - **E2E timeout tuning**: Test timeout 30s in CI (60s local), navigation timeout 15s in CI (45s local); 2 retries in CI (0 local); chromium-only in CI for speed (all browsers local); webServer stdout/stderr piped for debugging
 - **Mobile-responsive E2E tests**: Tests use Playwright's `isMobile` context property for viewport-aware assertions; navigation tests conditionally check desktop menu visibility (`if (!isMobile)`) while always testing mobile-specific elements; flexible selectors (`.first()`, regex matching) handle multiple matching elements across viewport sizes
+- **CI secret validation pattern**: GitHub Actions jobs validate required secrets before execution; bash script checks for empty variables, builds error message listing missing secrets, then either fails (if `DEPLOYMENT_TARGET` explicitly set) or skips gracefully (if unset); all subsequent steps conditional on validation with `if: steps.validate.outputs.skip != 'true'`
+- **Dual deployment strategy**: Single workflow handles both Vercel and VPS deployments via `jobs.<job>.if` conditions checking `vars.DEPLOYMENT_TARGET`; Vercel job runs if value is `vercel` or empty string; VPS job runs if value is `vps`; prevents both paths executing simultaneously; notify job uses `needs: [deploy-vercel, deploy-vps]` with `if: always()` to report status regardless of which path ran
 
 <!-- END AUTO-MANAGED -->
 
@@ -222,13 +226,13 @@ prisma/
 
 ## Git Insights
 
-- **Commit style**: Conventional commits (`feat:`, `fix:`, `docs:`, `chore:`) with optional scope (`feat(seo):`, `feat(perf):`, `fix(ci):`, `fix(e2e):`)
+- **Commit style**: Conventional commits (`feat:`, `fix:`, `docs:`, `chore:`) with optional scope (`feat(seo):`, `feat(perf):`, `fix(ci):`, `fix(e2e):`, `feat(deploy):`)
 - **Branch naming**: `feat/task-NNN-description` pattern
-- **Recent focus**: CI/CD reliability (Vercel deploy issues in GitHub Actions), E2E test infrastructure improvements (global setup validation, CI reliability, mobile-responsive tests), performance optimization (Web Vitals tracking, resource hints, image optimization)
-- **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability (React.cache not available in React 18); NextAuth requires `AUTH_TRUST_HOST=true` in CI E2E tests; E2E tests need seeded database with categories and active products; Vercel deploy job failing in CI (likely missing VERCEL_TOKEN, VERCEL_ORG_ID, or VERCEL_PROJECT_ID secrets)
-- **CI improvements**: E2E infrastructure overhaul with global setup validation, separated build and test jobs, PostgreSQL 16 + Redis 7 services with health checks; added workflow_call trigger for deploy.yml integration; JS files auto-formatted on commit via lint-staged; E2E tests run chromium-only in CI with port 3000, pre-built app, and optimized timeouts
-- **Latest completion**: TASK-025 E2E test infrastructure fix (e198eb9) - added mobile-responsive navigation tests, global setup validation, CI-optimized Playwright config, database seeding in CI workflow
-- **Active tasks**: TASK-026 Fix Vercel Deploy in CI (high priority) - diagnose deploy job failure, update GitHub Actions secrets, verify deploy succeeds
+- **Recent focus**: Deployment infrastructure (dual-target CI/CD with Vercel/VPS support), E2E test infrastructure improvements (global setup validation, CI reliability, mobile-responsive tests), performance optimization (Web Vitals tracking, resource hints, image optimization)
+- **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability (React.cache not available in React 18); NextAuth requires `AUTH_TRUST_HOST=true` in CI E2E tests; E2E tests need seeded database with categories and active products
+- **CI improvements**: E2E infrastructure overhaul with global setup validation, separated build and test jobs, PostgreSQL 16 + Redis 7 services with health checks; deployment workflow with graceful secret validation, dual-target support (Vercel/VPS), conditional job execution, and comprehensive deployment documentation; JS files auto-formatted on commit via lint-staged; E2E tests run chromium-only in CI with port 3000, pre-built app, and optimized timeouts
+- **Deployment strategy**: Dual-path deployment via `DEPLOYMENT_TARGET` variable (vercel/vps); graceful degradation when secrets missing (skip with notice if unset, fail with error if explicitly set); Vercel path uses CLI for pull/build/deploy + migrations; VPS path uses SSH action with git pull + pm2 restart; both paths validate secrets before execution
+- **Latest completion**: d6a9ae7 - Deployment infrastructure (CI/CD with Vercel/VPS support, Docker configs, Sentry integration, health check API, graceful secret validation)
 
 <!-- END AUTO-MANAGED -->
 
@@ -248,6 +252,7 @@ prisma/
 - Environment variables: never commit `.env` files; use `.env.example` as reference
 - Use `next/image` for all images; avoid native `<img>` tags (ESLint enforced)
 - **Performance**: Add blur placeholders to all product/category images using `DEFAULT_BLUR_DATA_URL` and `IMAGE_SIZES` from `image-utils.ts`; Web Vitals are automatically tracked via `WebVitalsReporter` in providers
+- **Deployment secrets**: Configure GitHub Actions secrets before deploying (see docs/deployment/setup.md); Vercel requires VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, DATABASE_URL; VPS requires VPS_HOST, VPS_USERNAME, VPS_SSH_KEY; missing secrets cause graceful skip or explicit failure depending on DEPLOYMENT_TARGET setting
 
 <!-- END AUTO-MANAGED -->
 
