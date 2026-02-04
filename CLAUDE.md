@@ -232,7 +232,8 @@ prisma/
 - **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability (React.cache not available in React 18); NextAuth requires `AUTH_TRUST_HOST=true` in CI E2E tests; E2E tests need seeded database with categories and active products
 - **CI improvements**: E2E infrastructure overhaul with global setup validation, separated build and test jobs, PostgreSQL 16 + Redis 7 services with health checks; deployment workflow with graceful secret validation, dual-target support (Vercel/VPS), conditional job execution, and comprehensive deployment documentation; JS files auto-formatted on commit via lint-staged; E2E tests run chromium-only in CI with port 3000, pre-built app, and optimized timeouts
 - **Deployment strategy**: Dual-path deployment via `DEPLOYMENT_TARGET` variable (vercel/vps); graceful degradation when secrets missing (skip with notice if unset, fail with error if explicitly set); Vercel path uses CLI for pull/build/deploy + migrations; VPS path uses SSH action with git pull + pm2 restart; both paths validate secrets before execution
-- **Latest completion**: d6a9ae7 - Deployment infrastructure (CI/CD with Vercel/VPS support, Docker configs, Sentry integration, health check API, graceful secret validation)
+- **Latest completion**: TASK-026 Fix Vercel Deploy in CI (7f38284) - added validation-first deployment pattern with graceful skip for missing secrets, conditional step execution via output checks, job-level env vars for Vercel CLI
+- **Active tasks**: None (MVP complete, post-MVP enhancements in BACKLOG)
 
 <!-- END AUTO-MANAGED -->
 
