@@ -155,7 +155,7 @@ prisma/
 
 **E2E test infrastructure**: Playwright with global setup hook validates database connectivity and seed data before tests run. CI runs E2E tests with pre-built app (PostgreSQL 16 + Redis 7 services), requires AUTH_TRUST_HOST=true for NextAuth. Local dev uses port 3001, CI uses port 3000. Tests include navigation, mobile responsiveness, and cart interactions.
 
-**Deployment pipeline**: GitHub Actions workflow supports dual deployment targets (Vercel serverless, VPS/PM2) controlled by `DEPLOYMENT_TARGET` variable. CI job runs first (lint, typecheck, tests), then deploy job validates required secrets before execution. Vercel path: secret validation → vercel pull → vercel build → vercel deploy → prisma migrate. VPS path: secret validation → SSH deploy → git pull → npm ci → prisma migrate → npm build → pm2 restart. Graceful degradation: missing secrets skip deployment with notice unless `DEPLOYMENT_TARGET` explicitly set, then fails with error.
+**Deployment pipeline**: GitHub Actions workflow supports dual deployment targets (Vercel serverless, VPS/PM2) controlled by `DEPLOYMENT_TARGET` variable. CI job runs first (lint, typecheck, tests), then deploy job validates required secrets before execution. Vercel path: secret validation → vercel pull → vercel build (with DATABASE_URL + NEXTAUTH_SECRET env) → vercel deploy → prisma migrate. VPS path: secret validation → SSH deploy → git pull → npm ci → prisma migrate → npm build → pm2 restart. Graceful degradation: missing secrets skip deployment with notice unless `DEPLOYMENT_TARGET` explicitly set, then fails with error.
 
 <!-- END AUTO-MANAGED -->
 
@@ -232,7 +232,7 @@ prisma/
 - **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability (React.cache not available in React 18); NextAuth requires `AUTH_TRUST_HOST=true` in CI E2E tests; E2E tests need seeded database with categories and active products
 - **CI improvements**: E2E infrastructure overhaul with global setup validation, separated build and test jobs, PostgreSQL 16 + Redis 7 services with health checks; deployment workflow with graceful secret validation, dual-target support (Vercel/VPS), conditional job execution, and comprehensive deployment documentation; JS files auto-formatted on commit via lint-staged; E2E tests run chromium-only in CI with port 3000, pre-built app, and optimized timeouts
 - **Deployment strategy**: Dual-path deployment via `DEPLOYMENT_TARGET` variable (vercel/vps); graceful degradation when secrets missing (skip with notice if unset, fail with error if explicitly set); Vercel path uses CLI for pull/build/deploy + migrations; VPS path uses SSH action with git pull + pm2 restart; both paths validate secrets before execution
-- **Latest completion**: TASK-026 Fix Vercel Deploy in CI (7f38284) - added validation-first deployment pattern with graceful skip for missing secrets, conditional step execution via output checks, job-level env vars for Vercel CLI
+- **Latest completion**: TASK-026 Fix Vercel Deploy in CI (8f17be9) - resolved Prisma and NextAuth build errors by passing DATABASE_URL and NEXTAUTH_SECRET to Vercel build step; added validation-first deployment pattern with graceful skip for missing secrets, conditional step execution via output checks, job-level env vars for Vercel CLI
 - **Active tasks**: None (MVP complete, post-MVP enhancements in BACKLOG)
 
 <!-- END AUTO-MANAGED -->
@@ -253,7 +253,7 @@ prisma/
 - Environment variables: never commit `.env` files; use `.env.example` as reference
 - Use `next/image` for all images; avoid native `<img>` tags (ESLint enforced)
 - **Performance**: Add blur placeholders to all product/category images using `DEFAULT_BLUR_DATA_URL` and `IMAGE_SIZES` from `image-utils.ts`; Web Vitals are automatically tracked via `WebVitalsReporter` in providers
-- **Deployment secrets**: Configure GitHub Actions secrets before deploying (see docs/deployment/setup.md); Vercel requires VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, DATABASE_URL; VPS requires VPS_HOST, VPS_USERNAME, VPS_SSH_KEY; missing secrets cause graceful skip or explicit failure depending on DEPLOYMENT_TARGET setting
+- **Deployment secrets**: Configure GitHub Actions secrets before deploying (see docs/deployment/setup.md); Vercel requires VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, DATABASE_URL, NEXTAUTH_SECRET; VPS requires VPS_HOST, VPS_USERNAME, VPS_SSH_KEY; missing secrets cause graceful skip or explicit failure depending on DEPLOYMENT_TARGET setting
 
 <!-- END AUTO-MANAGED -->
 
