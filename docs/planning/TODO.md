@@ -14,7 +14,24 @@ Active tasks for Dropshipping Website MVP.
 
 ## High Priority
 
-<!-- No high priority tasks -->
+### [TASK-025] - Fix E2E Test Infrastructure
+
+**Priority**: High
+**Dependencies**: None
+**Estimated Effort**: Medium
+
+**Description**: E2E tests are failing in CI due to infrastructure issues. Tests timeout waiting for `[data-testid='product-card']` to be visible, indicating database seeding or environment configuration problems.
+
+**Evidence**: All recent CI runs on main branch show E2E failures (f8997dd, 571f27c, a990b52).
+
+**Sub-tasks**:
+
+- [ ] Investigate CI E2E test environment setup
+- [ ] Verify database seeding runs correctly in CI
+- [ ] Check if test database has required product data
+- [ ] Review Playwright configuration for CI timeouts
+- [ ] Fix root cause of missing product cards in test environment
+- [ ] Verify E2E tests pass locally and in CI
 
 ---
 
