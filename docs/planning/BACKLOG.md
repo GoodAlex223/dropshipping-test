@@ -223,6 +223,8 @@ Improvements to existing functionality.
 - [ ] Add Vercel deploy preview on PRs — deploy preview for pull requests (separate from production deploy on main)
 - [ ] Add deploy status badge to README.md — workflow status badge for deployment visibility
 - [ ] Implement Slack/Discord notifications in deploy notify job — currently just echo, add real delivery
+- [ ] Add explicit default for `deployed` job output when validation skips — currently relies on bash `[ "" = "true" ]` evaluating false; an explicit `deployed: "false"` output in the skip path would be clearer
+- [ ] Refine notify job `if` condition to skip when both deploy jobs are skipped — `if: always()` runs even when neither deploy path triggers; could use `needs.deploy-vercel.result != 'skipped' || needs.deploy-vps.result != 'skipped'`
 
 ### [2026-02-04] From: TASK-025 Fix E2E Test Infrastructure
 
