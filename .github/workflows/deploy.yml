@@ -43,6 +43,7 @@ jobs:
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
           DEPLOYMENT_TARGET: ${{ vars.DEPLOYMENT_TARGET }}
         run: |
           missing=""
@@ -50,6 +51,7 @@ jobs:
           [ -z "$VERCEL_ORG_ID" ] && missing="$missing VERCEL_ORG_ID"
           [ -z "$VERCEL_PROJECT_ID" ] && missing="$missing VERCEL_PROJECT_ID"
           [ -z "$DATABASE_URL" ] && missing="$missing DATABASE_URL"
+          [ -z "$NEXTAUTH_SECRET" ] && missing="$missing NEXTAUTH_SECRET"
 
           if [ -n "$missing" ]; then
             if [ "$DEPLOYMENT_TARGET" = "vercel" ]; then
@@ -59,7 +61,7 @@ jobs:
               exit 1
             fi
             echo "::notice::Vercel deployment skipped — required secrets not configured:$missing"
-            echo "::notice::To enable, add VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, and DATABASE_URL to GitHub secrets"
+            echo "::notice::To enable, add VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, DATABASE_URL, and NEXTAUTH_SECRET to GitHub secrets"
             echo "::notice::See docs/deployment/setup.md for setup instructions"
             echo "skip=true" >> $GITHUB_OUTPUT
           else
@@ -91,6 +93,7 @@ jobs:
         run: vercel build ${{ github.event.inputs.environment == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
 
       - name: Deploy to Vercel
         if: steps.validate.outputs.skip != 'true'
