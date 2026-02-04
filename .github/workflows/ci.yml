@@ -166,6 +166,7 @@ jobs:
           NEXT_PUBLIC_APP_URL: "http://localhost:3000"
           AUTH_TRUST_HOST: "true"
           REDIS_URL: "redis://localhost:6379"
+          PORT: "3000"
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4

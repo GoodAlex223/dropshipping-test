@@ -1,11 +1,12 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = process.env.PORT || 3001;
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || `http://localhost:${PORT}`;
 const IS_CI = !!process.env.CI;
+const PORT = process.env.PORT || (IS_CI ? 3000 : 3001);
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || `http://localhost:${PORT}`;
 
 export default defineConfig({
   testDir: "./tests/e2e",
+  globalSetup: require.resolve("./tests/global-setup"),
   fullyParallel: IS_CI,
   forbidOnly: IS_CI,
   retries: IS_CI ? 2 : 0,
@@ -41,12 +42,13 @@ export default defineConfig({
     },
   ],
   webServer: {
-    // Use production build in CI for faster page loads
-    command: IS_CI
-      ? `npm run build && npm run start -- --port ${PORT}`
-      : `npm run dev -- --port ${PORT}`,
+    // CI: app is already built in previous CI step, just start the server
+    // Local: start dev server with HMR
+    command: IS_CI ? `npm run start -- --port ${PORT}` : `npm run dev -- --port ${PORT}`,
     url: BASE_URL,
     reuseExistingServer: !IS_CI,
     timeout: IS_CI ? 180 * 1000 : 120 * 1000,
+    stdout: "pipe",
+    stderr: "pipe",
   },
 });
