@@ -14,7 +14,19 @@ Active tasks for Dropshipping Website MVP.
 
 ## High Priority
 
-<!-- No high priority tasks -->
+### [TASK-026] - Fix Vercel Deploy in CI
+
+**Priority**: High
+**Dependencies**: None
+**Estimated Effort**: Low
+
+**Description**: The "Deploy to Vercel" job in the CI workflow is failing on every push to main. Likely missing `VERCEL_TOKEN`, `VERCEL_ORG_ID`, or `VERCEL_PROJECT_ID` in GitHub Actions secrets, or the deploy workflow configuration needs updating.
+
+**Sub-tasks**:
+
+- [ ] Diagnose deploy job failure (check logs for missing secrets/config)
+- [ ] Add or update required Vercel secrets in GitHub Actions
+- [ ] Verify deploy succeeds on next push to main
 
 ---
 
