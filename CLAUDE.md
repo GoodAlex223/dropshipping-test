@@ -215,8 +215,8 @@ prisma/
 - **Commit style**: Conventional commits (`feat:`, `fix:`, `docs:`, `chore:`) with optional scope (`feat(seo):`, `feat(perf):`)
 - **Branch naming**: `feat/task-NNN-description` pattern
 - **Recent focus**: Performance optimization (Web Vitals tracking, resource hints, image optimization), product feed generation (Google Shopping XML), analytics integration (GA4 via GTM)
-- **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability (React.cache not available in React 18); NextAuth requires `AUTH_TRUST_HOST=true` in CI E2E tests
-- **CI improvements**: Added workflow_call trigger for deploy.yml integration; JS files now auto-formatted on commit via lint-staged; E2E tests fixed with AUTH_TRUST_HOST env var
+- **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability (React.cache not available in React 18); E2E tests failing in CI due to database seeding/product card visibility issues (TASK-025 active)
+- **CI improvements**: Added workflow_call trigger for deploy.yml integration; JS files now auto-formatted on commit via lint-staged; AUTH_TRUST_HOST env var added for NextAuth in E2E tests
 - **Latest completion**: Code review cleanup removing unused db-cache.ts and ThemeFontsLoader.tsx placeholder; improved Web Vitals dataLayer consistency
 
 <!-- END AUTO-MANAGED -->
