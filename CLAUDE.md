@@ -133,6 +133,10 @@ src/
     ├── index.ts            # Worker orchestrator
     ├── order-forwarding.worker.ts
     └── order-status-sync.worker.ts
+tests/
+├── e2e/                    # Playwright E2E tests
+│   └── navigation.spec.ts  # Navigation and basic user flow tests
+└── global-setup.ts         # E2E test infrastructure validation
 prisma/
 ├── schema.prisma           # Database schema (PostgreSQL)
 ├── migrations/             # Prisma migrations
@@ -148,6 +152,8 @@ prisma/
 **Analytics flow**: Cookie consent banner (Zustand persisted) -> User accepts -> GTM script loads -> Client-side events pushed to `window.dataLayer` -> GA4 receives e-commerce events (view_item_list, select_item, view_item, add_to_cart, view_cart, begin_checkout, add_shipping_info, add_payment_info, purchase).
 
 **Performance optimizations**: Resource hints (preconnect to Stripe/GTM, dns-prefetch to Google Analytics/Fonts) in root layout; Web Vitals (CLS, LCP, FCP, TTFB, INP) reported to GA4 via GTM dataLayer; blur placeholders for next/image (shimmer effect, no external dependencies); deferred theme font loading (preload: false, display: swap saves ~60-80KB on initial load).
+
+**E2E test infrastructure**: Playwright with global setup hook validates database connectivity and seed data before tests run. CI runs E2E tests with pre-built app (PostgreSQL 16 + Redis 7 services), requires AUTH_TRUST_HOST=true for NextAuth. Local dev uses port 3001, CI uses port 3000. Tests include navigation, mobile responsiveness, and cart interactions.
 
 <!-- END AUTO-MANAGED -->
 
@@ -205,6 +211,9 @@ prisma/
 - **Resource hints pattern**: `preconnect` for critical third-party domains (Stripe, GTM) enables early connection establishment; `dns-prefetch` for secondary domains (Google Analytics, Google Fonts) reduces DNS lookup latency; hints added in root layout `<head>`
 - **Web Vitals tracking**: Core Web Vitals (CLS, LCP, FCP, TTFB, INP) captured via `web-vitals` library and reported to GTM dataLayer; `WebVitalsReporter` component dynamically imports metrics library, runs client-side only; dataLayer clearing (`{ ecommerce: null }`) applied before events for consistency with analytics.ts pattern
 - **Deferred font loading**: Theme-specific fonts (Playfair Display, Lora) loaded with `preload: false` and `display: swap` to defer loading until CSS actually uses them; saves ~60-80KB on initial load for users on default theme
+- **E2E test setup pattern**: Playwright config uses `globalSetup` hook (tests/global-setup.ts) to validate infrastructure before tests run; checks database connection via Prisma `$queryRaw`, verifies seed data exists (categories and active products), throws error if data missing; prevents test failures from infrastructure issues
+- **CI E2E configuration**: Port management via `IS_CI` flag (port 3000 in CI, 3001 local); CI uses pre-built app with `npm start` (build happens in separate job); PostgreSQL 16 and Redis 7 as GitHub Actions services with health checks; requires AUTH_TRUST_HOST=true for NextAuth in CI environment
+- **E2E timeout tuning**: Test timeout 30s in CI (60s local), navigation timeout 15s in CI (45s local); 2 retries in CI (0 local); chromium-only in CI for speed (all browsers local); webServer stdout/stderr piped for debugging
 
 <!-- END AUTO-MANAGED -->
 
@@ -212,12 +221,12 @@ prisma/
 
 ## Git Insights
 
-- **Commit style**: Conventional commits (`feat:`, `fix:`, `docs:`, `chore:`) with optional scope (`feat(seo):`, `feat(perf):`)
+- **Commit style**: Conventional commits (`feat:`, `fix:`, `docs:`, `chore:`) with optional scope (`feat(seo):`, `feat(perf):`, `fix(ci):`)
 - **Branch naming**: `feat/task-NNN-description` pattern
-- **Recent focus**: Performance optimization (Web Vitals tracking, resource hints, image optimization), product feed generation (Google Shopping XML), analytics integration (GA4 via GTM)
-- **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability (React.cache not available in React 18); NextAuth requires `AUTH_TRUST_HOST=true` in CI E2E tests
-- **CI improvements**: Added workflow_call trigger for deploy.yml integration; JS files now auto-formatted on commit via lint-staged; E2E tests fixed with AUTH_TRUST_HOST env var
-- **Latest completion**: Code review cleanup removing unused db-cache.ts and ThemeFontsLoader.tsx placeholder; improved Web Vitals dataLayer consistency
+- **Recent focus**: E2E test infrastructure improvements (global setup validation, CI reliability), performance optimization (Web Vitals tracking, resource hints, image optimization), product feed generation (Google Shopping XML)
+- **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability (React.cache not available in React 18); NextAuth requires `AUTH_TRUST_HOST=true` in CI E2E tests; E2E tests need seeded database with categories and active products
+- **CI improvements**: E2E infrastructure overhaul with global setup validation, separated build and test jobs, PostgreSQL 16 + Redis 7 services with health checks; added workflow_call trigger for deploy.yml integration; JS files auto-formatted on commit via lint-staged
+- **Latest completion**: E2E test infrastructure validation with global setup hook (ae6d7e3); created TASK-025 to address remaining CI E2E failures
 
 <!-- END AUTO-MANAGED -->
 
@@ -229,6 +238,7 @@ prisma/
 - Run `npm run lint:fix` to auto-fix linting issues
 - Run `npm run format:check` to verify formatting before CI (matches CI job)
 - Use `npm run test:run` for a single test pass (CI-style)
+- Run `npm run db:seed` after database setup to populate test data required for E2E tests
 - When modifying Prisma schema, run `npm run db:migrate` to create migration, then `npm run db:generate`
 - Always add Zod validation schemas for new API endpoints in `src/lib/validations/` (index.ts for core schemas, separate files for specialized domains like google-shopping.ts)
 - Use `requireAdmin()` or `requireAuth()` for protected API routes, never roll custom auth checks
