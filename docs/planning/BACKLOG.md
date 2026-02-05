@@ -249,6 +249,8 @@ Improvements to existing functionality.
 - [ ] Add bulk actions to admin newsletter page — bulk delete, bulk status change
 - [ ] Add subscriber analytics to admin — signup rate over time, confirmation rate, churn rate
 - [ ] Add rate limiting on subscribe endpoint — prevent email bombing/abuse
+- [ ] Implement streaming CSV export for large subscriber lists — current implementation loads all records into memory; use `ReadableStream` with chunked Prisma queries for scalability
+- [ ] Add GA4 analytics events for newsletter actions — `newsletter_subscribe`, `newsletter_confirm`, `newsletter_unsubscribe` events following established dataLayer pattern in `analytics.ts`
 
 ### [2026-02-04] From: TASK-025 Fix E2E Test Infrastructure
 
