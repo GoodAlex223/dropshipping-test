@@ -61,6 +61,19 @@ export async function POST(request: NextRequest) {
       } catch (err) {
         if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
           // Race condition: another request created the subscriber between our check and insert
+          // Fetch the existing record and send confirmation using its token
+          const raceExisting = await prisma.subscriber.findUnique({
+            where: { email: normalizedEmail },
+          });
+          if (raceExisting?.confirmationToken && raceExisting.status === "PENDING") {
+            const raceConfirmUrl = getConfirmationUrl(raceExisting.confirmationToken);
+            const raceUnsubUrl = getUnsubscribeUrl(normalizedEmail, raceExisting.id);
+            await sendNewsletterConfirmationEmail({
+              email: normalizedEmail,
+              confirmationUrl: raceConfirmUrl,
+              unsubscribeUrl: raceUnsubUrl,
+            });
+          }
           return apiSuccess(
             { message: "Please check your email to confirm your subscription" },
             201

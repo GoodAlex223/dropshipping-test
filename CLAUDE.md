@@ -243,7 +243,7 @@ prisma/
 - **Review JSON-LD structured data**: Dynamic review markup with author (customer name), ratingValue, reviewBody, datePublished, plus aggregateRating (bestRating, worstRating, ratingValue, ratingCount) for Google Rich Results and voice search optimization
 - **Newsletter double opt-in pattern**: Subscribe flow creates Subscriber record with PENDING status, generates crypto-random confirmation token (24-hour expiry), sends confirmation email via Resend; confirm endpoint validates token expiry and updates status to ACTIVE; race condition handling in subscribe endpoint via Prisma unique constraint catch (P2002 error code)
 - **HMAC-based unsubscribe tokens**: Deterministic unsubscribe URLs use HMAC-SHA256 with NEXTAUTH_SECRET to prevent token forgery; token verifies subscriber ID ownership before allowing unsubscribe; no database storage required for unsubscribe tokens
-- **Newsletter admin management**: Admin dashboard with search (email), status filter (PENDING/ACTIVE/UNSUBSCRIBED), pagination (20 per page), status toggle (activate/unsubscribe), delete functionality, and CSV export with streaming for large datasets
+- **Newsletter admin management**: Admin dashboard with search (email), status filter (PENDING/ACTIVE/UNSUBSCRIBED), pagination (20 per page), status toggle (activate/unsubscribe), delete functionality, and CSV export with formula injection prevention
 - **Email normalization pattern**: Newsletter subscribe endpoint normalizes emails to lowercase and trims whitespace before database operations to prevent duplicate subscriptions with different casing
 
 <!-- END AUTO-MANAGED -->
