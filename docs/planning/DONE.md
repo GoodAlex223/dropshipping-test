@@ -447,12 +447,34 @@ Completed tasks with implementation details and learnings.
 
 ---
 
+### [2026-02-05] - TASK-024: Email Newsletter Subscription
+
+**Summary**: Implemented complete double opt-in newsletter subscription system with footer signup form, admin management panel, CSV export, and dashboard integration. Code review hardened security with HMAC unsubscribe tokens, XSS prevention, P2002 race handling, and CSV formula injection protection.
+
+**Key Changes**:
+
+- Added Subscriber model to Prisma schema (PENDING/ACTIVE/UNSUBSCRIBED status, confirmation token with 24h expiry)
+- Created public API: subscribe (with P2002 race condition handling), confirm (token validation), unsubscribe (HMAC-SHA256 verification)
+- Created admin API: paginated list with search/filter, status toggle, delete, CSV export with formula injection prevention
+- Built newsletter utilities: crypto-random tokens, HMAC unsubscribe tokens, URL builders, HTML escaping
+- Created HTML email template with XSS-safe rendering and optional unsubscribe link
+- Built NewsletterSignup client component embedded in server Footer (merged Support+Company into Help column)
+- Created confirmation and unsubscribe landing pages with Suspense wrappers
+- Built admin newsletter management page with search, status filter, table, dropdown actions, delete dialog, pagination, CSV export
+- Added subscriber count card to admin dashboard, Newsletter link to admin sidebar
+
+**Files Created**: 14 | **Files Modified**: 6
+
+**Spawned Tasks**: Items added to BACKLOG.md (email marketing platform docs, unit/E2E tests, bulk actions, subscriber analytics)
+
+---
+
 ## Statistics
 
-| Month   | Tasks Completed | Key Deliverables                                                                                        |
-| ------- | --------------- | ------------------------------------------------------------------------------------------------------- |
-| 2026-01 | 17              | Full MVP + Demo Deployed + SEO Technical Setup                                                          |
-| 2026-02 | 7               | GA4 Analytics, Social Sharing, Google Shopping Feed, Performance, E2E Fix, Deploy Fix, Customer Reviews |
+| Month   | Tasks Completed | Key Deliverables                                                                                                    |
+| ------- | --------------- | ------------------------------------------------------------------------------------------------------------------- |
+| 2026-01 | 17              | Full MVP + Demo Deployed + SEO Technical Setup                                                                      |
+| 2026-02 | 8               | GA4 Analytics, Social Sharing, Google Shopping Feed, Performance, E2E Fix, Deploy Fix, Customer Reviews, Newsletter |
 
 ---
 

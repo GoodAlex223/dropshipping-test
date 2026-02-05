@@ -26,26 +26,6 @@ Active tasks for Dropshipping Website MVP.
 
 ## Low Priority
 
-### [TASK-024] - Email Newsletter Subscription
-
-**Priority**: Low
-**Dependencies**: None
-**Estimated Effort**: Low
-
-**Description**: Capture email subscribers for marketing campaigns and product updates.
-
-**Sub-tasks**:
-
-- [ ] Add Subscriber model to Prisma schema (email, status, subscribedAt)
-- [ ] Create subscription API endpoint with validation
-- [ ] Build newsletter signup form component (footer, popup)
-- [ ] Implement double opt-in email confirmation
-- [ ] Add unsubscribe functionality
-- [ ] Create admin view for subscriber management
-- [ ] Document integration with email marketing platforms (Mailchimp, etc.)
-
----
-
 ### [TASK-022] - Demo Content Enhancement
 
 **Priority**: Low
@@ -71,7 +51,7 @@ Active tasks for Dropshipping Website MVP.
 
 ## Completed
 
-All MVP implementation tasks (TASK-001 through TASK-016), TASK-017 through TASK-021, TASK-023 (Customer Reviews), TASK-025 (Fix E2E Tests), and TASK-026 (Fix Vercel Deploy) have been completed. See [DONE.md](DONE.md) for details.
+All MVP implementation tasks (TASK-001 through TASK-016), TASK-017 through TASK-021, TASK-023 (Customer Reviews), TASK-024 (Newsletter), TASK-025 (Fix E2E Tests), and TASK-026 (Fix Vercel Deploy) have been completed. See [DONE.md](DONE.md) for details.
 
 ---
 

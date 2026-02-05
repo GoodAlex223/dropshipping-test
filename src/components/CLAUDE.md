@@ -15,7 +15,7 @@ Shared React components organized by domain: admin panel, analytics tracking, ch
 ```
 components/
 ├── admin/                 # Admin panel components
-│   ├── AdminSidebar.tsx   # Navigation sidebar (collapsible)
+│   ├── AdminSidebar.tsx   # Navigation sidebar (collapsible, includes newsletter link)
 │   ├── ImageUploader.tsx  # S3 image upload with drag-and-drop
 │   ├── ProductForm.tsx    # Product create/edit form (react-hook-form + zod, includes "Product Identifiers" card with brand/barcode/MPN fields)
 │   ├── ProductImportDialog.tsx  # CSV import dialog (supports brand/barcode/MPN columns)
@@ -28,7 +28,8 @@ components/
 │   └── index.ts
 ├── common/
 │   ├── Header.tsx         # Site header with nav, cart, auth
-│   ├── Footer.tsx         # Site footer
+│   ├── Footer.tsx         # Site footer with NewsletterSignup component
+│   ├── NewsletterSignup.tsx  # Newsletter subscription form (email input, success state)
 │   ├── CookieConsent.tsx  # GDPR cookie consent banner + GTM loader (Zustand persisted)
 │   ├── ResourceHints.tsx  # Resource hints (preconnect/dns-prefetch for third-party domains)
 │   └── index.ts
@@ -88,6 +89,7 @@ components/
 - **Image optimization**: `ProductCard` uses `DEFAULT_BLUR_DATA_URL` and `IMAGE_SIZES.productCard` from `@/lib/image-utils` for optimized loading with blur placeholders
 - **Deferred font loading**: Theme-specific fonts (Playfair Display, Lora) loaded in root layout with `preload: false` and `display: swap` for optimal performance; saves ~60-80KB on initial load for users on default theme
 - **Review eligibility pattern**: `ReviewSection` handles eligibility checking client-side; fetches `/api/reviews/eligibility?productId=xxx` on mount to determine if form should render; displays form only if user has delivered order containing product and hasn't already reviewed it
+- **Newsletter signup pattern**: `NewsletterSignup` component manages subscription flow with local state (email, loading, success); success state replaces form with confirmation message (green background, checkmark icon); integrated into Footer component for site-wide visibility
 
 <!-- END AUTO-MANAGED -->
 
