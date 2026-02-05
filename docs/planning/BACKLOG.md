@@ -236,6 +236,8 @@ Improvements to existing functionality.
 - [ ] Add review sorting options (newest, highest rated, most helpful) to public reviews list
 - [ ] Add database-level CHECK constraint for rating 1-5 — defense in depth beyond Zod validation
 - [ ] Seed demo reviews for products in `prisma/seed.ts` — enables testing and demo presentation
+- [ ] Merge `getReviewsJsonLd()` into `getProductJsonLd()` — currently two separate `@type: Product` JSON-LD schemas on product pages; Google recommends single Product schema per page
+- [ ] Validate `parseInt()` result for rating query params in review API routes — `parseInt('abc', 10)` returns `NaN` which gets passed to Prisma; affects `admin/reviews/route.ts` and `products/[slug]/reviews/route.ts`
 
 ### [2026-02-04] From: TASK-025 Fix E2E Test Infrastructure
 
