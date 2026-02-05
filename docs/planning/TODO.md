@@ -2,7 +2,7 @@
 
 Active tasks for Dropshipping Website MVP.
 
-**Last Updated**: 2026-02-04
+**Last Updated**: 2026-02-05
 
 ---
 
@@ -25,26 +25,6 @@ Active tasks for Dropshipping Website MVP.
 ---
 
 ## Low Priority
-
-### [TASK-023] - Customer Feedback & Review System
-
-**Priority**: Low
-**Dependencies**: None
-**Estimated Effort**: Medium
-
-**Description**: Allow customers to leave reviews and ratings on products they've purchased.
-
-**Sub-tasks**:
-
-- [ ] Add Review model to Prisma schema (rating, comment, userId, productId, verified)
-- [ ] Create API endpoints for reviews (CRUD operations)
-- [ ] Build review submission form component
-- [ ] Display reviews on product pages with average rating
-- [ ] Add review moderation in admin panel
-- [ ] Implement "verified purchase" badge
-- [ ] Add review schema markup for SEO (JSON-LD)
-
----
 
 ### [TASK-024] - Email Newsletter Subscription
 
@@ -91,7 +71,7 @@ Active tasks for Dropshipping Website MVP.
 
 ## Completed
 
-All MVP implementation tasks (TASK-001 through TASK-016), TASK-017 (SEO Technical Setup), TASK-018 (Analytics Integration), TASK-019 (Social Sharing Enhancement), TASK-020 (Google Shopping Feed), TASK-021 (Performance Optimization), TASK-025 (Fix E2E Test Infrastructure), and TASK-026 (Fix Vercel Deploy in CI) have been completed. See [DONE.md](DONE.md) for details.
+All MVP implementation tasks (TASK-001 through TASK-016), TASK-017 through TASK-021, TASK-023 (Customer Reviews), TASK-025 (Fix E2E Tests), and TASK-026 (Fix Vercel Deploy) have been completed. See [DONE.md](DONE.md) for details.
 
 ---
 
