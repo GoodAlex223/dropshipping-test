@@ -129,7 +129,7 @@ These tasks from the advertising/promotion plan require a registered business, r
 - [ ] Multi-currency support
 - [ ] Internationalization (i18n)
 - [ ] Customer loyalty program
-- [x] Email marketing integration → Moved to TODO as TASK-024
+- [x] Email marketing integration → Completed as TASK-024
 - [ ] Analytics dashboard
 
 ---
@@ -238,6 +238,17 @@ Improvements to existing functionality.
 - [ ] Seed demo reviews for products in `prisma/seed.ts` — enables testing and demo presentation
 - [ ] Merge `getReviewsJsonLd()` into `getProductJsonLd()` — currently two separate `@type: Product` JSON-LD schemas on product pages; Google recommends single Product schema per page
 - [ ] Validate `parseInt()` result for rating query params in review API routes — `parseInt('abc', 10)` returns `NaN` which gets passed to Prisma; affects `admin/reviews/route.ts` and `products/[slug]/reviews/route.ts`
+
+### [2026-02-05] From: TASK-024 Email Newsletter Subscription
+
+**Origin**: feat/task-024-email-newsletter branch
+
+- [ ] Document integration with email marketing platforms (Mailchimp, SendGrid, etc.) — deferred from original task scope
+- [ ] Add unit tests for newsletter API routes — subscribe, confirm, unsubscribe, admin endpoints
+- [ ] Add E2E tests for newsletter subscription flow — signup, confirm email, unsubscribe
+- [ ] Add bulk actions to admin newsletter page — bulk delete, bulk status change
+- [ ] Add subscriber analytics to admin — signup rate over time, confirmation rate, churn rate
+- [ ] Add rate limiting on subscribe endpoint — prevent email bombing/abuse
 
 ### [2026-02-04] From: TASK-025 Fix E2E Test Infrastructure
 

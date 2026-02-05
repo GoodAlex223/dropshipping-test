@@ -371,6 +371,32 @@ model Setting {
 }
 
 // ============================================
+// EMAIL NEWSLETTER
+// ============================================
+
+model Subscriber {
+  id                 String           @id @default(cuid())
+  email              String           @unique
+  status             SubscriberStatus @default(PENDING)
+  confirmationToken  String?          @unique
+  confirmationExpiry DateTime?
+  subscribedAt       DateTime?
+  unsubscribedAt     DateTime?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("subscribers")
+}
+
+enum SubscriberStatus {
+  PENDING
+  ACTIVE
+  UNSUBSCRIBED
+}
+
+// ============================================
 // PRODUCT REVIEWS
 // ============================================
 

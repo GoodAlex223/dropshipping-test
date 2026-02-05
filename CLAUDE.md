@@ -11,8 +11,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Key capabilities:
 
 - Customer storefront with product catalog, cart, and checkout
-- Admin panel for products, categories, orders, customers, suppliers, and reviews
+- Admin panel for products, categories, orders, customers, suppliers, reviews, and newsletter subscribers
 - Product review system with verified purchase requirements, star ratings, and admin reply functionality
+- Newsletter subscription with double opt-in email confirmation and admin management
 - Stripe payment integration
 - Automated order forwarding to suppliers via background workers (BullMQ)
 - CSV product import, S3 image storage, email notifications (Resend)
@@ -75,18 +76,24 @@ Next.js 14 App Router with route groups for domain separation:
 src/
 ├── app/                    # Next.js App Router
 │   ├── (admin)/admin/      # Admin panel pages (protected, ADMIN role)
+│   │   ├── newsletter/     # Newsletter subscriber management (list, search, filter, export, delete)
 │   │   └── reviews/        # Review management (list, reply, hide/show, delete)
 │   ├── (auth)/             # Login & register pages
 │   ├── (shop)/             # Customer storefront (home, products, cart, checkout, account)
+│   ├── newsletter/         # Newsletter confirmation and unsubscribe pages
+│   │   ├── confirm/        # Email confirmation landing page
+│   │   └── unsubscribe/    # Unsubscribe landing page
 │   ├── showcase/           # Multi-theme demo pages (bold, luxury, organic)
 │   ├── api/                # API routes
 │   │   ├── admin/          # Admin-only API endpoints (auth-guarded)
+│   │   │   ├── newsletter/ # Admin newsletter API (list, [id] update/delete, export CSV)
 │   │   │   └── reviews/    # Admin review API ([id], [id]/reply, [id]/visibility)
 │   │   ├── auth/           # NextAuth endpoints
 │   │   ├── cart/            # Cart validation
 │   │   ├── categories/     # Public category endpoints
 │   │   ├── checkout/       # Payment & order creation
 │   │   ├── health/         # Health check
+│   │   ├── newsletter/     # Public newsletter API (subscribe, confirm, unsubscribe)
 │   │   ├── orders/         # Customer order endpoints
 │   │   ├── products/       # Public product endpoints
 │   │   │   └── [slug]/reviews/  # Product-specific review list
@@ -101,7 +108,7 @@ src/
 │   ├── admin/              # Admin panel components (sidebar, forms, dialogs)
 │   ├── analytics/          # Analytics tracking components (PurchaseTracker, WebVitalsReporter)
 │   ├── checkout/           # Payment form components
-│   ├── common/             # Header, Footer, CookieConsent, ResourceHints
+│   ├── common/             # Header, Footer (with NewsletterSignup), CookieConsent, ResourceHints
 │   ├── products/           # ProductCard, SocialShareButtons
 │   ├── reviews/            # Review components (ReviewSection, ReviewForm, ReviewList, ReviewItem, ReviewStats, StarRating)
 │   ├── shop/               # CartDrawer
@@ -116,7 +123,8 @@ src/
 │   ├── api-utils.ts        # API response helpers, auth guards
 │   ├── stripe.ts           # Stripe server-side
 │   ├── stripe-client.ts    # Stripe client-side
-│   ├── email.ts            # Resend email service
+│   ├── email.ts            # Resend email service (order confirmations, newsletter)
+│   ├── newsletter.ts       # Newsletter utilities (token generation, URL builders, HMAC unsubscribe)
 │   ├── queue.ts            # BullMQ queue setup
 │   ├── redis.ts            # Redis/ioredis connection
 │   ├── s3.ts               # AWS S3 image storage
@@ -126,8 +134,10 @@ src/
 │   ├── image-utils.ts      # Image optimization (blur placeholders, sizes)
 │   ├── web-vitals.ts       # Core Web Vitals reporting to GA4
 │   ├── utils.ts            # General utils (cn, etc.)
+│   ├── email-templates/    # HTML email templates
+│   │   └── newsletter-confirmation.ts  # Double opt-in confirmation email
 │   └── validations/        # Zod schemas for all entities
-│       ├── index.ts        # Product, category, order, user, review schemas
+│       ├── index.ts        # Product, category, order, user, review, newsletter schemas
 │       └── google-shopping.ts  # Google Shopping feed item schema
 ├── services/               # Business logic services
 │   └── supplier.service.ts # Supplier order forwarding
@@ -178,7 +188,7 @@ prisma/
 - **Non-component files**: kebab-case (e.g., `api-utils.ts`, `cart.store.ts`, `use-debounce.ts`)
 - **UI primitives**: shadcn/ui components in `src/components/ui/` (Radix UI + Tailwind + CVA)
 - **State management**: Zustand with `persist` middleware, stores in `src/stores/*.store.ts`
-- **Validation**: Zod schemas in `src/lib/validations/` (index.ts for core entities, google-shopping.ts for feed items), shared between client and server
+- **Validation**: Zod schemas in `src/lib/validations/` (index.ts for core entities including newsletter, google-shopping.ts for feed items), shared between client and server
 - **API routes**: Export named functions (`GET`, `POST`, `PUT`, `DELETE`), use `try/catch`, return `NextResponse.json()`
 - **API auth**: Use `requireAdmin()` / `requireAuth()` from `api-utils.ts` at top of handlers
 - **Types**: Re-export Prisma types from `src/types/index.ts`, add custom interfaces there
@@ -231,6 +241,10 @@ prisma/
 - **Review deletion cascade**: `onDelete: Cascade` on Review foreign keys ensures reviews cascade-delete when user/product/order deleted; unique constraint prevents orphaned reviews; index on `isHidden` for fast visibility filtering
 - **Review data structure**: Prisma Review model stores `rating` (1-5), `comment` (optional, max 2000 chars via schema validation), `isHidden` (boolean, default false), `adminReply` (optional, max 1000 chars), `adminRepliedAt` (timestamp); client interfaces extend with `user` details and computed fields (`averageRating`, `totalReviews`, `ratingDistribution`)
 - **Review JSON-LD structured data**: Dynamic review markup with author (customer name), ratingValue, reviewBody, datePublished, plus aggregateRating (bestRating, worstRating, ratingValue, ratingCount) for Google Rich Results and voice search optimization
+- **Newsletter double opt-in pattern**: Subscribe flow creates Subscriber record with PENDING status, generates crypto-random confirmation token (24-hour expiry), sends confirmation email via Resend; confirm endpoint validates token expiry and updates status to ACTIVE; race condition handling in subscribe endpoint via Prisma unique constraint catch (P2002 error code)
+- **HMAC-based unsubscribe tokens**: Deterministic unsubscribe URLs use HMAC-SHA256 with NEXTAUTH_SECRET to prevent token forgery; token verifies subscriber ID ownership before allowing unsubscribe; no database storage required for unsubscribe tokens
+- **Newsletter admin management**: Admin dashboard with search (email), status filter (PENDING/ACTIVE/UNSUBSCRIBED), pagination (20 per page), status toggle (activate/unsubscribe), delete functionality, and CSV export with formula injection prevention
+- **Email normalization pattern**: Newsletter subscribe endpoint normalizes emails to lowercase and trims whitespace before database operations to prevent duplicate subscriptions with different casing
 
 <!-- END AUTO-MANAGED -->
 
@@ -244,7 +258,7 @@ prisma/
 - **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability (React.cache not available in React 18); NextAuth requires `AUTH_TRUST_HOST=true` in CI E2E tests; E2E tests need seeded database with categories and active products
 - **CI improvements**: E2E infrastructure overhaul with global setup validation, separated build and test jobs, PostgreSQL 16 + Redis 7 services with health checks; deployment workflow with graceful secret validation, dual-target support (Vercel/VPS), conditional job execution, and comprehensive deployment documentation; JS files auto-formatted on commit via lint-staged; E2E tests run chromium-only in CI with port 3000, pre-built app, and optimized timeouts
 - **Deployment strategy**: Dual-path deployment via `DEPLOYMENT_TARGET` variable (vercel/vps); graceful degradation when secrets missing (skip with notice if unset, fail with error if explicitly set); Vercel path uses CLI for pull/build/deploy + migrations; VPS path uses SSH action with git pull + pm2 restart; both paths validate secrets before execution
-- **Latest completion**: TASK-023 Customer Review System (3a6a22b) - added product review system with verified purchase validation, admin reply functionality, and review-based JSON-LD structured data; Prisma Review model with cascade delete, unique userId_productId constraint, and visibility management; customer review API with eligibility checking (delivered orders only), create/update/delete operations; admin review API with reply and visibility toggle endpoints; React review components (ReviewSection, ReviewForm, ReviewList, ReviewItem, ReviewStats, StarRating) integrated into product detail page; admin reviews management page with list/reply/visibility controls; SEO integration with review JSON-LD structured data using aggregateRating and reviewRating schemas; TASK-026 Fix Vercel Deploy in CI (8f17be9) - resolved Prisma and NextAuth build errors by passing DATABASE_URL and NEXTAUTH_SECRET to Vercel build step
+- **Latest completion**: TASK-024 Email Newsletter Subscription (6b9790c) - added double opt-in newsletter system with email confirmation and admin management; Prisma Subscriber model with status tracking (PENDING/ACTIVE/UNSUBSCRIBED), confirmation tokens (24-hour expiry), and HMAC-based unsubscribe tokens; public newsletter API endpoints (subscribe, confirm, unsubscribe) with race condition handling and email normalization; admin newsletter management page with search, status filtering, pagination, CSV export, and status toggle/delete operations; NewsletterSignup component integrated into Footer for site-wide visibility; Resend email integration for confirmation emails with HTML templates; Previous: TASK-023 Customer Review System (3a6a22b), TASK-026 Fix Vercel Deploy in CI (8f17be9)
 - **Active tasks**: None (MVP complete, post-MVP enhancements in BACKLOG)
 
 <!-- END AUTO-MANAGED -->

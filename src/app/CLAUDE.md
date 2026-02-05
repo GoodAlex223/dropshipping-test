@@ -19,6 +19,8 @@ app/
 │   ├── page.tsx           # Dashboard
 │   ├── categories/        # Category CRUD
 │   ├── customers/         # Customer list
+│   ├── newsletter/        # Newsletter subscriber management
+│   │   └── page.tsx       # Subscriber list with search/filter/pagination/export
 │   ├── orders/            # Order management + detail view
 │   ├── products/          # Product CRUD + new/edit
 │   ├── reviews/           # Review management (list, reply, hide/show, delete)
@@ -38,15 +40,28 @@ app/
 │   ├── checkout/          # Checkout + confirmation page
 │   └── products/          # Product listing + detail
 │       └── [slug]/        # Product detail page, client component, opengraph-image.tsx
+├── newsletter/            # Newsletter public pages
+│   ├── confirm/           # Email confirmation landing page
+│   │   └── page.tsx       # Token validation and activation UI
+│   └── unsubscribe/       # Unsubscribe landing page
+│       └── page.tsx       # HMAC token validation and unsubscribe UI
 ├── showcase/              # Theme demo pages (bold, luxury, organic)
 ├── api/                   # API route handlers
 │   ├── admin/             # Admin-only endpoints (guarded by requireAdmin)
+│   │   ├── newsletter/    # Admin newsletter management
+│   │   │   ├── route.ts   # GET (list with search/filter/pagination)
+│   │   │   ├── [id]/route.ts  # PATCH (update status), DELETE
+│   │   │   └── export/route.ts  # GET (CSV export)
 │   │   └── reviews/       # Admin review API ([id], [id]/reply, [id]/visibility)
 │   ├── auth/              # NextAuth route handler
 │   ├── cart/validate/     # Cart validation
 │   ├── categories/        # Public category API
 │   ├── checkout/          # Payment intent + order confirmation
 │   ├── health/            # Health check endpoint
+│   ├── newsletter/        # Public newsletter endpoints
+│   │   ├── subscribe/route.ts    # POST (create subscriber, send confirmation)
+│   │   ├── confirm/route.ts      # GET (validate token, activate subscription)
+│   │   └── unsubscribe/route.ts  # POST (verify HMAC token, unsubscribe)
 │   ├── orders/            # Customer order API
 │   ├── products/          # Public product API
 │   │   └── [slug]/reviews/  # Product-specific review list
