@@ -1,0 +1,125 @@
+"use client";
+
+import { useState, useCallback } from "react";
+import { ReviewItem } from "./ReviewItem";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Loader2 } from "lucide-react";
+
+interface Review {
+  id: string;
+  rating: number;
+  comment: string | null;
+  adminReply: string | null;
+  adminRepliedAt: string | null;
+  createdAt: string;
+  user: { id: string; name: string | null; image: string | null };
+}
+
+interface ReviewListProps {
+  productSlug: string;
+  initialReviews: Review[];
+  totalReviews: number;
+}
+
+export function ReviewList({ productSlug, initialReviews, totalReviews }: ReviewListProps) {
+  const [reviews, setReviews] = useState<Review[]>(initialReviews);
+  const [ratingFilter, setRatingFilter] = useState<string>("all");
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(initialReviews.length < totalReviews);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchReviews = useCallback(
+    async (pageNum: number, rating: string, replace: boolean) => {
+      setIsLoading(true);
+      try {
+        const params = new URLSearchParams({
+          page: pageNum.toString(),
+          limit: "10",
+        });
+        if (rating !== "all") params.set("rating", rating);
+
+        const response = await fetch(`/api/products/${productSlug}/reviews?${params}`);
+        if (!response.ok) return;
+
+        const data = await response.json();
+        const newReviews = data.data as Review[];
+
+        if (replace) {
+          setReviews(newReviews);
+        } else {
+          setReviews((prev) => [...prev, ...newReviews]);
+        }
+        setHasMore(data.pagination.hasNext);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [productSlug]
+  );
+
+  const handleFilterChange = (value: string) => {
+    setRatingFilter(value);
+    setPage(1);
+    fetchReviews(1, value, true);
+  };
+
+  const handleLoadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchReviews(nextPage, ratingFilter, false);
+  };
+
+  return (
+    <div>
+      {/* Filter */}
+      {totalReviews > 0 && (
+        <div className="mb-4 flex items-center gap-2">
+          <span className="text-sm font-medium">Filter:</span>
+          <Select value={ratingFilter} onValueChange={handleFilterChange}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All ratings</SelectItem>
+              <SelectItem value="5">5 stars</SelectItem>
+              <SelectItem value="4">4 stars</SelectItem>
+              <SelectItem value="3">3 stars</SelectItem>
+              <SelectItem value="2">2 stars</SelectItem>
+              <SelectItem value="1">1 star</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      {/* Reviews */}
+      {reviews.length === 0 ? (
+        <p className="text-muted-foreground py-8 text-center text-sm">
+          {ratingFilter !== "all" ? "No reviews match this filter." : "No reviews yet."}
+        </p>
+      ) : (
+        <div>
+          {reviews.map((review) => (
+            <ReviewItem key={review.id} review={review} />
+          ))}
+        </div>
+      )}
+
+      {/* Load More */}
+      {hasMore && (
+        <div className="mt-4 flex justify-center">
+          <Button variant="outline" onClick={handleLoadMore} disabled={isLoading}>
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isLoading ? "Loading..." : "Load More Reviews"}
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}

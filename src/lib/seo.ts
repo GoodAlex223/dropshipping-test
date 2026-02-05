@@ -308,6 +308,45 @@ export function getProductJsonLd(product: {
   };
 }
 
+// JSON-LD for Product Reviews (AggregateRating + individual reviews)
+export function getReviewsJsonLd(
+  product: { name: string; slug: string },
+  reviews: { rating: number; comment: string | null; authorName: string; createdAt: string }[],
+  averageRating: number,
+  reviewCount: number
+) {
+  if (reviewCount === 0) return null;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    url: `${siteConfig.url}/products/${product.slug}`,
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: averageRating.toFixed(1),
+      reviewCount,
+      bestRating: 5,
+      worstRating: 1,
+    },
+    review: reviews.slice(0, 10).map((r) => ({
+      "@type": "Review",
+      reviewRating: {
+        "@type": "Rating",
+        ratingValue: r.rating,
+        bestRating: 5,
+        worstRating: 1,
+      },
+      author: {
+        "@type": "Person",
+        name: r.authorName,
+      },
+      ...(r.comment && { reviewBody: r.comment }),
+      datePublished: new Date(r.createdAt).toISOString().split("T")[0],
+    })),
+  };
+}
+
 // JSON-LD for BreadcrumbList
 export function getBreadcrumbJsonLd(items: { name: string; url: string }[]) {
   return {

@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ProductCard, SocialShareButtons } from "@/components/products";
+import { ReviewSection } from "@/components/reviews";
 import { useCartStore } from "@/stores/cart.store";
 import { cn } from "@/lib/utils";
 import { trackViewItem, trackAddToCart } from "@/lib/analytics";
@@ -37,6 +38,21 @@ interface ProductVariant {
   price: string;
   stock: number;
   options: Record<string, string>;
+}
+
+interface ReviewData {
+  id: string;
+  rating: number;
+  comment: string | null;
+  adminReply: string | null;
+  adminRepliedAt: string | null;
+  createdAt: string;
+  user: { id: string; name: string | null; image: string | null };
+}
+
+interface RatingDistribution {
+  rating: number;
+  count: number;
 }
 
 export interface Product {
@@ -67,6 +83,10 @@ export interface Product {
     category: { name: string; slug: string };
     images: { url: string; alt: string | null }[];
   }[];
+  reviews: ReviewData[];
+  averageRating: number;
+  totalReviews: number;
+  ratingDistribution: RatingDistribution[];
 }
 
 interface ProductDetailClientProps {
@@ -418,6 +438,16 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
           </div>
         </div>
       )}
+
+      {/* Customer Reviews */}
+      <ReviewSection
+        productId={product.id}
+        productSlug={product.slug}
+        initialReviews={product.reviews}
+        averageRating={product.averageRating}
+        totalReviews={product.totalReviews}
+        ratingDistribution={product.ratingDistribution}
+      />
 
       {/* Related Products */}
       {product.relatedProducts.length > 0 && (

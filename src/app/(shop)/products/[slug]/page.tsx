@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
-import { getProductMetadata, getProductJsonLd, getBreadcrumbJsonLd, siteConfig } from "@/lib/seo";
+import {
+  getProductMetadata,
+  getProductJsonLd,
+  getBreadcrumbJsonLd,
+  getReviewsJsonLd,
+  siteConfig,
+} from "@/lib/seo";
 import { ProductDetailClient, ProductNotFound, type Product } from "./product-detail-client";
 
 interface PageProps {
@@ -87,6 +93,39 @@ async function getProduct(slug: string): Promise<Product | null> {
     take: 4,
   });
 
+  // Fetch reviews and stats
+  const [reviews, reviewStats, reviewDistribution] = await Promise.all([
+    prisma.review.findMany({
+      where: { productId: product.id, isHidden: false },
+      select: {
+        id: true,
+        rating: true,
+        comment: true,
+        adminReply: true,
+        adminRepliedAt: true,
+        createdAt: true,
+        user: { select: { id: true, name: true, image: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+    }),
+    prisma.review.aggregate({
+      where: { productId: product.id, isHidden: false },
+      _avg: { rating: true },
+      _count: true,
+    }),
+    prisma.review.groupBy({
+      by: ["rating"],
+      where: { productId: product.id, isHidden: false },
+      _count: true,
+    }),
+  ]);
+
+  const ratingDistribution = [5, 4, 3, 2, 1].map((r) => ({
+    rating: r,
+    count: reviewDistribution.find((d) => d.rating === r)?._count ?? 0,
+  }));
+
   return {
     ...product,
     price: product.price.toString(),
@@ -102,6 +141,14 @@ async function getProduct(slug: string): Promise<Product | null> {
       price: p.price.toString(),
       comparePrice: p.comparePrice?.toString() ?? null,
     })),
+    reviews: reviews.map((r) => ({
+      ...r,
+      adminRepliedAt: r.adminRepliedAt?.toISOString() ?? null,
+      createdAt: r.createdAt.toISOString(),
+    })),
+    averageRating: reviewStats._avg.rating ?? 0,
+    totalReviews: reviewStats._count,
+    ratingDistribution,
   };
 }
 
@@ -156,6 +203,18 @@ export default async function ProductDetailPage({ params }: PageProps) {
     { name: product.name, url: `${siteConfig.url}/products/${product.slug}` },
   ]);
 
+  const reviewsJsonLd = getReviewsJsonLd(
+    { name: product.name, slug: product.slug },
+    product.reviews.map((r) => ({
+      rating: r.rating,
+      comment: r.comment,
+      authorName: r.user.name || "Anonymous",
+      createdAt: r.createdAt,
+    })),
+    product.averageRating,
+    product.totalReviews
+  );
+
   return (
     <>
       <script
@@ -170,6 +229,14 @@ export default async function ProductDetailPage({ params }: PageProps) {
           __html: JSON.stringify(breadcrumbJsonLd),
         }}
       />
+      {reviewsJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(reviewsJsonLd),
+          }}
+        />
+      )}
       <ProductDetailClient product={product} />
     </>
   );

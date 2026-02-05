@@ -25,6 +25,7 @@ model User {
   image         String?
   addresses     Address[]
   orders        Order[]
+  reviews       Review[]
   cart          Cart?
   accounts      Account[]
   sessions      Session[]
@@ -130,6 +131,7 @@ model Product {
   metaDesc      String?
   cartItems     CartItem[]
   orderItems    OrderItem[]
+  reviews       Review[]
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
 
@@ -253,6 +255,7 @@ model Order {
   paymentStatus   PaymentStatus   @default(PENDING)
   paidAt          DateTime?
   supplierOrders  SupplierOrder[]
+  reviews         Review[]
   trackingNumber  String?
   trackingUrl     String?
   notes           String?         @db.Text
@@ -365,4 +368,33 @@ model Setting {
   updatedAt DateTime @updatedAt
 
   @@map("settings")
+}
+
+// ============================================
+// PRODUCT REVIEWS
+// ============================================
+
+model Review {
+  id             String    @id @default(cuid())
+  productId      String
+  product        Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderId        String
+  order          Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  rating         Int
+  comment        String?   @db.Text
+  isHidden       Boolean   @default(false)
+  adminReply     String?   @db.Text
+  adminRepliedAt DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([userId, productId])
+  @@index([productId])
+  @@index([userId])
+  @@index([orderId])
+  @@index([isHidden])
+  @@index([createdAt])
+  @@map("reviews")
 }

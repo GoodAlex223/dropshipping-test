@@ -15,6 +15,7 @@ export type {
   SupplierOrder,
   Address,
   Setting,
+  Review,
 } from "@prisma/client";
 
 export { Role, OrderStatus, PaymentStatus } from "@prisma/client";
