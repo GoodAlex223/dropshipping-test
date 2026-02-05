@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-02-04
+**Last Updated**: 2026-02-05
 
 ---
 
@@ -91,7 +91,7 @@ These tasks from the advertising/promotion plan require a registered business, r
 
 **Sub-tasks**:
 
-- [x] Customer reviews and ratings → Moved to TODO as TASK-023
+- [x] Customer reviews and ratings → Completed as TASK-023
 - [ ] Wishlist functionality
 - [ ] Advanced search (Meilisearch)
 - [ ] Product recommendations
@@ -225,6 +225,17 @@ Improvements to existing functionality.
 - [ ] Implement Slack/Discord notifications in deploy notify job — currently just echo, add real delivery
 - [ ] Add explicit default for `deployed` job output when validation skips — currently relies on bash `[ "" = "true" ]` evaluating false; an explicit `deployed: "false"` output in the skip path would be clearer
 - [ ] Refine notify job `if` condition to skip when both deploy jobs are skipped — `if: always()` runs even when neither deploy path triggers; could use `needs.deploy-vercel.result != 'skipped' || needs.deploy-vps.result != 'skipped'`
+
+### [2026-02-05] From: TASK-023 Customer Feedback & Review System
+
+**Origin**: feat/task-023-customer-reviews branch
+
+- [ ] Extract shared Review interfaces to `src/types/index.ts` — duplicated across ReviewList, ReviewItem, ReviewSection, admin page
+- [ ] Add unit tests for review API routes — create, eligibility, admin reply, visibility toggle
+- [ ] Add E2E tests for review submission flow — verified purchase review lifecycle
+- [ ] Add review sorting options (newest, highest rated, most helpful) to public reviews list
+- [ ] Add database-level CHECK constraint for rating 1-5 — defense in depth beyond Zod validation
+- [ ] Seed demo reviews for products in `prisma/seed.ts` — enables testing and demo presentation
 
 ### [2026-02-04] From: TASK-025 Fix E2E Test Infrastructure
 

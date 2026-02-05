@@ -21,6 +21,7 @@ app/
 │   ├── customers/         # Customer list
 │   ├── orders/            # Order management + detail view
 │   ├── products/          # Product CRUD + new/edit
+│   ├── reviews/           # Review management (list, reply, hide/show, delete)
 │   ├── settings/          # Admin settings
 │   └── suppliers/         # Supplier management + detail
 ├── (auth)/                # Authentication pages
@@ -40,13 +41,16 @@ app/
 ├── showcase/              # Theme demo pages (bold, luxury, organic)
 ├── api/                   # API route handlers
 │   ├── admin/             # Admin-only endpoints (guarded by requireAdmin)
+│   │   └── reviews/       # Admin review API ([id], [id]/reply, [id]/visibility)
 │   ├── auth/              # NextAuth route handler
 │   ├── cart/validate/     # Cart validation
 │   ├── categories/        # Public category API
 │   ├── checkout/          # Payment intent + order confirmation
 │   ├── health/            # Health check endpoint
 │   ├── orders/            # Customer order API
-│   └── products/          # Public product API
+│   ├── products/          # Public product API
+│   │   └── [slug]/reviews/  # Product-specific review list
+│   └── reviews/           # Customer review API (create, update, delete, eligibility check)
 ├── feed/                  # Product feeds for external services
 │   └── google-shopping.xml/  # Google Shopping RSS 2.0 feed (hourly revalidation)
 ├── layout.tsx             # Root layout (providers, metadata)

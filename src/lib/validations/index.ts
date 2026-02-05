@@ -109,6 +109,35 @@ export const supplierSchema = z.object({
   notes: z.string().optional().nullable(),
 });
 
+// Review validations
+export const createReviewSchema = z.object({
+  productId: z.string().min(1, "Product ID is required"),
+  orderId: z.string().min(1, "Order ID is required"),
+  rating: z.number().int().min(1, "Rating must be at least 1").max(5, "Rating must be at most 5"),
+  comment: z.string().max(2000, "Comment must be less than 2000 characters").optional().nullable(),
+});
+
+export const updateReviewSchema = z.object({
+  rating: z
+    .number()
+    .int()
+    .min(1, "Rating must be at least 1")
+    .max(5, "Rating must be at most 5")
+    .optional(),
+  comment: z.string().max(2000, "Comment must be less than 2000 characters").optional().nullable(),
+});
+
+export const adminReviewReplySchema = z.object({
+  adminReply: z
+    .string()
+    .min(1, "Reply cannot be empty")
+    .max(1000, "Reply must be less than 1000 characters"),
+});
+
+export const adminReviewVisibilitySchema = z.object({
+  isHidden: z.boolean(),
+});
+
 // Google Shopping feed validations
 export {
   googleShoppingItemSchema,
@@ -128,3 +157,7 @@ export type ShippingAddressInput = z.infer<typeof shippingAddressSchema>;
 export type CheckoutInput = z.infer<typeof checkoutSchema>;
 export type UpdateOrderStatusInput = z.infer<typeof updateOrderStatusSchema>;
 export type SupplierInput = z.infer<typeof supplierSchema>;
+export type CreateReviewInput = z.infer<typeof createReviewSchema>;
+export type UpdateReviewInput = z.infer<typeof updateReviewSchema>;
+export type AdminReviewReplyInput = z.infer<typeof adminReviewReplySchema>;
+export type AdminReviewVisibilityInput = z.infer<typeof adminReviewVisibilitySchema>;

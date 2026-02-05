@@ -11,12 +11,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Key capabilities:
 
 - Customer storefront with product catalog, cart, and checkout
-- Admin panel for products, categories, orders, customers, and suppliers
+- Admin panel for products, categories, orders, customers, suppliers, and reviews
+- Product review system with verified purchase requirements, star ratings, and admin reply functionality
 - Stripe payment integration
 - Automated order forwarding to suppliers via background workers (BullMQ)
 - CSV product import, S3 image storage, email notifications (Resend)
 - Multi-theme showcase system (bold, luxury, organic design variants)
-- SEO with dynamic sitemap, robots.txt, dynamic Open Graph images, and Google Shopping XML feed
+- SEO with dynamic sitemap, robots.txt, dynamic Open Graph images, Google Shopping XML feed, and review-based JSON-LD structured data
 - Social sharing with platform-specific share buttons and Web Share API support
 - GA4 e-commerce analytics via Google Tag Manager with GDPR-compliant cookie consent
 
@@ -74,18 +75,22 @@ Next.js 14 App Router with route groups for domain separation:
 src/
 ├── app/                    # Next.js App Router
 │   ├── (admin)/admin/      # Admin panel pages (protected, ADMIN role)
+│   │   └── reviews/        # Review management (list, reply, hide/show, delete)
 │   ├── (auth)/             # Login & register pages
 │   ├── (shop)/             # Customer storefront (home, products, cart, checkout, account)
 │   ├── showcase/           # Multi-theme demo pages (bold, luxury, organic)
 │   ├── api/                # API routes
 │   │   ├── admin/          # Admin-only API endpoints (auth-guarded)
+│   │   │   └── reviews/    # Admin review API ([id], [id]/reply, [id]/visibility)
 │   │   ├── auth/           # NextAuth endpoints
 │   │   ├── cart/            # Cart validation
 │   │   ├── categories/     # Public category endpoints
 │   │   ├── checkout/       # Payment & order creation
 │   │   ├── health/         # Health check
 │   │   ├── orders/         # Customer order endpoints
-│   │   └── products/       # Public product endpoints
+│   │   ├── products/       # Public product endpoints
+│   │   │   └── [slug]/reviews/  # Product-specific review list
+│   │   └── reviews/        # Customer review API (create, update, delete, eligibility check)
 │   ├── feed/               # Product feeds
 │   │   └── google-shopping.xml/  # Google Shopping RSS 2.0 feed
 │   ├── layout.tsx          # Root layout
@@ -98,6 +103,7 @@ src/
 │   ├── checkout/           # Payment form components
 │   ├── common/             # Header, Footer, CookieConsent, ResourceHints
 │   ├── products/           # ProductCard, SocialShareButtons
+│   ├── reviews/            # Review components (ReviewSection, ReviewForm, ReviewList, ReviewItem, ReviewStats, StarRating)
 │   ├── shop/               # CartDrawer
 │   ├── showcase/           # Multi-theme showcase components (bold/, luxury/, organic/)
 │   ├── theme/              # Theme switcher & config
@@ -114,14 +120,14 @@ src/
 │   ├── queue.ts            # BullMQ queue setup
 │   ├── redis.ts            # Redis/ioredis connection
 │   ├── s3.ts               # AWS S3 image storage
-│   ├── seo.ts              # SEO utilities (metadata, JSON-LD)
+│   ├── seo.ts              # SEO utilities (metadata, JSON-LD, review structured data)
 │   ├── analytics.ts        # GA4 e-commerce + share event tracking (GTM dataLayer)
 │   ├── share-utils.ts      # Social sharing URL builders, Web Share API
 │   ├── image-utils.ts      # Image optimization (blur placeholders, sizes)
 │   ├── web-vitals.ts       # Core Web Vitals reporting to GA4
 │   ├── utils.ts            # General utils (cn, etc.)
 │   └── validations/        # Zod schemas for all entities
-│       ├── index.ts        # Product, category, order, user schemas
+│       ├── index.ts        # Product, category, order, user, review schemas
 │       └── google-shopping.ts  # Google Shopping feed item schema
 ├── services/               # Business logic services
 │   └── supplier.service.ts # Supplier order forwarding
@@ -219,6 +225,11 @@ prisma/
 - **Mobile-responsive E2E tests**: Tests use Playwright's `isMobile` context property for viewport-aware assertions; navigation tests conditionally check desktop menu visibility (`if (!isMobile)`) while always testing mobile-specific elements; flexible selectors (`.first()`, regex matching) handle multiple matching elements across viewport sizes
 - **CI secret validation pattern**: GitHub Actions jobs validate required secrets before execution; bash script checks for empty variables, builds error message listing missing secrets, then either fails (if `DEPLOYMENT_TARGET` explicitly set) or skips gracefully (if unset); all subsequent steps conditional on validation with `if: steps.validate.outputs.skip != 'true'`
 - **Dual deployment strategy**: Single workflow handles both Vercel and VPS deployments via `jobs.<job>.if` conditions checking `vars.DEPLOYMENT_TARGET`; Vercel job runs if value is `vercel` or empty string; VPS job runs if value is `vps`; prevents both paths executing simultaneously; notify job uses `needs: [deploy-vercel, deploy-vps]` with `if: always()` to report status regardless of which path ran
+- **Review eligibility pattern**: Customer reviews require verified purchase (order status `DELIVERED` with product in order items); eligibility check via `/api/reviews/eligibility?productId=xxx` returns `canReview`, `hasExistingReview`, `orderId`; enforces one review per product per user via unique constraint `userId_productId`; client checks eligibility before showing form
+- **Review visibility management**: Admin reviews page filters by `isHidden` status; toggle endpoint `PATCH /api/admin/reviews/[id]/visibility` manages visibility (default `false` = visible); product detail pages exclude hidden reviews from display (`where: { isHidden: false }`)
+- **Admin review reply pattern**: Two-step pattern for admin replies: (1) form pre-populates with existing `adminReply` text if already replied, (2) `PATCH /api/admin/reviews/[id]/reply` updates reply text and sets `adminRepliedAt` timestamp; product display shows admin replies with timestamp (`adminRepliedAt` formatted relative to review creation)
+- **Review deletion cascade**: `onDelete: Cascade` on Review foreign keys ensures reviews cascade-delete when user/product/order deleted; unique constraint prevents orphaned reviews; index on `isHidden` for fast visibility filtering
+- **Review data structure**: Prisma Review model stores `rating` (1-5), `comment` (optional, max 2000 chars via schema validation), `isHidden` (boolean, default false), `adminReply` (optional, max 1000 chars), `adminRepliedAt` (timestamp); client interfaces extend with `user` details and computed fields (`averageRating`, `totalReviews`, `ratingDistribution`)
 
 <!-- END AUTO-MANAGED -->
 
@@ -232,7 +243,7 @@ prisma/
 - **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability (React.cache not available in React 18); NextAuth requires `AUTH_TRUST_HOST=true` in CI E2E tests; E2E tests need seeded database with categories and active products
 - **CI improvements**: E2E infrastructure overhaul with global setup validation, separated build and test jobs, PostgreSQL 16 + Redis 7 services with health checks; deployment workflow with graceful secret validation, dual-target support (Vercel/VPS), conditional job execution, and comprehensive deployment documentation; JS files auto-formatted on commit via lint-staged; E2E tests run chromium-only in CI with port 3000, pre-built app, and optimized timeouts
 - **Deployment strategy**: Dual-path deployment via `DEPLOYMENT_TARGET` variable (vercel/vps); graceful degradation when secrets missing (skip with notice if unset, fail with error if explicitly set); Vercel path uses CLI for pull/build/deploy + migrations; VPS path uses SSH action with git pull + pm2 restart; both paths validate secrets before execution
-- **Latest completion**: TASK-026 Fix Vercel Deploy in CI (8f17be9) - resolved Prisma and NextAuth build errors by passing DATABASE_URL and NEXTAUTH_SECRET to Vercel build step; added validation-first deployment pattern with graceful skip for missing secrets, conditional step execution via output checks, job-level env vars for Vercel CLI
+- **Latest completion**: TASK-023 Customer Review System (3a6a22b) - added product review system with verified purchase validation, admin reply functionality, and review-based JSON-LD structured data; Prisma Review model with cascade delete, unique userId_productId constraint, and visibility management; customer review API with eligibility checking (delivered orders only), create/update/delete operations; admin review API with reply and visibility toggle endpoints; React review components (ReviewSection, ReviewForm, ReviewList, ReviewItem, ReviewStats, StarRating) integrated into product detail page; admin reviews management page with list/reply/visibility controls; SEO integration with review JSON-LD structured data using aggregateRating and reviewRating schemas
 - **Active tasks**: None (MVP complete, post-MVP enhancements in BACKLOG)
 
 <!-- END AUTO-MANAGED -->

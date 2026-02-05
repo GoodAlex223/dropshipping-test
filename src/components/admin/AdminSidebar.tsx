@@ -10,6 +10,7 @@ import {
   Truck,
   Settings,
   FolderTree,
+  MessageSquare,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -22,6 +23,7 @@ const navigation = [
   { name: "Products", href: "/admin/products", icon: Package },
   { name: "Categories", href: "/admin/categories", icon: FolderTree },
   { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
+  { name: "Reviews", href: "/admin/reviews", icon: MessageSquare },
   { name: "Customers", href: "/admin/customers", icon: Users },
   { name: "Suppliers", href: "/admin/suppliers", icon: Truck },
   { name: "Settings", href: "/admin/settings", icon: Settings },

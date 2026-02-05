@@ -36,6 +36,14 @@ components/
 │   ├── ProductCard.tsx    # Product card with blur placeholders and responsive sizes
 │   ├── SocialShareButtons.tsx  # Social media sharing buttons (Facebook, Twitter, Pinterest, WhatsApp, Telegram, copy link, native share)
 │   └── index.ts
+├── reviews/               # Review components
+│   ├── ReviewSection.tsx  # Main review section with stats and eligibility check
+│   ├── ReviewForm.tsx     # Customer review submission form with star rating
+│   ├── ReviewList.tsx     # Paginated list of reviews
+│   ├── ReviewItem.tsx     # Individual review display with admin reply
+│   ├── ReviewStats.tsx    # Average rating and distribution visualization
+│   ├── StarRating.tsx     # Star rating input component
+│   └── index.ts
 ├── shop/
 │   ├── CartDrawer.tsx     # Slide-out cart drawer (Sheet) with view_cart tracking
 │   └── index.ts
@@ -79,6 +87,7 @@ components/
 - **Resource hints**: `ResourceHints` component exports `PRECONNECT_DOMAINS` (Stripe, GTM), `DNS_PREFETCH_DOMAINS` (Google Analytics, Google Fonts), and helper function `getResourceHintTags()` for server-side rendering
 - **Image optimization**: `ProductCard` uses `DEFAULT_BLUR_DATA_URL` and `IMAGE_SIZES.productCard` from `@/lib/image-utils` for optimized loading with blur placeholders
 - **Deferred font loading**: Theme-specific fonts (Playfair Display, Lora) loaded in root layout with `preload: false` and `display: swap` for optimal performance; saves ~60-80KB on initial load for users on default theme
+- **Review eligibility pattern**: `ReviewSection` handles eligibility checking client-side; fetches `/api/reviews/eligibility?productId=xxx` on mount to determine if form should render; displays form only if user has delivered order containing product and hasn't already reviewed it
 
 <!-- END AUTO-MANAGED -->
 
