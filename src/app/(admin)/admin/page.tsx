@@ -1,7 +1,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Package, ShoppingCart, Users, DollarSign } from "lucide-react";
+import { Package, ShoppingCart, Users, DollarSign, Mail } from "lucide-react";
+import { prisma } from "@/lib/db";
 
-export default function AdminDashboardPage() {
+export default async function AdminDashboardPage() {
+  const subscriberCount = await prisma.subscriber.count({
+    where: { status: "ACTIVE" },
+  });
   return (
     <div className="space-y-6">
       <div>
@@ -9,7 +13,7 @@ export default function AdminDashboardPage() {
         <p className="text-muted-foreground">Overview of your store performance.</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
@@ -51,6 +55,17 @@ export default function AdminDashboardPage() {
           <CardContent>
             <div className="text-2xl font-bold">1</div>
             <p className="text-muted-foreground text-xs">Registered users</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Subscribers</CardTitle>
+            <Mail className="text-muted-foreground h-4 w-4" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{subscriberCount}</div>
+            <p className="text-muted-foreground text-xs">Active newsletter subscribers</p>
           </CardContent>
         </Card>
       </div>

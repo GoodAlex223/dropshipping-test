@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NewsletterSignup } from "./NewsletterSignup";
 
 const footerLinks = {
   shop: [
@@ -24,7 +25,7 @@ export function Footer() {
   return (
     <footer className="bg-muted/40 border-t">
       <div className="container py-12">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div className="space-y-4">
             <Link href="/" className="text-xl font-bold">
@@ -52,11 +53,11 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Support links */}
+          {/* Support & Company links */}
           <div>
-            <h3 className="mb-4 text-sm font-semibold">Support</h3>
+            <h3 className="mb-4 text-sm font-semibold">Help</h3>
             <ul className="space-y-2">
-              {footerLinks.support.map((link) => (
+              {[...footerLinks.support, ...footerLinks.company].map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
@@ -69,21 +70,13 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Company links */}
+          {/* Newsletter */}
           <div>
-            <h3 className="mb-4 text-sm font-semibold">Company</h3>
-            <ul className="space-y-2">
-              {footerLinks.company.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="text-muted-foreground hover:text-foreground text-sm transition-colors"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <h3 className="mb-4 text-sm font-semibold">Newsletter</h3>
+            <p className="text-muted-foreground mb-4 text-sm">
+              Get exclusive offers and updates delivered to your inbox.
+            </p>
+            <NewsletterSignup />
           </div>
         </div>
 

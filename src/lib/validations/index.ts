@@ -138,6 +138,20 @@ export const adminReviewVisibilitySchema = z.object({
   isHidden: z.boolean(),
 });
 
+// Newsletter validations
+export const subscribeNewsletterSchema = z.object({
+  email: z.string().email("Invalid email address"),
+});
+
+export const unsubscribeNewsletterSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  token: z.string().min(1, "Token is required"),
+});
+
+export const updateSubscriberStatusSchema = z.object({
+  status: z.enum(["ACTIVE", "UNSUBSCRIBED"]),
+});
+
 // Google Shopping feed validations
 export {
   googleShoppingItemSchema,
@@ -161,3 +175,6 @@ export type CreateReviewInput = z.infer<typeof createReviewSchema>;
 export type UpdateReviewInput = z.infer<typeof updateReviewSchema>;
 export type AdminReviewReplyInput = z.infer<typeof adminReviewReplySchema>;
 export type AdminReviewVisibilityInput = z.infer<typeof adminReviewVisibilitySchema>;
+export type SubscribeNewsletterInput = z.infer<typeof subscribeNewsletterSchema>;
+export type UnsubscribeNewsletterInput = z.infer<typeof unsubscribeNewsletterSchema>;
+export type UpdateSubscriberStatusInput = z.infer<typeof updateSubscriberStatusSchema>;

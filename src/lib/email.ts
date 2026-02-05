@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { generateNewsletterConfirmationHtml } from "./email-templates/newsletter-confirmation";
 
 const resendApiKey = process.env.RESEND_API_KEY;
 const emailFrom = process.env.EMAIL_FROM || "noreply@yourdomain.com";
@@ -170,6 +171,41 @@ export async function sendOrderConfirmationEmail(
     return { success: true };
   } catch (error) {
     console.error("Error sending order confirmation email:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+export async function sendNewsletterConfirmationEmail(data: {
+  email: string;
+  confirmationUrl: string;
+  unsubscribeUrl?: string;
+}): Promise<{ success: boolean; error?: string }> {
+  if (!resend) {
+    console.log("Skipping email send - RESEND_API_KEY not configured");
+    console.log("Would send newsletter confirmation to:", data.email);
+    console.log("Confirmation URL:", data.confirmationUrl);
+    return { success: true };
+  }
+
+  try {
+    const { error } = await resend.emails.send({
+      from: emailFrom,
+      to: data.email,
+      subject: `Confirm your ${storeName} newsletter subscription`,
+      html: generateNewsletterConfirmationHtml(data),
+    });
+
+    if (error) {
+      console.error("Failed to send newsletter confirmation email:", error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error sending newsletter confirmation email:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",
