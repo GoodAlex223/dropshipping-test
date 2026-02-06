@@ -1,92 +1,100 @@
 import "dotenv/config";
-import { PrismaClient, Role } from "@prisma/client";
+import { PrismaClient, Role, OrderStatus, PaymentStatus, SubscriberStatus } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { adminUser, testCustomers } from "./seed-data/users";
+import { topLevelCategories, subcategories } from "./seed-data/categories";
+import { products } from "./seed-data/products";
+import { orders } from "./seed-data/orders";
+import { reviews } from "./seed-data/reviews";
+import { subscribers } from "./seed-data/subscribers";
 
 const prisma = new PrismaClient();
-
 const SALT_ROUNDS = 12;
 
 async function main() {
-  console.log("Starting database seed...");
+  console.log("Starting database seed...\n");
 
-  // Create admin user
-  const adminPassword = await bcrypt.hash("admin123", SALT_ROUNDS);
+  // 1. USERS
+  console.log("Creating users...");
+  const userMap = new Map<string, string>();
+
+  const adminHash = await bcrypt.hash(adminUser.password, SALT_ROUNDS);
   const admin = await prisma.user.upsert({
-    where: { email: "admin@store.com" },
+    where: { email: adminUser.email },
     update: {},
     create: {
-      email: "admin@store.com",
-      name: "Admin User",
-      passwordHash: adminPassword,
+      email: adminUser.email,
+      name: adminUser.name,
+      passwordHash: adminHash,
       role: Role.ADMIN,
     },
   });
-  console.log("Created admin user:", admin.email);
+  userMap.set(admin.email, admin.id);
 
-  // Create test customer
-  const customerPassword = await bcrypt.hash("customer123", SALT_ROUNDS);
-  const customer = await prisma.user.upsert({
-    where: { email: "customer@example.com" },
-    update: {},
-    create: {
-      email: "customer@example.com",
-      name: "Test Customer",
-      passwordHash: customerPassword,
-      role: Role.CUSTOMER,
-    },
-  });
-  console.log("Created test customer:", customer.email);
+  for (const c of testCustomers) {
+    const hash = await bcrypt.hash(c.password, SALT_ROUNDS);
+    const user = await prisma.user.upsert({
+      where: { email: c.email },
+      update: { name: c.name },
+      create: {
+        email: c.email,
+        name: c.name,
+        passwordHash: hash,
+        role: Role.CUSTOMER,
+      },
+    });
+    userMap.set(user.email, user.id);
+  }
+  console.log(`  ${userMap.size} users`);
 
-  // Create categories
-  const categories = await Promise.all([
-    prisma.category.upsert({
-      where: { slug: "electronics" },
-      update: {},
-      create: {
-        name: "Electronics",
-        slug: "electronics",
-        description: "Electronic devices and gadgets",
-        isActive: true,
-        sortOrder: 1,
-      },
-    }),
-    prisma.category.upsert({
-      where: { slug: "clothing" },
-      update: {},
-      create: {
-        name: "Clothing",
-        slug: "clothing",
-        description: "Fashion and apparel",
-        isActive: true,
-        sortOrder: 2,
-      },
-    }),
-    prisma.category.upsert({
-      where: { slug: "home-garden" },
-      update: {},
-      create: {
-        name: "Home & Garden",
-        slug: "home-garden",
-        description: "Home decor and garden supplies",
-        isActive: true,
-        sortOrder: 3,
-      },
-    }),
-    prisma.category.upsert({
-      where: { slug: "sports" },
-      update: {},
-      create: {
-        name: "Sports & Outdoors",
-        slug: "sports",
-        description: "Sports equipment and outdoor gear",
-        isActive: true,
-        sortOrder: 4,
-      },
-    }),
-  ]);
-  console.log("Created categories:", categories.length);
+  // 2. CATEGORIES
+  console.log("Creating categories...");
+  const categoryMap = new Map<string, string>();
 
-  // Create sample supplier
+  for (const cat of topLevelCategories) {
+    const c = await prisma.category.upsert({
+      where: { slug: cat.slug },
+      update: {
+        name: cat.name,
+        description: cat.description,
+        image: cat.image,
+        sortOrder: cat.sortOrder,
+      },
+      create: {
+        name: cat.name,
+        slug: cat.slug,
+        description: cat.description,
+        image: cat.image,
+        isActive: true,
+        sortOrder: cat.sortOrder,
+      },
+    });
+    categoryMap.set(c.slug, c.id);
+  }
+
+  for (const sub of subcategories) {
+    const parentId = categoryMap.get(sub.parentSlug);
+    if (!parentId) throw new Error(`Parent category "${sub.parentSlug}" not found`);
+    const c = await prisma.category.upsert({
+      where: { slug: sub.slug },
+      update: { name: sub.name, description: sub.description, parentId, sortOrder: sub.sortOrder },
+      create: {
+        name: sub.name,
+        slug: sub.slug,
+        description: sub.description,
+        parentId,
+        isActive: true,
+        sortOrder: sub.sortOrder,
+      },
+    });
+    categoryMap.set(c.slug, c.id);
+  }
+  console.log(
+    `  ${categoryMap.size} categories (${topLevelCategories.length} top-level, ${subcategories.length} sub)`
+  );
+
+  // 3. SUPPLIER
+  console.log("Creating supplier...");
   const supplier = await prisma.supplier.upsert({
     where: { code: "MANUAL" },
     update: {},
@@ -98,205 +106,201 @@ async function main() {
       notes: "Default supplier for manually added products",
     },
   });
-  console.log("Created supplier:", supplier.name);
 
-  // Create sample products
-  const electronicsCategory = categories.find((c) => c.slug === "electronics")!;
-  const clothingCategory = categories.find((c) => c.slug === "clothing")!;
-  const homeCategory = categories.find((c) => c.slug === "home-garden")!;
+  // 4. PRODUCTS
+  console.log("Creating products...");
+  const productMap = new Map<string, string>();
 
-  const products = await Promise.all([
-    prisma.product.upsert({
-      where: { sku: "ELEC-001" },
-      update: {},
-      create: {
-        name: "Wireless Bluetooth Headphones",
-        slug: "wireless-bluetooth-headphones",
-        description:
-          "High-quality wireless headphones with active noise cancellation and 30-hour battery life.",
-        shortDesc: "Premium wireless headphones with ANC",
-        price: 79.99,
-        comparePrice: 99.99,
-        sku: "ELEC-001",
-        stock: 50,
-        categoryId: electronicsCategory.id,
-        supplierId: supplier.id,
-        isActive: true,
-        isFeatured: true,
-        images: {
-          create: [
-            {
-              url: "https://placehold.co/600x600/1a1a2e/white?text=Headphones",
-              alt: "Wireless Bluetooth Headphones",
-              position: 0,
-            },
-          ],
-        },
-      },
-    }),
-    prisma.product.upsert({
-      where: { sku: "ELEC-002" },
-      update: {},
-      create: {
-        name: "Smart Watch Pro",
-        slug: "smart-watch-pro",
-        description:
-          "Feature-packed smartwatch with heart rate monitoring, GPS, and 7-day battery life.",
-        shortDesc: "Advanced smartwatch with health features",
-        price: 149.99,
-        comparePrice: 199.99,
-        sku: "ELEC-002",
-        stock: 30,
-        categoryId: electronicsCategory.id,
-        supplierId: supplier.id,
-        isActive: true,
-        isFeatured: true,
-        images: {
-          create: [
-            {
-              url: "https://placehold.co/600x600/16213e/white?text=Smart+Watch",
-              alt: "Smart Watch Pro",
-              position: 0,
-            },
-          ],
-        },
-      },
-    }),
-    prisma.product.upsert({
-      where: { sku: "CLOTH-001" },
-      update: {},
-      create: {
-        name: "Classic Cotton T-Shirt",
-        slug: "classic-cotton-tshirt",
-        description: "Comfortable 100% cotton t-shirt available in multiple colors and sizes.",
-        shortDesc: "Premium cotton t-shirt",
-        price: 24.99,
-        sku: "CLOTH-001",
-        stock: 100,
-        categoryId: clothingCategory.id,
-        supplierId: supplier.id,
-        isActive: true,
-        isFeatured: false,
-        images: {
-          create: [
-            {
-              url: "https://placehold.co/600x600/0f3460/white?text=T-Shirt",
-              alt: "Classic Cotton T-Shirt",
-              position: 0,
-            },
-          ],
-        },
-        variants: {
-          create: [
-            { name: "Size", value: "S", stock: 25 },
-            { name: "Size", value: "M", stock: 30 },
-            { name: "Size", value: "L", stock: 25 },
-            { name: "Size", value: "XL", stock: 20 },
-          ],
-        },
-      },
-    }),
-    prisma.product.upsert({
-      where: { sku: "HOME-001" },
-      update: {},
-      create: {
-        name: "Minimalist Desk Lamp",
-        slug: "minimalist-desk-lamp",
-        description: "Modern LED desk lamp with adjustable brightness and color temperature.",
-        shortDesc: "Adjustable LED desk lamp",
-        price: 39.99,
-        comparePrice: 49.99,
-        sku: "HOME-001",
-        stock: 40,
-        categoryId: homeCategory.id,
-        supplierId: supplier.id,
-        isActive: true,
-        isFeatured: true,
-        images: {
-          create: [
-            {
-              url: "https://placehold.co/600x600/533483/white?text=Desk+Lamp",
-              alt: "Minimalist Desk Lamp",
-              position: 0,
-            },
-          ],
-        },
-      },
-    }),
-    prisma.product.upsert({
-      where: { sku: "HOME-002" },
-      update: {},
-      create: {
-        name: "Indoor Plant Pot Set",
-        slug: "indoor-plant-pot-set",
-        description: "Set of 3 ceramic plant pots in various sizes, perfect for indoor plants.",
-        shortDesc: "Set of 3 ceramic pots",
-        price: 34.99,
-        sku: "HOME-002",
-        stock: 25,
-        categoryId: homeCategory.id,
-        supplierId: supplier.id,
-        isActive: true,
-        isFeatured: false,
-        images: {
-          create: [
-            {
-              url: "https://placehold.co/600x600/2c3e50/white?text=Plant+Pots",
-              alt: "Indoor Plant Pot Set",
-              position: 0,
-            },
-          ],
-        },
-      },
-    }),
-  ]);
-  console.log("Created products:", products.length);
+  for (const p of products) {
+    const categoryId = categoryMap.get(p.categorySlug);
+    if (!categoryId)
+      throw new Error(`Category "${p.categorySlug}" not found for product "${p.sku}"`);
 
-  // Create store settings
-  const settings = await Promise.all([
-    prisma.setting.upsert({
-      where: { key: "store_name" },
-      update: {},
-      create: {
-        key: "store_name",
-        value: "Store",
-        type: "string",
-      },
-    }),
-    prisma.setting.upsert({
-      where: { key: "store_currency" },
-      update: {},
-      create: {
-        key: "store_currency",
-        value: "USD",
-        type: "string",
-      },
-    }),
-    prisma.setting.upsert({
-      where: { key: "shipping_flat_rate" },
-      update: {},
-      create: {
-        key: "shipping_flat_rate",
-        value: "5.99",
-        type: "number",
-      },
-    }),
-    prisma.setting.upsert({
-      where: { key: "free_shipping_threshold" },
-      update: {},
-      create: {
-        key: "free_shipping_threshold",
-        value: "50",
-        type: "number",
-      },
-    }),
-  ]);
-  console.log("Created settings:", settings.length);
+    const scalarFields = {
+      name: p.name,
+      slug: p.slug,
+      description: p.description,
+      shortDesc: p.shortDesc,
+      price: p.price,
+      comparePrice: p.comparePrice ?? null,
+      stock: p.stock,
+      isFeatured: p.isFeatured,
+      categoryId,
+      supplierId: supplier.id,
+      brand: p.brand,
+      barcode: p.barcode,
+      mpn: p.mpn,
+      isActive: true,
+    };
 
+    const product = await prisma.product.upsert({
+      where: { sku: p.sku },
+      update: {
+        ...scalarFields,
+        images: { deleteMany: {}, create: p.images },
+        variants: { deleteMany: {}, create: p.variants ?? [] },
+      },
+      create: {
+        ...scalarFields,
+        sku: p.sku,
+        images: { create: p.images },
+        variants: { create: p.variants ?? [] },
+      },
+    });
+    productMap.set(p.sku, product.id);
+  }
+  console.log(`  ${productMap.size} products`);
+
+  // 5. ORDERS
+  console.log("Creating orders...");
+  const orderMap = new Map<string, { id: string; userId: string; productSkus: string[] }>();
+
+  for (const o of orders) {
+    const userId = userMap.get(o.customerEmail);
+    if (!userId)
+      throw new Error(`User "${o.customerEmail}" not found for order "${o.orderNumber}"`);
+
+    const subtotal = o.items.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0);
+    const shippingCost = subtotal >= 50 ? 0 : 5.99;
+    const tax = Math.round(subtotal * 0.08 * 100) / 100;
+    const total = Math.round((subtotal + shippingCost + tax) * 100) / 100;
+
+    const orderItems = o.items.map((i) => {
+      const productId = productMap.get(i.productSku);
+      if (!productId)
+        throw new Error(`Product "${i.productSku}" not found for order "${o.orderNumber}"`);
+      return {
+        productId,
+        productName: i.productName,
+        productSku: i.productSku,
+        quantity: i.quantity,
+        unitPrice: i.unitPrice,
+        totalPrice: Math.round(i.unitPrice * i.quantity * 100) / 100,
+      };
+    });
+
+    const order = await prisma.order.upsert({
+      where: { orderNumber: o.orderNumber },
+      update: {
+        status: o.status as OrderStatus,
+        paymentStatus: o.paymentStatus as PaymentStatus,
+        items: { deleteMany: {}, create: orderItems },
+      },
+      create: {
+        orderNumber: o.orderNumber,
+        userId,
+        email: o.customerEmail,
+        status: o.status as OrderStatus,
+        paymentStatus: o.paymentStatus as PaymentStatus,
+        paidAt: o.paymentStatus === "PAID" ? o.createdAt : null,
+        subtotal,
+        shippingCost,
+        tax,
+        discount: 0,
+        total,
+        shippingAddress: o.shippingAddress,
+        items: { create: orderItems },
+        createdAt: o.createdAt,
+      },
+    });
+
+    orderMap.set(o.orderNumber, {
+      id: order.id,
+      userId,
+      productSkus: o.items.map((i) => i.productSku),
+    });
+  }
+  console.log(`  ${orderMap.size} orders`);
+
+  // 6. REVIEWS
+  console.log("Creating reviews...");
+  let reviewCount = 0;
+
+  for (const r of reviews) {
+    const userId = userMap.get(r.customerEmail);
+    if (!userId) throw new Error(`User "${r.customerEmail}" not found for review`);
+
+    const productId = productMap.get(r.productSku);
+    if (!productId) throw new Error(`Product "${r.productSku}" not found for review`);
+
+    const orderData = orderMap.get(r.orderNumber);
+    if (!orderData) throw new Error(`Order "${r.orderNumber}" not found for review`);
+    if (!orderData.productSkus.includes(r.productSku)) {
+      throw new Error(`Order "${r.orderNumber}" does not contain product "${r.productSku}"`);
+    }
+
+    await prisma.review.upsert({
+      where: { userId_productId: { userId, productId } },
+      update: {
+        rating: r.rating,
+        comment: r.comment,
+        adminReply: r.adminReply ?? null,
+        adminRepliedAt: r.adminRepliedAt ?? null,
+      },
+      create: {
+        userId,
+        productId,
+        orderId: orderData.id,
+        rating: r.rating,
+        comment: r.comment,
+        adminReply: r.adminReply ?? null,
+        adminRepliedAt: r.adminRepliedAt ?? null,
+        createdAt: r.createdAt,
+      },
+    });
+    reviewCount++;
+  }
+  console.log(`  ${reviewCount} reviews`);
+
+  // 7. NEWSLETTER SUBSCRIBERS
+  console.log("Creating subscribers...");
+  let subCount = 0;
+
+  for (const s of subscribers) {
+    await prisma.subscriber.upsert({
+      where: { email: s.email },
+      update: { status: s.status as SubscriberStatus },
+      create: {
+        email: s.email,
+        status: s.status as SubscriberStatus,
+        confirmationToken:
+          "confirmationToken" in s ? (s as { confirmationToken: string }).confirmationToken : null,
+        confirmationExpiry:
+          "confirmationExpiry" in s ? (s as { confirmationExpiry: Date }).confirmationExpiry : null,
+        subscribedAt: "subscribedAt" in s ? (s as { subscribedAt: Date }).subscribedAt : null,
+        unsubscribedAt:
+          "unsubscribedAt" in s ? (s as { unsubscribedAt: Date }).unsubscribedAt : null,
+        createdAt: s.createdAt,
+      },
+    });
+    subCount++;
+  }
+  console.log(`  ${subCount} subscribers`);
+
+  // 8. SETTINGS
+  console.log("Creating settings...");
+  const settingsData = [
+    { key: "store_name", value: "DropShip Store", type: "string" },
+    { key: "store_currency", value: "USD", type: "string" },
+    { key: "shipping_flat_rate", value: "5.99", type: "number" },
+    { key: "free_shipping_threshold", value: "50", type: "number" },
+  ];
+  for (const s of settingsData) {
+    await prisma.setting.upsert({
+      where: { key: s.key },
+      update: { value: s.value },
+      create: s,
+    });
+  }
+  console.log(`  ${settingsData.length} settings`);
+
+  // SUMMARY
   console.log("\nSeed completed successfully!");
   console.log("\nTest accounts:");
   console.log("  Admin: admin@store.com / admin123");
-  console.log("  Customer: customer@example.com / customer123");
+  for (const c of testCustomers) {
+    console.log(`  Customer: ${c.email} / ${c.password}`);
+  }
 }
 
 main()
