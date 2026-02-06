@@ -2,7 +2,40 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-02-05
+**Last Updated**: 2026-02-06
+
+---
+
+## 2026-02 (February)
+
+### [2026-02-06] TASK-022 - Demo Content Enhancement
+
+**Summary**: Enhanced seed data with realistic demo content for better site presentation.
+
+**Key Changes**:
+
+- Modularized seed data into `prisma/seed-data/` (users, categories, products, orders, reviews, subscribers)
+- Expanded from 5 to 21 products with Unsplash images, brands, barcodes, and MPNs
+- Added category hierarchy (4 top-level + 11 subcategories with images)
+- Added 4 test customers for realistic order/review authorship
+- Added 7 demo orders in various statuses (PENDING, PROCESSING, SHIPPED, DELIVERED)
+- Added 8 demo reviews with star ratings, comments, and admin replies
+- Added 6 newsletter subscribers across all statuses (PENDING, ACTIVE, UNSUBSCRIBED)
+
+**Files Created**:
+
+- `prisma/seed-data/users.ts` — Admin + 4 test customers
+- `prisma/seed-data/categories.ts` — 4 top-level + 11 subcategories
+- `prisma/seed-data/products.ts` — 21 products with rich data
+- `prisma/seed-data/orders.ts` — 7 orders with items
+- `prisma/seed-data/reviews.ts` — 8 reviews
+- `prisma/seed-data/subscribers.ts` — 6 newsletter subscribers
+
+**Files Modified**:
+
+- `prisma/seed.ts` — Refactored to orchestrate modular seed data imports
+
+**Commit**: 03364ec
 
 ---
 

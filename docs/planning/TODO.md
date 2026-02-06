@@ -2,7 +2,7 @@
 
 Active tasks for Dropshipping Website MVP.
 
-**Last Updated**: 2026-02-05
+**Last Updated**: 2026-02-06
 
 ---
 
@@ -26,20 +26,7 @@ Active tasks for Dropshipping Website MVP.
 
 ## Low Priority
 
-### [TASK-022] - Demo Content Enhancement
-
-**Priority**: Low
-**Dependencies**: None
-**Estimated Effort**: Low
-
-**Description**: Improve demo site presentation with quality content.
-
-**Sub-tasks**:
-
-- [ ] Upload high-quality images for demo products
-- [ ] Add realistic product descriptions
-- [ ] Create sample categories with proper hierarchy
-- [ ] Add sample customer reviews (demo data)
+<!-- No low priority tasks -->
 
 ---
 
@@ -51,7 +38,7 @@ Active tasks for Dropshipping Website MVP.
 
 ## Completed
 
-All MVP implementation tasks (TASK-001 through TASK-016), TASK-017 through TASK-021, TASK-023 (Customer Reviews), TASK-024 (Newsletter), TASK-025 (Fix E2E Tests), and TASK-026 (Fix Vercel Deploy) have been completed. See [DONE.md](DONE.md) for details.
+All MVP implementation tasks (TASK-001 through TASK-016), TASK-017 through TASK-022, TASK-023 (Customer Reviews), TASK-024 (Newsletter), TASK-025 (Fix E2E Tests), and TASK-026 (Fix Vercel Deploy) have been completed. See [DONE.md](DONE.md) for details.
 
 ---
 
