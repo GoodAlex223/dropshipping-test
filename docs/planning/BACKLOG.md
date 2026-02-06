@@ -261,6 +261,14 @@ Improvements to existing functionality.
 - [ ] Add error handling in `tests/global-setup.ts` for Prisma connection failures — currently throws raw Prisma errors; wrap with user-friendly message suggesting `docker-compose up -d` or checking DATABASE_URL
 - [ ] Add E2E test coverage for checkout and auth flows — current navigation.spec.ts only covers storefront browsing and category navigation
 
+### [2026-02-06] From: TASK-022 Demo Content Enhancement
+
+**Origin**: Code review of feat/task-022-demo-content-enhancement branch
+
+- [ ] Simplify type assertions in subscriber seeding — replace `"prop" in s ? (s as { prop: T }).prop : null` with optional chaining `s.prop ?? null` for cleaner TypeScript
+- [ ] Add DELIVERED status validation in review seeding — add runtime check `if (orderData.status !== 'DELIVERED')` before creating reviews to enforce eligibility pattern programmatically
+- [ ] Standardize user upsert patterns — admin uses `update: {}` while customers use `update: { name }` without password; make consistent (either both update all fields or both update none)
+
 ---
 
 ## Technical Debt
