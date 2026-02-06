@@ -156,7 +156,14 @@ tests/
 prisma/
 ├── schema.prisma           # Database schema (PostgreSQL)
 ├── migrations/             # Prisma migrations
-└── seed.ts                 # Database seeder
+├── seed.ts                 # Database seeder (orchestrator)
+└── seed-data/              # Modular seed data files
+    ├── users.ts            # User seed data (admin + test customers)
+    ├── categories.ts       # Category hierarchy (top-level + subcategories)
+    ├── products.ts         # Product catalog with images, variants, identifiers
+    ├── orders.ts           # Order history with various statuses
+    ├── reviews.ts          # Customer reviews with admin replies
+    └── subscribers.ts      # Newsletter subscribers with various statuses
 ```
 
 **Key data flow**: Customer checkout -> Stripe payment intent -> Order created -> BullMQ job queued -> Worker forwards to supplier -> Status sync worker polls supplier updates.
@@ -245,6 +252,7 @@ prisma/
 - **HMAC-based unsubscribe tokens**: Deterministic unsubscribe URLs use HMAC-SHA256 with NEXTAUTH_SECRET to prevent token forgery; token verifies subscriber ID ownership before allowing unsubscribe; no database storage required for unsubscribe tokens
 - **Newsletter admin management**: Admin dashboard with search (email), status filter (PENDING/ACTIVE/UNSUBSCRIBED), pagination (20 per page), status toggle (activate/unsubscribe), delete functionality, and CSV export with formula injection prevention
 - **Email normalization pattern**: Newsletter subscribe endpoint normalizes emails to lowercase and trims whitespace before database operations to prevent duplicate subscriptions with different casing
+- **Seed data modularization**: Database seed split into domain modules in `prisma/seed-data/` (users, categories, products, orders, reviews, subscribers); seed.ts orchestrates imports and manages entity relationships via Map<string, string> for foreign keys; supports upsert operations for idempotent seeding; includes comprehensive demo data (4 customers, 16 categories, 50+ products, 6+ orders, 8 reviews, 6 newsletter subscribers) for E2E testing and feature validation
 
 <!-- END AUTO-MANAGED -->
 
@@ -271,8 +279,9 @@ prisma/
 - Run `npm run lint:fix` to auto-fix linting issues
 - Run `npm run format:check` to verify formatting before CI (matches CI job)
 - Use `npm run test:run` for a single test pass (CI-style)
-- Run `npm run db:seed` after database setup to populate test data required for E2E tests
+- Run `npm run db:seed` after database setup to populate test data required for E2E tests; seed data is modular and located in `prisma/seed-data/` for easy extension
 - When modifying Prisma schema, run `npm run db:migrate` to create migration, then `npm run db:generate`
+- **Seed data management**: Add new seed data by creating/editing files in `prisma/seed-data/` (users, categories, products, orders, reviews, subscribers); seed.ts automatically imports and processes data; maintain entity relationships by referencing slugs/SKUs/emails; use backdated timestamps via `daysAgo()` helper for realistic test data
 - Always add Zod validation schemas for new API endpoints in `src/lib/validations/` (index.ts for core schemas, separate files for specialized domains like google-shopping.ts)
 - Use `requireAdmin()` or `requireAuth()` for protected API routes, never roll custom auth checks
 - Keep UI primitives in `src/components/ui/` unchanged (shadcn/ui managed)
