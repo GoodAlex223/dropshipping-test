@@ -269,6 +269,13 @@ Improvements to existing functionality.
 - [ ] Migrate Prisma 6 → 7 — Follow major version upgrade guide. Includes migrating `prisma.seed` from `package.json` to `prisma.config.ts`.
 - [ ] Add automated dependency monitoring (Dependabot or Renovate) — Automated PR creation for dependency updates to catch vulnerabilities early.
 
+### [2026-02-09] From: Code Review of TASK-027
+
+**Origin**: PR #10 code review
+
+- [ ] Clarify branch naming convention in CLAUDE.md — currently only documents `feat/task-NNN-description` pattern; should specify whether `chore/`, `fix/` prefixes are valid for non-feature branches
+- [ ] Distinguish package.json vs lockfile updates in dependency audit docs — plan docs list all 30 packages as "updated" without clarifying 28 were lockfile-only resolutions within existing semver ranges; future audits should separate explicit version bumps from `npm update` lockfile resolutions
+
 ### [2026-02-06] From: TASK-022 Demo Content Enhancement
 
 **Origin**: Code review of feat/task-022-demo-content-enhancement branch
