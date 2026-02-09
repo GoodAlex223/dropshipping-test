@@ -269,6 +269,7 @@ Improvements to existing functionality.
 - [ ] Fix `getPagination()` NaN propagation — `parseInt("abc")` returns NaN which passes through `Math.max(1, NaN)`; should default to safe values
 - [ ] Add unit tests for remaining untested API routes — products CRUD, categories CRUD, orders, checkout endpoints
 - [ ] Test Prisma P2002 unique constraint error handling in subscribe route — `instanceof` check can't be properly unit tested with mocks; needs integration test
+- [ ] Fix P2002 test in `reviews-api.test.ts` — currently asserts status 500 (generic catch) instead of 409 (P2002 handler) because mock error fails `instanceof` check; convert to `it.todo()` or use proper `PrismaClientKnownRequestError` instantiation
 
 ### [2026-02-09] From: TASK-027 Dependency Audit & Security Patches
 
