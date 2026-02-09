@@ -8,6 +8,21 @@ Completed tasks with implementation details and learnings.
 
 ## 2026-02 (February)
 
+### [2026-02-09] TASK-028 - Test Coverage Improvement
+
+**Summary**: Added 158 new unit tests covering review APIs, newsletter APIs, api-utils helpers, newsletter utilities, and SEO functions. Established shared test infrastructure and documented coverage baseline (89.82% stmts, 93.19% branches, 98.71% functions).
+**Key Changes**:
+
+- Created `tests/helpers/api-test-utils.ts` with `createNextRequest()` and `createRouteParams()` helpers
+- Created 6 new test files: api-utils, newsletter, reviews-api, admin-reviews-api, newsletter-api, admin-newsletter-api
+- Extended seo.test.ts with 18 new tests for metadata generators and JSON-LD
+- Total: 245 tests passing (87 existing + 158 new), lint/typecheck clean
+
+**Commit**: 1bac9b0
+**Spawned Tasks**: 4 items added to BACKLOG.md (integration tests, NaN fix, remaining API tests, P2002 testing)
+
+---
+
 ### [2026-02-09] TASK-027 - Dependency Audit & Security Patches
 
 **Plan**: [docs/archive/plans/2026-02-09_task-027-dependency-audit.md](../archive/plans/2026-02-09_task-027-dependency-audit.md)
@@ -521,10 +536,10 @@ Completed tasks with implementation details and learnings.
 
 ## Statistics
 
-| Month   | Tasks Completed | Key Deliverables                                                                                                                      |
-| ------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-01 | 17              | Full MVP + Demo Deployed + SEO Technical Setup                                                                                        |
-| 2026-02 | 9               | GA4 Analytics, Social Sharing, Google Shopping Feed, Performance, E2E Fix, Deploy Fix, Customer Reviews, Newsletter, Dependency Audit |
+| Month   | Tasks Completed | Key Deliverables                                                                                                                                     |
+| ------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-01 | 17              | Full MVP + Demo Deployed + SEO Technical Setup                                                                                                       |
+| 2026-02 | 10              | GA4 Analytics, Social Sharing, Google Shopping Feed, Performance, E2E Fix, Deploy Fix, Customer Reviews, Newsletter, Dependency Audit, Test Coverage |
 
 ---
 
