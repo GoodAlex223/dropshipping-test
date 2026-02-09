@@ -4,9 +4,14 @@ import {
   getDefaultMetadata,
   getProductMetadata,
   getCategoryMetadata,
+  getHomeMetadata,
+  getProductsListingMetadata,
+  getCategoriesListingMetadata,
+  getAuthMetadata,
   getOrganizationJsonLd,
   getWebsiteJsonLd,
   getProductJsonLd,
+  getReviewsJsonLd,
   getBreadcrumbJsonLd,
 } from "@/lib/seo";
 
@@ -254,6 +259,149 @@ describe("SEO Utilities", () => {
       const productWithoutCategory = { ...mockProduct, category: undefined };
       const jsonLd = getProductJsonLd(productWithoutCategory);
       expect(jsonLd.category).toBeUndefined();
+    });
+  });
+
+  describe("getHomeMetadata", () => {
+    it("should return absolute title with store name", () => {
+      const metadata = getHomeMetadata();
+
+      expect(metadata.title).toEqual({
+        absolute: expect.stringContaining(siteConfig.name),
+      });
+    });
+
+    it("should include canonical URL", () => {
+      const metadata = getHomeMetadata();
+      expect(metadata.alternates?.canonical).toBe(siteConfig.url);
+    });
+  });
+
+  describe("getProductsListingMetadata", () => {
+    it("should return All Products title", () => {
+      const metadata = getProductsListingMetadata();
+      expect(metadata.title).toBe("All Products");
+    });
+
+    it("should include canonical URL with /products path", () => {
+      const metadata = getProductsListingMetadata();
+      expect(metadata.alternates?.canonical).toBe(`${siteConfig.url}/products`);
+    });
+
+    it("should include OpenGraph data", () => {
+      const metadata = getProductsListingMetadata();
+      expect(metadata.openGraph?.url).toBe(`${siteConfig.url}/products`);
+    });
+  });
+
+  describe("getCategoriesListingMetadata", () => {
+    it("should return Shop by Category title", () => {
+      const metadata = getCategoriesListingMetadata();
+      expect(metadata.title).toBe("Shop by Category");
+    });
+
+    it("should include canonical URL with /categories path", () => {
+      const metadata = getCategoriesListingMetadata();
+      expect(metadata.alternates?.canonical).toBe(`${siteConfig.url}/categories`);
+    });
+  });
+
+  describe("getAuthMetadata", () => {
+    it("should return Sign In title for login", () => {
+      const metadata = getAuthMetadata("login");
+      expect(metadata.title).toBe("Sign In");
+    });
+
+    it("should return Create Account title for register", () => {
+      const metadata = getAuthMetadata("register");
+      expect(metadata.title).toBe("Create Account");
+    });
+
+    it("should disable indexing for auth pages", () => {
+      const metadata = getAuthMetadata("login");
+      expect(metadata.robots).toEqual({ index: false, follow: false });
+    });
+
+    it("should include description mentioning store name", () => {
+      const metadata = getAuthMetadata("login");
+      expect(metadata.description).toContain(siteConfig.name);
+    });
+  });
+
+  describe("getReviewsJsonLd", () => {
+    const mockProduct = { name: "Test Product", slug: "test-product" };
+    const mockReviews = [
+      {
+        rating: 5,
+        comment: "Excellent product!",
+        authorName: "Jane Doe",
+        createdAt: "2025-06-15T10:00:00.000Z",
+      },
+      {
+        rating: 4,
+        comment: null,
+        authorName: "John Smith",
+        createdAt: "2025-06-14T08:00:00.000Z",
+      },
+    ];
+
+    it("returns null when reviewCount is 0", () => {
+      const result = getReviewsJsonLd(mockProduct, [], 0, 0);
+      expect(result).toBeNull();
+    });
+
+    it("returns Product schema with aggregateRating", () => {
+      const result = getReviewsJsonLd(mockProduct, mockReviews, 4.5, 2);
+
+      expect(result).not.toBeNull();
+      expect(result!["@context"]).toBe("https://schema.org");
+      expect(result!["@type"]).toBe("Product");
+      expect(result!.name).toBe("Test Product");
+      expect(result!.url).toContain("/products/test-product");
+    });
+
+    it("includes correct aggregateRating values", () => {
+      const result = getReviewsJsonLd(mockProduct, mockReviews, 4.5, 2)!;
+
+      expect(result.aggregateRating["@type"]).toBe("AggregateRating");
+      expect(result.aggregateRating.ratingValue).toBe("4.5");
+      expect(result.aggregateRating.reviewCount).toBe(2);
+      expect(result.aggregateRating.bestRating).toBe(5);
+      expect(result.aggregateRating.worstRating).toBe(1);
+    });
+
+    it("includes individual reviews with ratings and authors", () => {
+      const result = getReviewsJsonLd(mockProduct, mockReviews, 4.5, 2)!;
+
+      expect(result.review).toHaveLength(2);
+      expect(result.review[0]["@type"]).toBe("Review");
+      expect(result.review[0].reviewRating.ratingValue).toBe(5);
+      expect(result.review[0].author.name).toBe("Jane Doe");
+      expect(result.review[0].reviewBody).toBe("Excellent product!");
+      expect(result.review[0].datePublished).toBe("2025-06-15");
+    });
+
+    it("omits reviewBody when comment is null", () => {
+      const result = getReviewsJsonLd(mockProduct, mockReviews, 4.5, 2)!;
+
+      expect(result.review[1]).not.toHaveProperty("reviewBody");
+    });
+
+    it("limits to 10 reviews maximum", () => {
+      const manyReviews = Array.from({ length: 15 }, (_, i) => ({
+        rating: 5,
+        comment: `Review ${i}`,
+        authorName: `User ${i}`,
+        createdAt: "2025-06-15T10:00:00.000Z",
+      }));
+
+      const result = getReviewsJsonLd(mockProduct, manyReviews, 5, 15)!;
+      expect(result.review).toHaveLength(10);
+    });
+
+    it("formats averageRating to one decimal place", () => {
+      const result = getReviewsJsonLd(mockProduct, mockReviews, 4.333333, 2)!;
+      expect(result.aggregateRating.ratingValue).toBe("4.3");
     });
   });
 
