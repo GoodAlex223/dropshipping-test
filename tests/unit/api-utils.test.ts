@@ -169,14 +169,9 @@ describe("getPagination", () => {
     expect(result.limit).toBe(1);
   });
 
-  it("handles NaN values", () => {
-    const params = new URLSearchParams({ page: "abc", limit: "xyz" });
-    const result = getPagination(params);
-
-    // parseInt("abc") = NaN, Math.max(1, NaN) = NaN in JS
-    // This documents current behavior — NaN propagates
-    expect(result.page).toBeNaN();
-  });
+  // BUG: parseInt("abc") = NaN, Math.max(1, NaN) = NaN — should default to safe values.
+  // Fix tracked in BACKLOG: getPagination() should use `parseInt(x, 10) || 1`.
+  it.todo("should default NaN to safe values when given non-numeric input");
 });
 
 describe("paginatedResponse", () => {
