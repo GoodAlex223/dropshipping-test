@@ -43,8 +43,8 @@ npm run format:check     # Prettier check formatting
 
 # Testing
 npm run test             # Vitest in watch mode
-npm run test:run         # Vitest single run
-npm run test:coverage    # Vitest with coverage
+npm run test:run         # Vitest single run (CI-style, runs all tests once)
+npm run test:coverage    # Vitest with coverage report
 npm run test:e2e         # Playwright end-to-end tests
 npm run test:e2e:ui      # Playwright with UI
 
@@ -152,7 +152,17 @@ src/
 tests/
 ├── e2e/                    # Playwright E2E tests
 │   └── navigation.spec.ts  # Navigation and basic user flow tests
-└── global-setup.ts         # E2E test infrastructure validation
+├── unit/                   # Vitest unit tests
+│   ├── admin-newsletter-api.test.ts  # Admin newsletter API tests (GET list, PATCH/DELETE [id], GET export)
+│   ├── admin-reviews-api.test.ts     # Admin review API tests (GET list/[id], DELETE, PUT reply/visibility)
+│   ├── api-utils.test.ts             # API utility tests (auth guards, response helpers, pagination, slug/SKU generation)
+│   ├── newsletter-api.test.ts        # Public newsletter API tests (subscribe, confirm, unsubscribe)
+│   ├── newsletter.test.ts            # Newsletter utility tests (token generation, URL builders, HMAC, HTML escaping)
+│   ├── reviews-api.test.ts           # Customer review API tests (create, update, delete, eligibility)
+│   └── seo.test.ts                   # SEO utility tests (metadata generators, JSON-LD structured data)
+├── helpers/                # Test utilities
+│   └── api-test-utils.ts   # NextRequest/params builders for API route testing
+└── global-setup.ts         # E2E test infrastructure validation (database connectivity, seed data check)
 prisma/
 ├── schema.prisma           # Database schema (PostgreSQL)
 ├── migrations/             # Prisma migrations
@@ -169,6 +179,8 @@ prisma/
 **Key data flow**: Customer checkout -> Stripe payment intent -> Order created -> BullMQ job queued -> Worker forwards to supplier -> Status sync worker polls supplier updates.
 
 **Auth flow**: NextAuth v5 with JWT strategy. Middleware protects `/account`, `/checkout` (auth required) and `/admin` (ADMIN role required). API routes use `requireAdmin()` / `requireAuth()` guards from `api-utils.ts`.
+
+**Test infrastructure**: Vitest for unit tests (`tests/unit/`), Playwright for E2E (`tests/e2e/`). Test helpers in `tests/helpers/api-test-utils.ts` provide `createNextRequest()` and `createRouteParams()` for API route testing. All API tests mock `@/lib/auth` and `@/lib/db` at module level. E2E tests use global setup validation (`tests/global-setup.ts`) to verify database connectivity and seed data before running.
 
 **Database**: PostgreSQL via Prisma. Local dev uses standard connection; production uses Neon serverless adapter. Global singleton pattern in `db.ts`.
 
@@ -255,6 +267,15 @@ prisma/
 - **Seed data modularization**: Database seed split into domain modules in `prisma/seed-data/` (users, categories, products, orders, reviews, subscribers); seed.ts orchestrates imports and manages entity relationships via Map<string, string> for foreign keys; supports upsert operations for idempotent seeding; includes comprehensive demo data (4 customers, 16 categories, 50+ products, 6+ orders, 8 reviews, 6 newsletter subscribers) for E2E testing and feature validation
 - **Conservative dependency updates**: During freeze periods or stability phases, update only patch/minor versions within semver ranges (`npm update`); defer major version upgrades requiring migration guides; explicitly document packages kept at older versions with reasoning; verify all checks pass after updates (lint, typecheck, tests, build)
 - **Stripe API version sync**: Stripe SDK minor updates can change expected `apiVersion` type string in stripe.ts; after updating `stripe` package, check TypeScript errors in stripe.ts and update `apiVersion` to match SDK expectations (e.g., 2025-12-15 → 2026-01-28 when upgrading stripe 20.1→20.3)
+- **Vitest API test pattern**: `createNextRequest()` helper builds NextRequest with method/body/searchParams for testing API routes; `createRouteParams()` wraps params as Promise for Next.js 14 dynamic route handlers; all API tests mock `@/lib/auth` and `@/lib/db` via `vi.mock()` before imports
+- **Mock setup conventions**: Test files declare all `vi.mock()` calls at top before any imports (hoisting); use `beforeEach(() => vi.clearAllMocks())` for isolation; mock Prisma methods as `vi.fn()` with `.mockResolvedValue()` for async returns
+- **Test organization**: Describe blocks use full endpoint paths as titles (`GET /api/admin/newsletter`); test names describe HTTP status and scenario (`returns 401 when not authenticated`); helpers section defines reusable session fixtures and mock functions
+- **Validation testing**: API tests verify Zod validation with invalid inputs (missing fields, out-of-range values, type mismatches) and expect 400 status; test both required field omissions and constraint violations
+- **Auth testing pattern**: Mock `auth()` with `null` for 401 tests, customer session for 403 tests, admin session for authorized tests; use helper functions like `mockAuth(session)` for readability
+- **Prisma query assertions**: Tests verify Prisma was called with correct `where`, `skip`, `take`, `orderBy` via `expect.objectContaining()` pattern; allows partial matching of complex query objects
+- **Environment-dependent tests**: Tests that depend on `process.env` store `originalEnv` in module scope, set values in `beforeEach`, restore in `afterEach`; prevents cross-test pollution
+- **Next.js 14 params testing**: Dynamic route tests use `createRouteParams({ id: 'x' })` which returns `{ params: Promise<{ id: 'x' }> }` matching Next.js 14 async params convention
+- **Test coverage targets**: Unit tests cover validation errors, auth/authorization failures, Prisma query construction, success paths with mocked data, and edge cases (e.g., email normalization, status filtering)
 
 <!-- END AUTO-MANAGED -->
 
@@ -268,10 +289,10 @@ prisma/
 - **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability (React.cache not available in React 18); NextAuth requires `AUTH_TRUST_HOST=true` in CI E2E tests; E2E tests need seeded database with categories and active products
 - **CI improvements**: E2E infrastructure overhaul with global setup validation, separated build and test jobs, PostgreSQL 16 + Redis 7 services with health checks; deployment workflow with graceful secret validation, dual-target support (Vercel/VPS), conditional job execution, and comprehensive deployment documentation; JS files auto-formatted on commit via lint-staged; E2E tests run chromium-only in CI with port 3000, pre-built app, and optimized timeouts
 - **Deployment strategy**: Dual-path deployment via `DEPLOYMENT_TARGET` variable (vercel/vps); graceful degradation when secrets missing (skip with notice if unset, fail with error if explicitly set); Vercel path uses CLI for pull/build/deploy + migrations; VPS path uses SSH action with git pull + pm2 restart; both paths validate secrets before execution
-- **Latest completion**: TASK-027 Dependency Audit & Security Patches (c4a3aa7) - ran full security audit, fixed 1 HIGH vulnerability (fast-xml-parser via AWS SDK update 3.965→3.985), updated 30 packages to latest patch/minor versions; updated Stripe API version in src/lib/stripe.ts to match SDK update; documented 7 packages intentionally kept at older major versions with reasoning (Next.js 14, React 18, NextAuth v5 beta, Prisma 6, ESLint 9, jsdom 27, @types/node 20); 2 deferred HIGH vulnerabilities in Next.js (require Next.js 16 upgrade, breaking change); all verification passed (lint, typecheck, 87/87 tests, production build); spawned 3 improvements to BACKLOG; Previous: TASK-024 Email Newsletter Subscription (6b9790c), TASK-023 Customer Review System (3a6a22b)
-- **Project freeze**: 2026-02-09 to 2026-02-13 - stability, cleanup, and documentation phase; no new features allowed; MVP implementation complete (TASK-001 through TASK-027), entering cleanup phase
-- **Freeze week tasks**: TASK-027 (Dependency Audit) completed 2026-02-09; TASK-028 (Test Coverage Improvement) 6-8h, TASK-029 (Technical Debt Cleanup) 4-5h, TASK-030 (Documentation Finalization) 3-4h, TASK-031 (Code Quality Sweep) 3-4h, TASK-032 (Freeze Finalization & Release Tag) 1-2h
-- **Active tasks**: TASK-028 Test Coverage Improvement next (review and newsletter API unit tests, coverage baseline)
+- **Latest completion**: TASK-028 Test Coverage Improvement (1bac9b0) - added 158 unit tests for review/newsletter APIs and utilities; created 6 test files (admin-reviews-api, admin-newsletter-api, reviews-api, newsletter-api, newsletter, api-utils) + extended seo.test.ts; established test infrastructure with `tests/helpers/api-test-utils.ts` (`createNextRequest()`, `createRouteParams()`); coverage baseline: 89.82% statements, 93.19% branches, 98.71% functions; 245 tests passing; spawned 4 BACKLOG items; Previous: TASK-027 Dependency Audit & Security Patches (c4a3aa7)
+- **Project freeze**: 2026-02-09 to 2026-02-13 - stability, cleanup, and documentation phase; no new features allowed; MVP implementation complete (TASK-001 through TASK-028), entering cleanup phase
+- **Freeze week tasks**: TASK-027 (Dependency Audit) completed 2026-02-09; TASK-028 (Test Coverage Improvement) completed 2026-02-09; TASK-029 (Technical Debt Cleanup) 4-5h, TASK-030 (Documentation Finalization) 3-4h, TASK-031 (Code Quality Sweep) 3-4h, TASK-032 (Freeze Finalization & Release Tag) 1-2h
+- **Active tasks**: TASK-029 Technical Debt Cleanup next (NaN validation, JSON-LD merge, type consolidation, form validation)
 
 <!-- END AUTO-MANAGED -->
 
@@ -282,8 +303,9 @@ prisma/
 - Run `npm run typecheck` before committing to catch type errors early
 - Run `npm run lint:fix` to auto-fix linting issues
 - Run `npm run format:check` to verify formatting before CI (matches CI job)
-- Use `npm run test:run` for a single test pass (CI-style)
+- Use `npm run test:run` for a single test pass (CI-style); use `npm run test:coverage` to generate coverage report
 - Run `npm run db:seed` after database setup to populate test data required for E2E tests; seed data is modular and located in `prisma/seed-data/` for easy extension
+- **Unit test pattern**: Create `*.test.ts` files in `tests/unit/`; mock external dependencies (`@/lib/auth`, `@/lib/db`, `@/lib/email`) at top before imports; use `createNextRequest()` helper for API route testing; verify both success paths and error handling (validation, auth, 404s)
 - When modifying Prisma schema, run `npm run db:migrate` to create migration, then `npm run db:generate`
 - **Seed data management**: Add new seed data by creating/editing files in `prisma/seed-data/` (users, categories, products, orders, reviews, subscribers); seed.ts automatically imports and processes data; maintain entity relationships by referencing slugs/SKUs/emails; use backdated timestamps via `daysAgo()` helper for realistic test data
 - Always add Zod validation schemas for new API endpoints in `src/lib/validations/` (index.ts for core schemas, separate files for specialized domains like google-shopping.ts)

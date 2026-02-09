@@ -231,7 +231,7 @@ Improvements to existing functionality.
 **Origin**: feat/task-023-customer-reviews branch
 
 - [ ] Extract shared Review interfaces to `src/types/index.ts` — duplicated across ReviewList, ReviewItem, ReviewSection, admin page
-- [ ] Add unit tests for review API routes — create, eligibility, admin reply, visibility toggle
+- [x] Add unit tests for review API routes — create, eligibility, admin reply, visibility toggle → Completed as TASK-028
 - [ ] Add E2E tests for review submission flow — verified purchase review lifecycle
 - [ ] Add review sorting options (newest, highest rated, most helpful) to public reviews list
 - [ ] Add database-level CHECK constraint for rating 1-5 — defense in depth beyond Zod validation
@@ -244,7 +244,7 @@ Improvements to existing functionality.
 **Origin**: feat/task-024-email-newsletter branch
 
 - [ ] Document integration with email marketing platforms (Mailchimp, SendGrid, etc.) — deferred from original task scope
-- [ ] Add unit tests for newsletter API routes — subscribe, confirm, unsubscribe, admin endpoints
+- [x] Add unit tests for newsletter API routes — subscribe, confirm, unsubscribe, admin endpoints → Completed as TASK-028
 - [ ] Add E2E tests for newsletter subscription flow — signup, confirm email, unsubscribe
 - [ ] Add bulk actions to admin newsletter page — bulk delete, bulk status change
 - [ ] Add subscriber analytics to admin — signup rate over time, confirmation rate, churn rate
@@ -260,6 +260,15 @@ Improvements to existing functionality.
 - [ ] Add per-worker database isolation for E2E tests — use `$TEST_WORKER_INDEX` for parallel test isolation
 - [ ] Add error handling in `tests/global-setup.ts` for Prisma connection failures — currently throws raw Prisma errors; wrap with user-friendly message suggesting `docker-compose up -d` or checking DATABASE_URL
 - [ ] Add E2E test coverage for checkout and auth flows — current navigation.spec.ts only covers storefront browsing and category navigation
+
+### [2026-02-09] From: TASK-028 Test Coverage Improvement
+
+**Origin**: feat/task-028-test-coverage branch
+
+- [ ] Add integration tests for review/newsletter flows with real database — current tests mock Prisma; integration tests would catch ORM misuse
+- [ ] Fix `getPagination()` NaN propagation — `parseInt("abc")` returns NaN which passes through `Math.max(1, NaN)`; should default to safe values
+- [ ] Add unit tests for remaining untested API routes — products CRUD, categories CRUD, orders, checkout endpoints
+- [ ] Test Prisma P2002 unique constraint error handling in subscribe route — `instanceof` check can't be properly unit tested with mocks; needs integration test
 
 ### [2026-02-09] From: TASK-027 Dependency Audit & Security Patches
 

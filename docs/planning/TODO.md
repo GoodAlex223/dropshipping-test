@@ -15,22 +15,7 @@ Project freeze week — stability, cleanup, and documentation. No new features.
 
 ## High Priority
 
-### [TASK-028] Test Coverage Improvement
-
-**Priority**: High
-**Date**: 2026-02-10 — 2026-02-11
-**Estimated effort**: 6-8 hours
-
-**Description**: Add missing unit tests for API routes and critical business logic. Focus on review and newsletter endpoints identified in BACKLOG.
-
-**Sub-tasks**:
-
-- [ ] Add unit tests for review API routes (create, eligibility, admin reply, visibility toggle)
-- [ ] Add unit tests for newsletter API routes (subscribe, confirm, unsubscribe, admin endpoints)
-- [ ] Add unit tests for `newsletter.ts` utility functions (token generation, HMAC verification)
-- [ ] Add unit tests for `seo.ts` JSON-LD generation (product, review structured data)
-- [ ] Run `npm run test:coverage` and document current coverage baseline
-- [ ] Ensure all new tests pass in CI
+<!-- No high-priority tasks remaining -->
 
 ---
 
@@ -120,7 +105,7 @@ Project freeze week — stability, cleanup, and documentation. No new features.
 
 ## Completed
 
-All MVP implementation tasks (TASK-001 through TASK-016), TASK-017 through TASK-022, TASK-023 (Customer Reviews), TASK-024 (Newsletter), TASK-025 (Fix E2E Tests), and TASK-026 (Fix Vercel Deploy) have been completed. See [DONE.md](DONE.md) for details.
+All MVP implementation tasks (TASK-001 through TASK-016), TASK-017 through TASK-022, TASK-023 (Customer Reviews), TASK-024 (Newsletter), TASK-025 (Fix E2E Tests), TASK-026 (Fix Vercel Deploy), TASK-027 (Dependency Audit), and TASK-028 (Test Coverage) have been completed. See [DONE.md](DONE.md) for details.
 
 ---
 
