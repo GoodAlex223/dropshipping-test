@@ -2,11 +2,28 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-02-06
+**Last Updated**: 2026-02-09
 
 ---
 
 ## 2026-02 (February)
+
+### [2026-02-09] TASK-027 - Dependency Audit & Security Patches
+
+**Plan**: [docs/archive/plans/2026-02-09_task-027-dependency-audit.md](../archive/plans/2026-02-09_task-027-dependency-audit.md)
+**Summary**: Ran full security audit, fixed 1 HIGH vulnerability (fast-xml-parser via AWS SDK), updated 30 packages to latest patch/minor versions, documented 2 deferred Next.js vulnerabilities requiring major upgrade.
+**Key Changes**:
+
+- Fixed fast-xml-parser HIGH vulnerability by updating AWS SDK 3.965→3.985
+- Updated 28 packages within semver ranges + 2 explicit bumps (lucide-react, eslint-config-next)
+- Updated Stripe API version in `src/lib/stripe.ts` to match SDK update
+- Documented 7 packages intentionally kept at older major versions with reasoning
+- All verification passed: lint, typecheck, 87/87 tests, production build
+
+**Commit**: c4a3aa7
+**Spawned Tasks**: 3 items added to BACKLOG.md (Next.js 16 upgrade, Prisma 7 migration, Dependabot setup)
+
+---
 
 ### [2026-02-06] TASK-022 - Demo Content Enhancement
 
@@ -504,10 +521,10 @@ Completed tasks with implementation details and learnings.
 
 ## Statistics
 
-| Month   | Tasks Completed | Key Deliverables                                                                                                    |
-| ------- | --------------- | ------------------------------------------------------------------------------------------------------------------- |
-| 2026-01 | 17              | Full MVP + Demo Deployed + SEO Technical Setup                                                                      |
-| 2026-02 | 8               | GA4 Analytics, Social Sharing, Google Shopping Feed, Performance, E2E Fix, Deploy Fix, Customer Reviews, Newsletter |
+| Month   | Tasks Completed | Key Deliverables                                                                                                                      |
+| ------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-01 | 17              | Full MVP + Demo Deployed + SEO Technical Setup                                                                                        |
+| 2026-02 | 9               | GA4 Analytics, Social Sharing, Google Shopping Feed, Performance, E2E Fix, Deploy Fix, Customer Reviews, Newsletter, Dependency Audit |
 
 ---
 

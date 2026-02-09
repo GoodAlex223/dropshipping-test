@@ -2,7 +2,7 @@
 
 Project freeze week — stability, cleanup, and documentation. No new features.
 
-**Last Updated**: 2026-02-09
+**Last Updated**: 2026-02-09 (updated)
 **Freeze Period**: 2026-02-09 to 2026-02-13
 
 ---
@@ -14,24 +14,6 @@ Project freeze week — stability, cleanup, and documentation. No new features.
 ---
 
 ## High Priority
-
-### [TASK-027] Dependency Audit & Security Patches
-
-**Priority**: High
-**Date**: 2026-02-09
-**Estimated effort**: 2-3 hours
-
-**Description**: Run security audit on all dependencies, update vulnerable packages, and ensure lock file is clean.
-
-**Sub-tasks**:
-
-- [ ] Run `npm audit` and document findings
-- [ ] Update packages with known vulnerabilities
-- [ ] Run `npm outdated` and update patch/minor versions where safe
-- [ ] Verify build, lint, typecheck, and tests still pass after updates
-- [ ] Document any packages intentionally kept at older versions (with reasoning)
-
----
 
 ### [TASK-028] Test Coverage Improvement
 
