@@ -78,8 +78,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     };
 
     return apiSuccess(transformedSupplier);
-  } catch (err) {
-    console.error("Error fetching supplier:", err);
+  } catch {
     return apiError("Failed to fetch supplier", 500);
   }
 }
@@ -145,8 +144,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     });
 
     return apiSuccess(supplier);
-  } catch (err) {
-    console.error("Error updating supplier:", err);
+  } catch {
     return apiError("Failed to update supplier", 500);
   }
 }
@@ -196,8 +194,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     await prisma.supplier.delete({ where: { id } });
 
     return apiSuccess({ message: "Supplier deleted successfully" });
-  } catch (err) {
-    console.error("Error deleting supplier:", err);
+  } catch {
     return apiError("Failed to delete supplier", 500);
   }
 }

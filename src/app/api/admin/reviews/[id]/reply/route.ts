@@ -40,8 +40,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     });
 
     return apiSuccess(updated);
-  } catch (err) {
-    console.error("Error updating admin reply:", err);
+  } catch {
     return apiError("Failed to update reply", 500);
   }
 }
@@ -73,8 +72,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     });
 
     return apiSuccess(updated);
-  } catch (err) {
-    console.error("Error removing admin reply:", err);
+  } catch {
     return apiError("Failed to remove reply", 500);
   }
 }

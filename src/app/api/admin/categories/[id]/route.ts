@@ -32,8 +32,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     return apiSuccess(category);
-  } catch (err) {
-    console.error("Error fetching category:", err);
+  } catch {
     return apiError("Failed to fetch category", 500);
   }
 }
@@ -122,8 +121,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     });
 
     return apiSuccess(category);
-  } catch (err) {
-    console.error("Error updating category:", err);
+  } catch {
     return apiError("Failed to update category", 500);
   }
 }
@@ -168,8 +166,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     await prisma.category.delete({ where: { id } });
 
     return apiSuccess({ message: "Category deleted successfully" });
-  } catch (err) {
-    console.error("Error deleting category:", err);
+  } catch {
     return apiError("Failed to delete category", 500);
   }
 }

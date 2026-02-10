@@ -96,8 +96,7 @@ export async function GET(request: NextRequest) {
     }));
 
     return NextResponse.json(paginatedResponse(transformedOrders, total, pagination));
-  } catch (err) {
-    console.error("Get admin orders error:", err);
+  } catch {
     return apiError("Failed to fetch orders", 500);
   }
 }

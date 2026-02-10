@@ -85,19 +85,14 @@ export async function POST(request: NextRequest) {
 
     const confirmationUrl = getConfirmationUrl(token);
     const unsubscribeUrl = getUnsubscribeUrl(normalizedEmail, subscriberId);
-    const emailResult = await sendNewsletterConfirmationEmail({
+    await sendNewsletterConfirmationEmail({
       email: normalizedEmail,
       confirmationUrl,
       unsubscribeUrl,
     });
 
-    if (!emailResult.success) {
-      console.error("Failed to send confirmation email:", emailResult.error);
-    }
-
     return apiSuccess({ message: "Please check your email to confirm your subscription" }, 201);
-  } catch (err) {
-    console.error("Newsletter subscribe error:", err);
+  } catch {
     return apiError("Failed to process subscription", 500);
   }
 }

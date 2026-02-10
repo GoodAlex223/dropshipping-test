@@ -263,13 +263,10 @@ async function main() {
       create: {
         email: s.email,
         status: s.status as SubscriberStatus,
-        confirmationToken:
-          "confirmationToken" in s ? (s as { confirmationToken: string }).confirmationToken : null,
-        confirmationExpiry:
-          "confirmationExpiry" in s ? (s as { confirmationExpiry: Date }).confirmationExpiry : null,
-        subscribedAt: "subscribedAt" in s ? (s as { subscribedAt: Date }).subscribedAt : null,
-        unsubscribedAt:
-          "unsubscribedAt" in s ? (s as { unsubscribedAt: Date }).unsubscribedAt : null,
+        confirmationToken: s.confirmationToken ?? null,
+        confirmationExpiry: s.confirmationExpiry ?? null,
+        subscribedAt: s.subscribedAt ?? null,
+        unsubscribedAt: s.unsubscribedAt ?? null,
         createdAt: s.createdAt,
       },
     });

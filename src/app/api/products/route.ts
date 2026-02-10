@@ -109,8 +109,7 @@ export async function GET(request: NextRequest) {
         hasPrev: page > 1,
       },
     });
-  } catch (err) {
-    console.error("Error fetching products:", err);
+  } catch {
     return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });
   }
 }

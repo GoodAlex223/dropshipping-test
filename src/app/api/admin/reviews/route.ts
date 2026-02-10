@@ -36,7 +36,12 @@ export async function GET(request: NextRequest) {
     }
 
     if (productId) where.productId = productId;
-    if (rating) where.rating = parseInt(rating, 10);
+    if (rating) {
+      const ratingNum = parseInt(rating, 10);
+      if (!isNaN(ratingNum) && ratingNum >= 1 && ratingNum <= 5) {
+        where.rating = ratingNum;
+      }
+    }
     if (isHidden === "true") where.isHidden = true;
     if (isHidden === "false") where.isHidden = false;
     if (hasReply === "true") where.adminReply = { not: null };
@@ -64,8 +69,7 @@ export async function GET(request: NextRequest) {
     ]);
 
     return apiSuccess(paginatedResponse(reviews, total, { page, limit, skip }));
-  } catch (err) {
-    console.error("Error fetching admin reviews:", err);
+  } catch {
     return apiError("Failed to fetch reviews", 500);
   }
 }

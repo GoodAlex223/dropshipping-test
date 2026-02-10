@@ -115,8 +115,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       message,
       data: responseData,
     });
-  } catch (err) {
-    console.error("Error testing supplier connection:", err);
+  } catch {
     return apiError("Failed to test connection", 500);
   }
 }

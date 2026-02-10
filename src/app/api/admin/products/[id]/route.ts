@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
-import { productSchema } from "@/lib/validations";
+import { productBaseSchema } from "@/lib/validations";
 import { requireAdmin, apiError, apiSuccess, generateSlug } from "@/lib/api-utils";
 
 interface RouteParams {
@@ -31,8 +31,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     return apiSuccess(product);
-  } catch (err) {
-    console.error("Error fetching product:", err);
+  } catch {
     return apiError("Failed to fetch product", 500);
   }
 }
@@ -53,7 +52,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     }
 
     // Validate input
-    const validationResult = productSchema.partial().safeParse(body);
+    const validationResult = productBaseSchema.partial().safeParse(body);
     if (!validationResult.success) {
       return apiError(validationResult.error.issues[0].message, 400);
     }
@@ -122,8 +121,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     });
 
     return apiSuccess(product);
-  } catch (err) {
-    console.error("Error updating product:", err);
+  } catch {
     return apiError("Failed to update product", 500);
   }
 }
@@ -160,8 +158,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     await prisma.product.delete({ where: { id } });
 
     return apiSuccess({ message: "Product deleted successfully" });
-  } catch (err) {
-    console.error("Error deleting product:", err);
+  } catch {
     return apiError("Failed to delete product", 500);
   }
 }

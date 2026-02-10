@@ -124,6 +124,22 @@ export interface PaginatedResponse<T> {
   };
 }
 
+// Serialized review types (for client components — dates as strings)
+export interface ReviewWithUser {
+  id: string;
+  rating: number;
+  comment: string | null;
+  adminReply: string | null;
+  adminRepliedAt: string | null;
+  createdAt: string;
+  user: { id: string; name: string | null; image: string | null };
+}
+
+export interface RatingDistribution {
+  rating: number;
+  count: number;
+}
+
 // Filter types
 export interface ProductFilters {
   categoryId?: string;

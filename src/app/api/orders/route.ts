@@ -74,8 +74,7 @@ export async function GET(request: NextRequest) {
         totalPages: Math.ceil(total / limit),
       },
     });
-  } catch (error) {
-    console.error("Get orders error:", error);
+  } catch {
     return NextResponse.json({ error: "Failed to fetch orders" }, { status: 500 });
   }
 }

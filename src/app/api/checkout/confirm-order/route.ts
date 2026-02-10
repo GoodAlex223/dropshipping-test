@@ -185,8 +185,8 @@ export async function POST(request: NextRequest) {
       total,
       shippingAddress: data.shippingAddress,
       shippingMethod: data.shippingMethod,
-    }).catch((err) => {
-      console.error("Failed to send order confirmation email:", err);
+    }).catch(() => {
+      // Email failure is non-critical — order is already created
     });
 
     // TODO: Queue supplier order creation
@@ -197,8 +197,6 @@ export async function POST(request: NextRequest) {
       message: "Order created successfully",
     });
   } catch (error) {
-    console.error("Confirm order error:", error);
-
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid order data", details: error.issues },

@@ -59,8 +59,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     };
 
     return NextResponse.json(transformedOrder);
-  } catch (error) {
-    console.error("Get order error:", error);
+  } catch {
     return NextResponse.json({ error: "Failed to fetch order" }, { status: 500 });
   }
 }

@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
-import {
-  getProductMetadata,
-  getProductJsonLd,
-  getBreadcrumbJsonLd,
-  getReviewsJsonLd,
-  siteConfig,
-} from "@/lib/seo";
+import { getProductMetadata, getProductJsonLd, getBreadcrumbJsonLd, siteConfig } from "@/lib/seo";
 import { ProductDetailClient, ProductNotFound, type Product } from "./product-detail-client";
 
 interface PageProps {
@@ -183,7 +177,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
     return <ProductNotFound />;
   }
 
-  // Generate JSON-LD structured data
+  // Generate JSON-LD structured data (single Product schema with optional reviews)
   const productJsonLd = getProductJsonLd({
     name: product.name,
     slug: product.slug,
@@ -194,6 +188,14 @@ export default async function ProductDetailPage({ params }: PageProps) {
     stock: product.stock,
     images: product.images,
     category: product.category,
+    reviews: product.reviews.map((r) => ({
+      rating: r.rating,
+      comment: r.comment,
+      authorName: r.user.name || "Anonymous",
+      createdAt: r.createdAt,
+    })),
+    averageRating: product.averageRating,
+    reviewCount: product.totalReviews,
   });
 
   const breadcrumbJsonLd = getBreadcrumbJsonLd([
@@ -202,18 +204,6 @@ export default async function ProductDetailPage({ params }: PageProps) {
     { name: product.category.name, url: `${siteConfig.url}/categories/${product.category.slug}` },
     { name: product.name, url: `${siteConfig.url}/products/${product.slug}` },
   ]);
-
-  const reviewsJsonLd = getReviewsJsonLd(
-    { name: product.name, slug: product.slug },
-    product.reviews.map((r) => ({
-      rating: r.rating,
-      comment: r.comment,
-      authorName: r.user.name || "Anonymous",
-      createdAt: r.createdAt,
-    })),
-    product.averageRating,
-    product.totalReviews
-  );
 
   return (
     <>
@@ -229,14 +219,6 @@ export default async function ProductDetailPage({ params }: PageProps) {
           __html: JSON.stringify(breadcrumbJsonLd),
         }}
       />
-      {reviewsJsonLd && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(reviewsJsonLd),
-          }}
-        />
-      )}
       <ProductDetailClient product={product} />
     </>
   );

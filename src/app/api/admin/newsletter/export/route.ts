@@ -58,8 +58,7 @@ export async function GET(request: NextRequest) {
         "Content-Disposition": `attachment; filename="${filename}"`,
       },
     });
-  } catch (err) {
-    console.error("Export error:", err);
+  } catch {
     return apiError("Failed to export subscribers", 500);
   }
 }

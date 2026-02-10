@@ -81,8 +81,7 @@ export async function GET(request: NextRequest) {
     ]);
 
     return apiSuccess(paginatedResponse(products, total, { page, limit, skip }));
-  } catch (err) {
-    console.error("Error fetching products:", err);
+  } catch {
     return apiError("Failed to fetch products", 500);
   }
 }
@@ -148,8 +147,7 @@ export async function POST(request: NextRequest) {
     });
 
     return apiSuccess(product, 201);
-  } catch (err) {
-    console.error("Error creating product:", err);
+  } catch {
     return apiError("Failed to create product", 500);
   }
 }

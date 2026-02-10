@@ -522,6 +522,55 @@ describe("GET /api/products/[slug]/reviews", () => {
     );
   });
 
+  it("ignores invalid rating filter (NaN)", async () => {
+    vi.mocked(prisma.product.findUnique).mockResolvedValue({ id: "prod-1" } as never);
+    vi.mocked(prisma.review.findMany).mockResolvedValue([]);
+    vi.mocked(prisma.review.count).mockResolvedValue(0);
+    vi.mocked(prisma.review.aggregate).mockResolvedValue({
+      _avg: { rating: null },
+      _count: 0,
+    } as never);
+    vi.mocked(prisma.review.groupBy).mockResolvedValue([] as never);
+
+    const req = createNextRequest({
+      url: "/api/products/test-product/reviews",
+      searchParams: { rating: "abc" },
+    });
+    const res = await GETProductReviews(req, params);
+
+    expect(res.status).toBe(200);
+    // Should NOT include rating in where clause
+    expect(prisma.review.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.not.objectContaining({ rating: expect.anything() }),
+      })
+    );
+  });
+
+  it("ignores out-of-range rating filter", async () => {
+    vi.mocked(prisma.product.findUnique).mockResolvedValue({ id: "prod-1" } as never);
+    vi.mocked(prisma.review.findMany).mockResolvedValue([]);
+    vi.mocked(prisma.review.count).mockResolvedValue(0);
+    vi.mocked(prisma.review.aggregate).mockResolvedValue({
+      _avg: { rating: null },
+      _count: 0,
+    } as never);
+    vi.mocked(prisma.review.groupBy).mockResolvedValue([] as never);
+
+    const req = createNextRequest({
+      url: "/api/products/test-product/reviews",
+      searchParams: { rating: "99" },
+    });
+    const res = await GETProductReviews(req, params);
+
+    expect(res.status).toBe(200);
+    expect(prisma.review.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.not.objectContaining({ rating: expect.anything() }),
+      })
+    );
+  });
+
   it("returns empty rating distribution when no reviews", async () => {
     vi.mocked(prisma.product.findUnique).mockResolvedValue({ id: "prod-1" } as never);
     vi.mocked(prisma.review.findMany).mockResolvedValue([]);

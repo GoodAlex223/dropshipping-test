@@ -1,10 +1,20 @@
 // Newsletter subscriber seed data with various statuses
 
+export interface SubscriberSeedData {
+  email: string;
+  status: string;
+  createdAt: Date;
+  subscribedAt?: Date;
+  unsubscribedAt?: Date;
+  confirmationToken?: string;
+  confirmationExpiry?: Date;
+}
+
 const now = new Date();
 const daysAgo = (days: number) => new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 const hoursFromNow = (hours: number) => new Date(now.getTime() + hours * 60 * 60 * 1000);
 
-export const subscribers = [
+export const subscribers: SubscriberSeedData[] = [
   // ACTIVE subscribers (confirmed)
   {
     email: "newsletter.fan@example.com",
