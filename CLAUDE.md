@@ -276,6 +276,9 @@ prisma/
 - **Environment-dependent tests**: Tests that depend on `process.env` store `originalEnv` in module scope, set values in `beforeEach`, restore in `afterEach`; prevents cross-test pollution
 - **Next.js 14 params testing**: Dynamic route tests use `createRouteParams({ id: 'x' })` which returns `{ params: Promise<{ id: 'x' }> }` matching Next.js 14 async params convention
 - **Test coverage targets**: Unit tests cover validation errors, auth/authorization failures, Prisma query construction, success paths with mocked data, and edge cases (e.g., email normalization, status filtering)
+- **Query param validation pattern**: API routes parse numeric filters with `parseInt(value, 10)` returning NaN for invalid input, then validate with `!isNaN(num) && num >= min && num <= max`; spreads validated value into query object with conditional spread (`...(valid ? { field: num } : {})`); avoids throwing errors on malformed user input
+- **Type serialization pattern**: Server components fetch Prisma types with Date objects; client components receive serialized interfaces with dates as strings (e.g., `ReviewWithUser` extends Review with `createdAt: string`, `adminRepliedAt: string | null`); pattern documented in `src/types/index.ts` with "Serialized" prefix in interface names
+- **Client-side eligibility checking**: Components that conditionally render forms based on user state fetch eligibility via API in `useEffect` hook on mount; store eligibility state (`canReview`, `hasExistingReview`, `orderId`) in local state; silently fail fetch errors (form just doesn't render); pattern used in ReviewSection for verified purchase validation
 
 <!-- END AUTO-MANAGED -->
 

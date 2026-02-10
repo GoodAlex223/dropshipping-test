@@ -2,7 +2,7 @@
 
 Project freeze week — stability, cleanup, and documentation. No new features.
 
-**Last Updated**: 2026-02-09 (updated)
+**Last Updated**: 2026-02-10
 **Freeze Period**: 2026-02-09 to 2026-02-13
 
 ---
@@ -20,25 +20,6 @@ Project freeze week — stability, cleanup, and documentation. No new features.
 ---
 
 ## Medium Priority
-
-### [TASK-029] Technical Debt Cleanup
-
-**Priority**: Medium
-**Date**: 2026-02-11 — 2026-02-12
-**Estimated effort**: 4-5 hours
-
-**Description**: Address technical debt items from BACKLOG and code review findings.
-
-**Sub-tasks**:
-
-- [ ] Validate `parseInt()` results for rating query params in review API routes (NaN guard)
-- [ ] Merge `getReviewsJsonLd()` into `getProductJsonLd()` — single Product JSON-LD per page
-- [ ] Extract shared Review interfaces to `src/types/index.ts` (remove duplication)
-- [ ] Simplify type assertions in subscriber seeding (use optional chaining)
-- [ ] Add cross-field validation for `comparePrice > price` in admin ProductForm
-- [ ] Replace `console.error` with structured error responses where appropriate
-
----
 
 ### [TASK-030] Documentation Finalization
 
@@ -105,7 +86,7 @@ Project freeze week — stability, cleanup, and documentation. No new features.
 
 ## Completed
 
-All MVP implementation tasks (TASK-001 through TASK-016), TASK-017 through TASK-022, TASK-023 (Customer Reviews), TASK-024 (Newsletter), TASK-025 (Fix E2E Tests), TASK-026 (Fix Vercel Deploy), TASK-027 (Dependency Audit), and TASK-028 (Test Coverage) have been completed. See [DONE.md](DONE.md) for details.
+All MVP implementation tasks (TASK-001 through TASK-016), TASK-017 through TASK-022, TASK-023 (Customer Reviews), TASK-024 (Newsletter), TASK-025 (Fix E2E Tests), TASK-026 (Fix Vercel Deploy), TASK-027 (Dependency Audit), TASK-028 (Test Coverage), and TASK-029 (Technical Debt Cleanup) have been completed. See [DONE.md](DONE.md) for details.
 
 ---
 

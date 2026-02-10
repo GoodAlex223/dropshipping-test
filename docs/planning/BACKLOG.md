@@ -204,7 +204,7 @@ Improvements to existing functionality.
 - [ ] Validate feed output with Google Merchant Center feed validation tool
 - [ ] Add additional feed formats (Facebook Catalog, Pinterest) if needed — current architecture is easy to extend
 - [ ] Add `google_product_category` field mapping to Google's product taxonomy
-- [ ] Add cross-field validation for comparePrice > price in admin ProductForm
+- [x] Add cross-field validation for comparePrice > price in admin ProductForm → Completed in TASK-029
 
 ### [2026-02-02] From: TASK-019 Social Sharing Enhancement
 
@@ -230,14 +230,14 @@ Improvements to existing functionality.
 
 **Origin**: feat/task-023-customer-reviews branch
 
-- [ ] Extract shared Review interfaces to `src/types/index.ts` — duplicated across ReviewList, ReviewItem, ReviewSection, admin page
+- [x] Extract shared Review interfaces to `src/types/index.ts` — duplicated across ReviewList, ReviewItem, ReviewSection, admin page → Completed in TASK-029
 - [x] Add unit tests for review API routes — create, eligibility, admin reply, visibility toggle → Completed as TASK-028
 - [ ] Add E2E tests for review submission flow — verified purchase review lifecycle
 - [ ] Add review sorting options (newest, highest rated, most helpful) to public reviews list
 - [ ] Add database-level CHECK constraint for rating 1-5 — defense in depth beyond Zod validation
 - [ ] Seed demo reviews for products in `prisma/seed.ts` — enables testing and demo presentation
-- [ ] Merge `getReviewsJsonLd()` into `getProductJsonLd()` — currently two separate `@type: Product` JSON-LD schemas on product pages; Google recommends single Product schema per page
-- [ ] Validate `parseInt()` result for rating query params in review API routes — `parseInt('abc', 10)` returns `NaN` which gets passed to Prisma; affects `admin/reviews/route.ts` and `products/[slug]/reviews/route.ts`
+- [x] Merge `getReviewsJsonLd()` into `getProductJsonLd()` — currently two separate `@type: Product` JSON-LD schemas on product pages → Completed in TASK-029
+- [x] Validate `parseInt()` result for rating query params in review API routes — `parseInt('abc', 10)` returns `NaN` → Completed in TASK-029
 
 ### [2026-02-05] From: TASK-024 Email Newsletter Subscription
 
@@ -261,7 +261,13 @@ Improvements to existing functionality.
 - [ ] Add error handling in `tests/global-setup.ts` for Prisma connection failures — currently throws raw Prisma errors; wrap with user-friendly message suggesting `docker-compose up -d` or checking DATABASE_URL
 - [ ] Add E2E test coverage for checkout and auth flows — current navigation.spec.ts only covers storefront browsing and category navigation
 
-### [2026-02-09] From: TASK-028 Test Coverage Improvement
+### [2026-02-10] From: TASK-029 Technical Debt Cleanup
+
+**Origin**: feat/task-029-technical-debt-cleanup branch
+
+- [ ] Add structured logging library (e.g., pino/winston) to replace removed console.error — API routes now silently catch errors; production needs observability
+- [ ] Add comparePrice cross-field validation to admin product PUT route — currently `productBaseSchema.partial()` skips the `.refine()` check; partial updates could set invalid comparePrice
+- [ ] Add E2E test for comparePrice validation in admin ProductForm — client-side validation added but not tested end-to-end
 
 **Origin**: feat/task-028-test-coverage branch
 
@@ -290,7 +296,7 @@ Improvements to existing functionality.
 
 **Origin**: Code review of feat/task-022-demo-content-enhancement branch
 
-- [ ] Simplify type assertions in subscriber seeding — replace `"prop" in s ? (s as { prop: T }).prop : null` with optional chaining `s.prop ?? null` for cleaner TypeScript
+- [x] Simplify type assertions in subscriber seeding — replace `"prop" in s ? (s as { prop: T }).prop : null` with optional chaining → Completed in TASK-029
 - [ ] Add DELIVERED status validation in review seeding — add runtime check `if (orderData.status !== 'DELIVERED')` before creating reviews to enforce eligibility pattern programmatically
 - [ ] Standardize user upsert patterns — admin uses `update: {}` while customers use `update: { name }` without password; make consistent (either both update all fields or both update none)
 
@@ -303,7 +309,7 @@ Known issues that should be addressed eventually.
 | Item                          | Impact                              | Effort | Added      |
 | ----------------------------- | ----------------------------------- | ------ | ---------- |
 | Unused Account/Session tables | Minor DB overhead with JWT strategy | Low    | 2026-01-13 |
-| Console.error logging         | Could leak sensitive info in logs   | Low    | 2026-01-13 |
+| ~~Console.error logging~~     | ~~Resolved in TASK-029~~            | Low    | 2026-01-13 |
 | Generic 500 error responses   | Users don't know what went wrong    | Med    | 2026-01-13 |
 | S3 cleanup failures silent    | Orphaned files in storage           | Low    | 2026-01-13 |
 | Email send failures silent    | Users don't know email wasn't sent  | Med    | 2026-01-13 |

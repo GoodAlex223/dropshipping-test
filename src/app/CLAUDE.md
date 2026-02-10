@@ -98,6 +98,7 @@ app/
 - **XML escaping**: Feed routes must escape special characters (&, <, >, ", ') using dedicated `escapeXml()` helper to prevent malformed XML
 - **Feed validation**: Use strict Zod schemas (e.g., `google-shopping.ts`) to validate feed items before XML serialization; enforce title/description length limits, price format, GTIN format, and enum values
 - **Performance optimizations**: Root layout includes resource hints (preconnect/dns-prefetch) in `<head>`; Web Vitals reporter integrated via providers; deferred theme font loading with `preload: false` and `display: swap`; shop pages (home, product detail, category) use blur placeholders for images
+- **Query param validation**: API routes parse numeric filters with `parseInt(value, 10)` which returns NaN for invalid input; validate with `!isNaN(num) && num >= min && num <= max`; spread validated value conditionally into Prisma query (`...(valid ? { field: num } : {})`); pattern avoids throwing on malformed user input (e.g., rating filter in `/api/products/[slug]/reviews`)
 
 <!-- END AUTO-MANAGED -->
 
