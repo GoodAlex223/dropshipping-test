@@ -80,8 +80,7 @@ export async function GET(request: NextRequest) {
     }));
 
     return apiSuccess(paginatedResponse(transformedSuppliers, total, { page, limit, skip }));
-  } catch (err) {
-    console.error("Error fetching suppliers:", err);
+  } catch {
     return apiError("Failed to fetch suppliers", 500);
   }
 }
@@ -135,8 +134,7 @@ export async function POST(request: NextRequest) {
     });
 
     return apiSuccess(supplier, 201);
-  } catch (err) {
-    console.error("Error creating supplier:", err);
+  } catch {
     return apiError("Failed to create supplier", 500);
   }
 }

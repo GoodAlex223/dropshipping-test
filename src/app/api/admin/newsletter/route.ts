@@ -50,8 +50,7 @@ export async function GET(request: NextRequest) {
     ]);
 
     return apiSuccess(paginatedResponse(subscribers, total, { page, limit, skip }));
-  } catch (err) {
-    console.error("Error fetching subscribers:", err);
+  } catch {
     return apiError("Failed to fetch subscribers", 500);
   }
 }

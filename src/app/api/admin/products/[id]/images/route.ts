@@ -40,8 +40,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     return apiSuccess(images);
-  } catch (err) {
-    console.error("Error fetching product images:", err);
+  } catch {
     return apiError("Failed to fetch images", 500);
   }
 }
@@ -95,8 +94,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     return apiSuccess(image, 201);
-  } catch (err) {
-    console.error("Error adding product image:", err);
+  } catch {
     return apiError("Failed to add image", 500);
   }
 }
@@ -145,8 +143,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     });
 
     return apiSuccess(images);
-  } catch (err) {
-    console.error("Error reordering product images:", err);
+  } catch {
     return apiError("Failed to reorder images", 500);
   }
 }

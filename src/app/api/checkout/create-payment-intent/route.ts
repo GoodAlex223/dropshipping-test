@@ -126,8 +126,6 @@ export async function POST(request: NextRequest) {
       items: orderItems,
     });
   } catch (error) {
-    console.error("Create payment intent error:", error);
-
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid checkout data", details: error.issues },

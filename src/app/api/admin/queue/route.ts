@@ -25,8 +25,7 @@ export async function GET(request: NextRequest) {
         },
       },
     });
-  } catch (err) {
-    console.error("Error fetching queue stats:", err);
+  } catch {
     return apiError("Failed to fetch queue statistics", 500);
   }
 }

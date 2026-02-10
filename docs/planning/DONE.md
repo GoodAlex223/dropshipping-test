@@ -2,11 +2,31 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-02-09
+**Last Updated**: 2026-02-10
 
 ---
 
 ## 2026-02 (February)
+
+### [2026-02-10] TASK-029 - Technical Debt Cleanup
+
+**Summary**: Addressed 6 technical debt items from code review findings. Added NaN guards to review rating filters, merged duplicate JSON-LD functions, extracted shared Review types, simplified seed data typing, added comparePrice cross-field validation, and removed all console.error from API routes (~60 occurrences across 41 files). Code review caught and fixed a ZodEffects/.partial() breaking change and an unsafe non-null assertion.
+**Key Changes**:
+
+- Added parseInt NaN validation in review API rating filters (2 routes)
+- Merged `getReviewsJsonLd()` into `getProductJsonLd()` — single Product JSON-LD per page
+- Extracted `ReviewWithUser` and `RatingDistribution` interfaces to `src/types/index.ts`
+- Added `SubscriberSeedData` interface, simplified seed.ts with optional chaining
+- Split `productBaseSchema` (ZodObject) from `productSchema` (ZodEffects) for safe `.partial()` usage
+- Added comparePrice > price validation on both server and client side
+- Removed ~60 console.error calls, converted unused `catch(err)` to bare `catch`
+- Added 4 new unit tests for NaN/out-of-range rating filter handling
+- Total: 249 tests passing, 0 lint errors, typecheck clean
+
+**Commit**: dcf654d
+**Spawned Tasks**: 3 items added to BACKLOG.md (structured logging, partial update validation, E2E test)
+
+---
 
 ### [2026-02-09] TASK-028 - Test Coverage Improvement
 
@@ -536,10 +556,10 @@ Completed tasks with implementation details and learnings.
 
 ## Statistics
 
-| Month   | Tasks Completed | Key Deliverables                                                                                                                                     |
-| ------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-01 | 17              | Full MVP + Demo Deployed + SEO Technical Setup                                                                                                       |
-| 2026-02 | 10              | GA4 Analytics, Social Sharing, Google Shopping Feed, Performance, E2E Fix, Deploy Fix, Customer Reviews, Newsletter, Dependency Audit, Test Coverage |
+| Month   | Tasks Completed | Key Deliverables                                                                                                                                                             |
+| ------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-01 | 17              | Full MVP + Demo Deployed + SEO Technical Setup                                                                                                                               |
+| 2026-02 | 11              | GA4 Analytics, Social Sharing, Google Shopping Feed, Performance, E2E Fix, Deploy Fix, Customer Reviews, Newsletter, Dependency Audit, Test Coverage, Technical Debt Cleanup |
 
 ---
 

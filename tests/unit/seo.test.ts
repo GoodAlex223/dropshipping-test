@@ -11,7 +11,6 @@ import {
   getOrganizationJsonLd,
   getWebsiteJsonLd,
   getProductJsonLd,
-  getReviewsJsonLd,
   getBreadcrumbJsonLd,
 } from "@/lib/seo";
 
@@ -328,8 +327,17 @@ describe("SEO Utilities", () => {
     });
   });
 
-  describe("getReviewsJsonLd", () => {
-    const mockProduct = { name: "Test Product", slug: "test-product" };
+  describe("getProductJsonLd with review data", () => {
+    const mockProduct = {
+      name: "Test Product",
+      slug: "test-product",
+      description: "A test product",
+      price: "29.99",
+      sku: "TEST-001",
+      stock: 10,
+      images: [{ url: "https://example.com/image.jpg" }],
+      category: { name: "Electronics" },
+    };
     const mockReviews = [
       {
         rating: 5,
@@ -345,24 +353,32 @@ describe("SEO Utilities", () => {
       },
     ];
 
-    it("returns null when reviewCount is 0", () => {
-      const result = getReviewsJsonLd(mockProduct, [], 0, 0);
-      expect(result).toBeNull();
+    it("omits review data when reviewCount is 0", () => {
+      const result = getProductJsonLd({
+        ...mockProduct,
+        reviews: [],
+        averageRating: 0,
+        reviewCount: 0,
+      });
+      expect(result).not.toHaveProperty("aggregateRating");
+      expect(result).not.toHaveProperty("review");
     });
 
-    it("returns Product schema with aggregateRating", () => {
-      const result = getReviewsJsonLd(mockProduct, mockReviews, 4.5, 2);
-
-      expect(result).not.toBeNull();
-      expect(result!["@context"]).toBe("https://schema.org");
-      expect(result!["@type"]).toBe("Product");
-      expect(result!.name).toBe("Test Product");
-      expect(result!.url).toContain("/products/test-product");
+    it("omits review data when reviewCount is undefined", () => {
+      const result = getProductJsonLd(mockProduct);
+      expect(result).not.toHaveProperty("aggregateRating");
+      expect(result).not.toHaveProperty("review");
     });
 
-    it("includes correct aggregateRating values", () => {
-      const result = getReviewsJsonLd(mockProduct, mockReviews, 4.5, 2)!;
+    it("includes aggregateRating when reviews exist", () => {
+      const result = getProductJsonLd({
+        ...mockProduct,
+        reviews: mockReviews,
+        averageRating: 4.5,
+        reviewCount: 2,
+      });
 
+      expect(result.aggregateRating).toBeDefined();
       expect(result.aggregateRating["@type"]).toBe("AggregateRating");
       expect(result.aggregateRating.ratingValue).toBe("4.5");
       expect(result.aggregateRating.reviewCount).toBe(2);
@@ -371,7 +387,12 @@ describe("SEO Utilities", () => {
     });
 
     it("includes individual reviews with ratings and authors", () => {
-      const result = getReviewsJsonLd(mockProduct, mockReviews, 4.5, 2)!;
+      const result = getProductJsonLd({
+        ...mockProduct,
+        reviews: mockReviews,
+        averageRating: 4.5,
+        reviewCount: 2,
+      });
 
       expect(result.review).toHaveLength(2);
       expect(result.review[0]["@type"]).toBe("Review");
@@ -382,7 +403,12 @@ describe("SEO Utilities", () => {
     });
 
     it("omits reviewBody when comment is null", () => {
-      const result = getReviewsJsonLd(mockProduct, mockReviews, 4.5, 2)!;
+      const result = getProductJsonLd({
+        ...mockProduct,
+        reviews: mockReviews,
+        averageRating: 4.5,
+        reviewCount: 2,
+      });
 
       expect(result.review[1]).not.toHaveProperty("reviewBody");
     });
@@ -395,13 +421,38 @@ describe("SEO Utilities", () => {
         createdAt: "2025-06-15T10:00:00.000Z",
       }));
 
-      const result = getReviewsJsonLd(mockProduct, manyReviews, 5, 15)!;
+      const result = getProductJsonLd({
+        ...mockProduct,
+        reviews: manyReviews,
+        averageRating: 5,
+        reviewCount: 15,
+      });
       expect(result.review).toHaveLength(10);
     });
 
     it("formats averageRating to one decimal place", () => {
-      const result = getReviewsJsonLd(mockProduct, mockReviews, 4.333333, 2)!;
+      const result = getProductJsonLd({
+        ...mockProduct,
+        reviews: mockReviews,
+        averageRating: 4.333333,
+        reviewCount: 2,
+      });
       expect(result.aggregateRating.ratingValue).toBe("4.3");
+    });
+
+    it("includes both offer and review data in single Product schema", () => {
+      const result = getProductJsonLd({
+        ...mockProduct,
+        reviews: mockReviews,
+        averageRating: 4.5,
+        reviewCount: 2,
+      });
+
+      // Single Product schema with all data
+      expect(result["@type"]).toBe("Product");
+      expect(result.offers).toBeDefined();
+      expect(result.aggregateRating).toBeDefined();
+      expect(result.review).toBeDefined();
     });
   });
 

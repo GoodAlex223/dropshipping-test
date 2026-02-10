@@ -53,8 +53,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     });
 
     return apiSuccess(updated);
-  } catch (err) {
-    console.error("Error updating subscriber:", err);
+  } catch {
     return apiError("Failed to update subscriber", 500);
   }
 }
@@ -75,8 +74,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     await prisma.subscriber.delete({ where: { id } });
 
     return apiSuccess({ message: "Subscriber deleted" });
-  } catch (err) {
-    console.error("Error deleting subscriber:", err);
+  } catch {
     return apiError("Failed to delete subscriber", 500);
   }
 }

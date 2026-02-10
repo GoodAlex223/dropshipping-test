@@ -83,8 +83,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       supplierOrders: supplierOrderIds.length,
       queuedJobs,
     });
-  } catch (err) {
-    console.error("Error forwarding order:", err);
+  } catch {
     return apiError("Failed to forward order", 500);
   }
 }

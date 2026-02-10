@@ -44,8 +44,7 @@ export async function POST(request: NextRequest) {
     const result = await getPresignedUploadUrl(filename, contentType, folder);
 
     return apiSuccess(result);
-  } catch (err) {
-    console.error("Error generating upload URL:", err);
+  } catch {
     return apiError("Failed to generate upload URL", 500);
   }
 }
@@ -73,8 +72,7 @@ export async function DELETE(request: NextRequest) {
     await deleteFromS3(key);
 
     return apiSuccess({ message: "File deleted successfully" });
-  } catch (err) {
-    console.error("Error deleting file:", err);
+  } catch {
     return apiError("Failed to delete file", 500);
   }
 }

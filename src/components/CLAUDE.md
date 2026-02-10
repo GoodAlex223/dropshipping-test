@@ -90,6 +90,8 @@ components/
 - **Deferred font loading**: Theme-specific fonts (Playfair Display, Lora) loaded in root layout with `preload: false` and `display: swap` for optimal performance; saves ~60-80KB on initial load for users on default theme
 - **Review eligibility pattern**: `ReviewSection` handles eligibility checking client-side; fetches `/api/reviews/eligibility?productId=xxx` on mount to determine if form should render; displays form only if user has delivered order containing product and hasn't already reviewed it
 - **Newsletter signup pattern**: `NewsletterSignup` component manages subscription flow with local state (email, loading, success); success state replaces form with confirmation message (green background, checkmark icon); integrated into Footer component for site-wide visibility
+- **Review list filtering**: `ReviewList` component manages client-side rating filter (1-5 stars or all) with dropdown; filter change replaces data (page reset to 1), load more appends data; fetches from `/api/products/[slug]/reviews?rating=X&page=Y&limit=10`; includes loading states and empty states for filtered results
+- **Optimistic UI updates**: `ReviewSection` updates local review state and stats immediately when new review created (via callback from `ReviewForm`); calculates new average rating and updates rating distribution optimistically before server confirmation; provides instant feedback to users
 
 <!-- END AUTO-MANAGED -->
 

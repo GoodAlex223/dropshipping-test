@@ -11,25 +11,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
-
-interface Review {
-  id: string;
-  rating: number;
-  comment: string | null;
-  adminReply: string | null;
-  adminRepliedAt: string | null;
-  createdAt: string;
-  user: { id: string; name: string | null; image: string | null };
-}
+import type { ReviewWithUser } from "@/types";
 
 interface ReviewListProps {
   productSlug: string;
-  initialReviews: Review[];
+  initialReviews: ReviewWithUser[];
   totalReviews: number;
 }
 
 export function ReviewList({ productSlug, initialReviews, totalReviews }: ReviewListProps) {
-  const [reviews, setReviews] = useState<Review[]>(initialReviews);
+  const [reviews, setReviews] = useState<ReviewWithUser[]>(initialReviews);
   const [ratingFilter, setRatingFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(initialReviews.length < totalReviews);
@@ -49,7 +40,7 @@ export function ReviewList({ productSlug, initialReviews, totalReviews }: Review
         if (!response.ok) return;
 
         const data = await response.json();
-        const newReviews = data.data as Review[];
+        const newReviews = data.data as ReviewWithUser[];
 
         if (replace) {
           setReviews(newReviews);

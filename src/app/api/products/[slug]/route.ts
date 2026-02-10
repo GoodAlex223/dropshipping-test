@@ -81,8 +81,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       ...product,
       relatedProducts,
     });
-  } catch (err) {
-    console.error("Error fetching product:", err);
+  } catch {
     return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 });
   }
 }

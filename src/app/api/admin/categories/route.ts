@@ -70,8 +70,7 @@ export async function GET(request: NextRequest) {
     ]);
 
     return apiSuccess(paginatedResponse(categories, total, { page, limit, skip }));
-  } catch (err) {
-    console.error("Error fetching categories:", err);
+  } catch {
     return apiError("Failed to fetch categories", 500);
   }
 }
@@ -123,8 +122,7 @@ export async function POST(request: NextRequest) {
     });
 
     return apiSuccess(category, 201);
-  } catch (err) {
-    console.error("Error creating category:", err);
+  } catch {
     return apiError("Failed to create category", 500);
   }
 }

@@ -37,8 +37,7 @@ export async function GET(request: NextRequest) {
     });
 
     return apiSuccess({ message: "Your subscription has been confirmed" });
-  } catch (err) {
-    console.error("Newsletter confirm error:", err);
+  } catch {
     return apiError("Failed to confirm subscription", 500);
   }
 }

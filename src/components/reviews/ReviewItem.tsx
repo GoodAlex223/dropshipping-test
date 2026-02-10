@@ -2,21 +2,10 @@
 
 import { StarRating } from "./StarRating";
 import { Store } from "lucide-react";
+import type { ReviewWithUser } from "@/types";
 
 interface ReviewItemProps {
-  review: {
-    id: string;
-    rating: number;
-    comment: string | null;
-    adminReply: string | null;
-    adminRepliedAt: string | null;
-    createdAt: string;
-    user: {
-      id: string;
-      name: string | null;
-      image: string | null;
-    };
-  };
+  review: ReviewWithUser;
 }
 
 function formatDate(dateString: string) {

@@ -41,8 +41,7 @@ export async function GET(request: NextRequest) {
       hasExistingReview: false,
       orderId: eligibleOrder?.id || null,
     });
-  } catch (err) {
-    console.error("Error checking review eligibility:", err);
+  } catch {
     return apiError("Failed to check review eligibility", 500);
   }
 }

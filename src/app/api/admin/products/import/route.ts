@@ -208,7 +208,6 @@ export async function POST(request: NextRequest) {
       ...result,
     });
   } catch (err) {
-    console.error("Error importing products:", err);
     return apiError("Failed to import products", 500);
   }
 }

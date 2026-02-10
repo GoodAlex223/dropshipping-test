@@ -48,8 +48,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     });
 
     return apiSuccess(image);
-  } catch (err) {
-    console.error("Error updating product image:", err);
+  } catch {
     return apiError("Failed to update image", 500);
   }
 }
@@ -75,8 +74,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     await prisma.productImage.delete({ where: { id: imageId } });
 
     return apiSuccess({ message: "Image deleted successfully" });
-  } catch (err) {
-    console.error("Error deleting product image:", err);
+  } catch {
     return apiError("Failed to delete image", 500);
   }
 }

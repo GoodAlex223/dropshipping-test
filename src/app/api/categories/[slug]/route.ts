@@ -53,8 +53,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     return NextResponse.json(category);
-  } catch (error) {
-    console.error("Error fetching category:", error);
+  } catch {
     return NextResponse.json({ error: "Failed to fetch category" }, { status: 500 });
   }
 }

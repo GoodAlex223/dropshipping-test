@@ -23,10 +23,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return apiError("Product not found", 404);
     }
 
+    const ratingNum = ratingFilter ? parseInt(ratingFilter, 10) : NaN;
+    const validRating = !isNaN(ratingNum) && ratingNum >= 1 && ratingNum <= 5;
+
     const where = {
       productId: product.id,
       isHidden: false,
-      ...(ratingFilter ? { rating: parseInt(ratingFilter, 10) } : {}),
+      ...(validRating ? { rating: ratingNum } : {}),
     };
 
     const [reviews, total, stats] = await Promise.all([
@@ -71,8 +74,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       totalReviews: stats._count,
       ratingDistribution,
     });
-  } catch (err) {
-    console.error("Error fetching reviews:", err);
+  } catch {
     return apiError("Failed to fetch reviews", 500);
   }
 }

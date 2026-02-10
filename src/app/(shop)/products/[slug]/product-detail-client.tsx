@@ -24,6 +24,7 @@ import { useCartStore } from "@/stores/cart.store";
 import { cn } from "@/lib/utils";
 import { trackViewItem, trackAddToCart } from "@/lib/analytics";
 import { DEFAULT_BLUR_DATA_URL, IMAGE_SIZES } from "@/lib/image-utils";
+import type { ReviewWithUser, RatingDistribution } from "@/types";
 
 interface ProductImage {
   id: string;
@@ -38,21 +39,6 @@ interface ProductVariant {
   price: string;
   stock: number;
   options: Record<string, string>;
-}
-
-interface ReviewData {
-  id: string;
-  rating: number;
-  comment: string | null;
-  adminReply: string | null;
-  adminRepliedAt: string | null;
-  createdAt: string;
-  user: { id: string; name: string | null; image: string | null };
-}
-
-interface RatingDistribution {
-  rating: number;
-  count: number;
 }
 
 export interface Product {
@@ -83,7 +69,7 @@ export interface Product {
     category: { name: string; slug: string };
     images: { url: string; alt: string | null }[];
   }[];
-  reviews: ReviewData[];
+  reviews: ReviewWithUser[];
   averageRating: number;
   totalReviews: number;
   ratingDistribution: RatingDistribution[];

@@ -78,7 +78,6 @@ export async function GET(request: NextRequest) {
 
     return apiSuccess(paginatedResponse(customersWithStats, total, { page, limit, skip }));
   } catch (err) {
-    console.error("Error fetching customers:", err);
     const errorMessage = err instanceof Error ? err.message : "Unknown error";
     return apiError(`Failed to fetch customers: ${errorMessage}`, 500);
   }

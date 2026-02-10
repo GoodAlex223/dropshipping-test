@@ -270,7 +270,7 @@ export function getWebsiteJsonLd() {
   };
 }
 
-// JSON-LD for Product
+// JSON-LD for Product (with optional review data)
 export function getProductJsonLd(product: {
   name: string;
   slug: string;
@@ -281,9 +281,15 @@ export function getProductJsonLd(product: {
   stock: number;
   images?: { url: string; alt?: string | null }[];
   category?: { name: string };
+  reviews?: { rating: number; comment: string | null; authorName: string; createdAt: string }[];
+  averageRating?: number;
+  reviewCount?: number;
 }) {
   const availability =
     product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock";
+
+  const hasReviews =
+    product.reviewCount && product.reviewCount > 0 && product.averageRating != null;
 
   return {
     "@context": "https://schema.org",
@@ -305,45 +311,30 @@ export function getProductJsonLd(product: {
         name: siteConfig.name,
       },
     },
-  };
-}
-
-// JSON-LD for Product Reviews (AggregateRating + individual reviews)
-export function getReviewsJsonLd(
-  product: { name: string; slug: string },
-  reviews: { rating: number; comment: string | null; authorName: string; createdAt: string }[],
-  averageRating: number,
-  reviewCount: number
-) {
-  if (reviewCount === 0) return null;
-
-  return {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: product.name,
-    url: `${siteConfig.url}/products/${product.slug}`,
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: averageRating.toFixed(1),
-      reviewCount,
-      bestRating: 5,
-      worstRating: 1,
-    },
-    review: reviews.slice(0, 10).map((r) => ({
-      "@type": "Review",
-      reviewRating: {
-        "@type": "Rating",
-        ratingValue: r.rating,
+    ...(hasReviews && {
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: (product.averageRating ?? 0).toFixed(1),
+        reviewCount: product.reviewCount,
         bestRating: 5,
         worstRating: 1,
       },
-      author: {
-        "@type": "Person",
-        name: r.authorName,
-      },
-      ...(r.comment && { reviewBody: r.comment }),
-      datePublished: new Date(r.createdAt).toISOString().split("T")[0],
-    })),
+      review: (product.reviews || []).slice(0, 10).map((r) => ({
+        "@type": "Review",
+        reviewRating: {
+          "@type": "Rating",
+          ratingValue: r.rating,
+          bestRating: 5,
+          worstRating: 1,
+        },
+        author: {
+          "@type": "Person",
+          name: r.authorName,
+        },
+        ...(r.comment && { reviewBody: r.comment }),
+        datePublished: new Date(r.createdAt).toISOString().split("T")[0],
+      })),
+    }),
   };
 }
 

@@ -49,8 +49,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     });
 
     return apiSuccess(updated);
-  } catch (err) {
-    console.error("Error updating review:", err);
+  } catch {
     return apiError("Failed to update review", 500);
   }
 }
@@ -76,8 +75,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     await prisma.review.delete({ where: { id } });
 
     return apiSuccess({ message: "Review deleted successfully" });
-  } catch (err) {
-    console.error("Error deleting review:", err);
+  } catch {
     return apiError("Failed to delete review", 500);
   }
 }

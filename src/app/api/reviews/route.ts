@@ -79,7 +79,6 @@ export async function POST(request: NextRequest) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
       return apiError("You have already reviewed this product", 409);
     }
-    console.error("Error creating review:", err);
     return apiError("Failed to create review", 500);
   }
 }

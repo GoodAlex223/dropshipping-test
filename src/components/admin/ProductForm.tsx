@@ -22,27 +22,40 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
-const productFormSchema = z.object({
-  name: z.string().min(1, "Name is required").max(255),
-  slug: z.string().max(255).optional(),
-  description: z.string().optional(),
-  shortDesc: z.string().max(500).optional(),
-  price: z.string().refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, {
-    message: "Price must be a positive number",
-  }),
-  comparePrice: z.string().optional(),
-  costPrice: z.string().optional(),
-  sku: z.string().min(1, "SKU is required"),
-  barcode: z.string().optional(),
-  brand: z.string().optional(),
-  mpn: z.string().optional(),
-  stock: z.string().refine((val) => !isNaN(parseInt(val)) && parseInt(val) >= 0, {
-    message: "Stock must be a non-negative integer",
-  }),
-  categoryId: z.string().min(1, "Category is required"),
-  isActive: z.boolean(),
-  isFeatured: z.boolean(),
-});
+const productFormSchema = z
+  .object({
+    name: z.string().min(1, "Name is required").max(255),
+    slug: z.string().max(255).optional(),
+    description: z.string().optional(),
+    shortDesc: z.string().max(500).optional(),
+    price: z.string().refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, {
+      message: "Price must be a positive number",
+    }),
+    comparePrice: z.string().optional(),
+    costPrice: z.string().optional(),
+    sku: z.string().min(1, "SKU is required"),
+    barcode: z.string().optional(),
+    brand: z.string().optional(),
+    mpn: z.string().optional(),
+    stock: z.string().refine((val) => !isNaN(parseInt(val)) && parseInt(val) >= 0, {
+      message: "Stock must be a non-negative integer",
+    }),
+    categoryId: z.string().min(1, "Category is required"),
+    isActive: z.boolean(),
+    isFeatured: z.boolean(),
+  })
+  .refine(
+    (data) => {
+      if (!data.comparePrice) return true;
+      const compare = parseFloat(data.comparePrice);
+      const price = parseFloat(data.price);
+      return isNaN(compare) || isNaN(price) || compare > price;
+    },
+    {
+      message: "Compare price must be greater than regular price",
+      path: ["comparePrice"],
+    }
+  );
 
 type ProductFormData = z.infer<typeof productFormSchema>;
 
@@ -305,9 +318,13 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
                       disabled={isLoading}
                     />
                   </div>
-                  <p className="text-muted-foreground text-xs">
-                    Original price for showing discounts
-                  </p>
+                  {errors.comparePrice ? (
+                    <p className="text-destructive text-sm">{errors.comparePrice.message}</p>
+                  ) : (
+                    <p className="text-muted-foreground text-xs">
+                      Original price for showing discounts
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">

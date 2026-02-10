@@ -172,6 +172,40 @@ describe("GET /api/admin/reviews", () => {
       })
     );
   });
+
+  it("ignores invalid rating filter (NaN)", async () => {
+    vi.mocked(prisma.review.findMany).mockResolvedValue([]);
+    vi.mocked(prisma.review.count).mockResolvedValue(0);
+
+    const req = createNextRequest({
+      url: "/api/admin/reviews",
+      searchParams: { rating: "abc" },
+    });
+    await GETList(req);
+
+    expect(prisma.review.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.not.objectContaining({ rating: expect.anything() }),
+      })
+    );
+  });
+
+  it("ignores out-of-range rating filter", async () => {
+    vi.mocked(prisma.review.findMany).mockResolvedValue([]);
+    vi.mocked(prisma.review.count).mockResolvedValue(0);
+
+    const req = createNextRequest({
+      url: "/api/admin/reviews",
+      searchParams: { rating: "0" },
+    });
+    await GETList(req);
+
+    expect(prisma.review.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.not.objectContaining({ rating: expect.anything() }),
+      })
+    );
+  });
 });
 
 // ===========================================================================

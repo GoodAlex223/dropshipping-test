@@ -78,8 +78,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     };
 
     return NextResponse.json(transformedOrder);
-  } catch (err) {
-    console.error("Get admin order error:", err);
+  } catch {
     return apiError("Failed to fetch order", 500);
   }
 }
@@ -119,8 +118,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       tax: updatedOrder.tax.toString(),
       total: updatedOrder.total.toString(),
     });
-  } catch (err) {
-    console.error("Update admin order error:", err);
+  } catch {
     return apiError("Failed to update order", 500);
   }
 }

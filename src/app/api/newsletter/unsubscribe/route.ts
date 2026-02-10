@@ -43,8 +43,7 @@ export async function POST(request: NextRequest) {
     });
 
     return apiSuccess({ message: "You have been unsubscribed successfully" });
-  } catch (err) {
-    console.error("Newsletter unsubscribe error:", err);
+  } catch {
     return apiError("Failed to process unsubscribe", 500);
   }
 }

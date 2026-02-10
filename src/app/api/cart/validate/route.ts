@@ -63,8 +63,7 @@ export async function GET(request: NextRequest) {
       stock: product.stock,
       isAvailable: product.isActive && product.stock > 0,
     });
-  } catch (error) {
-    console.error("Error validating cart item:", error);
+  } catch {
     return NextResponse.json({ error: "Failed to validate cart item" }, { status: 500 });
   }
 }

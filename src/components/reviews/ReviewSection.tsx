@@ -7,26 +7,12 @@ import { ReviewStats } from "./ReviewStats";
 import { ReviewForm } from "./ReviewForm";
 import { ReviewList } from "./ReviewList";
 import { MessageSquare } from "lucide-react";
-
-interface Review {
-  id: string;
-  rating: number;
-  comment: string | null;
-  adminReply: string | null;
-  adminRepliedAt: string | null;
-  createdAt: string;
-  user: { id: string; name: string | null; image: string | null };
-}
-
-interface RatingDistribution {
-  rating: number;
-  count: number;
-}
+import type { ReviewWithUser, RatingDistribution } from "@/types";
 
 interface ReviewSectionProps {
   productId: string;
   productSlug: string;
-  initialReviews: Review[];
+  initialReviews: ReviewWithUser[];
   averageRating: number;
   totalReviews: number;
   ratingDistribution: RatingDistribution[];
@@ -73,7 +59,7 @@ export function ReviewSection({
     createdAt: string;
     user: { id: string; name: string | null; image: string | null };
   }) => {
-    const newReview: Review = {
+    const newReview: ReviewWithUser = {
       ...review,
       adminReply: null,
       adminRepliedAt: null,

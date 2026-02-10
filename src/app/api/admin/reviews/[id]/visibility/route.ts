@@ -36,8 +36,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     });
 
     return apiSuccess(updated);
-  } catch (err) {
-    console.error("Error updating review visibility:", err);
+  } catch {
     return apiError("Failed to update review visibility", 500);
   }
 }
