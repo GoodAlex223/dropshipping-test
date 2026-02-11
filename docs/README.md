@@ -51,7 +51,7 @@ Central index for all project documentation.
 
 ## Implementation Plans
 
-**Active**: [2026-02-10_task-030-documentation-finalization.md](planning/plans/2026-02-10_task-030-documentation-finalization.md) — Documentation Finalization
+No active implementation plans.
 
 ### Archived Plans
 

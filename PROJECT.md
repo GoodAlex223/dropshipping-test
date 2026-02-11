@@ -34,15 +34,15 @@ Multi-category dropshipping e-commerce website with customer storefront, admin p
 
 ## Project Structure
 
-| Component      | Location                 | Purpose                  |
-| -------------- | ------------------------ | ------------------------ |
-| Entry Point    | `src/app/`               | Next.js App Router pages |
-| Components     | `src/components/`        | React components         |
-| Business Logic | `src/services/`          | Service layer            |
-| Database       | `prisma/`                | Schema and migrations    |
-| API Routes     | `src/app/api/`           | Backend API              |
-| Tests          | `tests/`                 | Unit and E2E tests       |
-| Config         | `.env`, `next.config.ts` | Configuration files      |
+| Component      | Location                  | Purpose                  |
+| -------------- | ------------------------- | ------------------------ |
+| Entry Point    | `src/app/`                | Next.js App Router pages |
+| Components     | `src/components/`         | React components         |
+| Business Logic | `src/services/`           | Service layer            |
+| Database       | `prisma/`                 | Schema and migrations    |
+| API Routes     | `src/app/api/`            | Backend API              |
+| Tests          | `tests/`                  | Unit and E2E tests       |
+| Config         | `.env`, `next.config.mjs` | Configuration files      |
 
 ---
 
