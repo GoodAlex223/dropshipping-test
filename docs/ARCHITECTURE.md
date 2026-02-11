@@ -2,13 +2,13 @@
 
 System design and technical architecture for the Dropshipping E-commerce Platform.
 
-**Last Updated**: 2026-01-26
+**Last Updated**: 2026-02-10
 
 ---
 
 ## Overview
 
-A multi-category dropshipping e-commerce website built with Next.js 16 App Router. The system supports customer product browsing, shopping cart, Stripe checkout, and admin management for products, orders, and suppliers.
+A multi-category dropshipping e-commerce website built with Next.js 14 App Router. The system supports customer product browsing, shopping cart, Stripe checkout, customer reviews, newsletter subscriptions, GA4 analytics, and admin management for products, orders, suppliers, reviews, and newsletter subscribers.
 
 ### System Diagram
 
@@ -57,15 +57,20 @@ A multi-category dropshipping e-commerce website built with Next.js 16 App Route
 
 **Components**:
 
-| Component         | Responsibility            | Location               |
-| ----------------- | ------------------------- | ---------------------- |
-| Shop Pages        | Customer-facing UI        | src/app/(shop)/        |
-| Admin Pages       | Admin dashboard UI        | src/app/(admin)/admin/ |
-| Auth Pages        | Login/Register UI         | src/app/(auth)/        |
-| UI Components     | Reusable UI elements      | src/components/ui/     |
-| Shop Components   | Shop-specific components  | src/components/shop/   |
-| Admin Components  | Admin-specific components | src/components/admin/  |
-| Common Components | Shared components         | src/components/common/ |
+| Component            | Responsibility            | Location                  |
+| -------------------- | ------------------------- | ------------------------- |
+| Shop Pages           | Customer-facing UI        | src/app/(shop)/           |
+| Admin Pages          | Admin dashboard UI        | src/app/(admin)/admin/    |
+| Auth Pages           | Login/Register UI         | src/app/(auth)/           |
+| Newsletter Pages     | Confirm/Unsubscribe       | src/app/newsletter/       |
+| Showcase Pages       | Multi-theme demos         | src/app/showcase/         |
+| UI Components        | Reusable UI elements      | src/components/ui/        |
+| Shop Components      | Shop-specific components  | src/components/shop/      |
+| Admin Components     | Admin-specific components | src/components/admin/     |
+| Review Components    | Review system UI          | src/components/reviews/   |
+| Analytics Components | Tracking components       | src/components/analytics/ |
+| Product Components   | ProductCard, SocialShare  | src/components/products/  |
+| Common Components    | Header, Footer, Consent   | src/components/common/    |
 
 **Key Interfaces**:
 
@@ -79,13 +84,15 @@ A multi-category dropshipping e-commerce website built with Next.js 16 App Route
 
 **Components**:
 
-| Component          | Responsibility         | Location                         |
-| ------------------ | ---------------------- | -------------------------------- |
-| Product Service    | Product business logic | src/services/                    |
-| Cart Service       | Cart operations        | src/stores/cart.store.ts         |
-| Order Service      | Order processing       | src/services/                    |
-| Supplier Service   | Supplier integration   | src/services/supplier.service.ts |
-| Validation Schemas | Input validation       | src/lib/validations/             |
+| Component          | Responsibility       | Location                         |
+| ------------------ | -------------------- | -------------------------------- |
+| Cart Service       | Cart operations      | src/stores/cart.store.ts         |
+| Supplier Service   | Supplier integration | src/services/supplier.service.ts |
+| Validation Schemas | Input validation     | src/lib/validations/             |
+| SEO Utilities      | Metadata, JSON-LD    | src/lib/seo.ts                   |
+| Analytics          | GA4 event tracking   | src/lib/analytics.ts             |
+| Newsletter Utils   | Tokens, HMAC, URLs   | src/lib/newsletter.ts            |
+| Share Utils        | Social sharing URLs  | src/lib/share-utils.ts           |
 
 ### API Layer
 
@@ -157,30 +164,36 @@ A multi-category dropshipping e-commerce website built with Next.js 16 App Route
 
 ### Core Entities
 
-| Entity        | Description                       | Key Fields                        |
-| ------------- | --------------------------------- | --------------------------------- |
-| User          | Customer and admin accounts       | id, email, role, passwordHash     |
-| Product       | Sellable items                    | id, name, slug, price, stock, sku |
-| Category      | Product categories (hierarchical) | id, name, slug, parentId          |
-| Cart          | Shopping cart per user            | id, userId, items                 |
-| Order         | Customer orders                   | id, orderNumber, status, total    |
-| OrderItem     | Line items in orders              | id, orderId, productId, quantity  |
-| Supplier      | Product suppliers                 | id, name, apiEndpoint, apiKey     |
-| SupplierOrder | Orders sent to suppliers          | id, orderId, supplierId, status   |
-| Address       | Customer shipping addresses       | id, userId, line1, city, country  |
+| Entity        | Description                       | Key Fields                                    |
+| ------------- | --------------------------------- | --------------------------------------------- |
+| User          | Customer and admin accounts       | id, email, role, passwordHash                 |
+| Product       | Sellable items                    | id, name, slug, price, stock, sku, brand, mpn |
+| Category      | Product categories (hierarchical) | id, name, slug, parentId                      |
+| Cart          | Shopping cart per user            | id, userId, items                             |
+| Order         | Customer orders                   | id, orderNumber, status, total                |
+| OrderItem     | Line items in orders              | id, orderId, productId, quantity              |
+| Supplier      | Product suppliers                 | id, name, apiEndpoint, apiKey                 |
+| SupplierOrder | Orders sent to suppliers          | id, orderId, supplierId, status               |
+| Address       | Customer shipping addresses       | id, userId, line1, city, country              |
+| Review        | Customer product reviews          | id, userId, productId, rating, comment        |
+| Subscriber    | Newsletter subscribers            | id, email, status, confirmationToken          |
 
 ### Relationships
 
 ```
 User ──1:N──▶ Order
 User ──1:N──▶ Address
+User ──1:N──▶ Review
 User ──1:1──▶ Cart
 Cart ──1:N──▶ CartItem ──N:1──▶ Product
 Order ──1:N──▶ OrderItem ──N:1──▶ Product
 Order ──1:N──▶ SupplierOrder ──N:1──▶ Supplier
+Order ──1:N──▶ Review
+Product ──1:N──▶ Review
 Category ──1:N──▶ Product
 Category ──1:N──▶ Category (self-referencing for hierarchy)
 Supplier ──1:N──▶ Product
+Review: Unique constraint on (userId, productId); Cascade delete on User/Product/Order
 ```
 
 ### Storage
@@ -211,17 +224,18 @@ Supplier ──1:N──▶ Product
 
 | Library                    | Version | Purpose                 |
 | -------------------------- | ------- | ----------------------- |
-| next                       | 16.x    | React framework         |
-| react                      | 19.x    | UI library              |
-| @prisma/client             | 7.x     | Database ORM            |
+| next                       | 14.x    | React framework         |
+| react                      | 18.x    | UI library              |
+| @prisma/client             | 6.x     | Database ORM            |
 | next-auth                  | 5.x     | Authentication          |
-| stripe / @stripe/stripe-js | latest  | Payment processing      |
-| zustand                    | latest  | Client state management |
-| react-hook-form            | latest  | Form handling           |
-| zod                        | latest  | Schema validation       |
-| bullmq                     | latest  | Background job queue    |
-| resend                     | latest  | Email sending           |
+| stripe / @stripe/stripe-js | 20.x    | Payment processing      |
+| zustand                    | 5.x     | Client state management |
+| react-hook-form            | 7.x     | Form handling           |
+| zod                        | 4.x     | Schema validation       |
+| bullmq                     | 5.x     | Background job queue    |
+| resend                     | 6.x     | Email sending           |
 | tailwindcss                | 4.x     | CSS framework           |
+| web-vitals                 | 5.x     | Core Web Vitals metrics |
 
 ---
 
@@ -263,7 +277,7 @@ Supplier ──1:N──▶ Product
 
 - NextAuth.js v5 with Credentials provider
 - Password hashing with bcrypt (12 rounds)
-- Session-based authentication (database sessions)
+- JWT-based authentication strategy
 - CSRF protection built into NextAuth
 - Role-based access (CUSTOMER, ADMIN)
 
@@ -278,9 +292,12 @@ Supplier ──1:N──▶ Product
 
 - Input validation with Zod schemas at all API boundaries
 - SQL injection prevented by Prisma ORM
-- XSS prevented by React's default escaping
+- XSS prevented by React's default escaping + HTML escaping in email templates
+- HMAC-SHA256 for newsletter unsubscribe token verification
+- CSV export with formula injection prevention (newsletter admin)
 - Stripe handles all payment card data (PCI compliance)
 - Passwords never stored in plain text
+- Cookie consent gating for GTM/analytics scripts
 
 ---
 
@@ -321,14 +338,17 @@ Supplier ──1:N──▶ Product
 ### Logging
 
 - Development: Console logging
-- Production: Sentry for error tracking (planned)
-- Structured error responses: `{ error: string, code: string, details?: object }`
+- Production: Sentry pre-configured but not yet activated
+- Structured error responses via `apiError()` / `apiSuccess()` helpers
+- No `console.error()` in API routes (removed in TASK-029)
 
 ### Monitoring
 
-- Uptime monitoring (planned)
-- Error tracking with Sentry (planned)
-- Performance monitoring with Next.js Analytics (planned)
+- Health check endpoint at `/api/health` (database + Redis checks)
+- Core Web Vitals tracking via `web-vitals` library → GA4 via GTM
+- GA4 e-commerce event tracking (9 events) with GDPR cookie consent
+- Sentry configuration files present (client, server, edge) — requires DSN to activate
+- Uptime monitoring recommended (UptimeRobot, Better Uptime)
 
 ---
 

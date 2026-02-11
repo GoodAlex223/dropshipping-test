@@ -2,7 +2,7 @@
 
 PostgreSQL database schema documentation for the Dropshipping E-commerce Platform.
 
-**Last Updated**: 2026-01-07
+**Last Updated**: 2026-02-10
 
 ---
 
@@ -52,7 +52,15 @@ DATABASE_URL="postgresql://postgres:postgres@localhost:5433/dropshipping"
 │    Order    │────▶│  OrderItem  │     │SupplierOrder│◀─────────┘
 └──────┬──────┘     └─────────────┘     └─────────────┘
        │
+       ├──────────▶┌─────────────┐
+       │           │   Review    │◀──── User, Product
+       │           └─────────────┘
+       │
        └─────────────────────────────────────▲
+
+┌─────────────┐
+│ Subscriber  │  (standalone, no FK)
+└─────────────┘
 ```
 
 ---
@@ -81,7 +89,7 @@ Stores user accounts (customers and admins).
 
 **Relations**:
 
-- Has many: Address, Order, Account, Session
+- Has many: Address, Order, Account, Session, Review
 - Has one: Cart
 
 ---
@@ -121,6 +129,23 @@ User sessions (NextAuth.js).
 | expires      | DateTime | No       | Session expiration   |
 
 **Indexes**: `sessionToken` (unique)
+
+---
+
+#### verification_tokens
+
+NextAuth.js verification tokens for passwordless authentication.
+
+| Column     | Type     | Nullable | Description         |
+| ---------- | -------- | -------- | ------------------- |
+| identifier | String   | No       | Email or identifier |
+| token      | String   | No       | Verification token  |
+| expires    | DateTime | No       | Token expiration    |
+
+**Indexes**:
+
+- `token` (unique)
+- `(identifier, token)` (unique)
 
 ---
 
@@ -167,7 +192,9 @@ Product catalog items.
 | comparePrice  | Decimal(10,2) | Yes      | -       | Original/compare price    |
 | costPrice     | Decimal(10,2) | Yes      | -       | Cost price (internal)     |
 | sku           | String        | No       | -       | Stock keeping unit        |
-| barcode       | String        | Yes      | -       | Product barcode           |
+| barcode       | String        | Yes      | -       | Product barcode (GTIN)    |
+| brand         | String        | Yes      | -       | Product brand name        |
+| mpn           | String        | Yes      | -       | Manufacturer Part Number  |
 | stock         | Int           | No       | 0       | Available stock           |
 | lowStockAlert | Int           | No       | 5       | Low stock threshold       |
 | weight        | Decimal(10,3) | Yes      | -       | Weight in kg              |
@@ -194,7 +221,7 @@ Product catalog items.
 **Relations**:
 
 - Belongs to: Category, Supplier
-- Has many: ProductImage, ProductVariant, CartItem, OrderItem
+- Has many: ProductImage, ProductVariant, CartItem, OrderItem, Review
 
 ---
 
@@ -409,6 +436,72 @@ Saved customer addresses.
 
 ---
 
+### Reviews
+
+#### reviews
+
+Customer product reviews with admin moderation.
+
+| Column         | Type     | Nullable | Default | Description                 |
+| -------------- | -------- | -------- | ------- | --------------------------- |
+| id             | String   | No       | cuid()  | Primary key                 |
+| productId      | String   | No       | -       | Foreign key to products     |
+| userId         | String   | No       | -       | Foreign key to users        |
+| orderId        | String   | No       | -       | Foreign key to orders       |
+| rating         | Int      | No       | -       | Rating (1-5 stars)          |
+| comment        | Text     | Yes      | -       | Review text (max 2000)      |
+| isHidden       | Boolean  | No       | false   | Hidden by admin             |
+| adminReply     | String   | Yes      | -       | Admin reply text (max 1000) |
+| adminRepliedAt | DateTime | Yes      | -       | When admin replied          |
+| createdAt      | DateTime | No       | now()   | Creation timestamp          |
+| updatedAt      | DateTime | No       | auto    | Last update timestamp       |
+
+**Indexes**:
+
+- `(userId, productId)` (unique — one review per product per user)
+- `productId`
+- `userId`
+- `orderId`
+- `isHidden`
+- `createdAt`
+
+**On Delete**: Cascade (deleted when user, product, or order is deleted)
+
+**Relations**:
+
+- Belongs to: Product, User, Order
+
+---
+
+### Newsletter
+
+#### subscribers
+
+Newsletter email subscribers with double opt-in.
+
+| Column             | Type             | Nullable | Default | Description           |
+| ------------------ | ---------------- | -------- | ------- | --------------------- |
+| id                 | String           | No       | cuid()  | Primary key           |
+| email              | String           | No       | -       | Unique email address  |
+| status             | SubscriberStatus | No       | PENDING | Subscription status   |
+| confirmationToken  | String           | Yes      | -       | Double opt-in token   |
+| confirmationExpiry | DateTime         | Yes      | -       | Token expiration      |
+| subscribedAt       | DateTime         | Yes      | -       | When confirmed/active |
+| unsubscribedAt     | DateTime         | Yes      | -       | When unsubscribed     |
+| createdAt          | DateTime         | No       | now()   | Creation timestamp    |
+| updatedAt          | DateTime         | No       | auto    | Last update timestamp |
+
+**Indexes**:
+
+- `email` (unique)
+- `confirmationToken` (unique)
+- `status`
+- `createdAt`
+
+**Relations**: Standalone (no foreign keys)
+
+---
+
 ### Configuration
 
 #### settings
@@ -465,6 +558,16 @@ Payment status.
 | REFUNDED           | Fully refunded     |
 | PARTIALLY_REFUNDED | Partially refunded |
 
+### SubscriberStatus
+
+Newsletter subscription status.
+
+| Value        | Description                     |
+| ------------ | ------------------------------- |
+| PENDING      | Awaiting email confirmation     |
+| ACTIVE       | Confirmed and active subscriber |
+| UNSUBSCRIBED | User has unsubscribed           |
+
 ---
 
 ## Common Commands
@@ -493,13 +596,18 @@ npx prisma db seed
 
 ## Seed Data
 
-The seed script (`prisma/seed.ts`) creates:
+The seed script (`prisma/seed.ts`) orchestrates modular seed files from `prisma/seed-data/`:
 
-- **Users**: Admin and customer test accounts
-- **Categories**: 4 sample categories
-- **Products**: 5 sample products with images
-- **Suppliers**: 1 sample supplier
-- **Settings**: Default application settings
+| Module      | File                       | Data                                          |
+| ----------- | -------------------------- | --------------------------------------------- |
+| Users       | `seed-data/users.ts`       | 1 admin + 4 test customers                    |
+| Categories  | `seed-data/categories.ts`  | 16 categories (top-level + subcategories)     |
+| Products    | `seed-data/products.ts`    | 50+ products with images, brand, MPN, barcode |
+| Orders      | `seed-data/orders.ts`      | 6+ orders with various statuses               |
+| Reviews     | `seed-data/reviews.ts`     | 8 reviews with admin replies                  |
+| Subscribers | `seed-data/subscribers.ts` | 6 newsletter subscribers (various statuses)   |
+
+Seed uses upsert operations for idempotent execution and maintains entity relationships via Map<string, string> for foreign keys.
 
 ```bash
 # Run seed
@@ -508,6 +616,7 @@ npx prisma db seed
 # Test accounts:
 # Admin: admin@store.com / admin123
 # Customer: customer@example.com / customer123
+# Additional: alice@example.com, bob@example.com, carol@example.com, diana@example.com (password: customer123)
 ```
 
 ---

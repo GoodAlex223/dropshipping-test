@@ -2,7 +2,7 @@
 
 Complete API documentation for the Dropshipping E-commerce Platform.
 
-**Last Updated**: 2026-01-07
+**Last Updated**: 2026-02-10
 
 ---
 
@@ -282,7 +282,196 @@ Confirm order after successful payment.
 
 ---
 
+### Newsletter (Public)
+
+#### POST /api/newsletter/subscribe
+
+Subscribe to newsletter (initiates double opt-in flow).
+
+**Request Body**:
+
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+**Response**: `200 OK`
+
+```json
+{
+  "message": "Confirmation email sent"
+}
+```
+
+**Errors**:
+
+- `400 Bad Request`: Invalid email
+- `409 Conflict`: Already subscribed (returns message, not error)
+
+**Notes**: Normalizes email to lowercase, sends confirmation email with token (24-hour expiry).
+
+---
+
+#### GET /api/newsletter/confirm
+
+Confirm newsletter subscription via token.
+
+**Query Parameters**:
+
+| Parameter | Type   | Description        |
+| --------- | ------ | ------------------ |
+| token     | string | Confirmation token |
+
+**Response**: `200 OK`
+
+```json
+{
+  "message": "Subscription confirmed"
+}
+```
+
+**Errors**:
+
+- `400 Bad Request`: Missing/invalid token
+- `410 Gone`: Token expired
+
+---
+
+#### GET /api/newsletter/unsubscribe
+
+Unsubscribe via HMAC-signed token.
+
+**Query Parameters**:
+
+| Parameter | Type   | Description       |
+| --------- | ------ | ----------------- |
+| id        | string | Subscriber ID     |
+| token     | string | HMAC-SHA256 token |
+
+**Response**: `200 OK`
+
+**Errors**:
+
+- `400 Bad Request`: Invalid/missing parameters
+- `403 Forbidden`: Invalid HMAC token
+
+---
+
+### Reviews (Public)
+
+#### GET /api/products/[slug]/reviews
+
+List reviews for a product.
+
+**Query Parameters**:
+
+| Parameter | Type   | Default | Description    |
+| --------- | ------ | ------- | -------------- |
+| page      | number | 1       | Page number    |
+| limit     | number | 10      | Items per page |
+
+**Response**: `200 OK`
+
+```json
+{
+  "reviews": [
+    {
+      "id": "clx...",
+      "rating": 5,
+      "comment": "Great product!",
+      "user": { "name": "John" },
+      "createdAt": "2026-01-05T...",
+      "adminReply": "Thanks!",
+      "adminRepliedAt": "2026-01-06T..."
+    }
+  ],
+  "pagination": { ... },
+  "stats": {
+    "averageRating": 4.5,
+    "totalReviews": 8,
+    "ratingDistribution": { "5": 4, "4": 2, "3": 1, "2": 0, "1": 1 }
+  }
+}
+```
+
+**Notes**: Only returns non-hidden reviews (`isHidden: false`).
+
+---
+
 ## Protected Endpoints (Authentication Required)
+
+### Reviews (Customer)
+
+#### GET /api/reviews/eligibility
+
+Check if user can review a product.
+
+**Query Parameters**:
+
+| Parameter | Type   | Description |
+| --------- | ------ | ----------- |
+| productId | string | Product ID  |
+
+**Response**: `200 OK`
+
+```json
+{
+  "canReview": true,
+  "hasExistingReview": false,
+  "orderId": "clx..."
+}
+```
+
+**Notes**: Requires DELIVERED order with product in order items. One review per product per user.
+
+---
+
+#### POST /api/reviews
+
+Create a product review.
+
+**Request Body**:
+
+```json
+{
+  "productId": "clx...",
+  "orderId": "clx...",
+  "rating": 5,
+  "comment": "Great product!"
+}
+```
+
+**Response**: `201 Created`
+
+**Errors**:
+
+- `400 Bad Request`: Invalid data (rating 1-5, comment max 2000 chars)
+- `400 Bad Request`: Not eligible to review
+- `409 Conflict`: Already reviewed this product
+
+---
+
+#### PUT /api/reviews/[id]
+
+Update own review.
+
+**Request Body**:
+
+```json
+{
+  "rating": 4,
+  "comment": "Updated review text"
+}
+```
+
+---
+
+#### DELETE /api/reviews/[id]
+
+Delete own review.
+
+---
 
 ### Orders
 
@@ -574,6 +763,117 @@ Test supplier API connection.
 
 ---
 
+### Admin Reviews
+
+#### GET /api/admin/reviews
+
+List all reviews with filters.
+
+**Query Parameters**:
+
+| Parameter | Type    | Description                    |
+| --------- | ------- | ------------------------------ |
+| page      | number  | Page number                    |
+| limit     | number  | Items per page                 |
+| search    | string  | Search in comment or user name |
+| rating    | number  | Filter by rating (1-5)         |
+| isHidden  | boolean | Filter by visibility           |
+
+---
+
+#### GET /api/admin/reviews/[id]
+
+Get single review with user and product details.
+
+---
+
+#### DELETE /api/admin/reviews/[id]
+
+Delete a review.
+
+---
+
+#### PATCH /api/admin/reviews/[id]/reply
+
+Add or update admin reply to a review.
+
+**Request Body**:
+
+```json
+{
+  "adminReply": "Thanks for your review!"
+}
+```
+
+**Notes**: Sets `adminRepliedAt` timestamp automatically.
+
+---
+
+#### PATCH /api/admin/reviews/[id]/visibility
+
+Toggle review visibility (show/hide).
+
+**Request Body**:
+
+```json
+{
+  "isHidden": true
+}
+```
+
+---
+
+### Admin Newsletter
+
+#### GET /api/admin/newsletter
+
+List newsletter subscribers with filters.
+
+**Query Parameters**:
+
+| Parameter | Type   | Description                           |
+| --------- | ------ | ------------------------------------- |
+| page      | number | Page number                           |
+| limit     | number | Items per page (default 20)           |
+| search    | string | Search by email                       |
+| status    | string | Filter: PENDING, ACTIVE, UNSUBSCRIBED |
+
+---
+
+#### PATCH /api/admin/newsletter/[id]
+
+Update subscriber status (activate or unsubscribe).
+
+**Request Body**:
+
+```json
+{
+  "status": "ACTIVE"
+}
+```
+
+---
+
+#### DELETE /api/admin/newsletter/[id]
+
+Delete a subscriber.
+
+---
+
+#### GET /api/admin/newsletter/export
+
+Export subscribers as CSV.
+
+**Query Parameters**:
+
+| Parameter | Type   | Description                 |
+| --------- | ------ | --------------------------- |
+| status    | string | Filter by status (optional) |
+
+**Response**: CSV file download with formula injection prevention.
+
+---
+
 ### Admin Upload
 
 #### POST /api/admin/upload
@@ -633,6 +933,39 @@ Get background job queue statistics.
   "orderStatusSync": { ... }
 }
 ```
+
+---
+
+## Utility Endpoints
+
+### GET /api/health
+
+Health check endpoint.
+
+**Response**: `200 OK`
+
+```json
+{
+  "status": "ok",
+  "timestamp": "2026-01-07T12:00:00.000Z",
+  "version": "0.1.0",
+  "uptime": 3600,
+  "checks": {
+    "database": { "status": "ok", "latency": 5 },
+    "redis": { "status": "ok", "latency": 2 }
+  }
+}
+```
+
+---
+
+### GET /feed/google-shopping.xml
+
+Google Shopping product feed (RSS 2.0).
+
+**Response**: `200 OK` (XML)
+
+**Notes**: Includes active products with Zod-validated fields (title, description, price, GTIN, brand, MPN). Hourly revalidation with stale-while-revalidate.
 
 ---
 

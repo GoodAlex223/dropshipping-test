@@ -101,6 +101,43 @@ This checklist covers critical user flows that should be tested before each rele
 - [ ] Order detail page shows full info
 - [ ] Order status timeline displays correctly
 
+### Product Reviews
+
+- [ ] Review section shows on product detail page
+- [ ] Star rating display shows average and distribution
+- [ ] Review list shows reviewer name, rating, date, comment
+- [ ] Admin replies display below reviews with timestamp
+- [ ] Hidden reviews are not shown to customers
+- [ ] Review form appears for eligible users (delivered order)
+- [ ] Review form hidden for ineligible users (no delivered order)
+- [ ] Review form validates rating (1-5) and comment (max 2000)
+- [ ] Submitting review works and shows in list
+- [ ] Edit own review works
+- [ ] Delete own review works
+- [ ] One review per product per user enforced
+
+### Newsletter
+
+- [ ] Newsletter signup form in footer works
+- [ ] Email validation on subscribe form
+- [ ] Success message shows after subscribing
+- [ ] Confirmation email received (if Resend configured)
+- [ ] Clicking confirmation link activates subscription
+- [ ] Expired confirmation token shows error
+- [ ] Unsubscribe link in emails works
+- [ ] Duplicate subscription shows appropriate message
+
+### Social Sharing
+
+- [ ] Share buttons display on product detail pages
+- [ ] Facebook share button opens correct URL
+- [ ] X (Twitter) share button opens correct URL
+- [ ] Pinterest share button opens correct URL
+- [ ] WhatsApp share button opens correct URL
+- [ ] Telegram share button opens correct URL
+- [ ] Native share button works on mobile (Web Share API)
+- [ ] Fallback clipboard copy works when native share unavailable
+
 ### Search
 
 - [ ] Search dialog opens with Ctrl+K
@@ -168,6 +205,51 @@ This checklist covers critical user flows that should be tested before each rele
 - [ ] Supplier detail shows products/orders
 - [ ] Delete supplier blocked if has products
 
+### Admin Review Management
+
+- [ ] Review list loads with pagination
+- [ ] Search reviews by content works
+- [ ] Rating filter works
+- [ ] Hidden/visible filter works
+- [ ] Reply to review works (creates reply)
+- [ ] Edit existing reply works
+- [ ] Toggle review visibility (hide/show) works
+- [ ] Delete review with confirmation works
+
+### Admin Newsletter Management
+
+- [ ] Subscriber list loads with pagination
+- [ ] Search by email works
+- [ ] Status filter works (Pending/Active/Unsubscribed)
+- [ ] Toggle subscriber status works
+- [ ] Delete subscriber works
+- [ ] CSV export downloads correctly
+- [ ] CSV export respects status filter
+
+---
+
+## Analytics & Consent Tests
+
+### Cookie Consent
+
+- [ ] Cookie consent banner shows on first visit
+- [ ] Accept button activates GTM
+- [ ] Decline button prevents GTM loading
+- [ ] Consent choice persists across page reloads
+- [ ] GTM script only loads after acceptance
+
+### GA4 E-commerce Events (requires GTM configured)
+
+- [ ] `view_item_list` fires on product listing pages
+- [ ] `select_item` fires on product card click
+- [ ] `view_item` fires on product detail page
+- [ ] `add_to_cart` fires when adding product
+- [ ] `view_cart` fires when opening cart
+- [ ] `begin_checkout` fires on checkout start
+- [ ] `add_shipping_info` fires on shipping step
+- [ ] `add_payment_info` fires on payment step
+- [ ] `purchase` fires on order confirmation
+
 ---
 
 ## Technical Tests
@@ -184,9 +266,13 @@ This checklist covers critical user flows that should be tested before each rele
 - [ ] Meta titles are set correctly
 - [ ] Meta descriptions are present
 - [ ] OpenGraph tags are set
-- [ ] sitemap.xml is accessible
+- [ ] Dynamic OG images generate for product pages
+- [ ] sitemap.xml is accessible and lists products/categories
 - [ ] robots.txt is correct
 - [ ] Structured data validates (Google Rich Results Test)
+- [ ] JSON-LD includes product and review data
+- [ ] Google Shopping XML feed is accessible at /feed/google-shopping.xml
+- [ ] Feed validates with Google Merchant Center
 
 ### Responsive Design
 

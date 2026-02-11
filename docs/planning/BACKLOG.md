@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-02-09
+**Last Updated**: 2026-02-11
 
 ---
 
@@ -260,6 +260,15 @@ Improvements to existing functionality.
 - [ ] Add per-worker database isolation for E2E tests — use `$TEST_WORKER_INDEX` for parallel test isolation
 - [ ] Add error handling in `tests/global-setup.ts` for Prisma connection failures — currently throws raw Prisma errors; wrap with user-friendly message suggesting `docker-compose up -d` or checking DATABASE_URL
 - [ ] Add E2E test coverage for checkout and auth flows — current navigation.spec.ts only covers storefront browsing and category navigation
+
+### [2026-02-10] From: TASK-030 Documentation Finalization
+
+**Origin**: docs/archive/plans/2026-02-10_task-030-documentation-finalization.md
+
+- [ ] Automated doc freshness check — Script to compare doc "Last Updated" dates with git file timestamps to identify stale documentation
+- [ ] API docs generation — Auto-generate endpoints.md from route files or OpenAPI spec to prevent docs drifting from code
+- [ ] Schema docs generation — Auto-generate schema.md from prisma/schema.prisma to keep database docs in sync
+- [ ] Link checker in CI — Add CI step to validate internal doc links are not broken after documentation changes
 
 ### [2026-02-10] From: TASK-029 Technical Debt Cleanup
 

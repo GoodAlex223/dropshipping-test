@@ -2,7 +2,7 @@
 
 Environment setup and deployment documentation for the Dropshipping E-commerce Platform.
 
-**Last Updated**: 2026-01-07
+**Last Updated**: 2026-02-10
 
 ---
 
@@ -122,7 +122,7 @@ openssl rand -base64 32
 | Redis      | Upstash, Railway        | Self-hosted Redis |
 | Storage    | Cloudflare R2, AWS S3   | MinIO             |
 | CDN        | Cloudflare              | CloudFront        |
-| Monitoring | Sentry                  | Self-hosted       |
+| Monitoring | Sentry (not yet active) | Self-hosted       |
 
 ### Deployment Options
 
@@ -428,6 +428,7 @@ Runs on push to main or manual trigger:
 | `VERCEL_ORG_ID`     | Vercel organization/team ID           | Vercel       |
 | `VERCEL_PROJECT_ID` | Vercel project ID                     | Vercel       |
 | `DATABASE_URL`      | Production database connection string | Vercel       |
+| `NEXTAUTH_SECRET`   | Auth encryption key (min 32 chars)    | Vercel       |
 | `VPS_HOST`          | VPS hostname or IP address            | VPS          |
 | `VPS_USERNAME`      | VPS SSH username                      | VPS          |
 | `VPS_SSH_KEY`       | VPS SSH private key                   | VPS          |
@@ -455,13 +456,16 @@ This means CI stays green even when deployment is not yet configured.
 
 ## Monitoring Setup
 
-### Sentry (Error Tracking)
+### Sentry (Error Tracking) — Not Yet Implemented
 
-Sentry is pre-configured in the project. To enable:
+> **Status**: Prepared but not active. Configuration files and env var placeholders exist, but Sentry SDK is not installed and no error tracking is active.
 
-1. Create project at sentry.io
-2. Get DSN from project settings
-3. Set environment variables:
+To enable in the future:
+
+1. Install Sentry SDK: `npm install @sentry/nextjs`
+2. Create project at sentry.io
+3. Get DSN from project settings
+4. Set environment variables:
 
 ```bash
 SENTRY_DSN="https://xxx@xxx.ingest.sentry.io/xxx"
@@ -470,7 +474,7 @@ SENTRY_ORG="your-org"
 SENTRY_PROJECT="dropshipping"
 ```
 
-**Configuration files:**
+**Planned configuration files (not yet created):**
 
 - `sentry.client.config.ts` - Browser error tracking
 - `sentry.server.config.ts` - Server error tracking
@@ -556,7 +560,7 @@ Configure monitoring service (UptimeRobot, Better Uptime, Pingdom) to check:
 
 ### Monitoring
 
-- [ ] Error tracking configured (Sentry)
+- [ ] Error tracking configured (Sentry — not yet implemented, see monitoring section)
 - [ ] Uptime monitoring configured
 - [ ] Logs accessible
 - [ ] Health check endpoint accessible
@@ -595,11 +599,10 @@ Configure monitoring service (UptimeRobot, Better Uptime, Pingdom) to check:
 - Check for TypeScript errors
 - Verify all env vars are set
 
-**Sentry not reporting errors**:
+**Sentry not reporting errors** (not yet implemented):
 
-- Verify DSN is correct
-- Check that `enabled: true` in config
-- Ensure SENTRY_DSN env var is set
+- Sentry is prepared but not active — SDK not installed
+- To enable: install `@sentry/nextjs`, create config files, set env vars
 
 **Health check failing**:
 

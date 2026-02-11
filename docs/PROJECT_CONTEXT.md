@@ -2,17 +2,17 @@
 
 Accumulated knowledge, decisions, and patterns for the Dropshipping E-commerce Platform.
 
-**Last Updated**: 2026-01-26
+**Last Updated**: 2026-02-10
 
 ---
 
 ## Overview
 
-Multi-category dropshipping e-commerce website built with Next.js 16 App Router. Supports product management via API and CSV import, Stripe payments, and automated order forwarding to suppliers.
+Multi-category dropshipping e-commerce website built with Next.js 14 App Router. Supports product management via API and CSV import, Stripe payments, automated order forwarding to suppliers, customer reviews, newsletter subscriptions, GA4 analytics, and social sharing.
 
 **Project Start**: 2026-01-05
 **Current Status**: MVP Complete & Demo Deployed
-**Current Phase**: Post-MVP (SEO, Analytics, Marketing Preparation)
+**Current Phase**: Freeze & Finalization (2026-02-09 to 2026-02-13)
 
 ---
 
@@ -20,15 +20,23 @@ Multi-category dropshipping e-commerce website built with Next.js 16 App Router.
 
 ### Decision Log
 
-| Date       | Decision                   | Rationale                                        | Alternatives Considered        |
-| ---------- | -------------------------- | ------------------------------------------------ | ------------------------------ |
-| 2026-01-05 | Next.js 14+ App Router     | Modern patterns, SSR/SSG, great DX               | Pages Router, separate backend |
-| 2026-01-05 | Prisma ORM                 | Type-safe queries, migrations, good DX           | Raw SQL, Drizzle, TypeORM      |
-| 2026-01-05 | Zustand for cart state     | Lightweight, TypeScript-friendly                 | Redux, Jotai, React Context    |
-| 2026-01-05 | Stripe for payments        | Industry standard, excellent docs, PCI compliant | PayPal, Square                 |
-| 2026-01-05 | BullMQ for background jobs | Reliable, Redis-backed, good monitoring          | pg-boss, custom solution       |
-| 2026-01-05 | S3/R2 for file storage     | Scalable, CDN-ready, cost-effective              | Local storage, Cloudinary      |
-| 2026-01-05 | shadcn/ui components       | Customizable, accessible, Tailwind-based         | MUI, Chakra, custom components |
+| Date       | Decision                        | Rationale                                           | Alternatives Considered        |
+| ---------- | ------------------------------- | --------------------------------------------------- | ------------------------------ |
+| 2026-01-05 | Next.js 14+ App Router          | Modern patterns, SSR/SSG, great DX                  | Pages Router, separate backend |
+| 2026-01-05 | Prisma ORM                      | Type-safe queries, migrations, good DX              | Raw SQL, Drizzle, TypeORM      |
+| 2026-01-05 | Zustand for cart state          | Lightweight, TypeScript-friendly                    | Redux, Jotai, React Context    |
+| 2026-01-05 | Stripe for payments             | Industry standard, excellent docs, PCI compliant    | PayPal, Square                 |
+| 2026-01-05 | BullMQ for background jobs      | Reliable, Redis-backed, good monitoring             | pg-boss, custom solution       |
+| 2026-01-05 | S3/R2 for file storage          | Scalable, CDN-ready, cost-effective                 | Local storage, Cloudinary      |
+| 2026-01-05 | shadcn/ui components            | Customizable, accessible, Tailwind-based            | MUI, Chakra, custom components |
+| 2026-02-01 | GA4 via GTM for analytics       | Industry standard, GDPR compliance, rich e-commerce | Plausible, PostHog, Fathom     |
+| 2026-02-01 | Cookie consent gating GTM       | GDPR compliance, no tracking without consent        | Consent mode v2, no consent    |
+| 2026-02-02 | Platform-specific share buttons | Better UX than generic share, tracks per platform   | AddThis, ShareThis, generic    |
+| 2026-02-04 | Double opt-in newsletter        | Anti-spam compliance, higher quality subscribers    | Single opt-in                  |
+| 2026-02-04 | HMAC-SHA256 unsubscribe tokens  | Deterministic, no DB storage needed, tamper-proof   | Random tokens stored in DB     |
+| 2026-02-06 | Verified purchase reviews       | Prevents fake reviews, builds trust                 | Open reviews, captcha-only     |
+| 2026-02-06 | Google Shopping XML feed        | SEO product visibility, free merchant listings      | No feed, JSON-LD only          |
+| 2026-02-07 | Dual CI/CD deployment           | Flexibility for serverless or traditional hosting   | Vercel-only, VPS-only          |
 
 ### Major Architectural Decisions
 
@@ -117,14 +125,18 @@ Multi-category dropshipping e-commerce website built with Next.js 16 App Router.
 
 ### Code Patterns
 
-| Pattern               | When to Use                          | Example                             |
-| --------------------- | ------------------------------------ | ----------------------------------- |
-| Server Components     | Data fetching, SEO-critical pages    | Product detail, category pages      |
-| Client Components     | Interactivity, forms, client state   | Cart drawer, checkout form          |
-| API Routes            | External webhooks, complex mutations | Stripe webhooks, order confirmation |
-| Server Actions        | Form submissions (future)            | Not currently used                  |
-| Zustand stores        | Client-side global state             | Cart state                          |
-| React Hook Form + Zod | All forms                            | Checkout, login, product forms      |
+| Pattern                      | When to Use                          | Example                                 |
+| ---------------------------- | ------------------------------------ | --------------------------------------- |
+| Server Components            | Data fetching, SEO-critical pages    | Product detail, category pages          |
+| Client Components            | Interactivity, forms, client state   | Cart drawer, checkout form, review form |
+| API Routes                   | External webhooks, complex mutations | Stripe webhooks, order confirmation     |
+| Zustand stores               | Client-side global state             | Cart state, cookie consent              |
+| React Hook Form + Zod        | All forms                            | Checkout, login, product forms          |
+| apiError()/apiSuccess()      | Standardized API responses           | All API route handlers                  |
+| requireAdmin()/requireAuth() | Auth guards as early returns         | Protected API endpoints                 |
+| useEffect + useRef           | Prevent duplicate analytics events   | Cart tracking, purchase tracking        |
+| GTM dataLayer push           | Client-side analytics events         | GA4 e-commerce events                   |
+| HMAC token verification      | Tamper-proof URL tokens              | Newsletter unsubscribe links            |
 
 ### Component Patterns
 
@@ -216,11 +228,13 @@ src/
 ### Code Style
 
 - Server Components by default, `"use client"` only when needed
-- Prefer Server Actions for mutations (future)
 - Always validate inputs with Zod at API boundaries
 - Use `async/await` over `.then()` chains
 - Destructure props in function signature
 - Export types alongside functions when needed
+- Use `apiError()`/`apiSuccess()` for all API responses
+- No `console.error()` in API routes (removed in TASK-029)
+- Use bare `catch` syntax for unused error variables
 
 ---
 
@@ -228,25 +242,40 @@ src/
 
 ### Glossary
 
-| Term             | Definition                                       |
-| ---------------- | ------------------------------------------------ |
-| Dropshipping     | Retail model where seller doesn't hold inventory |
-| SKU              | Stock Keeping Unit - unique product identifier   |
-| Supplier Order   | Order sent to supplier for fulfillment           |
-| Payment Intent   | Stripe object representing a payment attempt     |
-| Compare Price    | Original/strikethrough price (before discount)   |
-| Featured Product | Product highlighted on homepage                  |
-| Slug             | URL-friendly identifier (e.g., "blue-widget")    |
+| Term             | Definition                                                        |
+| ---------------- | ----------------------------------------------------------------- |
+| Dropshipping     | Retail model where seller doesn't hold inventory                  |
+| SKU              | Stock Keeping Unit - unique product identifier                    |
+| MPN              | Manufacturer Part Number - manufacturer's product identifier      |
+| GTIN             | Global Trade Item Number - barcode/UPC identifier                 |
+| Supplier Order   | Order sent to supplier for fulfillment                            |
+| Payment Intent   | Stripe object representing a payment attempt                      |
+| Compare Price    | Original/strikethrough price (before discount)                    |
+| Featured Product | Product highlighted on homepage                                   |
+| Slug             | URL-friendly identifier (e.g., "blue-widget")                     |
+| Double Opt-in    | Email subscription requiring confirmation click before activation |
+| HMAC             | Hash-based Message Authentication Code for tamper-proof tokens    |
+| OG Image         | Open Graph image for social media link previews                   |
+| GTM              | Google Tag Manager - analytics tag management                     |
+| JSON-LD          | Structured data format for search engine rich results             |
+| Web Vitals       | Core performance metrics (CLS, LCP, FCP, TTFB, INP)               |
 
 ### Business Rules
 
-| Rule                        | Description                            | Implemented In            |
-| --------------------------- | -------------------------------------- | ------------------------- |
-| Stock validation            | Cannot purchase more than available    | Cart validation, checkout |
-| Price at purchase           | Order stores price at time of purchase | Order creation            |
-| Admin-only product creation | Only admins can create/edit products   | API middleware            |
-| Order number format         | ORD-YYYYMMDD-XXXX                      | src/lib/stripe.ts         |
-| Guest checkout              | Users can checkout without account     | Checkout flow             |
+| Rule                        | Description                                               | Implemented In                     |
+| --------------------------- | --------------------------------------------------------- | ---------------------------------- |
+| Stock validation            | Cannot purchase more than available                       | Cart validation, checkout          |
+| Price at purchase           | Order stores price at time of purchase                    | Order creation                     |
+| Admin-only product creation | Only admins can create/edit products                      | API middleware                     |
+| Order number format         | ORD-YYYYMMDD-XXXX                                         | src/lib/stripe.ts                  |
+| Guest checkout              | Users can checkout without account                        | Checkout flow                      |
+| Verified purchase reviews   | Only users with DELIVERED orders can review               | Review eligibility API             |
+| One review per product      | Users can write only one review per product               | Unique constraint userId+productId |
+| comparePrice > price        | Compare price must exceed selling price if provided       | Zod refinement, API routes         |
+| Newsletter double opt-in    | Subscribers must confirm email before activation          | Newsletter API + email flow        |
+| HMAC unsubscribe            | Unsubscribe tokens are HMAC-signed, not stored in DB      | Newsletter unsubscribe API         |
+| Email normalization         | Emails lowercased and trimmed before DB operations        | Newsletter subscribe API           |
+| CSV formula injection       | CSV exports escape cells starting with =, +, -, @, \t, \r | Admin newsletter/order export      |
 
 ---
 
@@ -254,19 +283,24 @@ src/
 
 ### Technical Debt
 
-| Issue                      | Impact                   | Remediation Plan            | Priority |
-| -------------------------- | ------------------------ | --------------------------- | -------- |
-| No cart merge on login     | Guest cart lost on login | Implement cart sync service | Medium   |
-| E2E tests need prod build  | Slow CI, unreliable dev  | Pre-compile in CI           | Low      |
-| No product search indexing | Basic search only        | Add Meilisearch             | Low      |
+| Issue                        | Impact                                  | Remediation Plan             | Priority |
+| ---------------------------- | --------------------------------------- | ---------------------------- | -------- |
+| No cart merge on login       | Guest cart lost on login                | Implement cart sync service  | Medium   |
+| No product search indexing   | Basic search only                       | Add Meilisearch              | Low      |
+| No structured logging        | Hard to debug in production             | Add pino or winston          | Medium   |
+| No partial update validation | Admin updates accept any fields         | Add explicit partial schemas | Low      |
+| React 18 pinned              | Can't use React.cache, RSC improvements | Upgrade when stable          | Low      |
+| Next.js 14 pinned            | Security patches pending                | Major upgrade with migration | Medium   |
 
 ### Workarounds
 
-| Issue                        | Workaround                       | Permanent Fix Needed |
-| ---------------------------- | -------------------------------- | -------------------- |
-| Prisma Decimal serialization | Convert to string for JSON       | No                   |
-| Middleware Edge runtime      | Added `runtime = "nodejs"`       | No                   |
-| Hydration mismatch for cart  | `useEffect` for client rendering | No                   |
+| Issue                        | Workaround                               | Permanent Fix Needed |
+| ---------------------------- | ---------------------------------------- | -------------------- |
+| Prisma Decimal serialization | Convert to string for JSON               | No                   |
+| Middleware Edge runtime      | Added `runtime = "nodejs"`               | No                   |
+| Hydration mismatch for cart  | `useEffect` for client rendering         | No                   |
+| ZodEffects breaks .partial() | Split base/refined schemas               | No (design pattern)  |
+| Native share hydration       | CSS hiding instead of conditional render | No (design pattern)  |
 
 ---
 
@@ -274,19 +308,34 @@ src/
 
 ### Project Evolution
 
-- **2026-01-05**: Project initialized with Next.js 16, TypeScript, Prisma
+- **2026-01-05**: Project initialized with Next.js 14, TypeScript, Prisma
 - **2026-01-05**: Completed all MVP phases (1-5.2: Foundation, Catalog, Cart, Orders, SEO, Testing)
-- **2026-01-07**: Phase 5.3 Deployment infrastructure complete (CI/CD, Docker, Sentry)
+- **2026-01-07**: Phase 5.3 Deployment infrastructure complete (CI/CD, Docker)
 - **2026-01-07**: Documentation completion
 - **2026-01-13**: Phase 5.4 Demo deployment to Vercel with Neon PostgreSQL
 - **2026-01-13**: MVP plan archived
-- **2026-01-22**: TASK-017 SEO Technical Setup complete
+- **2026-01-22**: TASK-017 SEO Technical Setup (sitemap, robots.txt, meta tags, JSON-LD)
+- **2026-02-01**: TASK-018 GA4 Analytics Integration (GTM, e-commerce events, cookie consent, Web Vitals)
+- **2026-02-02**: TASK-019 Social Sharing (platform buttons, Web Share API, OG images)
+- **2026-02-03**: TASK-020 Performance Optimization (image blur placeholders, resource hints, deferred fonts)
+- **2026-02-04**: TASK-021 Google Shopping XML Feed (RSS 2.0, Zod validation, hourly revalidation)
+- **2026-02-04**: TASK-022 Newsletter System (double opt-in, HMAC unsubscribe, admin management)
+- **2026-02-05**: TASK-023 Product Seed Data (50+ products, hierarchical categories, realistic data)
+- **2026-02-06**: TASK-024 Review System (verified purchase, star ratings, admin moderation)
+- **2026-02-06**: TASK-025 E2E Test Infrastructure (Playwright, global setup, CI optimization)
+- **2026-02-07**: TASK-026 CI/CD Deployment Pipeline (dual Vercel/VPS, secret validation)
+- **2026-02-09**: TASK-027 Dependency Audit (security patches, 30 package updates)
+- **2026-02-09**: TASK-028 Test Coverage Improvement (158 new tests, 89.82% coverage)
+- **2026-02-10**: TASK-029 Technical Debt Cleanup (NaN guards, JSON-LD merge, console.error removal)
+- **2026-02-09 to 2026-02-13**: Freeze Week (stability, cleanup, documentation)
 
 ### Deprecated Approaches
 
-| What | When Deprecated | Replaced By | Why                 |
-| ---- | --------------- | ----------- | ------------------- |
-| -    | -               | -           | No deprecations yet |
+| What                   | When Deprecated | Replaced By               | Why                             |
+| ---------------------- | --------------- | ------------------------- | ------------------------------- |
+| console.error in APIs  | 2026-02-10      | Structured apiError()     | Cleaner error handling          |
+| Separate JSON-LD funcs | 2026-02-10      | Single getProductJsonLd() | Avoid duplicate structured data |
+| Server Actions mention | 2026-02-10      | API Routes pattern        | Not currently used in project   |
 
 ---
 
