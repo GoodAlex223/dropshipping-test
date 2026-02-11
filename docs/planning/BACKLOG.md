@@ -269,6 +269,7 @@ Improvements to existing functionality.
 - [ ] API docs generation — Auto-generate endpoints.md from route files or OpenAPI spec to prevent docs drifting from code
 - [ ] Schema docs generation — Auto-generate schema.md from prisma/schema.prisma to keep database docs in sync
 - [ ] Link checker in CI — Add CI step to validate internal doc links are not broken after documentation changes
+- [ ] Repo file reference validation — Verify that documentation references to actual repo files (e.g., `next.config.mjs` in PROJECT.md) match real filenames; caught `next.config.ts` typo in TASK-030 code review
 
 ### [2026-02-10] From: TASK-029 Technical Debt Cleanup
 
