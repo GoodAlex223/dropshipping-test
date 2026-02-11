@@ -2,30 +2,32 @@
 
 Project-specific configuration. Universal rules are in [CLAUDE.md](CLAUDE.md).
 
-**Last Updated**: 2026-01-26
+**Last Updated**: 2026-02-10
 
 ---
 
 ## Project Overview
 
-Multi-category dropshipping e-commerce website with customer storefront, admin panel, and supplier integrations. Supports product management via API and CSV import, Stripe payments, and automated order forwarding to suppliers.
+Multi-category dropshipping e-commerce website with customer storefront, admin panel, and supplier integrations. Supports product management via API and CSV import, Stripe payments, automated order forwarding to suppliers, customer reviews, newsletter subscriptions, and GA4 analytics.
 
 ### Tech Stack
 
 | Component    | Technology                         |
 | ------------ | ---------------------------------- |
 | Language     | TypeScript                         |
-| Framework    | Next.js 16 (App Router)            |
+| Framework    | Next.js 14 (App Router)            |
+| UI Library   | React 18                           |
 | Styling      | Tailwind CSS 4 + shadcn/ui + Radix |
 | Database     | PostgreSQL                         |
-| ORM          | Prisma 7                           |
+| ORM          | Prisma 6                           |
 | Auth         | NextAuth.js (Auth.js v5)           |
 | State        | Zustand                            |
 | Forms        | React Hook Form + Zod              |
 | Payments     | Stripe                             |
 | Email        | Resend                             |
-| File Storage | S3-compatible (Cloudflare R2)      |
+| File Storage | S3-compatible (AWS/Cloudflare R2)  |
 | Queue        | BullMQ + Redis                     |
+| Analytics    | GA4 via Google Tag Manager         |
 | Testing      | Vitest (unit) + Playwright (E2E)   |
 
 ---
@@ -40,7 +42,7 @@ Multi-category dropshipping e-commerce website with customer storefront, admin p
 | Database       | `prisma/`                | Schema and migrations    |
 | API Routes     | `src/app/api/`           | Backend API              |
 | Tests          | `tests/`                 | Unit and E2E tests       |
-| Config         | `.env`, `next.config.js` | Configuration files      |
+| Config         | `.env`, `next.config.ts` | Configuration files      |
 
 ---
 
@@ -120,17 +122,17 @@ pre-commit run --all-files
 ### Code Patterns
 
 - **Server Components by default**: Only use `"use client"` when necessary
-- **Server Actions for mutations**: Prefer Server Actions over API routes for forms
 - **Zod for all validation**: Input validation at API boundaries
-- **Service layer**: Business logic in `services/`, not in routes
+- **API route pattern**: Export named functions (GET, POST, PUT, DELETE), use `try/catch`, return `NextResponse.json()`
+- **Auth guards**: Use `requireAdmin()` / `requireAuth()` from `api-utils.ts`, never roll custom auth checks
 - **Optimistic updates**: Use for cart operations
 
 ### Error Handling
 
-- Use custom `AppError` class for business logic errors
-- Structured error responses: `{ error: string, code: string, details?: object }`
-- Log errors with context to Sentry
+- Structured error responses via `apiError()` helper: `{ error: string }`
+- No `console.error()` in API routes (removed in TASK-029)
 - User-friendly error messages, no stack traces in production
+- Sentry integration prepared but not yet activated
 
 ---
 
@@ -154,10 +156,11 @@ pre-commit run --all-files
 | `STRIPE_SECRET_KEY`     | Stripe API key              | .env     |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook verification | .env     |
 | `RESEND_API_KEY`        | Email service key           | .env     |
-| `R2_ACCESS_KEY_ID`      | R2 storage credentials      | .env     |
-| `R2_SECRET_ACCESS_KEY`  | R2 storage credentials      | .env     |
-| `R2_BUCKET_NAME`        | R2 bucket name              | .env     |
+| `AWS_ACCESS_KEY_ID`     | S3/R2 storage credentials   | .env     |
+| `AWS_SECRET_ACCESS_KEY` | S3/R2 storage credentials   | .env     |
 | `REDIS_URL`             | Redis connection for queues | .env     |
+| `NEXT_PUBLIC_GTM_ID`    | Google Tag Manager ID       | .env     |
+| `NEXT_PUBLIC_APP_URL`   | Application base URL        | .env     |
 
 ---
 

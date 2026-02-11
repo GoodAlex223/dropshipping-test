@@ -2,7 +2,7 @@
 
 Historical documents that are no longer actively used but preserved for reference.
 
-**Last Updated**: 2026-01-26
+**Last Updated**: 2026-02-10
 
 ---
 
@@ -26,10 +26,14 @@ Plans are archived in `plans/` subdirectory after completion.
 
 See: [plans/README.md](plans/README.md)
 
-| Plan                                                                             | Original Task            | Archived Date |
-| -------------------------------------------------------------------------------- | ------------------------ | ------------- |
-| [2026-01-05_dropshipping-mvp-plan.md](plans/2026-01-05_dropshipping-mvp-plan.md) | Dropshipping Website MVP | 2026-01-13    |
-| [2026-01-22_seo-technical-setup.md](plans/2026-01-22_seo-technical-setup.md)     | SEO Technical Setup      | 2026-01-22    |
+| Plan                                                                                             | Original Task             | Archived Date |
+| ------------------------------------------------------------------------------------------------ | ------------------------- | ------------- |
+| [2026-01-05_dropshipping-mvp-plan.md](plans/2026-01-05_dropshipping-mvp-plan.md)                 | Dropshipping Website MVP  | 2026-01-13    |
+| [2026-01-22_seo-technical-setup.md](plans/2026-01-22_seo-technical-setup.md)                     | SEO Technical Setup       | 2026-01-22    |
+| [2026-02-01_analytics-integration.md](plans/2026-02-01_analytics-integration.md)                 | GA4 Analytics Integration | 2026-02-01    |
+| [2026-02-02_task-019-social-sharing.md](plans/2026-02-02_task-019-social-sharing.md)             | Social Sharing            | 2026-02-02    |
+| [2026-02-04_task-026-fix-vercel-deploy-ci.md](plans/2026-02-04_task-026-fix-vercel-deploy-ci.md) | CI/CD Deployment Pipeline | 2026-02-07    |
+| [2026-02-09_task-027-dependency-audit.md](plans/2026-02-09_task-027-dependency-audit.md)         | Dependency Audit          | 2026-02-09    |
 
 ### Deprecated Documentation
 

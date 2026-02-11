@@ -295,10 +295,10 @@ prisma/
 - **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability (React.cache not available in React 18); NextAuth requires `AUTH_TRUST_HOST=true` in CI E2E tests; E2E tests need seeded database with categories and active products
 - **CI improvements**: E2E infrastructure overhaul with global setup validation, separated build and test jobs, PostgreSQL 16 + Redis 7 services with health checks; deployment workflow with graceful secret validation, dual-target support (Vercel/VPS), conditional job execution, and comprehensive deployment documentation; JS files auto-formatted on commit via lint-staged; E2E tests run chromium-only in CI with port 3000, pre-built app, and optimized timeouts
 - **Deployment strategy**: Dual-path deployment via `DEPLOYMENT_TARGET` variable (vercel/vps); graceful degradation when secrets missing (skip with notice if unset, fail with error if explicitly set); Vercel path uses CLI for pull/build/deploy + migrations; VPS path uses SSH action with git pull + pm2 restart; both paths validate secrets before execution
-- **Latest completion**: TASK-029 Technical Debt Cleanup (dcf654d) - addressed 6 technical debt items: added NaN guards to review rating filters, merged duplicate JSON-LD functions, extracted shared Review types, simplified seed data typing, added comparePrice cross-field validation, removed ~60 console.error calls from API routes; added 4 new unit tests; total 249 tests passing; spawned 3 BACKLOG items; Previous: TASK-028 Test Coverage Improvement (1bac9b0)
+- **Latest completion**: TASK-030 Documentation Finalization (2026-02-10) - comprehensive documentation audit and updates across 11 files; fixed version numbers, updated tech stack references, documented Review/Subscriber schema, added 17 missing API endpoints, expanded testing checklist with 6 new sections, clarified .env.example with port mapping notes (5433/6380), marked unimplemented features (Google OAuth, Meilisearch, Sentry) with comments; documentation now comprehensive for handoff/onboarding; Previous: TASK-029 Technical Debt Cleanup (dcf654d)
 - **Project freeze**: 2026-02-09 to 2026-02-13 - stability, cleanup, and documentation phase; no new features allowed; MVP implementation complete (TASK-001 through TASK-029), entering cleanup phase
-- **Freeze week tasks**: TASK-027 (Dependency Audit) completed 2026-02-09; TASK-028 (Test Coverage Improvement) completed 2026-02-09; TASK-029 (Technical Debt Cleanup) completed 2026-02-10; TASK-030 (Documentation Finalization) 3-4h, TASK-031 (Code Quality Sweep) 3-4h, TASK-032 (Freeze Finalization & Release Tag) 1-2h
-- **Active tasks**: TASK-030 Documentation Finalization next (README, docs/ verification, deployment docs)
+- **Freeze week tasks**: TASK-027 (Dependency Audit) completed 2026-02-09; TASK-028 (Test Coverage Improvement) completed 2026-02-09; TASK-029 (Technical Debt Cleanup) completed 2026-02-10; TASK-030 (Documentation Finalization) completed 2026-02-10; TASK-031 (Code Quality Sweep) 3-4h, TASK-032 (Freeze Finalization & Release Tag) 1-2h
+- **Active tasks**: TASK-031 Code Quality Sweep next (final cleanup, consistency check)
 
 <!-- END AUTO-MANAGED -->
 
@@ -317,7 +317,7 @@ prisma/
 - Always add Zod validation schemas for new API endpoints in `src/lib/validations/` (index.ts for core schemas, separate files for specialized domains like google-shopping.ts)
 - Use `requireAdmin()` or `requireAuth()` for protected API routes, never roll custom auth checks
 - Keep UI primitives in `src/components/ui/` unchanged (shadcn/ui managed)
-- Environment variables: never commit `.env` files; use `.env.example` as reference
+- Environment variables: never commit `.env` files; use `.env.example` as reference; note Docker Compose port mappings (host 5433→container 5432 for Postgres, host 6380→container 6379 for Redis)
 - Use `next/image` for all images; avoid native `<img>` tags (ESLint enforced)
 - **Performance**: Add blur placeholders to all product/category images using `DEFAULT_BLUR_DATA_URL` and `IMAGE_SIZES` from `image-utils.ts`; Web Vitals are automatically tracked via `WebVitalsReporter` in providers
 - **Deployment secrets**: Configure GitHub Actions secrets before deploying (see docs/deployment/setup.md); Vercel requires VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, DATABASE_URL, NEXTAUTH_SECRET; VPS requires VPS_HOST, VPS_USERNAME, VPS_SSH_KEY; missing secrets cause graceful skip or explicit failure depending on DEPLOYMENT_TARGET setting

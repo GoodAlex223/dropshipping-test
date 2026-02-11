@@ -2,7 +2,7 @@
 
 Testing approach and guidelines for the Dropshipping E-commerce Platform.
 
-**Last Updated**: 2026-01-07
+**Last Updated**: 2026-02-10
 
 ---
 
@@ -64,11 +64,24 @@ npm run test:coverage
 
 ```
 tests/
-├── setup.tsx           # Global setup (mocks)
-└── unit/
-    ├── cart.store.test.ts    # Cart store tests
-    ├── seo.test.ts           # SEO utilities tests
-    └── [feature].test.ts     # Feature tests
+├── setup.tsx                          # Global setup (mocks for Next.js router, image)
+├── global-setup.ts                    # E2E infrastructure validation
+├── helpers/
+│   └── api-test-utils.ts             # NextRequest/params builders for API route testing
+├── unit/
+│   ├── cart.store.test.ts            # Cart store tests
+│   ├── seo.test.ts                   # SEO utilities tests (metadata, JSON-LD)
+│   ├── api-utils.test.ts            # API helpers (auth guards, pagination, slug/SKU gen)
+│   ├── newsletter.test.ts           # Newsletter utilities (token, URL builders, HMAC)
+│   ├── newsletter-api.test.ts       # Public newsletter API (subscribe, confirm, unsubscribe)
+│   ├── admin-newsletter-api.test.ts # Admin newsletter API (list, update, delete, export)
+│   ├── reviews-api.test.ts          # Customer review API (create, update, delete, eligibility)
+│   ├── admin-reviews-api.test.ts    # Admin review API (list, detail, delete, reply, visibility)
+│   └── google-shopping-feed.test.ts # Google Shopping feed validation
+└── e2e/
+    ├── navigation.spec.ts           # Homepage, navigation, mobile responsive
+    ├── products.spec.ts             # Product listing and detail pages
+    └── cart.spec.ts                 # Cart operations
 ```
 
 ### Writing Unit Tests
@@ -153,14 +166,21 @@ describe("SEO Utilities", () => {
 
 ### Test Coverage
 
-Current coverage targets:
+Coverage baseline (as of TASK-028, 249 tests):
 
-| Area      | Target | Current |
-| --------- | ------ | ------- |
-| Stores    | 80%    | 100%    |
-| Utilities | 80%    | 85%     |
-| Services  | 70%    | TBD     |
-| Overall   | 70%    | TBD     |
+| Metric     | Coverage |
+| ---------- | -------- |
+| Statements | 89.82%   |
+| Branches   | 93.19%   |
+| Functions  | 98.71%   |
+| Lines      | 89.82%   |
+
+| Area             | Target | Current |
+| ---------------- | ------ | ------- |
+| Stores           | 80%    | 100%    |
+| Utilities (lib/) | 80%    | ~90%    |
+| API routes       | 70%    | ~85%    |
+| Overall          | 70%    | 89.82%  |
 
 ---
 
@@ -219,11 +239,12 @@ npx playwright test --project=chromium
 
 ```
 tests/e2e/
-├── navigation.spec.ts    # Navigation, homepage
-├── products.spec.ts      # Product listing, detail
-├── cart.spec.ts          # Cart operations
-└── checkout.spec.ts      # Checkout flow (future)
+├── navigation.spec.ts    # Homepage, navigation, mobile responsive
+├── products.spec.ts      # Product listing and detail pages
+└── cart.spec.ts          # Cart operations and persistence
 ```
+
+**E2E Infrastructure**: Global setup (`tests/global-setup.ts`) validates database connectivity and seed data before tests run. CI uses pre-built app with PostgreSQL 16 + Redis 7 services.
 
 ### Writing E2E Tests
 
