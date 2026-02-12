@@ -1,7 +1,6 @@
-import type { FullConfig } from "@playwright/test";
 import { PrismaClient } from "@prisma/client";
 
-export default async function globalSetup(_config: FullConfig) {
+export default async function globalSetup() {
   console.log("Playwright Global Setup: Validating test infrastructure...");
 
   const prisma = new PrismaClient();

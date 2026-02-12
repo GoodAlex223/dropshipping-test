@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -642,9 +643,11 @@ export default function CheckoutPage() {
                 {items.map((item) => (
                   <div key={`${item.productId}-${item.variantId || ""}`} className="flex gap-4">
                     {item.image ? (
-                      <img
+                      <Image
                         src={item.image}
                         alt={item.name}
+                        width={64}
+                        height={64}
                         className="h-16 w-16 rounded-md object-cover"
                       />
                     ) : (

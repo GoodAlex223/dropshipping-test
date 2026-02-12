@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Package } from "lucide-react";
 import type { CategoriesProps } from "../types";
@@ -45,10 +46,12 @@ export function BoldCategories({
                 <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-xl transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-2xl">
                   {/* Background image or gradient */}
                   {category.image ? (
-                    <img
+                    <Image
                       src={category.image}
                       alt={category.name}
-                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      fill
+                      sizes="320px"
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                   ) : (
                     <div className="from-primary via-primary/80 to-accent absolute inset-0 bg-gradient-to-br" />

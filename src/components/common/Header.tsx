@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import {
@@ -11,20 +12,12 @@ import {
   User,
   LogOut,
   Settings,
-  X,
   Loader2,
   ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-  SheetHeader,
-  SheetTitle,
-  SheetClose,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -389,9 +382,11 @@ export function Header() {
                       className="hover:bg-muted flex w-full items-center gap-3 rounded-md p-2 text-left"
                     >
                       {result.image ? (
-                        <img
+                        <Image
                           src={result.image}
                           alt={result.name}
+                          width={48}
+                          height={48}
                           className="h-12 w-12 rounded-md object-cover"
                         />
                       ) : (

@@ -84,7 +84,7 @@ components/
 - **Cookie consent**: Zustand store with `persist` middleware, GTM loads conditionally when consent status is "accepted"
 - **Social sharing**: Platform-specific URL builders in `share-utils.ts`, Web Share API detection with fallback to clipboard copy, native share button uses CSS hiding (`sm:hidden`) to avoid hydration mismatch
 - **Custom icons**: Use lucide-react for icons; for platforms without lucide support (e.g., Pinterest), create custom SVG components
-- **Web Vitals**: `WebVitalsReporter` uses dynamic import (`ssr: false`) to ensure client-only execution; captures CLS, LCP, FCP, TTFB, INP via `web-vitals` library; reports to GA4 via GTM dataLayer with dataLayer clearing pattern (`{ ecommerce: null }`) for consistency; console logs in development
+- **Web Vitals**: `WebVitalsReporter` uses dynamic import (`ssr: false`) to ensure client-only execution; captures CLS, LCP, FCP, TTFB, INP via `web-vitals` library; reports to GA4 via GTM dataLayer with dataLayer clearing pattern (`{ ecommerce: null }`) for consistency; console logs in development; uses bare `catch` syntax for error handling
 - **Resource hints**: `ResourceHints` component exports `PRECONNECT_DOMAINS` (Stripe, GTM), `DNS_PREFETCH_DOMAINS` (Google Analytics, Google Fonts), and helper function `getResourceHintTags()` for server-side rendering
 - **Image optimization**: `ProductCard` uses `DEFAULT_BLUR_DATA_URL` and `IMAGE_SIZES.productCard` from `@/lib/image-utils` for optimized loading with blur placeholders
 - **Deferred font loading**: Theme-specific fonts (Playfair Display, Lora) loaded in root layout with `preload: false` and `display: swap` for optimal performance; saves ~60-80KB on initial load for users on default theme
@@ -92,6 +92,7 @@ components/
 - **Newsletter signup pattern**: `NewsletterSignup` component manages subscription flow with local state (email, loading, success); success state replaces form with confirmation message (green background, checkmark icon); integrated into Footer component for site-wide visibility
 - **Review list filtering**: `ReviewList` component manages client-side rating filter (1-5 stars or all) with dropdown; filter change replaces data (page reset to 1), load more appends data; fetches from `/api/products/[slug]/reviews?rating=X&page=Y&limit=10`; includes loading states and empty states for filtered results
 - **Optimistic UI updates**: `ReviewSection` updates local review state and stats immediately when new review created (via callback from `ReviewForm`); calculates new average rating and updates rating distribution optimistically before server confirmation; provides instant feedback to users
+- **Client error handling**: Interactive components use `try/catch` with bare `catch` syntax when error variable not needed (Header search, PaymentForm, CartDrawer analytics, NewsletterSignup); prevents ESLint warnings and cleaner code
 
 <!-- END AUTO-MANAGED -->
 

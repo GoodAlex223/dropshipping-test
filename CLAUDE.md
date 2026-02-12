@@ -201,7 +201,7 @@ prisma/
 - **Language**: TypeScript strict mode (`"strict": true`)
 - **Path aliases**: `@/*` maps to `./src/*`
 - **Formatting**: Prettier with double quotes, semicolons, 2-space indent, 100 char print width, trailing commas (es5), tailwindcss plugin
-- **Linting**: ESLint with next/core-web-vitals + next/typescript configs
+- **Linting**: ESLint flat config format (eslint.config.mjs) with next/core-web-vitals + next/typescript configs
 - **Pre-commit**: Husky + lint-staged (eslint --fix + prettier --write on TypeScript files; prettier --write on JS/JSON/MD files)
 - **Components**: PascalCase filenames for React components (e.g., `AdminSidebar.tsx`, `ProductCard.tsx`)
 - **Non-component files**: kebab-case (e.g., `api-utils.ts`, `cart.store.ts`, `use-debounce.ts`)
@@ -281,7 +281,8 @@ prisma/
 - **Client-side eligibility checking**: Components that conditionally render forms based on user state fetch eligibility via API in `useEffect` hook on mount; store eligibility state (`canReview`, `hasExistingReview`, `orderId`) in local state; silently fail fetch errors (form just doesn't render); pattern used in ReviewSection for verified purchase validation
 - **Schema refinement split pattern**: Separate base schema (ZodObject) from refined schema (ZodEffects) to enable `.partial()` usage; `productBaseSchema` defines fields, `productSchema` adds cross-field validation via `.refine()`; allows admin update routes to use `productBaseSchema.partial()` without type errors; example: comparePrice validation requires `comparePrice > price`
 - **Cross-field validation pattern**: Use Zod `.refine()` for validations requiring multiple fields; comparePrice must exceed price if provided; validation message targets specific field via `path` option; enforced on both server (API routes) and client (form validation)
-- **API error handling pattern**: API routes use `try/catch` with `apiError()` helper for consistent error responses; no `console.error()` calls in API routes (removed during TASK-029 cleanup); catch blocks with unused error use bare `catch` syntax; structured error responses via `NextResponse.json()` with appropriate status codes
+- **API error handling pattern**: API routes use `try/catch` with `apiError()` helper for consistent error responses; no `console.error()` calls in API routes (removed during TASK-029 cleanup); catch blocks with unused error variables use bare `catch` syntax without error parameter (ESLint recommended pattern from TASK-031); structured error responses via `NextResponse.json()` with appropriate status codes
+- **Bare catch syntax**: When catch block doesn't use error variable, use bare `catch` without parameter (e.g., `} catch {` instead of `} catch (error) {`); pattern enforced by ESLint and applied across API routes, client components, server pages, and utilities during TASK-031 code quality sweep
 
 <!-- END AUTO-MANAGED -->
 
@@ -291,13 +292,13 @@ prisma/
 
 - **Commit style**: Conventional commits (`feat:`, `fix:`, `docs:`, `chore:`) with optional scope (`feat(seo):`, `feat(perf):`, `fix(ci):`, `fix(e2e):`, `feat(deploy):`)
 - **Branch naming**: `feat/task-NNN-description` pattern
-- **Recent focus**: Deployment infrastructure (dual-target CI/CD with Vercel/VPS support), E2E test infrastructure improvements (global setup validation, CI reliability, mobile-responsive tests), performance optimization (Web Vitals tracking, resource hints, image optimization)
+- **Recent focus**: Code quality and stability during freeze week (ESLint modernization, error handling cleanup, documentation finalization), deployment infrastructure (dual-target CI/CD with Vercel/VPS support), E2E test infrastructure improvements (global setup validation, CI reliability, mobile-responsive tests), performance optimization (Web Vitals tracking, resource hints, image optimization)
 - **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability (React.cache not available in React 18); NextAuth requires `AUTH_TRUST_HOST=true` in CI E2E tests; E2E tests need seeded database with categories and active products
 - **CI improvements**: E2E infrastructure overhaul with global setup validation, separated build and test jobs, PostgreSQL 16 + Redis 7 services with health checks; deployment workflow with graceful secret validation, dual-target support (Vercel/VPS), conditional job execution, and comprehensive deployment documentation; JS files auto-formatted on commit via lint-staged; E2E tests run chromium-only in CI with port 3000, pre-built app, and optimized timeouts
 - **Deployment strategy**: Dual-path deployment via `DEPLOYMENT_TARGET` variable (vercel/vps); graceful degradation when secrets missing (skip with notice if unset, fail with error if explicitly set); Vercel path uses CLI for pull/build/deploy + migrations; VPS path uses SSH action with git pull + pm2 restart; both paths validate secrets before execution
-- **Latest completion**: TASK-030 Documentation Finalization (c6e3fdc, archived 64c5969) - comprehensive audit of 15+ files across 4 phases: (1) Critical fixes - ROADMAP rewrite, MIT LICENSE creation; (2) Core docs - README/PROJECT.md/ARCHITECTURE.md/PROJECT_CONTEXT.md full updates; (3) Domain docs - added Review/Subscriber/VerificationToken to schema.md, 17 endpoints to endpoints.md, 53 test items to TESTING_CHECKLIST.md, coverage numbers to strategy.md; (4) Metadata - docs index, .env.example ports/comments; quality review with 3 parallel agents fixed 8 issues (version numbers, missing table, status codes, counts); 16 files changed, 1172 insertions, 329 deletions; spawned 4 BACKLOG items; Previous: TASK-029 Technical Debt Cleanup (dcf654d)
+- **Latest completion**: TASK-031 Code Quality Sweep (in progress) - ESLint config modernization (eslintrc → flat config format) and error handling cleanup (bare catch syntax across 20+ files including API routes, client components, server pages, utilities); no functional changes, pure code quality improvements; Previous: TASK-030 Documentation Finalization (c6e3fdc, archived 64c5969)
 - **Project freeze**: 2026-02-09 to 2026-02-13 - stability, cleanup, and documentation phase; no new features allowed; MVP implementation complete (TASK-001 through TASK-030), entering final cleanup phase
-- **Freeze week tasks**: TASK-027 (Dependency Audit) completed 2026-02-09; TASK-028 (Test Coverage Improvement) completed 2026-02-09; TASK-029 (Technical Debt Cleanup) completed 2026-02-10; TASK-030 (Documentation Finalization) completed 2026-02-11; TASK-031 (Code Quality Sweep) 3-4h, TASK-032 (Freeze Finalization & Release Tag) 1-2h
+- **Freeze week tasks**: TASK-027 (Dependency Audit) completed 2026-02-09; TASK-028 (Test Coverage Improvement) completed 2026-02-09; TASK-029 (Technical Debt Cleanup) completed 2026-02-10; TASK-030 (Documentation Finalization) completed 2026-02-11; TASK-031 (Code Quality Sweep) in progress; TASK-032 (Freeze Finalization & Release Tag) 1-2h remaining
 - **Active tasks**: TASK-031 Code Quality Sweep next (lint warnings, TypeScript strict issues, dead code removal, TODO/FIXME cleanup)
 
 <!-- END AUTO-MANAGED -->

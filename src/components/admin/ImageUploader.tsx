@@ -31,45 +31,48 @@ export function ImageUploader({
   const [uploadingCount, setUploadingCount] = useState(0);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
-  const uploadFile = async (file: File): Promise<string | null> => {
-    try {
-      // Get presigned URL
-      const response = await fetch("/api/admin/upload", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          filename: file.name,
-          contentType: file.type,
-          folder,
-        }),
-      });
+  const uploadFile = useCallback(
+    async (file: File): Promise<string | null> => {
+      try {
+        // Get presigned URL
+        const response = await fetch("/api/admin/upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            filename: file.name,
+            contentType: file.type,
+            folder,
+          }),
+        });
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to get upload URL");
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || "Failed to get upload URL");
+        }
+
+        const { uploadUrl, publicUrl } = await response.json();
+
+        // Upload file to S3
+        const uploadResponse = await fetch(uploadUrl, {
+          method: "PUT",
+          body: file,
+          headers: {
+            "Content-Type": file.type,
+          },
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error("Failed to upload file");
+        }
+
+        return publicUrl;
+      } catch (error) {
+        console.error("Upload error:", error);
+        throw error;
       }
-
-      const { uploadUrl, publicUrl } = await response.json();
-
-      // Upload file to S3
-      const uploadResponse = await fetch(uploadUrl, {
-        method: "PUT",
-        body: file,
-        headers: {
-          "Content-Type": file.type,
-        },
-      });
-
-      if (!uploadResponse.ok) {
-        throw new Error("Failed to upload file");
-      }
-
-      return publicUrl;
-    } catch (error) {
-      console.error("Upload error:", error);
-      throw error;
-    }
-  };
+    },
+    [folder]
+  );
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
@@ -104,7 +107,7 @@ export function ImageUploader({
 
       setUploadingCount(0);
     },
-    [images, maxImages, onChange, folder]
+    [images, maxImages, onChange, uploadFile]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({

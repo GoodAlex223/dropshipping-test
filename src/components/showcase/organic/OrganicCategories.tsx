@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Leaf, Package } from "lucide-react";
 import type { CategoriesProps } from "../types";
@@ -35,10 +36,12 @@ export function OrganicCategories({
                 <div className="relative h-40 overflow-hidden">
                   {category.image ? (
                     <>
-                      <img
+                      <Image
                         src={category.image}
                         alt={category.name}
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                       {/* Earth-tone overlay */}
                       <div className="from-background/90 via-background/40 absolute inset-0 bg-gradient-to-t to-transparent" />

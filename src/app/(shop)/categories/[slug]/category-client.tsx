@@ -62,7 +62,6 @@ interface CategoryClientProps {
 }
 
 export function CategoryClient({ category }: CategoryClientProps) {
-  const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,

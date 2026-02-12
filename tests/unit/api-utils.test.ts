@@ -13,7 +13,6 @@ import {
   getPagination,
   paginatedResponse,
   generateSlug,
-  generateSku,
 } from "@/lib/api-utils";
 
 beforeEach(() => {
@@ -237,22 +236,5 @@ describe("generateSlug", () => {
 
   it("handles single word", () => {
     expect(generateSlug("Electronics")).toBe("electronics");
-  });
-});
-
-describe("generateSku", () => {
-  it("generates SKU with given prefix", () => {
-    const sku = generateSku("PROD");
-    expect(sku).toMatch(/^PROD-[A-Z0-9]+-[A-Z0-9]+$/);
-  });
-
-  it("uses default prefix SKU", () => {
-    const sku = generateSku();
-    expect(sku).toMatch(/^SKU-/);
-  });
-
-  it("generates unique SKUs on repeated calls", () => {
-    const skus = new Set(Array.from({ length: 10 }, () => generateSku()));
-    expect(skus.size).toBe(10);
   });
 });

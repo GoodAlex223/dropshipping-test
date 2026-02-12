@@ -89,7 +89,7 @@ app/
 - **API auth**: Admin endpoints call `requireAdmin()` first; customer endpoints call `requireAuth()`
 - **Dynamic segments**: `[id]` for admin resources, `[slug]` for public-facing pages
 - **Static export control**: Use `export const dynamic = "force-dynamic"` when routes need runtime data
-- **Error handling**: Wrap API handlers in try/catch, return standardized error responses via `apiError()`
+- **Error handling**: Wrap API handlers in try/catch, return standardized error responses via `apiError()`; use bare `catch` syntax when error variable unused (ESLint pattern)
 - **Async params**: Dynamic route params are Promise-based in Next.js 14; unwrap with `const { id } = use(params)` from `react`
 - **List page structure**: Admin list pages follow pattern: Suspense wrapper → filters/search → debounced fetch → table/grid → pagination
 - **OG image generation**: Use `opengraph-image.tsx` file convention for dynamic Open Graph images (exports `alt`, `size`, `contentType`, and default `Image` function returning `ImageResponse`)

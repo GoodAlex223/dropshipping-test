@@ -49,12 +49,6 @@ export function generateSlug(name: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
-export function generateSku(prefix: string = "SKU"): string {
-  const timestamp = Date.now().toString(36).toUpperCase();
-  const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-  return `${prefix}-${timestamp}-${random}`;
-}
-
 export interface PaginationParams {
   page: number;
   limit: number;

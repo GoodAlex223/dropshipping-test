@@ -1,9 +1,8 @@
-import { NextRequest } from "next/server";
 import { requireAdmin, apiError, apiSuccess } from "@/lib/api-utils";
 import { getQueueStats, QUEUE_NAMES } from "@/lib/queue";
 
 // GET /api/admin/queue - Get queue statistics
-export async function GET(request: NextRequest) {
+export async function GET() {
   const { error } = await requireAdmin();
   if (error) return error;
 
