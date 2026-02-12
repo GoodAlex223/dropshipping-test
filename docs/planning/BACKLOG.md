@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-02-11
+**Last Updated**: 2026-02-12
 
 ---
 
@@ -301,6 +301,13 @@ Improvements to existing functionality.
 - [ ] Upgrade Next.js 14 → 16 + React 18 → 19 — Required to fix 2 HIGH security vulnerabilities (DoS via Image Optimizer, HTTP deserialization). Major effort (~1-2 days) due to breaking changes.
 - [ ] Migrate Prisma 6 → 7 — Follow major version upgrade guide. Includes migrating `prisma.seed` from `package.json` to `prisma.config.ts`.
 - [ ] Add automated dependency monitoring (Dependabot or Renovate) — Automated PR creation for dependency updates to catch vulnerabilities early.
+
+### [2026-02-12] From: Code Review of TASK-032
+
+**Origin**: PR #15 code review
+
+- [ ] Verify DONE.md statistics table accuracy — February task count (13) may undercount actual entries; audit all `### [2026-02-xx]` headings and reconcile with statistics row
+- [ ] Use precise test counts in planning docs — TASK-032 DONE.md entry uses "245+" while actual count is 246; prefer exact numbers from `npm run test:run` output in completion records
 
 ### [2026-02-09] From: Code Review of TASK-027
 
