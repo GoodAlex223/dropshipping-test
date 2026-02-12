@@ -6,7 +6,31 @@ Completed tasks with implementation details and learnings.
 
 ---
 
+## Release Tag
+
+### [2026-02-12] v1.2.0 — Freeze Complete
+
+All MVP implementation (TASK-001 through TASK-016), post-MVP features (TASK-017 through TASK-024), and freeze cleanup (TASK-025 through TASK-032) are complete. Project tagged as `v1.2.0` on main.
+
+---
+
 ## 2026-02 (February)
+
+### [2026-02-12] TASK-032 - Freeze Finalization & Release Tag
+
+**Plan**: N/A (finalization task, no plan document)
+**Summary**: Final freeze step — verified all TASK-027 through TASK-031 complete, updated ROADMAP.md with freeze completion status and post-freeze resumption guide, cleaned up TODO.md, ran full validation (build, unit tests, E2E tests), and tagged release as `v1.2.0` on main.
+**Key Changes**:
+
+- Updated ROADMAP.md: marked all freeze tasks complete, updated timeline, added post-freeze resumption section
+- Updated TODO.md: cleared tasks, added freeze complete summary with next steps
+- Verified all 6 freeze tasks (TASK-027 through TASK-032) completed
+- Final validation: build, 245+ unit tests, E2E tests all passing
+- Git tag `v1.2.0` created on main branch
+
+**Spawned Tasks**: 0 (freeze complete, future work in BACKLOG.md)
+
+---
 
 ### [2026-02-12] TASK-031 - Code Quality Sweep
 
@@ -593,10 +617,10 @@ Completed tasks with implementation details and learnings.
 
 ## Statistics
 
-| Month   | Tasks Completed | Key Deliverables                                                                                                                                                                                         |
-| ------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-01 | 17              | Full MVP + Demo Deployed + SEO Technical Setup                                                                                                                                                           |
-| 2026-02 | 12              | GA4 Analytics, Social Sharing, Google Shopping Feed, Performance, E2E Fix, Deploy Fix, Customer Reviews, Newsletter, Dependency Audit, Test Coverage, Technical Debt Cleanup, Documentation Finalization |
+| Month   | Tasks Completed | Key Deliverables                                                                                                                                                                                                               |
+| ------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-01 | 17              | Full MVP + Demo Deployed + SEO Technical Setup                                                                                                                                                                                 |
+| 2026-02 | 13              | GA4 Analytics, Social Sharing, Google Shopping Feed, Performance, E2E Fix, Deploy Fix, Customer Reviews, Newsletter, Dependency Audit, Test Coverage, Technical Debt Cleanup, Documentation, Code Quality, Freeze Finalization |
 
 ---
 
