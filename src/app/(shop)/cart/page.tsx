@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft, ArrowRight, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -180,9 +181,11 @@ export default function CartPage() {
                       <TableCell>
                         <div className="flex items-center gap-4">
                           {item.image ? (
-                            <img
+                            <Image
                               src={item.image}
                               alt={item.name}
+                              width={80}
+                              height={80}
                               className="h-20 w-20 rounded-md object-cover"
                             />
                           ) : (
@@ -277,9 +280,11 @@ export default function CartPage() {
                 <div key={getItemKey(item)} className="rounded-lg border p-4">
                   <div className="flex gap-4">
                     {item.image ? (
-                      <img
+                      <Image
                         src={item.image}
                         alt={item.name}
+                        width={96}
+                        height={96}
                         className="h-24 w-24 rounded-md object-cover"
                       />
                     ) : (

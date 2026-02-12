@@ -271,6 +271,13 @@ Improvements to existing functionality.
 - [ ] Link checker in CI — Add CI step to validate internal doc links are not broken after documentation changes
 - [ ] Repo file reference validation — Verify that documentation references to actual repo files (e.g., `next.config.mjs` in PROJECT.md) match real filenames; caught `next.config.ts` typo in TASK-030 code review
 
+### [2026-02-11] From: TASK-031 Code Quality Sweep
+
+**Origin**: feat/task-031-code-quality-sweep branch
+
+- [ ] Implement tax calculation in checkout confirm-order route — currently hardcoded to `0` in `src/app/api/checkout/confirm-order/route.ts`
+- [ ] Queue supplier order creation after checkout — integrate BullMQ job dispatch in confirm-order route for automated supplier forwarding
+
 ### [2026-02-10] From: TASK-029 Technical Debt Cleanup
 
 **Origin**: feat/task-029-technical-debt-cleanup branch

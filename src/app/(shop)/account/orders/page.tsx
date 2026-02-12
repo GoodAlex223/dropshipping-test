@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Package, ChevronLeft, ChevronRight, Eye, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -217,9 +218,11 @@ function OrdersPageContent() {
                       {order.items.slice(0, 4).map((item) => (
                         <div key={item.id} className="flex items-center gap-3">
                           {item.image ? (
-                            <img
+                            <Image
                               src={item.image}
                               alt={item.productName}
+                              width={64}
+                              height={64}
                               className="h-16 w-16 rounded-md object-cover"
                             />
                           ) : (

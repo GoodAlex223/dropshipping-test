@@ -2,11 +2,30 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-02-11
+**Last Updated**: 2026-02-12
 
 ---
 
 ## 2026-02 (February)
+
+### [2026-02-12] TASK-031 - Code Quality Sweep
+
+**Plan**: N/A (cleanup task, no plan document)
+**Summary**: Final code quality pass resolving all 24 ESLint warnings to zero. Migrated 10 `<img>` tags to `next/image`, removed ~120 lines of dead code from utility files, fixed 12 unused imports/variables, resolved a `useCallback` missing dependency, and moved 2 inline TODO comments to BACKLOG.md. 27 files changed, 110 insertions, 262 deletions.
+**Key Changes**:
+
+- Migrated all `<img>` to `next/image` across 9 shop/component files (10 instances)
+- Removed dead code: 4 unused functions from image-utils.ts, 2 exports from web-vitals.ts, `generateSku()` from api-utils.ts
+- Fixed 12 unused imports/variables in 8 files (Header, CartDrawer, category-client, product-detail-client, admin routes, PaymentForm, global-setup)
+- Fixed `react-hooks/exhaustive-deps` in ImageUploader.tsx (wrapped `uploadFile` in `useCallback`)
+- Added `coverage/**` to ESLint globalIgnores
+- Removed 2 TODO comments from confirm-order/route.ts, added to BACKLOG.md
+- Updated 3 generateSku tests removed from api-utils.test.ts
+
+**Commit**: 901ddbd
+**Spawned Tasks**: 2 items added to BACKLOG.md (tax calculation, supplier order queue)
+
+---
 
 ### [2026-02-11] TASK-030 - Documentation Finalization
 

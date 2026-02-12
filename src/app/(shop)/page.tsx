@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { getHomeMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = getHomeMetadata();
@@ -170,10 +171,12 @@ export default async function HomePage() {
                 <Card className="group overflow-hidden transition-shadow hover:shadow-lg">
                   <div className="bg-muted relative aspect-[16/9]">
                     {category.image ? (
-                      <img
+                      <Image
                         src={category.image}
                         alt={category.name}
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                     ) : (
                       <div className="from-primary/20 to-primary/5 flex h-full items-center justify-center bg-gradient-to-br">

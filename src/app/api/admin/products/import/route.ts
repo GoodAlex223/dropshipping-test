@@ -207,7 +207,7 @@ export async function POST(request: NextRequest) {
       message: `Import complete: ${result.success} succeeded, ${result.failed} failed`,
       ...result,
     });
-  } catch (err) {
+  } catch {
     return apiError("Failed to import products", 500);
   }
 }

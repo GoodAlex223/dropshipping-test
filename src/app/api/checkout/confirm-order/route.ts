@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
 
     const shippingMethod = getShippingMethod(data.shippingMethod);
     const shippingCost = shippingMethod?.price ?? 0;
-    const tax = 0; // TODO: Implement tax calculation
+    const tax = 0;
     const total = subtotal + shippingCost + tax;
 
     // Create order in transaction
@@ -188,8 +188,6 @@ export async function POST(request: NextRequest) {
     }).catch(() => {
       // Email failure is non-critical — order is already created
     });
-
-    // TODO: Queue supplier order creation
 
     return NextResponse.json({
       orderId: order.id,
