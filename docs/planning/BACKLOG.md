@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-02-12
+**Last Updated**: 2026-07-14
 
 ---
 
@@ -323,6 +323,15 @@ Improvements to existing functionality.
 - [x] Simplify type assertions in subscriber seeding — replace `"prop" in s ? (s as { prop: T }).prop : null` with optional chaining → Completed in TASK-029
 - [ ] Add DELIVERED status validation in review seeding — add runtime check `if (orderData.status !== 'DELIVERED')` before creating reviews to enforce eligibility pattern programmatically
 - [ ] Standardize user upsert patterns — admin uses `update: {}` while customers use `update: { name }` without password; make consistent (either both update all fields or both update none)
+
+### [2026-07-14] From: TASK-033 Resumption Audit
+
+**Origin**: docs/planning/plans/2026-07-14_task-033-resumption.md (Task 2 security & dependency audit, feat/task-033-resumption branch)
+
+- [ ] Upgrade Next.js 14 → 16 to clear 14 HIGH advisories against `next@14.2.35` — npm audit fix requires `next@16.2.10` (breaking); advisories include DoS via Image Optimizer (GHSA-9g9p-9gw9-jx7f), HTTP request smuggling in rewrites (GHSA-ggv3-7p47-pfv8), middleware/proxy redirect cache poisoning (GHSA-3g8h-86w9-wvmq), XSS via CSP nonces (GHSA-ffhc-5mcf-pf4q), RSC cache poisoning (GHSA-wfc6-r584-vfw7), SSRF via WebSocket upgrades (GHSA-c4j6-fc7j-m34r), plus 8 further DoS/XSS/cache advisories. Also clears the nested MODERATE `postcss <8.5.10` XSS (GHSA-qx2v-qp2m-jg93) bundled inside `node_modules/next`. Deferred per conservative-update policy (Next.js 14 / React 18 pinned). `[possible-dup-of: [2026-02-09] From: TASK-027 "Upgrade Next.js 14 → 16 + React 18 → 19" — that entry predates most of these advisories; reconcile on promotion]`
+- [ ] Monitor @auth/core / next-auth for a release depending on `nodemailer >= 9.0.1` — 6 HIGH nodemailer advisories (SMTP command injection GHSA-c7w3-x93f-qmm8, CRLF injection GHSA-vvjj-xcjg-gr5g and GHSA-268h-hp4c-crq3, file-access bypasses GHSA-wqvq-jvpq-h66f and GHSA-p6gq-j5cr-w38f, TLS validation GHSA-r7g4-qg5f-qqm2) are fixed only in nodemailer 9.0.1+, but `@auth/core@0.41.2` (via `next-auth@5.0.0-beta.31` and `@auth/prisma-adapter@2.11.2`) pins `nodemailer@^7` — no non-breaking fix exists (npm's only "fix" is a downgrade to next-auth@1.x). Practical exposure is low: transactional email goes through Resend (`src/lib/email.ts`); no next-auth email/SMTP provider is configured, so nodemailer is never invoked. Re-run `npm audit` when next-auth v5 GA or a new @auth/core lands.
+- [ ] Fix WebKit/Mobile Safari-only E2E failure in `tests/e2e/products.spec.ts` ("can filter products by search") — pre-existing product bug, not a TASK-033 regression: search submit produces `/products?page=1` without the `search` param on WebKit engines (`webkit`, `Mobile Safari`); `chromium`, `firefox`, and `Mobile Chrome` all pass consistently. Root cause traced to the `handleSearch`/`updateFilters` flow in `src/app/(shop)/products/products-content.tsx`. Invisible to CI because `.github/workflows/ci.yml` installs and runs chromium only. Fix deferred — product-code changes are out of TASK-033 scope.
+- [ ] Reconcile stale seed-count documentation — CLAUDE.md and older docs state "16 categories, 50+ products," but `prisma/seed-data/categories.ts` / `products.ts` currently define 15 categories / 21 products (seed output matches the seed files exactly; the seed pipeline itself is not broken, only the documented counts are stale). `[possible-dup-of: 2026-02-12 Code Review of TASK-032 entry]`
 
 ---
 

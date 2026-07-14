@@ -2,7 +2,7 @@
 
 Long-term vision and major releases for the Dropshipping E-commerce Platform.
 
-**Last Updated**: 2026-02-12
+**Last Updated**: 2026-07-14
 
 ---
 
@@ -14,9 +14,9 @@ Build a fully operational dropshipping e-commerce platform that enables efficien
 
 ## Current Phase
 
-**Phase**: Freeze Complete
-**Focus**: All freeze tasks completed. Project tagged as v1.2.0.
-**Timeline**: 2026-02-09 to 2026-02-12 (completed ahead of schedule)
+**Phase**: Mirox Shop Program — v1.3 "Rebrand Demo"
+**Focus**: Post-freeze resumption (TASK-033, PR #16) and v1.3 track start; program spec: [docs/superpowers/specs/2026-07-14-mirox-shop-program-design.md](../superpowers/specs/2026-07-14-mirox-shop-program-design.md)
+**Timeline**: Started 2026-07-14 (freeze ended 2026-02-12; project dormant in between)
 
 ---
 
@@ -261,6 +261,7 @@ Q1 2026                Q2 2026              Q3 2026              Q4 2026
 | 2026-01-26 | Roadmap updated with current status                                   |
 | 2026-02-10 | Major update: marked v1.1 and v1.2 complete, added freeze             |
 | 2026-02-12 | Freeze complete: all tasks done, v1.2.0 tagged, resumption plan added |
+| 2026-07-14 | Resumption: Mirox Shop program phase started (TASK-033, PR #16)       |
 
 ---
 
