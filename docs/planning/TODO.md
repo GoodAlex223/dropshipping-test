@@ -1,34 +1,143 @@
 # TODO
 
-**Last Updated**: 2026-02-12
+**Last Updated**: 2026-07-14
+
+Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-shop-program-design.md) · Current week: [WEEKLY.md](WEEKLY.md)
 
 ---
 
-## Freeze Complete
+## 🔄 In Progress
 
-The project freeze (2026-02-09 to 2026-02-12) has been completed. All freeze tasks finished:
+#### [TASK-033] Post-freeze resumption validation
 
-- **TASK-027**: Dependency Audit & Security Patches
-- **TASK-028**: Test Coverage Improvement (245 tests, 89.82% coverage)
-- **TASK-029**: Technical Debt Cleanup (6 items resolved)
-- **TASK-030**: Documentation Finalization (16 files updated)
-- **TASK-031**: Code Quality Sweep (24 ESLint warnings → 0)
-- **TASK-032**: Freeze Finalization & Release Tag (v1.2.0)
+**Priority**: 🔴 Critical
+**Status**: 🔄 In Progress
+**Effort**: M
+**Plan**: [docs/planning/plans/2026-07-14_task-033-resumption.md](plans/2026-07-14_task-033-resumption.md)
 
-The project is tagged as `v1.2.0` on main.
+**Description**: Re-validate the frozen v1.2.0 codebase (npm audit, dependency drift, full build/unit/E2E baseline) and set up Mirox Shop program planning docs. Gates all v1.3 work.
+
+**Acceptance Criteria**:
+
+- [ ] `npm audit` reviewed; HIGH/CRITICAL patched within semver or deferred to BACKLOG with rationale
+- [ ] Lint, format, typecheck, unit tests, build, E2E all green
+- [ ] WEEKLY.md created; TASK-034..040 promoted to TODO.md
+
+## 📋 Planned (v1.3 — "Mirox Rebrand Demo")
+
+#### [TASK-034] Design system & rebrand foundation
+
+**Priority**: 🟠 High
+**Status**: 📋 Planned
+**Effort**: XL
+**Dependencies**: [TASK-033]
+
+**Description**: Mirox Shop black/white luxury-minimal design system: color tokens (#000000, #FFFFFF, #1A1A1A, #F5F5F5), typography, logo assets, animation primitives (fade-in, hover, skeleton loaders, transitions); restyle shared components (header, footer, buttons, cards). Token-driven so later design files re-skin tokens, not components. Candidate for Ultracode restyle-sweep workflow.
+
+**Acceptance Criteria**:
+
+- [ ] Design tokens defined and consumed by all shared components
+- [ ] Header, footer, buttons, cards restyled to the screenshot's direction
+- [ ] Animation primitives available as reusable utilities
+- [ ] No bright colors anywhere in the customer-facing theme
+
+#### [TASK-035] Homepage rebrand
+
+**Priority**: 🟠 High
+**Status**: 📋 Planned
+**Effort**: L
+**Dependencies**: [TASK-034]
+
+**Description**: Hero banner (model photo, "STYLE. QUALITY. CONFIDENCE.", catalog + new-arrivals CTAs), benefit cards (delivery, size exchange, quality, 24/7 support), "Why choose us" block, featured/hits sections, social links, rebranded footer.
+
+**Acceptance Criteria**:
+
+- [ ] First screen matches brief: slogan, subtitle, two CTAs
+- [ ] Benefit cards and "Why choose us" blocks present
+- [ ] Social section (Instagram, TikTok, Telegram) present
+
+#### [TASK-036] Catalog redesign + filters
+
+**Priority**: 🟠 High
+**Status**: 📋 Planned
+**Effort**: L
+**Dependencies**: [TASK-034]
+
+**Description**: Catalog page in the new design with filters (price, size, color, brand, availability) and sorting (new, popular, price ↑/↓). Variants and `brand` field already exist in the Prisma schema.
+
+**Acceptance Criteria**:
+
+- [ ] All five filters functional and combinable
+- [ ] Four sort orders functional ("popular" definition decided in plan)
+- [ ] Filter state reflected in the URL (shareable)
+
+#### [TASK-037] Product page redesign
+
+**Priority**: 🟠 High
+**Status**: 📋 Planned
+**Effort**: L
+**Dependencies**: [TASK-034]
+
+**Description**: Large gallery, size/color pickers, size table, stock counter ("Only N left"), related products, recently viewed.
+
+**Acceptance Criteria**:
+
+- [ ] Gallery, size/color selection, size table implemented
+- [ ] Stock counter shows real inventory below a threshold
+- [ ] Related + recently-viewed sections implemented
+
+#### [TASK-038] Payments & delivery research spike (Ukraine)
+
+**Priority**: 🔴 Critical
+**Status**: 📋 Planned
+**Effort**: M
+**Dependencies**: [TASK-033]
+
+**Description**: Decision doc, no code. Stripe does not onboard Ukrainian merchants → evaluate LiqPay / WayForPay / Fondy / monobank acquiring (fees, API, merchant requirements, refunds/webhooks); scope Nova Poshta API; define UAH currency strategy. Output: gateway decision + integration plan for TASK-048/049. Candidate for Ultracode research fan-out workflow.
+
+**Acceptance Criteria**:
+
+- [ ] Comparison matrix of ≥3 gateways with fees and API capabilities
+- [ ] Recommended gateway with rationale; merchant-account prerequisites listed
+- [ ] Nova Poshta integration scoped (API, branch picker, cost calc)
+- [ ] UAH pricing strategy defined (single- vs multi-currency)
+
+#### [TASK-039] i18n foundation
+
+**Priority**: 🟠 High
+**Status**: 📋 Planned
+**Effort**: L
+**Dependencies**: [TASK-033]
+
+**Description**: Ukrainian as default customer-facing locale (language-law requirement), Russian secondary; UAH price formatting. Library choice (e.g., next-intl) decided in plan.
+
+**Acceptance Criteria**:
+
+- [ ] Locale infrastructure with UA default, RU toggle
+- [ ] Customer-facing storefront strings externalized
+- [ ] Prices render in UAH with correct formatting
+
+#### [TASK-040] CI extensions
+
+**Priority**: 🟡 Medium
+**Status**: 📋 Planned
+**Effort**: M
+**Dependencies**: [TASK-033]
+
+**Description**: Lighthouse CI with performance budget (brief demands PageSpeed 95+), preview deploys per PR, scheduled weekly `npm audit` workflow.
+
+**Acceptance Criteria**:
+
+- [ ] Lighthouse CI job with budget failing PRs below threshold
+- [ ] Preview deploy per PR with URL comment
+- [ ] Weekly scheduled audit workflow opening an issue on findings
 
 ---
 
-## Next Steps
+## ⏸️ Blocked
 
-When ready to resume development:
+_None._
 
-1. See [BACKLOG.md](BACKLOG.md) for ~50+ enhancement ideas organized by category
-2. See [ROADMAP.md](ROADMAP.md) for post-freeze resumption guide
-3. Promote items from BACKLOG.md here when ready to work on them
+## 🔀 Spawned
 
----
-
-## Completed
-
-All MVP tasks (TASK-001 through TASK-016), post-MVP features (TASK-017 through TASK-024), and freeze tasks (TASK-025 through TASK-032) have been completed. See [DONE.md](DONE.md) for details.
+_None yet — audit findings from TASK-033 may add entries here or to BACKLOG.md._
