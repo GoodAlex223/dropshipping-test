@@ -25,6 +25,22 @@ Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-
 
 ## 📋 Planned (v1.3 — "Mirox Rebrand Demo")
 
+#### [TASK-038] Payments & delivery research spike (Ukraine)
+
+**Priority**: 🔴 Critical
+**Status**: 📋 Planned
+**Effort**: M
+**Dependencies**: [TASK-033]
+
+**Description**: Decision doc, no code. Stripe does not onboard Ukrainian merchants → evaluate LiqPay / WayForPay / Fondy / monobank acquiring (fees, API, merchant requirements, refunds/webhooks); scope Nova Poshta API; define UAH currency strategy. Output: gateway decision + integration plan for TASK-048/049. Candidate for Ultracode research fan-out workflow.
+
+**Acceptance Criteria**:
+
+- [ ] Comparison matrix of ≥3 gateways with fees and API capabilities
+- [ ] Recommended gateway with rationale; merchant-account prerequisites listed
+- [ ] Nova Poshta integration scoped (API, branch picker, cost calc)
+- [ ] UAH pricing strategy defined (single- vs multi-currency)
+
 #### [TASK-034] Design system & rebrand foundation
 
 **Priority**: 🟠 High
@@ -85,22 +101,6 @@ Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-
 - [ ] Gallery, size/color selection, size table implemented
 - [ ] Stock counter shows real inventory below a threshold
 - [ ] Related + recently-viewed sections implemented
-
-#### [TASK-038] Payments & delivery research spike (Ukraine)
-
-**Priority**: 🔴 Critical
-**Status**: 📋 Planned
-**Effort**: M
-**Dependencies**: [TASK-033]
-
-**Description**: Decision doc, no code. Stripe does not onboard Ukrainian merchants → evaluate LiqPay / WayForPay / Fondy / monobank acquiring (fees, API, merchant requirements, refunds/webhooks); scope Nova Poshta API; define UAH currency strategy. Output: gateway decision + integration plan for TASK-048/049. Candidate for Ultracode research fan-out workflow.
-
-**Acceptance Criteria**:
-
-- [ ] Comparison matrix of ≥3 gateways with fees and API capabilities
-- [ ] Recommended gateway with rationale; merchant-account prerequisites listed
-- [ ] Nova Poshta integration scoped (API, branch picker, cost calc)
-- [ ] UAH pricing strategy defined (single- vs multi-currency)
 
 #### [TASK-039] i18n foundation
 
