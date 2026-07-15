@@ -132,12 +132,12 @@ The fix targets **only** what Phase 2 confirms. Three landing states are all acc
   would then be disproven.
 - **Product bug, structurally rooted** → **stop.** Do not restructure the component's state/URL
   model. Document the diagnosis, add it as a TASK-036 acceptance criterion, land Workstreams B and
-  C, and leave the product code untouched. **Mark the test `test.fail()`** (see §4.5).
+  C, and leave the product code untouched. **Mark the test `test.fail()`** (see §4.4).
 
 **Circuit-breaker trigger**: the minimal fix requires restructuring the component's state or URL
 model, rather than a localized change.
 
-### 4.5 Branch-three interaction with CI (required)
+### 4.4 Branch-three interaction with CI (required)
 
 Branch three enables `webkit` in CI while the test still fails — which would make CI red and defeat
 the purpose of Workstream C. It must therefore be paired with an explicit expected-failure marker:
@@ -152,7 +152,7 @@ passes**, so the marker self-flags the moment TASK-036's rewrite fixes the behav
 rotting silently as a skipped test would. CI stays green, the expectation stays recorded, and the
 regression test still exists in branches one and two as a normal passing test.
 
-### 4.4 On the program spec §2 green-baseline gate
+### 4.5 On the program spec §2 green-baseline gate
 
 If the work lands in the third branch, the baseline remains technically red against program spec §2.
 
@@ -217,7 +217,7 @@ platform trouble), split it into its own PR so it cannot block the WebKit work.
 - [ ] Root cause confirmed by the Phase 2 experiment, with evidence recorded
 - [ ] One of the three §4.3 branches taken, and the choice justified in the PR
 - [ ] Regression test covering the confirmed cause, failing before the fix and passing after
-- [ ] `webkit` E2E green — either genuinely, or via a branch-three `test.fail()` marker (§4.5) with
+- [ ] `webkit` E2E green — either genuinely, or via a branch-three `test.fail()` marker (§4.4) with
       a TASK-036 acceptance criterion added
 - [ ] CI is green on merge in every branch of §4.3
 - [ ] `chromium` E2E still green
