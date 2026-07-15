@@ -110,16 +110,30 @@ failure.
 
 The search input is **controlled** (`value={search}`,
 [products-content.tsx:221-226](<../../../src/app/(shop)/products/products-content.tsx#L221-L226>)),
-so React reasserts its own state onto the DOM on every re-render. That property yields a single
-decisive read:
+so React reasserts its own state onto the DOM on every re-render. That property yields a decisive
+read:
 
-> Fill `"test"`, wait for the product fetch to resolve (forcing a re-render), then read
-> `input.value` back.
+> Fill `"test"` **while the product fetch is still in flight**, let the fetch resolve (forcing a
+> re-render), then read `input.value` back.
+
+**Required premise — do not omit.** The forcing re-render must be one that does **not** change
+`searchParams`. The product-fetch resolution qualifies: it sets `products`, `pagination`, and
+`isLoading` only. This premise is what makes the read discriminating. Without it the experiment is
+invalid, because a snap-back to `""` is consistent with **both** H1 and H2 — under H1 `onChange`
+never fired, and under H2 the effect overwrote the value; both leave `search === ""` and both make
+React reassert `value=""`. Holding `searchParams` constant rules H2 out, since its effect cannot
+fire.
 
 | Observation              | Conclusion                                                                       |
 | ------------------------ | -------------------------------------------------------------------------------- |
 | Value snaps back to `""` | **H1.** `onChange` never fired; `fill()` only mutated the DOM.                   |
 | Value stays `"test"`     | State genuinely holds it; defect is downstream in `updateFilters`/`router.push`. |
+
+**Make the race deterministic.** Rather than relying on WebKit's natural slowness, delay the API
+response with `page.route("**/api/products*", ...)` so the fill provably precedes the re-render on
+every engine. This converts a timing-dependent flake into a reproducible experiment, and lets the
+same probe run on `chromium` — which reveals whether the defect is genuinely engine-specific or
+merely a race that WebKit loses more often.
 
 This read also settles the product-bug-vs-test-artifact fork.
 
@@ -191,6 +205,12 @@ run.
 **Mobile Safari is deliberately excluded.** Desktop `webkit` covers the same engine and therefore
 the same root cause. The Enter-key interaction path stays uncovered in CI and is cheap to run
 locally. Revisit under TASK-040 if broader matrix coverage is wanted.
+
+**Note on the deterministic probe.** If §4.2's `page.route` delay reproduces the defect on
+`chromium` as well, then the regression test can be written engine-independently and will fail on
+`chromium` too — meaning the primary regression guard no longer depends on the webkit job at all.
+Webkit in CI then becomes belt-and-braces rather than the sole protection. This is the preferred
+outcome and should be pursued if Phase 2 supports it.
 
 ---
 
