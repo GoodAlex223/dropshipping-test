@@ -324,6 +324,13 @@ Improvements to existing functionality.
 - [ ] Add DELIVERED status validation in review seeding — add runtime check `if (orderData.status !== 'DELIVERED')` before creating reviews to enforce eligibility pattern programmatically
 - [ ] Standardize user upsert patterns — admin uses `update: {}` while customers use `update: { name }` without password; make consistent (either both update all fields or both update none)
 
+### [2026-07-14] From: TASK-033 Completion
+
+- **Gitignore Playwright artifacts**: `playwright-report/` and `test-results/` are git-tracked generated outputs; every local E2E run dirties the tree (observed throughout TASK-033). Add both to `.gitignore` and remove from tracking. (Med value, Low effort)
+- **`.env` hygiene**: deduplicate the two `DATABASE_URL` keys (second points at a live-looking Neon DB alongside Vercel tokens); confirm rotation with owner. Note: `.env` is gitignored and never committed — local-file hygiene, not repo exposure. (High value, Low effort)
+- **Add `.superpowers/` to `.prettierignore`**: session scratch files trip `npm run format:check` locally. (Low value, Low effort)
+- **CLAUDE.md E2E docs scope**: testing docs list only `navigation.spec.ts`; `cart.spec.ts` and `products.spec.ts` exist. Correct at next CLAUDE.md refresh. (Low value, Low effort)
+
 ### [2026-07-14] From: TASK-033 Resumption Audit
 
 **Origin**: docs/planning/plans/2026-07-14_task-033-resumption.md (Task 2 security & dependency audit, feat/task-033-resumption branch)

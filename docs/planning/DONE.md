@@ -2,7 +2,26 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-02-12
+**Last Updated**: 2026-07-14
+
+---
+
+## 2026-07 (July)
+
+### [2026-07-14] TASK-033 - Post-Freeze Resumption Validation
+
+**Plan**: [docs/archive/plans/2026-07-14_task-033-resumption.md](../archive/plans/2026-07-14_task-033-resumption.md)
+**Summary**: First task of the Mirox Shop program (spec: [2026-07-14-mirox-shop-program-design.md](../superpowers/specs/2026-07-14-mirox-shop-program-design.md)). Re-validated the codebase after the 5-month freeze: conservative dependency audit reduced vulnerabilities 32→6 (0 critical; remaining need major upgrades, deferred to BACKLOG), full validation baseline (lint/format/typecheck/unit 246/build green; E2E 83/85 with one pre-existing WebKit-only bug documented), created WEEKLY.md, promoted v1.3 tasks TASK-034..040 to TODO.md. Executed via subagent-driven development (5 tasks, per-task spec+quality reviews, final whole-branch review: READY TO MERGE).
+**Key Changes**:
+
+- `package-lock.json`: 151 packages bumped, 35 removed, 1 added — lockfile-only, `package.json` untouched (conservative policy)
+- New `docs/planning/WEEKLY.md`; `TODO.md` rewritten with TASK-034..040 (priorities, dependencies, acceptance criteria)
+- 4 BACKLOG entries: Next.js 14→16 security majors, nodemailer chain (blocked by @auth/core pin), WebKit E2E search-filter bug, stale seed-count docs
+- Program design spec committed; docs/README.md, CLAUDE.md, ROADMAP.md refreshed per PR review findings (stale state, v1.2.0 tag commit corrected to 1ab109a)
+
+**PR**: [#16](https://github.com/GoodAlex223/dropshipping-test/pull/16) (merge commit c07e474)
+**Spawned Tasks**: 4 BACKLOG entries from audit/validation + repo-hygiene extractions (see BACKLOG `[2026-07-14] From: TASK-033 Completion`)
+**Open Decision**: WebKit E2E fix-vs-defer before v1.3 feature work (spec requires green baseline)
 
 ---
 

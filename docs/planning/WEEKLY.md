@@ -20,10 +20,10 @@
 
 ### Must Complete (Critical)
 
-| Task                      | Reference        | Status         | Notes                |
-| ------------------------- | ---------------- | -------------- | -------------------- |
-| Resumption validation     | TODO.md TASK-033 | ⏳ In Progress | Gates all other work |
-| Payments & delivery spike | TODO.md TASK-038 | 📋 Planned     | Blocks v1.4 Track B  |
+| Task                      | Reference        | Status     | Notes               |
+| ------------------------- | ---------------- | ---------- | ------------------- |
+| Resumption validation     | TODO.md TASK-033 | ✅ PR #16  | Merged 2026-07-14   |
+| Payments & delivery spike | TODO.md TASK-038 | 📋 Planned | Blocks v1.4 Track B |
 
 ### Should Complete (Important)
 
@@ -54,9 +54,9 @@
 
 #### Tuesday (2026-07-14)
 
-- [ ] TASK-033: environment bring-up, audit, validation baseline, planning docs
-- **Completed**: TASK-033 Tasks 1–4: env bring-up, audit (32→6 vulns, commit 3a3ec75), validation baseline (unit/build green; E2E 83/85, WebKit-only pre-existing bug), planning docs
-- **Blockers**:
+- [x] TASK-033: environment bring-up, audit, validation baseline, planning docs
+- **Completed**: TASK-033 in full — env bring-up, audit (32→6 vulns, commit 3a3ec75), validation baseline (unit/build green; E2E 83/85, WebKit-only pre-existing bug), planning docs, review fixes, PR #16 merged (c07e474)
+- **Blockers**: none (open decision: WebKit E2E fix-vs-defer before v1.3 feature work)
 
 ---
 

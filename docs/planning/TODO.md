@@ -8,20 +8,7 @@ Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-
 
 ## 🔄 In Progress
 
-#### [TASK-033] Post-freeze resumption validation
-
-**Priority**: 🔴 Critical
-**Status**: 🔄 In Progress
-**Effort**: M
-**Plan**: [docs/planning/plans/2026-07-14_task-033-resumption.md](plans/2026-07-14_task-033-resumption.md)
-
-**Description**: Re-validate the frozen v1.2.0 codebase (npm audit, dependency drift, full build/unit/E2E baseline) and set up Mirox Shop program planning docs. Gates all v1.3 work.
-
-**Acceptance Criteria**:
-
-- [ ] `npm audit` reviewed; HIGH/CRITICAL patched within semver or deferred to BACKLOG with rationale
-- [ ] Lint, format, typecheck, unit tests, build, E2E all green
-- [ ] WEEKLY.md created; TASK-034..040 promoted to TODO.md
+_None. TASK-033 completed 2026-07-14 (PR #16) — see [DONE.md](DONE.md)._
 
 ## 📋 Planned (v1.3 — "Mirox Rebrand Demo")
 

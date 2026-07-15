@@ -35,9 +35,9 @@ Central index for all project documentation.
 | [planning/README.md](planning/README.md)         | Planning overview    | 2026-01-05   |
 | [planning/WEEKLY.md](planning/WEEKLY.md)         | Current week's plan  | 2026-07-14   |
 | [planning/TODO.md](planning/TODO.md)             | Active tasks         | 2026-07-14   |
-| [planning/DONE.md](planning/DONE.md)             | Completed tasks      | 2026-02-10   |
+| [planning/DONE.md](planning/DONE.md)             | Completed tasks      | 2026-07-14   |
 | [planning/BACKLOG.md](planning/BACKLOG.md)       | Unprioritized ideas  | 2026-07-14   |
-| [planning/ROADMAP.md](planning/ROADMAP.md)       | Long-term vision     | 2026-02-10   |
+| [planning/ROADMAP.md](planning/ROADMAP.md)       | Long-term vision     | 2026-07-14   |
 | [planning/GOALS.md](planning/GOALS.md)           | Objectives & metrics | 2026-01-26   |
 | [planning/MILESTONES.md](planning/MILESTONES.md) | Key targets          | 2026-01-26   |
 
@@ -53,9 +53,7 @@ Central index for all project documentation.
 
 ## Implementation Plans
 
-| Plan                                                                                  | Task                              | Status | Started    |
-| ------------------------------------------------------------------------------------- | --------------------------------- | ------ | ---------- |
-| [2026-07-14_task-033-resumption.md](planning/plans/2026-07-14_task-033-resumption.md) | Post-freeze resumption validation | ACTIVE | 2026-07-14 |
+No active implementation plans.
 
 ### Archived Plans
 
@@ -67,6 +65,7 @@ Central index for all project documentation.
 | [2026-02-02_task-019-social-sharing.md](archive/plans/2026-02-02_task-019-social-sharing.md)             | Social Sharing            | COMPLETE | 2026-02-02 |
 | [2026-02-04_task-026-fix-vercel-deploy-ci.md](archive/plans/2026-02-04_task-026-fix-vercel-deploy-ci.md) | CI/CD Deployment Pipeline | COMPLETE | 2026-02-07 |
 | [2026-02-09_task-027-dependency-audit.md](archive/plans/2026-02-09_task-027-dependency-audit.md)         | Dependency Audit          | COMPLETE | 2026-02-09 |
+| [2026-07-14_task-033-resumption.md](archive/plans/2026-07-14_task-033-resumption.md)                     | Post-Freeze Resumption    | COMPLETE | 2026-07-14 |
 
 See [archive/README.md](archive/README.md) for more historical plans.
 
