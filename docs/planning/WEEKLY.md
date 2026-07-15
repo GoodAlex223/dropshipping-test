@@ -73,6 +73,8 @@
 **Preparation Needed**:
 
 - [ ] Client design files (Figma) — chase if still missing
+- [ ] Client asset chase-list: hero model photos, customer/gallery photos (w/ consent), vector logo, real follower counts, size charts — see BACKLOG "Content dependencies" note
+- [ ] Client decision: discount wheel — present recorded doubts (BACKLOG) before any build
 - [ ] Payment gateway merchant account prerequisites from TASK-038 findings
 
 ---
