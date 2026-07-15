@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-07-14
+**Last Updated**: 2026-07-15
 
 ---
 
@@ -323,6 +323,11 @@ Improvements to existing functionality.
 - [x] Simplify type assertions in subscriber seeding — replace `"prop" in s ? (s as { prop: T }).prop : null` with optional chaining → Completed in TASK-029
 - [ ] Add DELIVERED status validation in review seeding — add runtime check `if (orderData.status !== 'DELIVERED')` before creating reviews to enforce eligibility pattern programmatically
 - [ ] Standardize user upsert patterns — admin uses `update: {}` while customers use `update: { name }` without password; make consistent (either both update all fields or both update none)
+
+### [2026-07-15] From: TASK-033 Post-Merge Verification
+
+- **Add `sharp` dependency**: CI E2E web-server logs flood with `'sharp' is required to be installed in standalone mode`; `sharp` is absent from package.json. Vercel production unaffected (own image service), but `next/image` optimization is broken on the self-hosted/VPS deploy path and the noise can bury real E2E errors. Fix: `npm install sharp` + one validation run. (Med value, Low effort)
+- **Actions Deploy-to-Vercel job is a validated no-op**: with Vercel secrets unset in GitHub, the job runs only "Validate Vercel configuration" and reports green; actual production deploys come from the Vercel Git integration. A green "Deploy" badge without the integration would ship nothing. Either document this as the intended setup or wire the secrets; fold into [TASK-040] CI extensions. (Med value, Low effort) `[relates-to: TASK-040]`
 
 ### [2026-07-14] From: TASK-033 Completion
 
