@@ -1,6 +1,6 @@
 # TODO
 
-**Last Updated**: 2026-07-14
+**Last Updated**: 2026-07-15
 
 Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-shop-program-design.md) · Current week: [WEEKLY.md](WEEKLY.md)
 
@@ -12,7 +12,12 @@ _None. TASK-033 completed 2026-07-14 (PR #16) — see [DONE.md](DONE.md)._
 
 ## 📋 Planned (v1.3 — "Mirox Rebrand Demo")
 
-#### [TASK-038] Payments & delivery research spike (Ukraine)
+#### [TASK-038a] Prework
+
+- Decision: WebKit search-filter bug — fix before v1.3 feature work (my recommendation) or accept deferral.
+- Decision: sharp — quick add with a validation run, or leave in backlog.
+
+#### [TASK-038b] Payments & delivery research spike (Ukraine)
 
 **Priority**: 🔴 Critical
 **Status**: 📋 Planned
@@ -58,6 +63,9 @@ _None. TASK-033 completed 2026-07-14 (PR #16) — see [DONE.md](DONE.md)._
 - [ ] First screen matches brief: slogan, subtitle, two CTAs
 - [ ] Benefit cards and "Why choose us" blocks present
 - [ ] Social section (Instagram, TikTok, Telegram) present
+- [ ] Top announcement banner slot (free delivery/promo text) — client list #2 item 13
+- [ ] Hero uses real model photography (client to supply; placeholder until then) — item 14
+- [ ] Social follower counters only if real numbers supplied — item 16
 
 #### [TASK-036] Catalog redesign + filters
 
@@ -73,6 +81,7 @@ _None. TASK-033 completed 2026-07-14 (PR #16) — see [DONE.md](DONE.md)._
 - [ ] All five filters functional and combinable
 - [ ] Four sort orders functional ("popular" definition decided in plan)
 - [ ] Filter state reflected in the URL (shareable)
+- [ ] ProductCard: second image on hover, quick-view, quick-buy, circular color swatches — client list #2 items 18/19
 
 #### [TASK-037] Product page redesign
 

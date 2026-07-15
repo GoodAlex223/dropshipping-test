@@ -324,6 +324,16 @@ Improvements to existing functionality.
 - [ ] Add DELIVERED status validation in review seeding — add runtime check `if (orderData.status !== 'DELIVERED')` before creating reviews to enforce eligibility pattern programmatically
 - [ ] Standardize user upsert patterns — admin uses `update: {}` while customers use `update: { name }` without password; make consistent (either both update all fields or both update none)
 
+### [2026-07-15] From: Client Improvement List #2 (user-raised)
+
+Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 already covered by planned tasks (see enrichment notes); genuinely new items below.
+
+- **Floating support buttons**: site-wide floating Instagram / Telegram / manager-chat buttons. Small, v1.3/v1.4 candidate. (Med value, S effort)
+- **Discount wheel popup** (5–15% after 15s on site): ⚠️ brand-fit concern — contradicts the premium-minimal positioning the same client mandated; also depends on promo-code backend [TASK-046]. Needs explicit client confirmation before building. (Value questionable, M effort)
+- **Guest order tracking**: track order by order number + phone. Privacy constraint: never lookup by phone alone (order enumeration risk) — require order#+phone pair or OTP. v1.4/v2.0 candidate, Track B. (High value, M effort)
+- **Top announcement banner** (free shipping / promos): static version folds into [TASK-035]; admin-managed version belongs to [TASK-047]. (Med value, S effort)
+- **Enrichments to already-planned tasks** (apply when promoting each): TASK-041 wishlist → header counter, heart animation, add-toast; TASK-042 search → explicit typo tolerance; TASK-043 → restyle existing CartDrawer; TASK-044 reviews → delivery-time field, gallery needs real client photos; TASK-034 → animation library decision must respect PageSpeed-95+ budget (client suggested GSAP); TASK-051 unchanged (real-data-only stands). Items 1,3–6,9,10,12,14–20 tagged `[covered-by: TASK-034..053]` — no separate entries.
+
 ### [2026-07-15] From: TASK-033 Post-Merge Verification
 
 - **Add `sharp` dependency**: CI E2E web-server logs flood with `'sharp' is required to be installed in standalone mode`; `sharp` is absent from package.json. Vercel production unaffected (own image service), but `next/image` optimization is broken on the self-hosted/VPS deploy path and the noise can bury real E2E errors. Fix: `npm install sharp` + one validation run. (Med value, Low effort)
