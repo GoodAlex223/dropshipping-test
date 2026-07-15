@@ -54,13 +54,49 @@
 
 Per spec §4.1, no fix is written against an unreproduced failure.
 
-- [ ] **Step 1: Confirm the DB is reachable and seeded**
+- [ ] **Step 1: Verify the database target is LOCAL — never seed blindly**
+
+> **⚠️ This step originally read `npx prisma db seed`. That was dangerous and has been corrected.**
+> `.env` defines `DATABASE_URL` **twice**, and dotenv is last-wins — the second entry pointed at the
+> **live Neon production database**. `prisma/seed.ts` upserts users/catalog and calls `deleteMany`
+> on product images (`seed.ts:140`), variants (`seed.ts:141`), and order items (`seed.ts:187`), so
+> seeding production would delete and recreate real product imagery and order line items.
+> The duplicate is now commented out locally (backup: `.env.backup-task038a`).
+
+**Never run `prisma db seed` without confirming the target first.** Run this guard:
 
 ```bash
-npx prisma db seed
+node -e "
+require('dotenv').config({ path: '.env', override: true });
+const u = process.env.DATABASE_URL || '';
+if (!u) { console.error('ABORT: DATABASE_URL unset'); process.exit(1); }
+if (!/@(postgres|localhost|127\.0\.0\.1)[:\/]/.test(u)) {
+  console.error('ABORT: DATABASE_URL is NOT local — refusing. Host:', u.replace(/:\/\/[^:]+:[^@]+@/, '://***@'));
+  process.exit(1);
+}
+console.log('OK: DATABASE_URL is local');
+"
 ```
 
-Expected: seeds without error. If it fails, STOP — E2E needs categories and active products (`tests/global-setup.ts` enforces this).
+Expected: `OK: DATABASE_URL is local`. **If it aborts, STOP and escalate — do not work around it.**
+
+- [ ] **Step 1b: Confirm seed data exists (read-only)**
+
+```bash
+npx tsx -e "
+import { PrismaClient } from '@prisma/client';
+const p = new PrismaClient();
+(async () => {
+  const [c, a] = await Promise.all([p.category.count(), p.product.count({ where: { isActive: true } })]);
+  console.log('categories:', c, '| active products:', a, '=>', c > 0 && a > 0 ? 'OK' : 'EMPTY — needs seed');
+  await p.\$disconnect();
+})();
+"
+```
+
+Expected as of 2026-07-15: `categories: 15 | active products: 21 => OK`. `tests/global-setup.ts` only
+_validates_ these counts — it never seeds. **If and only if this reports EMPTY**, and Step 1 passed,
+run `npx prisma db seed`.
 
 - [ ] **Step 2: Run the failing test on webkit**
 
