@@ -15,6 +15,15 @@ test.describe("Product Browsing", () => {
   test("can filter products by search", async ({ page, isMobile }) => {
     await page.goto("/products");
 
+    // Wait for the product grid before interacting with the form. Cards are
+    // rendered by a client-side effect (fetchProducts) that only runs after
+    // React has hydrated, so their presence is a reliable hydration signal —
+    // unlike isVisible() below, which only proves the element has painted.
+    // On WebKit specifically, filling an input before hydration produces an
+    // `input` event that never reaches React (state stays empty), so a
+    // pre-hydration fill() silently no-ops. See BACKLOG.md TASK-038a entry.
+    await page.waitForSelector("[data-testid='product-card']");
+
     // Find search input and search button
     const searchInput = page.getByPlaceholder(/search/i);
 
