@@ -77,6 +77,7 @@ _None. TASK-033 completed 2026-07-14 (PR #16) — see [DONE.md](DONE.md)._
 - [ ] Four sort orders functional ("popular" definition decided in plan)
 - [ ] Filter state reflected in the URL (shareable)
 - [ ] ProductCard: second image on hover, quick-view, quick-buy, circular color swatches — client list #2 items 18/19
+- [ ] Hydration invariant preserved or replaced: the E2E hydration gate in `tests/e2e/products.spec.ts` (`waitForSelector("[data-testid='product-card']")`) relies on product cards being client-rendered by a post-hydration `useEffect` fetch. If this rewrite moves product rendering to server components or streaming SSR, that gate stops being a valid hydration signal — replace it with an equivalent readiness signal, or the WebKit `fill()`-before-hydration race diagnosed in TASK-038a returns undetected.
 
 #### [TASK-037] Product page redesign
 

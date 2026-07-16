@@ -18,16 +18,16 @@ Root cause: the test called `searchInput.fill()` gated only on element visibilit
 
 **Key Changes**:
 
-- `tests/e2e/products.spec.ts`: the test now waits for `[data-testid='product-card']` (a hydration-only render signal — cards only appear from a client-side post-hydration fetch effect) before touching the search input; added a permanent regression test that delays `/api/products` via `page.route` to make the race deterministic and reproducible on every engine, not just WebKit
+- `tests/e2e/products.spec.ts`: the test now waits for `[data-testid='product-card']` (a hydration-only render signal — cards only appear from a client-side post-hydration fetch effect) before touching the search input
 - `package.json` / `package-lock.json`: added `sharp ^0.35.3` to `dependencies` (not `devDependencies` — `next.config.mjs` uses `output: "standalone"`, which needs `sharp` at serve time for `next/image` optimization)
 - `.github/workflows/ci.yml`: added `webkit` to the Playwright browser install (line 136) and the E2E run (line 161); `Mobile Safari` deliberately excluded from CI (same engine as `webkit`, and CI runs `workers: 1` so each added project costs a full serial pass — flagged to BACKLOG for TASK-040)
-- `docs/planning/BACKLOG.md`: `:345` (sharp) marked resolved; `:361` (WebKit) corrected in place — "product bug" claim disproven, actual root cause and fix documented; 5 new entries added under `[2026-07-16] From: TASK-038a`
+- `docs/planning/BACKLOG.md`: `:345` (sharp) marked resolved; `:361` (WebKit) corrected in place — "product bug" claim disproven, actual root cause and fix documented; 6 new entries added under `[2026-07-16] From: TASK-038a`
 - `.prettierignore`: added `.superpowers`, `playwright-report`, `test-results` — `npm run format:check` was failing on 28 generated artifacts (24 gitignored agent scratch + 4 E2E run outputs) and zero source files, making the check unusable locally; consistent with the file's existing exclusion of other generated dirs (`.next`, `dist`, `build`, `coverage`)
 
 **Verification**: unit 246 passed + 1 todo; lint/typecheck/build PASS; `format:check` PASS (after the `.prettierignore` fix above). E2E 84/85 — up from the TASK-033 baseline of 83/85: chromium 16/17, firefox 17/17, webkit 17/17, Mobile Chrome 17/17, Mobile Safari 17/17. Both previously-failing tests (webkit and Mobile Safari "can filter products by search") now pass. The one remaining failure, `[chromium] navigation.spec.ts "can navigate to categories page"`, is a pre-existing, intermittent `next dev` cold-compile flake unrelated to this work (reproduced ~2/3 in isolation; `navigation.spec.ts` is byte-identical to `main`, `src/` untouched on this branch) — BACKLOG'd.
 
 **PR**: _Not yet opened as of this entry._ Branch `feat/task-038a-prework`, commits: `e5ff8ef` (test fix + BACKLOG:361 correction), `69f8682` (sharp), `9fe4732` (ci: webkit), plus earlier spec/plan commits `84886e4`, `3e4ce8f`, `0925bd8`, `5230d84`.
-**Spawned Tasks**: 5 BACKLOG entries added under `[2026-07-16] From: TASK-038a` — shared interact-before-hydration pattern unexercised in `products.spec.ts`/`cart.spec.ts`/`navigation.spec.ts`, the chromium cold-compile flake, `page.route` race-testing as a reusable pattern, `sharp`'s undocumented Node ≥20.9.0 floor, and CI `workers: 1` serial-cost ahead of TASK-040.
+**Spawned Tasks**: 6 BACKLOG entries added under `[2026-07-16] From: TASK-038a` — shared interact-before-hydration pattern unexercised in `products.spec.ts`/`cart.spec.ts`/`navigation.spec.ts`, the chromium cold-compile flake, `page.route` race-testing as a reusable pattern, `sharp`'s undocumented Node ≥20.9.0 floor, CI `workers: 1` serial-cost ahead of TASK-040, and auditing remaining BACKLOG entries for other unverified root-cause claims.
 **Open Decision**: none — both TODO.md decisions (WebKit fix-vs-defer, sharp add-vs-backlog) are now resolved.
 
 ---
