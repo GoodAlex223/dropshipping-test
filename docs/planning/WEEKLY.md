@@ -68,8 +68,8 @@
 #### Thursday (2026-07-16)
 
 - [x] TASK-038a: diagnosed WebKit E2E search-filter failure, added `sharp`, added `webkit` to CI, completion workflow
-- **Completed**: TASK-038a in full — diagnosis proved the WebKit failure is a test artifact (pre-hydration `fill()` race), not a product bug, per Branch B of spec §4.3; `tests/e2e/products.spec.ts` now waits for a hydration signal before interacting; `sharp ^0.35.3` added to `dependencies`; `webkit` added to the CI E2E matrix; BACKLOG `:345`/`:361` resolved, 5 new entries added; `.prettierignore` fixed so `format:check` is usable locally again. Full verification: unit 246+1 todo, lint/typecheck/build/format:check all PASS, E2E 84/85 (both previously-failing WebKit/Mobile Safari tests now pass; 1 pre-existing unrelated chromium dev-server flake remains, BACKLOG'd)
-- **Blockers**: none. Both open decisions from 2026-07-15 (WebKit fix-vs-defer, `sharp` add-vs-backlog) are resolved. PR for `feat/task-038a-prework` not yet opened — see Summary Table `#TBD` placeholder
+- **Completed**: TASK-038a in full — diagnosis proved the WebKit failure is a test artifact (pre-hydration `fill()` race), not a product bug, per Branch B of spec §4.3; `tests/e2e/products.spec.ts` now waits for a hydration signal before interacting; `sharp ^0.35.3` added to `dependencies`; `webkit` added to the CI E2E matrix; BACKLOG `:345`/`:361` resolved, 6 new entries added; `.prettierignore` fixed so `format:check` is usable locally again. Full verification: unit 246+1 todo, lint/typecheck/build/format:check all PASS, E2E 84/85 (both previously-failing WebKit/Mobile Safari tests now pass; 1 pre-existing unrelated chromium dev-server flake remains, BACKLOG'd)
+- **Blockers**: none. Both open decisions from 2026-07-15 (WebKit fix-vs-defer, `sharp` add-vs-backlog) are resolved. PR #17 opened from `feat/task-038a-prework`; that run is the first execution of the new `webkit` CI job, which is spec §8's one criterion not verifiable locally
 
 ---
 
