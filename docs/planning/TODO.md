@@ -1,6 +1,6 @@
 # TODO
 
-**Last Updated**: 2026-07-15
+**Last Updated**: 2026-07-16
 
 Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-shop-program-design.md) · Current week: [WEEKLY.md](WEEKLY.md)
 
@@ -11,11 +11,6 @@ Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-
 _None. TASK-033 completed 2026-07-14 (PR #16) — see [DONE.md](DONE.md)._
 
 ## 📋 Planned (v1.3 — "Mirox Rebrand Demo")
-
-#### [TASK-038a] Prework
-
-- Decision: WebKit search-filter bug — fix before v1.3 feature work (my recommendation) or accept deferral.
-- Decision: sharp — quick add with a validation run, or leave in backlog.
 
 #### [TASK-038b] Payments & delivery research spike (Ukraine)
 
