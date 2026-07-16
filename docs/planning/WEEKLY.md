@@ -20,11 +20,11 @@
 
 ### Must Complete (Critical)
 
-| Task                      | Reference         | Status     | Notes                                                                                                            |
-| ------------------------- | ----------------- | ---------- | ---------------------------------------------------------------------------------------------------------------- |
-| Resumption validation     | TODO.md TASK-033  | ✅ PR #16  | Merged 2026-07-14                                                                                                |
-| Prework (WebKit/sharp/CI) | TODO.md TASK-038a | ✅ PR #TBD | Branch B (test artifact, not a product bug); PR not opened yet — replace `#TBD` with the real number once opened |
-| Payments & delivery spike | TODO.md TASK-038b | 📋 Planned | Blocks v1.4 Track B                                                                                              |
+| Task                      | Reference         | Status     | Notes                                                                                                   |
+| ------------------------- | ----------------- | ---------- | ------------------------------------------------------------------------------------------------------- |
+| Resumption validation     | TODO.md TASK-033  | ✅ PR #16  | Merged 2026-07-14                                                                                       |
+| Prework (WebKit/sharp/CI) | TODO.md TASK-038a | ✅ PR #17  | Branch B (test artifact, not a product bug) — WebKit `fill()` before hydration; no product code changed |
+| Payments & delivery spike | TODO.md TASK-038b | 📋 Planned | Blocks v1.4 Track B                                                                                     |
 
 ### Should Complete (Important)
 
