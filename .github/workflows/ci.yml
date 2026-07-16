@@ -133,7 +133,7 @@ jobs:
         run: npm ci
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium webkit
 
       - name: Generate Prisma Client
         run: npx prisma generate
@@ -158,7 +158,7 @@ jobs:
           AUTH_TRUST_HOST: "true"
 
       - name: Run E2E tests
-        run: npm run test:e2e -- --project=chromium
+        run: npm run test:e2e -- --project=chromium --project=webkit
         env:
           DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/dropshipping_test"
           NEXTAUTH_SECRET: "test-secret-for-e2e-tests-min-32-chars"

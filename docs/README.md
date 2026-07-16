@@ -2,7 +2,7 @@
 
 Central index for all project documentation.
 
-**Last Updated**: 2026-07-14
+**Last Updated**: 2026-07-16
 
 ---
 
@@ -33,21 +33,22 @@ Central index for all project documentation.
 | Document                                         | Purpose              | Last Updated |
 | ------------------------------------------------ | -------------------- | ------------ |
 | [planning/README.md](planning/README.md)         | Planning overview    | 2026-01-05   |
-| [planning/WEEKLY.md](planning/WEEKLY.md)         | Current week's plan  | 2026-07-14   |
-| [planning/TODO.md](planning/TODO.md)             | Active tasks         | 2026-07-14   |
-| [planning/DONE.md](planning/DONE.md)             | Completed tasks      | 2026-07-14   |
-| [planning/BACKLOG.md](planning/BACKLOG.md)       | Unprioritized ideas  | 2026-07-14   |
+| [planning/WEEKLY.md](planning/WEEKLY.md)         | Current week's plan  | 2026-07-16   |
+| [planning/TODO.md](planning/TODO.md)             | Active tasks         | 2026-07-16   |
+| [planning/DONE.md](planning/DONE.md)             | Completed tasks      | 2026-07-16   |
+| [planning/BACKLOG.md](planning/BACKLOG.md)       | Unprioritized ideas  | 2026-07-16   |
 | [planning/ROADMAP.md](planning/ROADMAP.md)       | Long-term vision     | 2026-07-14   |
 | [planning/GOALS.md](planning/GOALS.md)           | Objectives & metrics | 2026-01-26   |
 | [planning/MILESTONES.md](planning/MILESTONES.md) | Key targets          | 2026-01-26   |
 
 ### Architecture & Design
 
-| Document                                                                                                               | Purpose                                 | Last Updated |
-| ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------- | ------------ |
-| [ARCHITECTURE.md](ARCHITECTURE.md)                                                                                     | System design, layers, data flow        | 2026-02-10   |
-| [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md)                                                                               | Decisions, patterns, history            | 2026-02-10   |
-| [superpowers/specs/2026-07-14-mirox-shop-program-design.md](superpowers/specs/2026-07-14-mirox-shop-program-design.md) | Mirox Shop program design (v1.3 → v2.0) | 2026-07-14   |
+| Document                                                                                                               | Purpose                                                 | Last Updated |
+| ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- | ------------ |
+| [ARCHITECTURE.md](ARCHITECTURE.md)                                                                                     | System design, layers, data flow                        | 2026-02-10   |
+| [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md)                                                                               | Decisions, patterns, history                            | 2026-02-10   |
+| [superpowers/specs/2026-07-14-mirox-shop-program-design.md](superpowers/specs/2026-07-14-mirox-shop-program-design.md) | Mirox Shop program design (v1.3 → v2.0)                 | 2026-07-14   |
+| [superpowers/specs/2026-07-15-task-038a-prework-design.md](superpowers/specs/2026-07-15-task-038a-prework-design.md)   | TASK-038a prework: WebKit diagnosis, sharp, CI coverage | 2026-07-16   |
 
 ---
 
@@ -66,6 +67,7 @@ No active implementation plans.
 | [2026-02-04_task-026-fix-vercel-deploy-ci.md](archive/plans/2026-02-04_task-026-fix-vercel-deploy-ci.md) | CI/CD Deployment Pipeline | COMPLETE | 2026-02-07 |
 | [2026-02-09_task-027-dependency-audit.md](archive/plans/2026-02-09_task-027-dependency-audit.md)         | Dependency Audit          | COMPLETE | 2026-02-09 |
 | [2026-07-14_task-033-resumption.md](archive/plans/2026-07-14_task-033-resumption.md)                     | Post-Freeze Resumption    | COMPLETE | 2026-07-14 |
+| [2026-07-15_task-038a-prework.md](archive/plans/2026-07-15_task-038a-prework.md)                         | TASK-038a Prework         | COMPLETE | 2026-07-16 |
 
 See [archive/README.md](archive/README.md) for more historical plans.
 
