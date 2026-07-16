@@ -12,7 +12,7 @@
 **Secondary Goals**:
 
 - Start Track A rebrand foundation (TASK-034)
-- Complete Track B payments/delivery research spike (TASK-038)
+- Complete Track B payments/delivery research spike (TASK-038b)
 
 ---
 
