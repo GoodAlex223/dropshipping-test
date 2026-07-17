@@ -20,7 +20,7 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono, Playfair_Display, Lora } from "next/font/google";
+import { Inter, JetBrains_Mono, Playfair_Display, Lora, Manrope } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { getDefaultMetadata, getOrganizationJsonLd, getWebsiteJsonLd } from "@/lib/seo";
 import { PRECONNECT_DOMAINS, DNS_PREFETCH_DOMAINS } from "@/components/common/ResourceHints";
@@ -29,7 +29,15 @@ import "./globals.css";
 // Primary sans-serif font (always loaded immediately)
 const inter = Inter({
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  subsets: ["latin", "cyrillic", "cyrillic-ext"],
+});
+
+// Heading + wordmark font (Mirox design system, always loaded immediately)
+// cyrillic-ext is mandatory: it is the only subset carrying the hryvnia sign (U+20B4)
+const manrope = Manrope({
+  variable: "--font-manrope",
+  subsets: ["latin", "cyrillic", "cyrillic-ext"],
+  weight: ["500", "700", "800"],
 });
 
 // Monospace font for code snippets (always loaded immediately)
@@ -105,7 +113,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${inter.variable} ${jetbrainsMono.variable} ${playfair.variable} ${lora.variable} antialiased`}
+        className={`${inter.variable} ${jetbrainsMono.variable} ${playfair.variable} ${lora.variable} ${manrope.variable} antialiased`}
       >
         <Providers>{children}</Providers>
       </body>

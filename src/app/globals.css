@@ -7,6 +7,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
+  --font-heading: var(--font-heading);
   --font-serif: var(--font-serif);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -52,7 +53,7 @@
    ======================================== */
 :root {
   --radius: 0.25rem;
-  --font-heading: var(--font-geist-sans); /* Manrope wired in Task 2 */
+  --font-heading: var(--font-manrope);
   --font-body: var(--font-geist-sans);
   --font-serif: var(--font-playfair);
 
