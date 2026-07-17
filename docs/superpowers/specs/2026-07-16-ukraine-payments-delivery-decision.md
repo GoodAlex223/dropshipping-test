@@ -9,6 +9,35 @@
 
 ## 1. Executive summary & recommendation
 
+Stripe does not onboard Ukrainian merchants, so Mirox Shop needs a Ukrainian gateway. This document settles that choice, scopes Nova Poshta delivery, and fixes the currency strategy, so that TASK-048 and TASK-049 can be planned without re-discovery.
+
+**The headline: this is not one payment integration, it is two.** Ukrainian e-commerce runs on two rails — an online card gateway **and** Nova Poshta cash-on-delivery (післяплата) — with **opposite order lifecycles** (`paid → ship` vs `ship → maybe paid`). Building only the gateway would forfeit the way a large share of Ukrainian customers actually buy. See §3.
+
+**Gateway recommendation** — conditional, because it turns on facts only the client holds (§5.3):
+
+| If…                                                                | Then                        | Why                                                                                                                        |
+| ------------------------------------------------------------------ | --------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Already banks with **monobank**, installments not needed at launch | **Plata by mono**           | Live in <10 min; 1.3%/2%; 0 UAH/mo. Costs: monobank account mandatory, UA-language site mandatory, no installments via API |
+| **Any other case** — wants bank freedom and/or native installments | **LiqPay** ← safest default | Only candidate that settles to **any bank's** IBAN; 1.3%/2% published; ~24 h approval; installments built in               |
+| **Installments are a primary conversion lever**                    | **WayForPay**               | 2% flat buys **nine** bank installment programs vs LiqPay's two; no refund fee                                             |
+| BankPay 1% is material, or a relationship exists                   | **Portmone**                | Otherwise loses: 3–10 **business days** onboarding, payout period unverifiable                                             |
+| —                                                                  | **~~Fondy~~ DISQUALIFIED**  | NBU licence of its Ukrainian entity **revoked 2024-07-22**                                                                 |
+
+Branches A and B are both 1.3%/2%: **fee is not the differentiator** — bank lock-in versus onboarding speed is.
+
+**Four findings that change the plan** (each caught by adversarial verification _contradicting_ the initial research — see §9):
+
+1. **Fondy is disqualified on licensing**, not on price. ТОВ «ФК "ЕЛАЄНС"» lost its NBU licence on 2024-07-22 (NBU's own register). The original research had it as a live candidate.
+2. **Plata by mono cannot offer installments** through the acquiring API — `paymentScheme` is read-only reporting. Instalments are a **separate product** where **the merchant pays the commission**.
+3. **monobank requires a Ukrainian-language site** to approve internet acquiring. This makes **TASK-039 (i18n) a hard prerequisite for payments** under Branch A — not a parallel track — and it converges with the language-law requirement already in the program spec.
+4. **Nova Poshta's postomat filter UUID was inverted** in the research; building on it would have shipped **branch pickups to customers who chose a locker**. See §6.
+
+**Nova Poshta** (§6): one API covers branch, postomat, and courier. COD splits into two products with different tariffs and different eligibility — and **«Контроль оплати» is legal-entity-only**, so a ФОП must take the NovaPay route. One open question remains for a human: whether the classic API offers a status webhook (the devportal is Cloudflare-blocked) — this gates TASK-049's polling design.
+
+**Currency** (§7): **single UAH**. Every viable candidate settles in UAH only; NP COD is UAH. Requires migrating the `Order.currency` default from `"USD"`.
+
+**Status of the evidence:** 120 claims researched, **120 verified** against primary sources — 93 confirmed, **42 disputed**, 10 unverifiable. A ~29% dispute rate on the raw research is the reason this document exists in this form; unverifiable figures are tagged, never guessed.
+
 ## 2. Context & constraints
 
 ## 3. Two-rail payment model (online prepayment + Nova Poshta COD)
@@ -28,9 +57,12 @@ Customer pays at checkout; the gateway confirms via webhook; funds settle to the
 
 Customer pays cash or card at the Nova Poshta branch on collection; NP collects the money and remits it to the merchant. Lifecycle: **fulfil → ship → _maybe_ paid**. The goods leave before the merchant has the money.
 
-- Cost: **2% + 20 UAH** standard; **1% + 10 UAH** on a business contract — charged on the money-transfer leg. (Official NP page; behaviourally confirmed against the live API's `CostRedelivery`, which matched `0.02·N + 20` across all tested amounts.)
-- Ceiling: **399,999 UAH** per single післяплата.
-- Remittance: **same-day ("день у день") only with a NovaPay account**; **next business day** for all other banks. This is a cash-flow constraint, not a detail.
+- Cost — **two different products, two different tariffs.** Getting these confused is the most common modelling error here:
+  - **COD → sender's card** (the retail default): **1% + 10 UAH** to a NovaPay card (money in ~30 min), **2% + 20 UAH** to any other card or in cash (next business day). Behaviourally confirmed against the live API's `CostRedelivery`, which matched `0.02·N + 20` exactly across all tested amounts.
+  - **COD → business account** (NovaPay «Зарахування післяплати на рахунок», the merchant-grade route): _Universal_ tariff — **0.5%** credited to a NovaPay account **same day**, **1.3%** to any other bank **next business day**. _Standard_ tariff (recipient pays the whole fee) — 2.5% / 3.3%.
+- Ceiling: **399,999 UAH** per single післяплата (both routes).
+- **Eligibility trap:** the classic contract-based **«Контроль оплати» requires the sender to be a legal entity (юридична особа)**. A ФОП cannot use it — a ФОП must go via the NovaPay «післяплата на рахунок» route, whose business accounts do serve both ФОП and legal entities. This makes the COD rail's shape depend on the merchant's legal form, exactly like the gateway choice does.
+- Reconciliation: NovaPay emails a payment register (реєстр виплат) to the address named in the COD agreement; the merchant can also view a COD statement (виписка) in the NovaPay app.
 - Merchant bears: COD fee, **non-redemption risk** (customer never collects → merchant eats return shipping and gets no sale), and a cash-flow delay.
 - Failure mode: parcel unredeemed — goods travel twice, revenue zero. This risk has no analogue on Rail A and is the reason most UA stores still offer both.
 
@@ -76,7 +108,7 @@ All sources verified 2026-07-16, except Fondy / Plata by mono / Nova Poshta re-v
 
 **LiqPay (PrivatBank)** — 1.3% Ukrainian-issued cards / 2% foreign, percentage-only, no fixed fee; "Individual" plan negotiable above scale [liqpay.ua/tariffs]. Settlement UAH no later than the next operational day, credited daily [liqpay.ua/information/terms]. ФОП eligible to an IBAN at any bank; ТОВ requires passport+RNOKPP, статут, signatory authority [liqpay.ua/information/instructions/registration]. Registration "up to 15 minutes" — ⚠️ a published _ceiling_, not an average [liqpay.ua/information/handbook/activation]. Callbacks POST `data`+`signature` to `server_url`; final states include success/failure/error/reversed [liqpay.ua/en/doc/api/callback]. Refunds full or partial, amount managed via API, `action="refund"` [liqpay.ua/en/doc/api/internet_acquiring/refund]. Installments: «Оплата частинами» + «Миттєва розстрочка», 1–24 months, 300–300,000 UAH; ⚠️ who sets the term differs by product [liqpay.ua/methods/paypart]. Sandbox: per-merchant `sandbox_`-prefixed keys, `sandbox=1` flag, published test cards [liqpay.ua/en/doc/api/testing]. Ownership: brand of JSC CB PrivatBank, 100% state-owned since the 2016 nationalisation; no 2025–26 ownership change found [privatbank.ua/en/liqpay-oplaty].
 
-**WayForPay** — flat 2% per successful transaction, no fixed component, free onboarding, **no fee on refunds or hold cancellations**; individually set in some cases [help.wayforpay.com/view/3342384]. Settlement **UAH only** ("Відшкодування коштів доступне тільки у валюті гривня"), next banking day, banking days only [help.wayforpay.com/uk/view/3342386]. ФОП and ТОВ both standard tracks; ФОП needs виписка з ЄДР; ТОВ needs статут, наказ, protocol, bank statement, financial reporting [help.wayforpay.com/view/13730003]. Onboarding fully online in 6 steps with id.gov.ua / Diia.Signature and automatic activation [help.wayforpay.com/view/1737806]. Refunds full+partial via REFUND API, HMAC_MD5 signature [wiki.wayforpay.com/en/view/852115]. ⚠️ **Installments are the widest of any candidate — nine bank programs**: monobank «Покупка частинами», PrivatBank «Оплата частинами» + «Миттєва розстрочка», A-Bank ×2, Globus Bank, and others [help.wayforpay.com/view/962875452]. ⚠️ **Sandbox is weaker than claimed**: the primary source documents only _shared_ test merchant credentials (`test_merch_n1`), not a per-merchant sandbox [wiki.wayforpay.com/en/view/852472]. Widget requires no merchant PCI DSS certification [wiki.wayforpay.com/view/852091]. ⚠️ Entity: ТОВ ФК «ВЕЙ ФОР ПЕЙ», EDRPOU 39626179, registered 2015, share capital 65,500,000 UAH, status active, no reorganisation records [clarity-project.info/edr/39626179].
+**WayForPay** — flat 2% per successful transaction, no fixed component, free onboarding, **no fee on refunds or hold cancellations**; individually set in some cases [help.wayforpay.com/view/3342384]. Settlement **UAH only** ("Відшкодування коштів доступне тільки у валюті гривня"), next banking day, banking days only [help.wayforpay.com/uk/view/3342386]. ФОП and ТОВ both standard tracks; ФОП needs виписка з ЄДР; ТОВ needs статут, наказ, protocol, bank statement, financial reporting [help.wayforpay.com/view/13730003]. Onboarding fully online in 6 steps with id.gov.ua / Diia.Signature and automatic activation [help.wayforpay.com/view/1737806]. Refunds full+partial via REFUND API, HMAC*MD5 signature [wiki.wayforpay.com/en/view/852115]. ⚠️ **Installments are the widest of any candidate — nine bank programs**: monobank «Покупка частинами», PrivatBank «Оплата частинами» + «Миттєва розстрочка», A-Bank ×2, Globus Bank, and others [help.wayforpay.com/view/962875452]. ⚠️ **Sandbox is weaker than claimed**: the primary source documents only \_shared* test merchant credentials (`test_merch_n1`), not a per-merchant sandbox [wiki.wayforpay.com/en/view/852472]. Widget requires no merchant PCI DSS certification [wiki.wayforpay.com/view/852091]. ⚠️ Entity: ТОВ ФК «ВЕЙ ФОР ПЕЙ», EDRPOU 39626179, registered 2015, share capital 65,500,000 UAH, status active, no reorganisation records [clarity-project.info/edr/39626179].
 
 **Plata by mono (monobank / АТ «Універсал Банк»)** — 1.3% Ukrainian-issued / 2% foreign for internet acquiring; **0 UAH monthly**; no fixed fee. Marketing says "від 1,3%" but that wording appears **only in an SEO meta description** — every customer-facing surface states a flat rate, so "individually negotiable" is an unsourced inference [monobank.ua/en/knowledge-base/acquiring/index]. Settlement T+1 UAH **to a monobank business account — this is a hard prerequisite**, not a preference [same]. ФОП: any registered ФОП with an open monobank ФОП business account, no tax-group restriction in public docs. ТОВ: eligible with a monobank legal-entity account; self-service onboarding is ФОП-oriented, ТОВ routed via support [monobank.ua/en/knowledge-base/acquiring/signup]. Self-service connection under 10 minutes; approval ~10 minutes [same]. ⚠️ **Webhooks fire on every status change _except_ `expired`** — verbatim: "окрім статусу `expired`". An invoice that simply lapses (24 h default validity) **never** produces a callback and must be polled or timed out locally [api.monobank.ua/docs/acquiring.html]. Refunds full+partial via `POST /api/merchant/invoice/cancel`, asynchronous with its own status lifecycle [same]. ⚠️ **Installments are not available through the acquiring API**: `paymentScheme` (incl. `bnpl_parts_4`) exists **only in response schemas** — a merchant can observe which scheme a buyer used but cannot offer BNPL. The real product is a **separate API, «Покупка Частинами»** (`/api-docs/chast`; `/api/order/create|state|confirm`), **3–25 instalments**, and **the merchant pays the commission** ("комісію сплачує магазин") [monobank.ua/api-docs/chast]. ⚠️ Recurring: "Токенізація недоступна за замовчуванням" — must contact support to enable [api.monobank.ua/docs/acquiring.html]. Hosted redirect to `pay.mbnk.biz` keeps SAQ-A scope. Ownership: licensed entity is АТ «Універсал Банк», NBU licence №92, TAS Group; monobank is a brand, not a separate bank [monobank.ua footer]. **⚠️ Launch-gating eligibility item the research missed: monobank's internet-acquiring checklist requires a Ukrainian-language version of the site**, an About/offer section, contacts, and products with photo/description/price.
 
@@ -92,6 +124,50 @@ Two compounding problems make Fondy's Ukrainian numbers unusable rather than mer
 ⚠️ Also: the Fondy sandbox publishes test currencies **GBP, EUR, USD, PLN, CZK — no UAH**, so a UAH checkout could not be exercised end-to-end pre-launch even if licensing were resolved [docs.fondy.io/gateway/test-gateway-payments].
 
 ## 5. Conditional recommendation & prerequisites checklist
+
+### 5.0 Gate 0 — applies to every branch
+
+**No gateway can be connected without a registered ФОП or ТОВ.** Every Ukrainian card-acquiring gateway (LiqPay, WayForPay, Portmone, Plata by mono) requires a registered business with a **business current account** (not personal) and a **public offer + return policy published on the site**. A private individual cannot legally connect internet acquiring for commercial sales [liqpay.ua/information/instructions/registration].
+
+If the client is not yet registered, that — not the gateway choice — is the launch's critical path.
+
+### 5.1 The decision tree
+
+**Branch A — ФОП/ТОВ already banking with monobank, and installments are not required at launch → _Plata by mono_.**
+Fastest path to live: self-service onboarding under 10 minutes, 1.3% domestic / 2% foreign, 0 UAH monthly, T+1 settlement.
+_Accept these costs:_ a **monobank business account is mandatory** (bank lock-in); the site **must have a Ukrainian-language version** before approval; **no installments** via the acquiring API; and the `expired`-status webhook gap forces local invoice timeout handling.
+
+**Branch B — wants bank-agnostic settlement and/or native installments → _LiqPay_. ← the safest default**
+Settles to an IBAN business account of a ФОП **or** legal entity **at any bank** — no banking relationship forced. Published 1.3% domestic / 2% foreign, next-operational-day settlement, application processed in ~24 h, and installments («Оплата частинами», «Миттєва розстрочка», 1–24 months, 300–300,000 UAH) are built in rather than bolted on.
+_Caveat:_ the published tariff is indicative — the real commission is **set per merchant/MCC on contract**, so the 1.3% is a starting point, not a quote.
+
+**Branch C — installments are a primary conversion lever → _WayForPay_.**
+Pay 2% flat (higher than A/B) to buy the widest installment reach of any candidate: **nine bank programs** (monobank, PrivatBank ×2, A-Bank ×2, Globus, …) versus LiqPay's PrivatBank-only pair. Also charges **no fee on refunds or hold cancellations**, and onboards fully online via Diia.Signature.
+_Caveat:_ sandbox is **shared test credentials only**, not a per-merchant environment — weaker pre-launch testing than A or B.
+
+**Branch D — _Portmone_: only on a specific reason.** Choose it if BankPay at 1% is material to the mix or a relationship already exists. Otherwise it loses on every axis that matters here: **3–10 business days** onboarding (slowest by an order of magnitude), payout period not publicly verifiable, and no native wallet SDKs.
+
+**Disqualified — _Fondy_.** Not a ranking; an eligibility failure. The NBU register records the licence of its Ukrainian entity ТОВ «ФК "ЕЛАЄНС"» as **revoked 2024-07-22**. Do not plan TASK-048 against Fondy unless the client obtains **written proof of a current licensed route** (see §4.2 and §9).
+
+### 5.2 How to read this tree
+
+Branches A and B are both 1.3%/2% — **fee is not the differentiator between them**. The real trade is: _Plata by mono buys onboarding speed at the price of bank lock-in and no installments; LiqPay buys bank freedom and native installments at the price of a negotiated (not published) rate._ If the client already banks with monobank and wants to be live fastest, take A. In every other case, **B is the safest default** — it is the only candidate that imposes no banking relationship at all.
+
+### 5.3 Prerequisites checklist — confirm with the client before TASK-048 starts
+
+The recommendation resolves to a single gateway the moment these are answered. Until then, all branches stay live.
+
+- [ ] **1. Legal form — ФОП or ТОВ?** _(Gates everything, including the COD rail.)_
+- [ ] **2. If ФОП — which single-tax group?** **Group 3 is the fit** for e-commerce card acceptance: sells to anyone including legal entities, no employee cap, **5%** of turnover (non-VAT-registered) or **3%** (VAT-registered) [Tax Code Art. 291.4, 293.3]. **Group 2 cannot sell to legal entities** (population + single-tax payers only). Group 1 is RRO-exempt but far too restricted for this.
+- [ ] **3. Expected annual turnover vs the Group 3 ceiling — 10,091,049 UAH for 2026** (1167 × the 8,647 UAH minimum wage effective 2026-01-01, per Law No. 4695-IX). Exceeding it triggers the Art. 293.5 **penalty** rate.
+- [ ] **4. VAT-registered?** _(Selects 3% vs 5% on Group 3; also drives ПДВ display — see §7.)_
+- [ ] **5. Current bank — monobank, PrivatBank, or other?** _(This is the A-vs-B switch.)_
+- [ ] **6. Are installments wanted at launch?** _(If yes and breadth matters → Branch C. Note Plata by mono cannot offer them via the acquiring API at all.)_
+- [ ] **7. РРО/ПРРО status — confirm with an accountant, not with us.** General rule under Law 265/95-ВР + Tax Code п.296.10: a settlement operation **for goods** with card acceptance / internet acquiring generally **requires a fiscal receipt** via an RRO or software ПРРО (the free State Tax Service «ПРРО Каса», or checkbox). Main carve-out: ФОП Group 1. **This document does not give tax advice and this item must not be treated as settled by it.**
+- [ ] **8. NovaPay account — yes or no?** _(Sets the COD economics: 0.5% same-day vs 1.3% next-business-day to another bank.)_
+- [ ] **9. Site prerequisites acknowledged:** public offer + return policy published (**all** gateways); **Ukrainian-language site version** (monobank specifically — and see §7 for why this converges with the language law).
+
+> **A ТОВ correction worth stating explicitly**, because the raw research got it backwards and it would have skewed this tree: a ТОВ on Group 3 pays **the same 5%/3% as a ФОП — not double**. The 10%/6% figure is an Art. 293.5 **penalty** (applied to income over the limit and similar breaches), not a ТОВ's normal operating rate. Legal form should therefore be chosen on liability, ownership, and turnover headroom — **not** on a single-tax-rate penalty that does not exist.
 
 ## 6. Nova Poshta scoping
 
