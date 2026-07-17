@@ -40,6 +40,32 @@ Branches A and B are both 1.3%/2%: **fee is not the differentiator** — bank lo
 
 ## 2. Context & constraints
 
+**Business context.** Mirox Shop is a real production launch in Ukraine (not a demo), selling men's clothing. Ukraine-only: no diaspora or cross-border sales in scope.
+
+**Constraints fixed before this research began** (from the brainstorming session, §9 decision log):
+
+| Constraint                                                                 | Consequence                                                                                  |
+| -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Stripe does not onboard Ukrainian merchants                                | The existing payment integration must be **replaced**, not extended                          |
+| Merchant's legal entity and bank are **unknown**                           | The recommendation must be a decision tree + prerequisites checklist (§5), not a single pick |
+| **Ukrainian language law** — UA must be the default customer-facing locale | Converges with monobank's acquiring requirement (§4.2)                                       |
+| **Single UAH** — display, storage, charges                                 | §7; every viable gateway settles UAH-only anyway                                             |
+| Both rails in scope — online card **and** NP COD                           | §3                                                                                           |
+
+**Code being replaced.** The current checkout is Stripe-shaped throughout:
+
+- [`src/lib/stripe.ts`](../../../src/lib/stripe.ts) — lazy Stripe client (`apiVersion: "2026-01-28.clover"`), plus `SHIPPING_METHODS` hardcoded in **USD** (`standard 5.99` / `express 12.99` / `overnight 24.99`) and `calculateOrderTotals(subtotal, shippingMethodId, taxRate = 0)`.
+- [`src/app/api/checkout/create-payment-intent/`](../../../src/app/api/checkout/create-payment-intent/) and [`confirm-order/`](../../../src/app/api/checkout/confirm-order/) — the payment-intent flow.
+- `prisma/schema.prisma` — `Order.currency String @default("USD")` (line 249); `paymentIntent String?` (Stripe-specific naming); `paymentMethod String?` (untyped); `PaymentStatus { PENDING, PAID, FAILED, REFUNDED, PARTIALLY_REFUNDED }`.
+
+Three of these carry hidden assumptions that the two-rail model breaks:
+
+1. **`SHIPPING_METHODS` is a static USD price list.** Nova Poshta shipping is _computed per shipment_ from city refs + weight (§6.4). The static list cannot survive; shipping cost becomes an API call.
+2. **`PaymentStatus` assumes pay-then-ship.** On the COD rail an order legitimately ships while unpaid (§3), so `PENDING` would have to mean both "customer abandoned checkout" and "shipped, awaiting collection" — two states that need different operational handling (§8.4).
+3. **`taxRate = 0` is currently an accident that happens to be right.** For a non-VAT-registered single-tax ФОП, zero is not a placeholder — it is _required_ that no VAT line is displayed at all (§7.4). This must become a deliberate, documented behaviour rather than an unexamined default.
+
+**Program constraints that bind the blueprint:** one schema migration per PR; never two schema-changing PRs in flight simultaneously ([program spec](./2026-07-14-mirox-shop-program-design.md) §5). TASK-048 and TASK-049 both touch `Order` — see §8.7.
+
 ## 3. Two-rail payment model (online prepayment + Nova Poshta COD)
 
 Ukrainian e-commerce runs on two payment rails with **different order lifecycles**. This is the single most important structural fact in this document: it is not "a gateway plus a shipping integration," it is two distinct money flows that the `Order` model must represent separately.
@@ -283,7 +309,191 @@ The chosen `ServiceType` (§6.5) and the warehouse/address ref must agree — a 
 
 ## 7. UAH currency strategy
 
+### 7.1 Decision: single UAH
+
+**Store, display, and charge in UAH only. Retire the multi-currency ambition.**
+
+This is not a preference — it is what the rails allow. **All mutual settlements within Ukraine are legally in UAH**, and every viable candidate settles UAH-only to the merchant's account regardless of what currency the checkout accepted (verified for all five: LiqPay, WayForPay, Plata by mono, Portmone, Fondy). NP COD is UAH by construction. Multi-currency would add per-currency pricing, FX handling, and reconciliation complexity for **zero settlement benefit** — the money arrives as hryvnia either way.
+
+### 7.2 Storage — no schema change needed for precision
+
+`Decimal(10, 2)` is **adequate** and already used throughout (`price`, `subtotal`, `shippingCost`, `discount`, `tax`, `total`, `unitPrice`, `totalPrice`; `weight` is `Decimal(10,3)`). It permits up to **99,999,999.99** — ample for order totals well above the ФОП Group 3 ceiling.
+
+⚠️ One consequence to plan for: **UAH amounts are ~40× larger than the USD figures** currently in the codebase. Existing seed data and any hardcoded prices become nonsense at face value and must be re-denominated, not merely relabelled.
+
+### 7.3 The migration — smaller than it looks, with one trap
+
+`Order.currency` is `String @default("USD")` at `prisma/schema.prisma:249`. Changing the Prisma default generates exactly:
+
+```sql
+ALTER TABLE "Order" ALTER COLUMN "currency" SET DEFAULT 'UAH';
+```
+
+**This changes the column default only — it does not rewrite existing rows.** Two follow-ups the migration will not do for you:
+
+- Application code that passes `currency` **explicitly** on order creation must be updated; the default only covers rows that omit it.
+- **⚠️ Never reinterpret historical rows as UAH.** Existing orders hold `currency='USD'` with USD-denominated Decimals. Treating them as UAH would misstate historical revenue by ~40×. **Keep the `currency` column** (do not drop it), render every order using _its own stored currency_, and gate any "assume UAH" formatting on `currency = 'UAH'`.
+
+### 7.4 Display & formatting — hand-off to TASK-039
+
+UAH is ISO 4217 **UAH / numeric 980**; sub-unit is the kopiyka (100 per hryvnia), always shown as two digits.
+
+**uk-UA convention** — and it differs from en-US on every axis, so `toFixed(2)` + `"$"` string-concat will be wrong three ways:
+
+- thousands separator: **non-breaking space** (not a comma)
+- decimal separator: **comma** (not a period)
+- symbol placement: **after** the amount — `1 234,56 ₴` or `1 234,56 грн`
+- per **ДСТУ 3582:2013**, `грн` takes **no trailing period**
+
+Use `Intl.NumberFormat('uk-UA', { style: 'currency', currency: 'UAH' })` rather than hand-rolling. This lands in TASK-039 (i18n) — but note the dependency direction: **TASK-039 is a prerequisite for payments under Branch A**, not a downstream cosmetic pass.
+
+### 7.5 Cash rounding — applies to the COD rail only
+
+**NBU Board Resolution No. 115 (08.09.2025):** since **2025-10-01** the 10-kopiyka coin is being withdrawn, so **cash** grand totals round to the nearest 0 or 50 kopiykas:
+
+| Kopiykas | Rounds to       |
+| -------- | --------------- |
+| 1–24     | `.00` (down)    |
+| 25–49    | `.50` (up)      |
+| 51–74    | `.50` (down)    |
+| 75–99    | next `.00` (up) |
+
+(This supersedes the nearest-10-kopiykas rule of Resolution No. 148/2019.)
+
+**Card payments are exact — no rounding.** This matters specifically because the COD rail can be settled in **cash** at the branch: the amount a customer physically pays may differ by up to 24 kopiykas from the order total. Reconciliation logic must tolerate that delta rather than treat it as a mismatch.
+
+### 7.6 ПДВ (VAT) display
+
+**VAT status depends on VAT registration, _not_ on legal form** — ФОП vs ТОВ does not determine it. Single-tax ФОП on groups 2/3 at 5% are **not required to register for VAT** even above the 1M UAH threshold, so most small ФОП are non-VAT.
+
+**A non-VAT payer must not display any VAT line at all** — the price is simply the full amount, `без ПДВ`. The current `taxRate = 0` default and the `Order.tax` field are therefore _correct_ for the likely case, but must become deliberate: keep tax at zero and render no VAT line unless prerequisite #4 (§5.3) comes back "VAT-registered".
+
+### 7.7 Minor units — an integration detail that bites
+
+**Plata by mono expects amounts in minor units**: invoices default to `ccy=980` with `amount` in **kopiykas** — `4200` means **42.00 UAH**. A gateway adapter that passes hryvnias where kopiykas are expected undercharges by 100×. Each adapter must own its own unit conversion (§8.2).
+
 ## 8. Integration blueprint (seeds TASK-048/049)
+
+### 8.1 Strategy — build to an interface, not to a gateway
+
+The gateway choice is **conditional on client facts we do not have** (§5.3). Rather than let TASK-048 block on that answer, build against a **narrow adapter interface** and implement the chosen gateway behind it. All viable candidates are the same shape — hosted redirect + signed webhook + server-to-server refund — so the interface is cheap and swapping adapters is a contained change rather than a rewrite.
+
+```ts
+// src/lib/payments/types.ts
+export interface PaymentGateway {
+  /** Create a payment; returns where to send the customer. */
+  createPayment(order: OrderForPayment): Promise<{ redirectUrl: string; externalId: string }>;
+  /** Verify signature and normalise the provider's callback into one event shape. */
+  parseWebhook(req: Request): Promise<PaymentWebhookEvent>;
+  /** Full refund when amount is omitted; partial otherwise. */
+  refund(externalId: string, amount?: Decimal): Promise<RefundResult>;
+}
+```
+
+Adapters: `src/lib/payments/liqpay.ts`, `src/lib/payments/plata.ts`. Selected at runtime by `PAYMENT_GATEWAY` (§8.5). Each adapter owns its own signature scheme **and its own unit conversion** (§7.7).
+
+### 8.2 Gateway API surface (per candidate)
+
+|             | **LiqPay** (Branch B)                                                                             | **Plata by mono** (Branch A)                                                |
+| ----------- | ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Create      | `action="pay"`, server-to-server to `https://www.liqpay.ua/api/request`; hosted Checkout redirect | `POST /api/merchant/invoice/create` → `pageUrl` (`pay.mbnk.biz`)            |
+| Amount unit | hryvnias                                                                                          | **kopiykas** (`ccy=980`)                                                    |
+| Webhook     | POST `data` + `signature` → `server_url`; final states `success`/`failure`/`error`/`reversed`     | POST to `webHookUrl` on status change — **except `expired`**                |
+| Signature   | base64 + SHA-1 over `private_key + data + private_key`                                            | **`X-Sign`, ECDSA**                                                         |
+| Refund      | `action="refund"`; amount controls full vs partial                                                | `POST /api/merchant/invoice/cancel`; **asynchronous**, own status lifecycle |
+| Sandbox     | per-merchant `sandbox_`-prefixed keys; `sandbox=1`                                                | test token from `api.monobank.ua`; no acquiring permission needed           |
+
+⚠️ **Two adapter-specific gotchas that are not symmetric:**
+
+- **Plata never calls back on `expired`.** An invoice that lapses (24 h default) produces **no** webhook, ever. The adapter must run a local timeout/poll to reap stale invoices, or orders will sit in `PENDING` forever.
+- **Plata's refund is asynchronous** — `cancel` returns before the refund resolves, so the refund's own status lifecycle must be polled. LiqPay's is synchronous. Do not model refunds as instant.
+
+### 8.3 COD reconciliation flow (Rail B)
+
+The money-leg is a **separate waybill** from the parcel. Reconciliation is the job of matching it back to the order:
+
+1. **Checkout** — customer picks COD; order created with `paymentMethod = COD_NOVA_POSHTA`, `paymentStatus = AWAITING_COD` (§8.4).
+2. **Fulfilment** — create the waybill (`InternetDocument.save`) with `BackwardDeliveryData: [{ PayerType: 'Recipient', CargoType: 'Money', RedeliveryString: '<total>' }]` (§6.5). Store the returned TTN.
+3. **In transit** — poll `TrackingDocument.getStatusDocuments` (§6.6). Persist **`RedeliveryNum`** — the money-transfer waybill number — as soon as it appears; **this is the join key** between the parcel and the money.
+4. **Collected** — customer pays at the branch. Watch for status **code 16 «Зворотна доставка - грошовий переказ»**, the COD money-leg signal.
+5. **Remitted** — NovaPay credits the account (same-day to NovaPay, next business day elsewhere — §3) and emails a **payment register (реєстр виплат)**. Match register rows to orders by `RedeliveryNum`; set `paymentStatus = PAID`, stamp `codSettledAt`.
+6. **Never collected** — parcel returns. Order must move to a returned/cancelled state and stock be restored. **This path has no analogue on Rail A and is the one most likely to be forgotten.**
+
+Tolerate a **≤24 kopiyka delta** on cash-settled orders (§7.5) rather than flagging a mismatch.
+
+### 8.4 Schema deltas — one migration
+
+```prisma
+model Order {
+  currency        String        @default("UAH")   // was "USD" (line 249)
+  paymentMethod   PaymentMethod @default(ONLINE_CARD)  // was untyped String?
+  externalPaymentId String?     // supersedes Stripe-specific `paymentIntent`
+  // --- delivery (TASK-049) ---
+  deliveryMode    DeliveryMode?
+  npCityRef       String?       // Address.getCities   → CityRef
+  npWarehouseRef  String?       // Address.getWarehouses → Ref (branch or postomat)
+  npTtn           String?       // parcel waybill
+  // --- COD money-leg (Rail B) ---
+  codAmount       Decimal?      @db.Decimal(10, 2)
+  codRedeliveryNum String?      // TrackingDocument RedeliveryNum — the reconciliation join key
+  codSettledAt    DateTime?
+  @@index([codRedeliveryNum])
+}
+
+enum PaymentMethod { ONLINE_CARD  COD_NOVA_POSHTA }
+enum DeliveryMode  { BRANCH  POSTOMAT  COURIER }   // → ServiceType (§6.5)
+
+enum PaymentStatus {
+  PENDING          // checkout not completed
+  AWAITING_COD     // NEW — shipped, money not yet collected (Rail B only)
+  PAID
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+```
+
+**Why `AWAITING_COD` earns its place:** without it, `PENDING` means both "customer abandoned checkout" and "goods are in transit awaiting collection." Those need opposite operational responses — chase the cart vs chase the parcel — and conflating them makes the COD funnel unmeasurable.
+
+`Order.trackingNumber` already exists and could carry the TTN; `npTtn` is proposed instead to keep the NP waybill distinct from the generic tracking field the supplier-forwarding workers already use. **Decide this in TASK-049's plan** — it is a naming call, not a research question.
+
+### 8.5 Environment variables
+
+```bash
+# Retire (Stripe)
+- STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+
+# Add — adapter selection
+PAYMENT_GATEWAY=liqpay            # liqpay | plata
+
+# Add — Branch B (LiqPay)
+LIQPAY_PUBLIC_KEY=
+LIQPAY_PRIVATE_KEY=               # also the webhook signature secret
+
+# Add — Branch A (Plata by mono)
+MONOBANK_ACQUIRING_TOKEN=         # X-Token
+
+# Add — Nova Poshta (TASK-049)
+NOVAPOSHTA_API_KEY=
+NOVAPOSHTA_SENDER_CITY_REF=
+NOVAPOSHTA_SENDER_WAREHOUSE_REF=
+```
+
+Follow the existing runtime-validation pattern (`NEXTAUTH_SECRET`/`DATABASE_URL`) with descriptive errors, and keep the NP key **server-side only** — the picker (§6.7) proxies through our API rather than calling NP from the browser.
+
+### 8.6 Feature flag & test-mode plan
+
+- **Flag the new checkout** until a real merchant account exists. The gateway decision needs client facts (§5.3), and merchant approval is not instant (3–10 business days for Portmone; ~24 h LiqPay).
+- **Nova Poshta needs no key to start**: directory methods (`getCities`, `getWarehouses`, `getWarehouseTypes`, `getDocumentPrice`) answer with an **empty `apiKey`** [live]. The entire picker and cost calculator can be built and tested before the client has an NP account — **so TASK-049 is not blocked on merchant onboarding at all.** Only waybill creation needs a real key.
+- **Gateway sandboxes** differ in strength: LiqPay per-merchant `sandbox_` keys and Plata's open test token are both usable pre-approval; WayForPay offers only shared credentials; Fondy's sandbox has **no UAH** currency (moot — disqualified).
+- **E2E**: add a checkout spec per rail. Apply the WebKit hydration-wait pattern from TASK-038a (wait for a post-hydration render signal before `fill()`), since the checkout form is exactly the interaction class that bug affected.
+
+### 8.7 Sequencing
+
+1. **TASK-039 (i18n) first if Branch A.** monobank will not approve internet acquiring without a Ukrainian-language site (§4.2). Under Branch A this is a hard blocker on payments; under B/C/D it is merely the language law.
+2. **The §8.4 delta is one migration** — currency default + payment/delivery fields + enum values land together, in **one PR**, per the program's one-migration-per-PR rule.
+3. **Do not run TASK-048 and TASK-049 migrations concurrently.** Both touch `Order`; the program spec forbids two schema-changing PRs in flight. Land the combined delta once, then build the two integrations against it.
+4. **Close the §6.6 webhook question before TASK-049 locks its polling design** — plan for polling, treat push as upside.
 
 ## 9. Risks, open questions & decision log
 
