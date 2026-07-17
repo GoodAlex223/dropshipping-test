@@ -1,6 +1,6 @@
 # TODO
 
-**Last Updated**: 2026-07-16
+**Last Updated**: 2026-07-17
 
 Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-shop-program-design.md) · Current week: [WEEKLY.md](WEEKLY.md)
 
@@ -11,22 +11,6 @@ Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-
 _None. TASK-033 completed 2026-07-14 (PR #16) — see [DONE.md](DONE.md)._
 
 ## 📋 Planned (v1.3 — "Mirox Rebrand Demo")
-
-#### [TASK-038b] Payments & delivery research spike (Ukraine)
-
-**Priority**: 🔴 Critical
-**Status**: 📋 Planned
-**Effort**: M
-**Dependencies**: [TASK-033]
-
-**Description**: Decision doc, no code. Stripe does not onboard Ukrainian merchants → evaluate LiqPay / WayForPay / Fondy / monobank acquiring (fees, API, merchant requirements, refunds/webhooks); scope Nova Poshta API; define UAH currency strategy. Output: gateway decision + integration plan for TASK-048/049. Candidate for Ultracode research fan-out workflow.
-
-**Acceptance Criteria**:
-
-- [ ] Comparison matrix of ≥3 gateways with fees and API capabilities
-- [ ] Recommended gateway with rationale; merchant-account prerequisites listed
-- [ ] Nova Poshta integration scoped (API, branch picker, cost calc)
-- [ ] UAH pricing strategy defined (single- vs multi-currency)
 
 #### [TASK-034] Design system & rebrand foundation
 
@@ -103,11 +87,13 @@ _None. TASK-033 completed 2026-07-14 (PR #16) — see [DONE.md](DONE.md)._
 
 **Description**: Ukrainian as default customer-facing locale (language-law requirement), Russian secondary; UAH price formatting. Library choice (e.g., next-intl) decided in plan.
 
+**⚠️ Dependency escalated by [TASK-038b]**: this is no longer only a language-law item. **monobank will not approve internet acquiring without a Ukrainian-language version of the site** ([decision doc §4.2](../superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md)) — so if the Plata-by-mono branch is chosen, TASK-039 becomes a **hard prerequisite for payments (TASK-048)**, not a parallel track. UAH formatting is specified in decision doc §7.4 (uk-UA: non-breaking-space thousands, comma decimal, `₴`/`грн` **after** the amount, ДСТУ 3582:2013) — use `Intl.NumberFormat('uk-UA', …)`, not hand-rolled formatting.
+
 **Acceptance Criteria**:
 
 - [ ] Locale infrastructure with UA default, RU toggle
 - [ ] Customer-facing storefront strings externalized
-- [ ] Prices render in UAH with correct formatting
+- [ ] Prices render in UAH with correct formatting (per decision doc §7.4)
 
 #### [TASK-040] CI extensions
 

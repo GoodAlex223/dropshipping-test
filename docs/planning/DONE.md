@@ -2,11 +2,53 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-07-16
+**Last Updated**: 2026-07-17
 
 ---
 
 ## 2026-07 (July)
+
+### [2026-07-17] TASK-038b - Ukraine Payments & Delivery Research Spike
+
+**Plan**: [docs/archive/plans/2026-07-16_task-038b-payments-delivery-spike.md](../archive/plans/2026-07-16_task-038b-payments-delivery-spike.md)
+**Spec**: [2026-07-16-ukraine-payments-delivery-design.md](../superpowers/specs/2026-07-16-ukraine-payments-delivery-design.md)
+**Deliverable**: [2026-07-16-ukraine-payments-delivery-decision.md](../superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md)
+
+**Summary**: Decision doc, **no product code** (`src/` untouched). Settles the Ukraine gateway choice, scopes Nova Poshta, and fixes the UAH strategy so TASK-048/049 can be planned without re-discovery. Method: Ultracode research fan-out across 8 topics (5 gateways + Nova Poshta + COD/legal + currency) piped through **adversarial verification of every claim** against primary sources. **120 claims researched, all 120 verified — 77 confirmed, 33 disputed, 10 unverifiable (27.5% dispute rate on the raw research).** All four acceptance criteria met.
+
+**The central finding is methodological**: single-pass research would have shipped a fluent, confidently-worded, **wrong** launch-gating document. Three of the four plan-changing findings came from the verifier _contradicting_ the researcher. Two failure modes recurred and are worth naming: **citing pages never actually loaded** (search-index snippets reported as sources — this produced the Fondy error) and **conflating adjacent-but-distinct products**. Neither is detectable by reading the research alone.
+
+**Key Findings**:
+
+- **Fondy disqualified on licensing, not price** — its Ukrainian entity ТОВ «ФК "ЕЛАЄНС"» (EDRPOU 38905834) had NBU licence 21/778-рк **revoked 2024-07-22**, per the NBU's own machine-readable register. The raw research had it as a live candidate. Compounding: `fondy.ua` is TCP-unreachable from our network, so every Ukraine-side claim was sourced to pages never loaded; `docs.fondy.io` documents the **UK** entity (FONDY LTD) and says nothing about Ukrainian acquiring.
+- **Plata by mono cannot offer installments via the acquiring API** — `paymentScheme` (incl. `bnpl_parts_4`) exists only in _response_ schemas; a merchant can observe a buyer's scheme but not offer BNPL. Instalments are a separate product («Покупка Частинами», 3–25 instalments) where **the merchant pays the commission**.
+- **monobank requires a Ukrainian-language site** for internet acquiring → **TASK-039 (i18n) is a hard prerequisite for payments** under that branch. TODO.md TASK-039 updated with this escalation.
+- **Nova Poshta's postomat filter UUID was inverted** in the research — the claimed `9a68df70-…` is «Вантажне(ий)» and returns `CategoryOfWarehouse: Branch`; the real «Поштомат» ref is `f9316480-…`. Building on it would have shipped **branch pickups to customers who chose a locker**.
+
+**Recommendation (conditional — turns on facts only the client holds, §5.3)**: already banks with monobank + no installments → **Plata by mono**; **any other case → LiqPay** (safest default; only candidate settling to _any_ bank's IBAN); installments a primary lever → **WayForPay** (9 bank programs vs LiqPay's 2); Portmone only on a specific reason. Branches A and B are both 1.3%/2% — **fee is not the differentiator**; bank lock-in vs onboarding speed is.
+
+**Key Changes** (docs only):
+
+- `docs/superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md` — the deliverable (9 sections + Sources): two-rail model (online gateway **and** NP COD, with opposite order lifecycles), 5-gateway × 16-field matrix, conditional decision tree + 9-item client prerequisites checklist, NP scoping (all 6 `ServiceType` modes, live-verified refs), single-UAH strategy, and an integration blueprint seeding TASK-048/049
+- `docs/superpowers/specs/2026-07-16-ukraine-payments-delivery-design.md` — the spike's spec (scope, candidate set, methodology, doc outline)
+- `docs/archive/plans/2026-07-16_task-038b-payments-delivery-spike.md` — the 8-task plan
+- `docs/planning/BACKLOG.md` — `[2026-07-17]` group: devcontainer OOM investigation (5 entries)
+- `docs/planning/TODO.md` — TASK-039 dependency escalation
+
+**Blueprint decisions beyond the task's ask** (§8): a **`PaymentGateway` adapter interface** so TASK-048 is not blocked waiting on the client's legal-entity answer; a new **`AWAITING_COD`** `PaymentStatus` because the COD rail ships before payment, so today's `PENDING` would conflate "abandoned cart" with "in transit awaiting collection"; and the §8.4 schema delta scoped as **one migration** per the program's one-migration-per-PR rule.
+
+**Verification**: documentary — 9 sections intact, zero dangling cross-references, zero placeholders, every quantitative claim carrying a primary-source citation or an explicit unverifiable tag. No code changed, so no test impact; CI green on the merge regardless (Lint/Typecheck, Unit 246, Build, E2E).
+
+**PR**: [#18](https://github.com/GoodAlex223/dropshipping-test/pull/18) — merged `cebbbe5`, all 6 checks green, Vercel production deploy live. Branch `feat/task-038b-payments-delivery-research`, 10 commits: `2e8d682` (spec), `7321c09` (plan), `76d7e39` (skeleton), `aecdefd` (two-rail + matrix), `346687f` (recommendation + prerequisites), `b15e640` (NP + COD), `aff2bb4` (UAH + blueprint), `87d60ff` (risks + audit), `34f5f53` (OOM backlog), `92b4e1f` (review fixes).
+
+**Code review**: 3 findings, all the deliverable failing rules it wrote for itself (broken headline arithmetic; the mandated Support column dropped while a Card-fee row-split masked the count; uncited payout limits). All fixed in `92b4e1f`; re-review clean. **The statistic finding's diagnosis was wrong and was pushed back on**: the reviewer inferred 145 was the true denominator, but 120 claims and 145 verdicts are both real (16 claims were re-checked during crash/resume cycles) — the bug was a verdict-level breakdown attached to a claim-level count. Following the suggestion would have introduced a new error. Two sub-threshold findings were also acted on: the plan had been written to `docs/superpowers/plans/` (the writing-plans skill default) instead of `docs/planning/plans/` per global CLAUDE.md — the skill explicitly defers to user preference and I followed the default past the override; and §3 carried nine figures with zero citations.
+
+**Execution note**: the research workflow was **OOM-killed three times** mid-run (devcontainer, not a Docker bug — `oom_kill 1`, 8.45 GiB peak vs 9.7 GiB total, 14 concurrent agents). Resume proved unreliable — it replayed the head and left Fondy and Plata by mono with **zero** verification across all three attempts while the raw verdict count climbed 80→93→126, which looked like progress and wasn't. The gap was closed by 3 **foreground** agents (one per topic), which also did the job better. Investigation Phase 1 complete and BACKLOG'd; root cause **not yet confirmed by repro**.
+
+**Spawned Tasks**: 5 BACKLOG entries under `[2026-07-17] From: TASK-038b workflow crashes`, plus follow-ups under `[2026-07-17] From: TASK-038b Completion`.
+**Open Decisions / Blockers for downstream**: (1) the 9-item client prerequisites checklist (§5.3) must be answered before TASK-048 can pick a single gateway — including РРО/ПРРО status, which needs an accountant, not us; (2) whether the **classic** NP API offers a status webhook is **unresolved** (devportal Cloudflare-blocked) and gates TASK-049's polling design — plan for polling, treat push as upside; (3) all published rates are negotiable — real economics need sales quotes.
+
+---
 
 ### [2026-07-16] TASK-038a - Prework: WebKit E2E Diagnosis, sharp, CI Coverage
 

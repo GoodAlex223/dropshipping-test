@@ -43,12 +43,14 @@ Central index for all project documentation.
 
 ### Architecture & Design
 
-| Document                                                                                                               | Purpose                                                 | Last Updated |
-| ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- | ------------ |
-| [ARCHITECTURE.md](ARCHITECTURE.md)                                                                                     | System design, layers, data flow                        | 2026-02-10   |
-| [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md)                                                                               | Decisions, patterns, history                            | 2026-02-10   |
-| [superpowers/specs/2026-07-14-mirox-shop-program-design.md](superpowers/specs/2026-07-14-mirox-shop-program-design.md) | Mirox Shop program design (v1.3 → v2.0)                 | 2026-07-14   |
-| [superpowers/specs/2026-07-15-task-038a-prework-design.md](superpowers/specs/2026-07-15-task-038a-prework-design.md)   | TASK-038a prework: WebKit diagnosis, sharp, CI coverage | 2026-07-16   |
+| Document                                                                                                                                 | Purpose                                                                                                              | Last Updated |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ------------ |
+| [ARCHITECTURE.md](ARCHITECTURE.md)                                                                                                       | System design, layers, data flow                                                                                     | 2026-02-10   |
+| [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md)                                                                                                 | Decisions, patterns, history                                                                                         | 2026-02-10   |
+| [superpowers/specs/2026-07-14-mirox-shop-program-design.md](superpowers/specs/2026-07-14-mirox-shop-program-design.md)                   | Mirox Shop program design (v1.3 → v2.0)                                                                              | 2026-07-14   |
+| [superpowers/specs/2026-07-15-task-038a-prework-design.md](superpowers/specs/2026-07-15-task-038a-prework-design.md)                     | TASK-038a prework: WebKit diagnosis, sharp, CI coverage                                                              | 2026-07-16   |
+| [superpowers/specs/2026-07-16-ukraine-payments-delivery-design.md](superpowers/specs/2026-07-16-ukraine-payments-delivery-design.md)     | TASK-038b spike design: scope, gateway candidates, research methodology                                              | 2026-07-17   |
+| [superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md](superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md) | **Ukraine payments & delivery decision** — gateway choice, Nova Poshta scoping, UAH strategy, TASK-048/049 blueprint | 2026-07-17   |
 
 ---
 
@@ -58,16 +60,17 @@ No active implementation plans.
 
 ### Archived Plans
 
-| Plan                                                                                                     | Task                      | Status   | Completed  |
-| -------------------------------------------------------------------------------------------------------- | ------------------------- | -------- | ---------- |
-| [2026-01-05_dropshipping-mvp-plan.md](archive/plans/2026-01-05_dropshipping-mvp-plan.md)                 | Dropshipping Website MVP  | COMPLETE | 2026-01-13 |
-| [2026-01-22_seo-technical-setup.md](archive/plans/2026-01-22_seo-technical-setup.md)                     | SEO Technical Setup       | COMPLETE | 2026-01-22 |
-| [2026-02-01_analytics-integration.md](archive/plans/2026-02-01_analytics-integration.md)                 | GA4 Analytics Integration | COMPLETE | 2026-02-01 |
-| [2026-02-02_task-019-social-sharing.md](archive/plans/2026-02-02_task-019-social-sharing.md)             | Social Sharing            | COMPLETE | 2026-02-02 |
-| [2026-02-04_task-026-fix-vercel-deploy-ci.md](archive/plans/2026-02-04_task-026-fix-vercel-deploy-ci.md) | CI/CD Deployment Pipeline | COMPLETE | 2026-02-07 |
-| [2026-02-09_task-027-dependency-audit.md](archive/plans/2026-02-09_task-027-dependency-audit.md)         | Dependency Audit          | COMPLETE | 2026-02-09 |
-| [2026-07-14_task-033-resumption.md](archive/plans/2026-07-14_task-033-resumption.md)                     | Post-Freeze Resumption    | COMPLETE | 2026-07-14 |
-| [2026-07-15_task-038a-prework.md](archive/plans/2026-07-15_task-038a-prework.md)                         | TASK-038a Prework         | COMPLETE | 2026-07-16 |
+| Plan                                                                                                             | Task                                | Status   | Completed  |
+| ---------------------------------------------------------------------------------------------------------------- | ----------------------------------- | -------- | ---------- |
+| [2026-01-05_dropshipping-mvp-plan.md](archive/plans/2026-01-05_dropshipping-mvp-plan.md)                         | Dropshipping Website MVP            | COMPLETE | 2026-01-13 |
+| [2026-01-22_seo-technical-setup.md](archive/plans/2026-01-22_seo-technical-setup.md)                             | SEO Technical Setup                 | COMPLETE | 2026-01-22 |
+| [2026-02-01_analytics-integration.md](archive/plans/2026-02-01_analytics-integration.md)                         | GA4 Analytics Integration           | COMPLETE | 2026-02-01 |
+| [2026-02-02_task-019-social-sharing.md](archive/plans/2026-02-02_task-019-social-sharing.md)                     | Social Sharing                      | COMPLETE | 2026-02-02 |
+| [2026-02-04_task-026-fix-vercel-deploy-ci.md](archive/plans/2026-02-04_task-026-fix-vercel-deploy-ci.md)         | CI/CD Deployment Pipeline           | COMPLETE | 2026-02-07 |
+| [2026-02-09_task-027-dependency-audit.md](archive/plans/2026-02-09_task-027-dependency-audit.md)                 | Dependency Audit                    | COMPLETE | 2026-02-09 |
+| [2026-07-14_task-033-resumption.md](archive/plans/2026-07-14_task-033-resumption.md)                             | Post-Freeze Resumption              | COMPLETE | 2026-07-14 |
+| [2026-07-15_task-038a-prework.md](archive/plans/2026-07-15_task-038a-prework.md)                                 | TASK-038a Prework                   | COMPLETE | 2026-07-16 |
+| [2026-07-16_task-038b-payments-delivery-spike.md](archive/plans/2026-07-16_task-038b-payments-delivery-spike.md) | TASK-038b Payments & Delivery Spike | COMPLETE | 2026-07-17 |
 
 See [archive/README.md](archive/README.md) for more historical plans.
 
