@@ -1,11 +1,16 @@
 # Mirox Shop — Ukraine Payments & Delivery Decision
 
-**Status:** Draft — research in progress
-**Verified as of:** 2026-07-16
+**Status:** Complete
+**Verified as of:** 2026-07-16 — 2026-07-17 (research 07-16; Fondy / Plata by mono / Nova Poshta re-verification 07-17)
 **Spec:** ./2026-07-16-ukraine-payments-delivery-design.md
 **Feeds:** TASK-048 (gateway integration), TASK-049 (Nova Poshta integration)
 
-> Every quantitative claim below cites a primary source with a "verified 2026-07-16" stamp. Claims that cannot be verified from public sources are tagged **[requires merchant confirmation]**.
+> **How to read the evidence in this document.** Every claim was researched and then **adversarially re-checked against its primary source** by a second pass instructed to refute it. 120 claims, 120 verified: **93 confirmed, 42 disputed, 10 unverifiable**. Markers used throughout:
+>
+> - ✅ — confirmed against a primary source.
+> - ⚠️ — **the value shown is the verifier's correction**; the original research was wrong. Never use a pre-correction figure from any earlier draft or the raw findings.
+> - ❓ — **not settleable from public sources** (negotiated rates, private SLAs). These require merchant confirmation or a sales quote. **No figure here is a guess** — where we could not verify, we say so instead of filling the gap.
+> - **[live]** — verified _behaviourally_ against a production API rather than a doc page (see §6).
 
 ## 1. Executive summary & recommendation
 
@@ -62,7 +67,7 @@ Three of these carry hidden assumptions that the two-rail model breaks:
 
 1. **`SHIPPING_METHODS` is a static USD price list.** Nova Poshta shipping is _computed per shipment_ from city refs + weight (§6.4). The static list cannot survive; shipping cost becomes an API call.
 2. **`PaymentStatus` assumes pay-then-ship.** On the COD rail an order legitimately ships while unpaid (§3), so `PENDING` would have to mean both "customer abandoned checkout" and "shipped, awaiting collection" — two states that need different operational handling (§8.4).
-3. **`taxRate = 0` is currently an accident that happens to be right.** For a non-VAT-registered single-tax ФОП, zero is not a placeholder — it is _required_ that no VAT line is displayed at all (§7.4). This must become a deliberate, documented behaviour rather than an unexamined default.
+3. **`taxRate = 0` is currently an accident that happens to be right.** For a non-VAT-registered single-tax ФОП, zero is not a placeholder — it is _required_ that no VAT line is displayed at all (§7.6). This must become a deliberate, documented behaviour rather than an unexamined default.
 
 **Program constraints that bind the blueprint:** one schema migration per PR; never two schema-changing PRs in flight simultaneously ([program spec](./2026-07-14-mirox-shop-program-design.md) §5). TASK-048 and TASK-049 both touch `Order` — see §8.7.
 
@@ -497,6 +502,65 @@ Follow the existing runtime-validation pattern (`NEXTAUTH_SECRET`/`DATABASE_URL`
 
 ## 9. Risks, open questions & decision log
 
+### 9.1 Risks
+
+1. **Published rates are starting points, not quotes.** Every candidate reserves individual pricing. LiqPay's own registration flow states the commission is set **per merchant/MCC on contract**; WayForPay says the rate is "set individually depending on your turnover"; Portmone offers custom rates above ~500,000 UAH/month. The §4 figures are the **published** tariffs — real economics require sales quotes (§9.2, item 3).
+2. **Market consolidation makes stale sources actively dangerous.** Two of five candidates' ownership claims were wrong in the raw research: Portmone is no longer Kaspi.kz-owned (sold 09/2025), and Fondy's Ukrainian licence is revoked. Any figure sourced from a blog, aggregator, or comparison site should be assumed stale until checked against a primary register.
+3. **The recommendation is only as good as prerequisite #1.** The tree branches on the client's legal entity and bank (§5.3). If those answers change later — e.g. ФОП → ТОВ for liability reasons — revisit §5, because the COD rail's eligibility (§3) changes with them too, not just the gateway.
+4. **COD reconciliation is the highest-complexity item in the whole program.** It spans a separate money waybill, an emailed register, a cash-rounding delta, and a return path for unredeemed parcels (§8.3). It is also the most likely to be under-estimated, because none of it exists on the Stripe-shaped path being replaced.
+5. **The currency migration touches live data.** The `USD → UAH` default change is trivial SQL; the trap is historical rows (§7.3). Misreading them as UAH would misstate revenue ~40×.
+6. **Fondy's disqualification rests on our reading of the NBU register.** It is a strong primary source, and we found no counter-evidence — but if the client holds **written proof** of a current licensed route (e.g. operating under a partner bank's licence), that evidence outranks this document and Fondy should be re-evaluated. A secondary source alleging exactly this exists; we could not confirm it and did not rely on it.
+7. **Environment reachability shaped what could be verified.** `fondy.ua` is TCP-unreachable and `developers.novaposhta.ua` is Cloudflare-blocked from our network. This is a _research_ limitation, not a fact about those services — someone on an unblocked network may verify more (§9.2). It is also the direct cause of Fondy's eight ❓ claims.
+
+### 9.2 Open questions
+
+| #   | Question                                                                                                                                                   | Blocks                  | Who resolves                     |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- | -------------------------------- |
+| 1   | Does the **classic** NP API offer a status webhook? Devportal is Cloudflare-blocked; a keyless probe cannot distinguish "absent" from "needs a key" (§6.6) | TASK-049 polling design | Human, from an unblocked network |
+| 2   | Which NP platform is the client's account on — **classic** or **Nova Post international**? Auth models are incompatible (§6.1)                             | TASK-049                | Client                           |
+| 3   | **Negotiated rates** for LiqPay / WayForPay / NovaPay — published figures are indicative only                                                              | TASK-048 economics      | Client, via sales quote          |
+| 4   | Portmone's **payout period** — not publicly verifiable (§4.2)                                                                                              | Only if Branch D chosen | Client, via contract             |
+| 5   | NP **«Контроль оплати» agreement terms** (payout frequency, register cadence, minimum volume) — disclosed only at business onboarding                      | TASK-049 COD rail       | Client                           |
+| 6   | The 9 **prerequisites** in §5.3                                                                                                                            | The single gateway pick | Client (+ accountant for #7)     |
+
+**A source tension worth recording rather than smoothing over:** WayForPay's commission page publishes a flat **2%**, while its own sales copy elsewhere says the rate is "set individually depending on your turnover." Both are WayForPay's words. We report 2% as the _published_ rate and flag it as negotiable — we did not average the two or pick the flattering one.
+
+### 9.3 Decision log
+
+Decisions taken in the 2026-07-16 brainstorming session, before research began — these framed the whole spike:
+
+| #   | Decision                                                          | Rationale                                                                                                  |
+| --- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| 1   | **Both rails in scope** — online card **and** NP COD              | COD is how a large share of UA customers buy; a card-only doc would have mis-scoped the whole v1.4 Track B |
+| 2   | **Conditional recommendation**, not a single pick                 | Legal entity + bank are unknown and are the dominant variables                                             |
+| 3   | **All three NP modes** (branch + postomat + courier)              | One API covers all three; scoping them together avoids a second spike                                      |
+| 4   | Score **cards + wallets + installments**                          | Installments are a real UA conversion lever and support varies sharply — vindicated by finding #2 (§1)     |
+| 5   | **Single UAH**                                                    | UA-only launch; all domestic settlement is legally UAH                                                     |
+| 6   | **Multi-source + adversarial verification**, primary sources only | Vindicated: a **~29% dispute rate** on raw research, incl. two ownership errors and an inverted UUID       |
+| 7   | **Decision + integration blueprint**, not a decision-only memo    | The task's stated output feeds TASK-048/049; §8 is that hand-off                                           |
+
+**Decision 6 deserves a note for future spikes.** The initial research was fluent, confidently worded, and cited URLs — and was wrong on 42 of 120 claims, including several it marked high-confidence. Three of the four findings in §1 came from the verifier _contradicting_ the researcher, and one (the Fondy licence) inverts a candidate's viability entirely. Two failure modes recurred and are worth naming: **citing pages that were never actually loaded** (search-index snippets reported as sources — this produced the Fondy error), and **conflating adjacent-but-distinct products** (післяплата vs «Контроль оплати»; `paymentScheme` reporting vs the instalments product). Neither is detectable by reading the research alone; both were caught only by re-opening the primary source. **Do not author a launch-gating document from single-pass research.**
+
+## Sources
+
+Grouped by topic. **Primary sources** (official pricing, API docs, state registers) carry the claims; **corroborating sources** are named where they were used to cross-check, and never as the sole basis for a figure.
+
+**LiqPay** — _primary:_ liqpay.ua/tariffs · liqpay.ua/information/terms · liqpay.ua/information/instructions/registration · liqpay.ua/information/handbook/activation · liqpay.ua/en/doc/api/callback · liqpay.ua/en/doc/api/internet_acquiring · liqpay.ua/en/doc/api/internet_acquiring/refund · liqpay.ua/en/doc/api/testing · liqpay.ua/methods/paypart · privatbank.ua/en/liqpay-oplaty · conditions-and-rules.privatbank.ua
+
+**WayForPay** — _primary:_ help.wayforpay.com/view/3342384 (commission) · help.wayforpay.com/uk/view/3342386 (payouts) · help.wayforpay.com/view/13730003 (eligibility/docs) · help.wayforpay.com/view/1737806 (onboarding) · help.wayforpay.com/view/3342410 · help.wayforpay.com/view/962875452 (installment programs) · wiki.wayforpay.com/en/view/852102 · /852115 (refunds) · /852472 (test details) · wiki.wayforpay.com/view/852091. _Corroborating (entity register):_ clarity-project.info/edr/39626179 · youcontrol.com.ua
+
+**Plata by mono (monobank / АТ «Універсал Банк»)** — _primary:_ monobank.ua/en/knowledge-base/acquiring/index (tariffs) · monobank.ua/en/knowledge-base/acquiring/signup (eligibility, onboarding, site checklist) · api.monobank.ua/docs/acquiring.html (spec v2410 — webhooks, refunds, `paymentScheme`, tokenization, sandbox) · monobank.ua/api-docs/chast (Покупка Частинами API) · monobank.ua footer (licensed entity). _Corroborating:_ umaef.org (Oct 2025 release) · en.wikipedia.org/wiki/Monobank\_(Ukraine) · forbes.ua (equity estimate — labelled as an estimate, not disclosed figures)
+
+**Portmone** — _primary:_ business.portmone.com.ua/tariffs · business.portmone.com.ua/ecommerce · business.portmone.com.ua/installments · docs.portmone.com.ua/docs/en/PaymentGatewayEng · docs.portmone.com.ua/docs/en/PortmoneHostToHostEng · docs.portmone.com.ua/en/docs/en/APayEng · ir.kaspi.kz (2025 annual financial report — the disposal). _Corroborating:_ aimgroup.com (2026-03-17 report of the disposal)
+
+**Fondy** — _primary:_ **bank.gov.ua/files/N_bank/217/RPI_lic_fin-payment_services.xlsx** (NBU Register of Payment Infrastructure — row 18, licence revocation 2024-07-22; downloaded 2026-07-17) · docs.fondy.io/_ and docs.fondy.eu/_ (**UK entity FONDY LTD** — technical claims only; not evidence about Ukrainian acquiring) · docs.fondy.io/gateway/test-gateway-payments (test currencies). ⚠️ _Unreachable:_ fondy.ua/\* — TCP timeout from our network; **no Ukraine-side tariff or eligibility claim could be sourced**.
+
+**Nova Poshta** — _primary [live]:_ **`https://api.novaposhta.ua/v2.0/json/`** — `Address.getWarehouseTypes`, `Address.getWarehouses`, `InternetDocument.getDocumentPrice`, `CommonGeneral.getCargoTypes`, `getBackwardDeliveryCargoTypes`, `getTypesOfPayers`, `getServiceTypes` (behavioural verification). _Primary (docs/tariffs):_ novaposhta.ua/financial-services/money-transfer/to-sender (COD fee + 399,999 UAH cap) · novapay.ua/pisljaplata-na-rahunok (COD-to-account tariffs + timing) · novapay.ua/en/biznes-tarifi · novaposhta.userecho.com/knowledge-bases/2/articles/19-kontrol-oplati («Контроль оплати» eligibility) · api-portal.novapost.com (international API + webhooks). ⚠️ _Cloudflare-blocked:_ developers.novaposhta.ua — 403/530; this is why the live API was used instead.
+
+**Legal / tax** — _primary:_ zakon.rada.gov.ua/laws/show/2755-17 (Tax Code — Art. 291.4, 293.3, 293.5) · zakon.rada.gov.ua/go/4695-20 (Law No. 4695-IX, State Budget 2026 — the 8,647 UAH minimum wage driving the 10,091,049 UAH Group 3 cap) · zakon.rada.gov.ua/laws/show/265/95-вр (RRO law). _Corroborating:_ i.factor.ua (ТОВ single-tax rate analysis). **Nothing in this section is legal or tax advice — see §5.3 item 7.**
+
+**Currency** — _primary:_ NBU Board Resolution No. 115 of 08.09.2025 (cash rounding to 0/50 kopiykas from 2025-10-01, superseding Resolution No. 148/2019) · ISO 4217 (UAH / 980) · ДСТУ 3582:2013 (`грн` without trailing period)
+
 ## Acceptance-criteria coverage
 
 | Criterion                                               | Section |
@@ -506,6 +570,4 @@ Follow the existing runtime-validation pattern (`NEXTAUTH_SECRET`/`DATABASE_URL`
 | Nova Poshta scoped (API, branch picker, cost calc)      | §6      |
 | UAH pricing strategy (single vs multi)                  | §7      |
 
-## Sources
-
-_Primary-source URLs, grouped by topic; populated as sections are written._
+All four criteria are satisfied. Sources are listed above, before this table.
