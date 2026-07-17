@@ -8,7 +8,7 @@
 
 **Tech Stack:** Markdown deliverable; Workflow tool (Ultracode) for the research fan-out; WebSearch/WebFetch + context7 for primary-source retrieval; scratchpad for intermediate findings.
 
-**Spec:** [2026-07-16-ukraine-payments-delivery-design.md](../specs/2026-07-16-ukraine-payments-delivery-design.md)
+**Spec:** [2026-07-16-ukraine-payments-delivery-design.md](../../superpowers/specs/2026-07-16-ukraine-payments-delivery-design.md)
 
 ## Global Constraints
 
