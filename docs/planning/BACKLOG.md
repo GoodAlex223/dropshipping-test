@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-07-15
+**Last Updated**: 2026-07-17
 
 ---
 
@@ -372,6 +372,51 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 - 🟤 **CI runs `workers: 1`, so every added Playwright project costs a full serial pass** — adding `webkit` to the matrix in this task roughly doubles E2E wall-clock (chromium + webkit both run full-serial instead of in parallel). TASK-040 (CI extensions) is expected to broaden the matrix further (Lighthouse, preview deploys); parallelising Playwright workers or sharding by project should be evaluated before then to keep CI time bounded. (Med value, Med effort) `[relates-to: TASK-040]`
 - 🟤 **Audit remaining BACKLOG entries for other unverified root-cause claims** — `:361` asserted a product bug without evidence, and that assertion shaped planning until TASK-038a disproved it. Other entries may carry similarly unverified root-cause claims that could misdirect future work; worth a pass to confirm each cited root cause is backed by evidence rather than assumption. (Med value, Med effort)
 - 🟤 **`CLAUDE.md`'s `<!-- AUTO-MANAGED -->` sections have no regeneration story** — TASK-038a's PR review found two claims inside AUTO-MANAGED blocks ("chromium-only in CI" at `CLAUDE.md:253` and `:297`) falsified by that same PR's `ci.yml` change. The marker implies something regenerates these sections, but a repo-wide grep for `AUTO-MANAGED` across scripts/config finds **nothing that does** — so in practice they are hand-maintained by default and simply rot, while the marker discourages hand-editing. The two stale claims were corrected by hand in TASK-038a, but the underlying ownership question will keep recurring on every PR that changes build/CI/architecture facts. Decide: either wire up an actual regeneration step (e.g. `/init`-driven), or drop the AUTO-MANAGED markers so the sections are honestly hand-maintained and reviewers treat drift as a normal defect. (Med value, Low effort)
+
+### [2026-07-17] From: TASK-038b workflow crashes — devcontainer OOM investigation
+
+**Origin**: TASK-038b research spike (feat/task-038b-payments-delivery-research). The Ultracode research workflow died three times mid-run; user asked for an investigation. Phase 1 of superpowers:systematic-debugging completed in-session — root cause identified, **not yet confirmed by repro**. Nothing here is fixed.
+
+- 🔵 **Devcontainer is OOM-killed during Workflow fan-out — confirmed OOM, unconfirmed as the cause of all three crashes.** User-raised (2026-07-17): "these docker crashes… always related to the launch of a workflow."
+
+  **Confirmed evidence** (read from inside the container, 2026-07-17):
+  - `/sys/fs/cgroup/memory.events` → **`oom_kill 1`**, `oom 0`. A process **was** killed by the kernel OOM killer, but _not_ for exceeding a cgroup limit.
+  - `memory.max` = `max` — **Docker imposes no memory cap**; the real ceiling is the WSL2 VM's RAM.
+  - `memory.peak` = **8.45 GiB** vs `MemTotal` **9.7 GiB** (persisted since boot; uptime 1d 3h, no reboot).
+  - Swap 4 GiB total with **2.4 GiB already consumed at rest**; `Committed_AS` 8.5 GiB of `CommitLimit` 8.9 GiB — **96% committed while idle**.
+  - `nproc` = 16 → Workflow concurrency cap is `min(16, nproc-2)` = **14 concurrent agents**.
+  - At-rest baseline ≈ 2.7 GiB: VS Code server ~630 MB, Claude extension ~405 MB, ~15 node procs / a dozen MCP servers ~600 MB.
+
+  **Mechanism (hypothesis):** 14 concurrent agents, each holding a full LLM context plus WebFetch payloads (the 3 foreground agents used 116k/133k/130k tokens each), stacked on a 2.7 GiB floor, reach the 9.7 GiB ceiling → **global** OOM killer picks a victim → process tree dies → workflow leaves no completion record. Fits every observation: only ever on workflow launch; 3 foreground agents were stable; every resume died at the same point; MCP servers disconnect/reconnect around each crash.
+
+  **Not proven:** `oom_kill` reads only **1** against ~3 deaths. Either the others weren't OOM (see the rate-limit entry below) or their counters died with their cgroups. Checked to `maxdepth 3`; counter found only at the root cgroup.
+
+  **To confirm** (do in a **separate session** — reproducing may kill the session doing the observing; all TASK-038b work is committed so a crash costs only context): reset `memory.peak`, then sample every 2 s while launching a workflow —
+
+  ```bash
+  while true; do
+    printf '%s cur=%sMB peak=%sMB swap=%sMB %s\n' "$(date +%T)" \
+      $(( $(cat /sys/fs/cgroup/memory.current) / 1048576 )) \
+      $(( $(cat /sys/fs/cgroup/memory.peak) / 1048576 )) \
+      $(( $(cat /sys/fs/cgroup/memory.swap.current) / 1048576 )) \
+      "$(grep '^oom_kill ' /sys/fs/cgroup/memory.events)"
+    sleep 2
+  done | tee /tmp/oom-watch.log
+  ```
+
+  Confirmed iff `cur` climbs toward ~9 GiB as agents spawn **and** `oom_kill` increments at the moment of death.
+
+  **Host-side check (invisible from inside the container):** `%USERPROFILE%\.wslconfig` on Windows — 9.7 GiB implies either a ~20 GB host or an explicit cap. `[wsl2] memory=…` / `swap=…`.
+
+  **Candidate levers, to test only after the repro confirms** — cheapest first: (a) raise the WSL2 memory cap if the host has headroom; (b) shed unused MCP servers (see below); (c) set an explicit container memory limit so the OOM killer targets the container predictably instead of the global killer choosing an arbitrary victim; (d) narrow workflow fan-out (see below). (High value, Med effort)
+
+- 🔵 **Rate limiting is a second, distinct failure mode — do not conflate with OOM.** User-raised (2026-07-17): the _first_ crash was Claude API rate limits, and separately, rate-limited requests occurred **outside Docker** when search auto-confirmation was enabled (this session confirmed each request manually and saw no rate limiting). Two different causes with one symptom ("the workflow stopped"); an OOM fix will not address the rate-limit path, and vice versa. Any future triage should first read `memory.events`/`oom_kill` to tell them apart. (Med value, Low effort) `[relates-to: the OOM entry above]`
+
+- 🟤 **Workflow fan-out width is a design choice that was made badly in TASK-038b** — the research workflow spawned **one agent per claim** (~120 agents, 14 concurrent). The foreground recovery pass did the _same verification work_ with **one agent per topic** — 3 agents, no crash, and arguably better output (each agent saw its whole topic and caught cross-claim issues like Fondy's licence invalidating eight sibling claims at once). Claude-surfaced: the fan-out width was my choice, not a constraint of the tool, and a per-topic design would likely have avoided the crash entirely. Worth a documented default: **fan out per topic, not per claim**, and treat per-item fan-out as needing justification. (Med value, Low effort)
+
+- 🟤 **Workflow resume replays the head instead of advancing the tail** — across three `resumeFromRunId` attempts, verdict count climbed 80 → 93 → 126 while **actual claim coverage stayed frozen at 81/120**. Resumes re-dispatched topics in original order, burning the concurrency budget re-verifying already-done LiqPay/WayForPay claims, and died (OOM) before reaching Fondy and Plata by mono — which ended with **zero** verification across all three runs. The raw verdict count looked reassuring and was misleading; only a topic×field join against the journal revealed the gap. Two lessons: (a) in a crash-prone environment, resume is not a reliable way to finish a fan-out — target the _missing_ work directly; (b) **verify coverage by joining results to inputs, never by counting results**. (Med value, Med effort)
+
+- 🟤 **A dozen unused MCP servers consume baseline memory in every session** — Canva, Figma, Gamma, Hugging Face, Notion, PDF Viewer, Play Sheet Music, Three.js, Chrome DevTools, Playwright, context7, github, memory are all loaded (~15 node procs, ~600 MB RSS combined, ~211 deferred tools). None of the first eight are used by this repo. This is pure headroom against the OOM ceiling above, and also churns the tool list on every reconnect. Prune the connector set for this project. (Med value, Low effort) `[relates-to: the OOM entry above]`
 
 ---
 
