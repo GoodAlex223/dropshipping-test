@@ -88,7 +88,11 @@ export default function RootLayout({
   const websiteJsonLd = getWebsiteJsonLd();
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${inter.variable} ${jetbrainsMono.variable} ${playfair.variable} ${lora.variable} ${manrope.variable}`}
+    >
       <head>
         {/* Resource hints for faster third-party connections */}
         {PRECONNECT_DOMAINS.map((domain) => (
