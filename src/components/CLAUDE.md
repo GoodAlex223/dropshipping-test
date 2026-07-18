@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Shared React components organized by domain: admin panel, analytics tracking, checkout flow, common layout, product display, shop interactions, multi-theme showcase, theme configuration, and shadcn/ui primitives.
+Shared React components organized by domain: admin panel, analytics tracking, checkout flow, common layout, product display, shop interactions, multi-theme showcase, and shadcn/ui primitives.
 
 <!-- END AUTO-MANAGED -->
 
@@ -55,14 +55,10 @@ components/
 │   ├── types.ts           # Shared showcase types
 │   ├── data-fetchers.ts   # Server-side data fetching for showcase
 │   └── index.ts
-├── theme/
-│   ├── theme-config.ts    # Theme configuration and variants
-│   ├── theme-switcher.tsx # Theme toggle component
-│   └── index.ts
 ├── ui/                    # shadcn/ui primitives (DO NOT modify directly)
 │   ├── button.tsx, card.tsx, dialog.tsx, form.tsx, input.tsx, ...
 │   └── (20+ Radix-based components with Tailwind styling)
-└── providers.tsx          # App-wide context providers (theme, auth, toast, cookie consent, web vitals)
+└── providers.tsx          # App-wide context providers (auth, toast, cookie consent, web vitals)
 ```
 
 <!-- END AUTO-MANAGED -->
@@ -71,10 +67,10 @@ components/
 
 ## Module-Specific Conventions
 
-- **Naming**: PascalCase for component files (`ProductCard.tsx`), kebab-case for non-component files (`data-fetchers.ts`, `theme-config.ts`)
+- **Naming**: PascalCase for component files (`ProductCard.tsx`), kebab-case for non-component files (`data-fetchers.ts`)
 - **Client directive**: Interactive components use `"use client"` at file top
 - **Barrel exports**: Each subdirectory has `index.ts` re-exporting public components
-- **UI primitives**: `ui/` directory contains shadcn/ui components — regenerate with CLI rather than editing directly
+- **UI primitives**: `ui/` directory contains shadcn/ui components — regenerate with CLI rather than editing directly. One sanctioned exception: `ui/sonner.tsx` is hand-edited (TASK-034 dropped `next-themes`, so its `useTheme()` had to go and `theme` is hardcoded to `"light"`) — re-apply that edit after any CLI regeneration, which would otherwise reintroduce the import with no provider mounted
 - **Styling**: Tailwind CSS classes with `cn()` utility for conditional class merging (clsx + tailwind-merge)
 - **CVA**: Class Variance Authority for component variants (button, badge, etc.)
 - **Forms**: react-hook-form + @hookform/resolvers/zod for form state and validation
@@ -89,7 +85,7 @@ components/
 - **Image optimization**: `ProductCard` uses `DEFAULT_BLUR_DATA_URL` and `IMAGE_SIZES.productCard` from `@/lib/image-utils` for optimized loading with blur placeholders
 - **Deferred font loading**: Theme-specific fonts (Playfair Display, Lora) loaded in root layout with `preload: false` and `display: swap` for optimal performance; saves ~60-80KB on initial load for users on default theme
 - **Review eligibility pattern**: `ReviewSection` handles eligibility checking client-side; fetches `/api/reviews/eligibility?productId=xxx` on mount to determine if form should render; displays form only if user has delivered order containing product and hasn't already reviewed it
-- **Newsletter signup pattern**: `NewsletterSignup` component manages subscription flow with local state (email, loading, success); success state replaces form with confirmation message (green background, checkmark icon); integrated into Footer component for site-wide visibility
+- **Newsletter signup pattern**: `NewsletterSignup` component manages subscription flow with local state (email, loading, success); success state replaces form with confirmation message (monochrome `bg-muted` box, checkmark icon, no green); integrated into Footer component for site-wide visibility
 - **Review list filtering**: `ReviewList` component manages client-side rating filter (1-5 stars or all) with dropdown; filter change replaces data (page reset to 1), load more appends data; fetches from `/api/products/[slug]/reviews?rating=X&page=Y&limit=10`; includes loading states and empty states for filtered results
 - **Optimistic UI updates**: `ReviewSection` updates local review state and stats immediately when new review created (via callback from `ReviewForm`); calculates new average rating and updates rating distribution optimistically before server confirmation; provides instant feedback to users
 - **Client error handling**: Interactive components use `try/catch` with bare `catch` syntax when error variable not needed (Header search, PaymentForm, CartDrawer analytics, NewsletterSignup); prevents ESLint warnings and cleaner code
@@ -110,7 +106,6 @@ components/
 - `@stripe/react-stripe-js` — Payment form elements
 - `react-dropzone` — File upload (ImageUploader)
 - `sonner` — Toast notifications
-- `next-themes` — Dark/light theme switching
 - `next/script` — Script component for GTM loading (CookieConsent)
 - `web-vitals` — Core Web Vitals measurement library (WebVitalsReporter)
 

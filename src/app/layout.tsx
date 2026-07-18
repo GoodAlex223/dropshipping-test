@@ -15,12 +15,12 @@
  * - Deferred theme font loading
  *
  * Note: force-dynamic is required because the app uses client-side contexts
- * (auth, theme) that don't work during static prerendering.
+ * (auth) that don't work during static prerendering.
  */
 export const dynamic = "force-dynamic";
 
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono, Playfair_Display, Lora } from "next/font/google";
+import { Inter, JetBrains_Mono, Playfair_Display, Lora, Manrope } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { getDefaultMetadata, getOrganizationJsonLd, getWebsiteJsonLd } from "@/lib/seo";
 import { PRECONNECT_DOMAINS, DNS_PREFETCH_DOMAINS } from "@/components/common/ResourceHints";
@@ -29,7 +29,18 @@ import "./globals.css";
 // Primary sans-serif font (always loaded immediately)
 const inter = Inter({
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  subsets: ["latin", "cyrillic", "cyrillic-ext"],
+});
+
+// Heading + wordmark font (Mirox design system, always loaded immediately)
+// cyrillic-ext is mandatory: it is the only subset carrying the hryvnia sign (U+20B4)
+// Manrope is a variable font (wght 200-800); no `weight` array means next/font loads
+// the full variable range instead of pinning static instances. Pinning to
+// ["500","700","800"] previously left font-semibold (600) with no matching
+// instance, so it silently resolved up to 700.
+const manrope = Manrope({
+  variable: "--font-manrope",
+  subsets: ["latin", "cyrillic", "cyrillic-ext"],
 });
 
 // Monospace font for code snippets (always loaded immediately)
@@ -80,7 +91,11 @@ export default function RootLayout({
   const websiteJsonLd = getWebsiteJsonLd();
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${inter.variable} ${jetbrainsMono.variable} ${playfair.variable} ${lora.variable} ${manrope.variable}`}
+    >
       <head>
         {/* Resource hints for faster third-party connections */}
         {PRECONNECT_DOMAINS.map((domain) => (
@@ -105,7 +120,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${inter.variable} ${jetbrainsMono.variable} ${playfair.variable} ${lora.variable} antialiased`}
+        className={`${inter.variable} ${jetbrainsMono.variable} ${playfair.variable} ${lora.variable} ${manrope.variable} antialiased`}
       >
         <Providers>{children}</Providers>
       </body>

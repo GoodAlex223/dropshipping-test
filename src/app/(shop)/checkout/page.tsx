@@ -606,9 +606,14 @@ export default function CheckoutPage() {
                       options={{
                         clientSecret,
                         appearance: {
-                          theme: "stripe",
+                          theme: "flat",
                           variables: {
-                            colorPrimary: "#0f172a",
+                            colorPrimary: "#000000",
+                            colorBackground: "#ffffff",
+                            colorText: "#1a1a1a",
+                            colorDanger: "#b91c1c",
+                            borderRadius: "4px",
+                            fontFamily: "system-ui, sans-serif",
                           },
                         },
                       }}

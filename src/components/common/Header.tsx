@@ -28,9 +28,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { Logo } from "@/components/common/Logo";
 import { useCartStore } from "@/stores/cart.store";
 import { useDebounce } from "@/hooks/use-debounce";
-import { ThemeSwitcher } from "@/components/theme";
 
 interface SearchResult {
   id: string;
@@ -178,7 +178,10 @@ export function Header() {
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
   return (
-    <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
+    <header
+      data-surface="dark"
+      className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur"
+    >
       <div className="container flex h-16 items-center justify-between">
         {/* Mobile menu */}
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -270,7 +273,7 @@ export function Header() {
                 </Link>
                 <button
                   onClick={handleSignOut}
-                  className="hover:bg-muted flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-red-600 transition-colors"
+                  className="hover:bg-muted text-destructive flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
                   Sign out
@@ -293,7 +296,7 @@ export function Header() {
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-xl font-bold">Store</span>
+          <Logo />
         </Link>
 
         {/* Desktop navigation */}
@@ -302,7 +305,7 @@ export function Header() {
             <Link
               key={item.name}
               href={item.href}
-              className="hover:text-primary text-sm font-medium transition-colors"
+              className="hover:text-muted-foreground text-sm font-medium transition-colors"
             >
               {item.name}
             </Link>
@@ -310,7 +313,7 @@ export function Header() {
 
           {/* Categories Dropdown */}
           <DropdownMenu>
-            <DropdownMenuTrigger className="hover:text-primary flex items-center gap-1 text-sm font-medium transition-colors outline-none">
+            <DropdownMenuTrigger className="hover:text-muted-foreground flex items-center gap-1 text-sm font-medium transition-colors outline-none">
               Categories
               <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
@@ -334,7 +337,7 @@ export function Header() {
           {isAdmin && (
             <Link
               href="/admin"
-              className="text-primary hover:text-primary/80 text-sm font-medium transition-colors"
+              className="hover:text-muted-foreground text-sm font-medium transition-colors"
             >
               Admin Panel
             </Link>
@@ -348,9 +351,6 @@ export function Header() {
             <Search className="h-5 w-5" />
             <span className="sr-only">Search (Ctrl+K)</span>
           </Button>
-
-          {/* Theme Switcher */}
-          <ThemeSwitcher />
 
           {/* Search Dialog */}
           <Dialog open={searchOpen} onOpenChange={setSearchOpen}>
@@ -480,7 +480,10 @@ export function Header() {
                   </>
                 )}
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-600">
+                <DropdownMenuItem
+                  onClick={handleSignOut}
+                  className="text-destructive cursor-pointer"
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   Sign out
                 </DropdownMenuItem>

@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { getOrderStatusStyle } from "@/lib/order-status";
 
 interface OrderItem {
   id: string;
@@ -124,16 +125,6 @@ const STATUS_OPTIONS = [
   { value: "CANCELLED", label: "Cancelled" },
   { value: "REFUNDED", label: "Refunded" },
 ];
-
-const STATUS_COLORS: Record<string, string> = {
-  PENDING: "bg-yellow-100 text-yellow-800",
-  CONFIRMED: "bg-blue-100 text-blue-800",
-  PROCESSING: "bg-purple-100 text-purple-800",
-  SHIPPED: "bg-indigo-100 text-indigo-800",
-  DELIVERED: "bg-green-100 text-green-800",
-  CANCELLED: "bg-red-100 text-red-800",
-  REFUNDED: "bg-gray-100 text-gray-800",
-};
 
 const PAYMENT_STATUS_COLORS: Record<string, string> = {
   PENDING: "bg-yellow-100 text-yellow-800",
@@ -329,7 +320,7 @@ export default function AdminOrderDetailPage({ params }: AdminOrderDetailPagePro
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="secondary" className={`${STATUS_COLORS[order.status]} text-sm`}>
+          <Badge variant="secondary" className={`${getOrderStatusStyle(order.status)} text-sm`}>
             {order.status}
           </Badge>
           <Badge

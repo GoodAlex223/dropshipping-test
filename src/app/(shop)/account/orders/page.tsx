@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getOrderStatusStyle, getOrderStatusLabel } from "@/lib/order-status";
 
 interface OrderItem {
   id: string;
@@ -46,26 +47,6 @@ interface OrdersResponse {
     totalPages: number;
   };
 }
-
-const STATUS_COLORS: Record<string, string> = {
-  PENDING: "bg-yellow-100 text-yellow-800",
-  CONFIRMED: "bg-blue-100 text-blue-800",
-  PROCESSING: "bg-purple-100 text-purple-800",
-  SHIPPED: "bg-indigo-100 text-indigo-800",
-  DELIVERED: "bg-green-100 text-green-800",
-  CANCELLED: "bg-red-100 text-red-800",
-  REFUNDED: "bg-gray-100 text-gray-800",
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  PENDING: "Pending",
-  CONFIRMED: "Confirmed",
-  PROCESSING: "Processing",
-  SHIPPED: "Shipped",
-  DELIVERED: "Delivered",
-  CANCELLED: "Cancelled",
-  REFUNDED: "Refunded",
-};
 
 function OrdersPageContent() {
   const router = useRouter();
@@ -200,8 +181,8 @@ function OrdersPageContent() {
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
-                      <Badge variant="secondary" className={STATUS_COLORS[order.status]}>
-                        {STATUS_LABELS[order.status] || order.status}
+                      <Badge variant="secondary" className={getOrderStatusStyle(order.status)}>
+                        {getOrderStatusLabel(order.status)}
                       </Badge>
                       <Button variant="outline" size="sm" asChild>
                         <Link href={`/account/orders/${order.id}`}>

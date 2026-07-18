@@ -39,7 +39,7 @@ export function ReviewStats({ averageRating, totalReviews, ratingDistribution }:
                 <span className="w-8 text-right">{rating} ★</span>
                 <div className="bg-muted h-2 flex-1 overflow-hidden rounded-full">
                   <div
-                    className="h-full rounded-full bg-yellow-400 transition-all"
+                    className="bg-foreground h-full rounded-full transition-all"
                     style={{ width: `${percentage}%` }}
                   />
                 </div>

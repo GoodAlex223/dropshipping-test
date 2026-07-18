@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Logo } from "@/components/common/Logo";
 import { NewsletterSignup } from "./NewsletterSignup";
 
 const footerLinks = {
@@ -23,13 +24,13 @@ const footerLinks = {
 
 export function Footer() {
   return (
-    <footer className="bg-muted/40 border-t">
+    <footer data-surface="dark" className="bg-background border-t">
       <div className="container py-12">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div className="space-y-4">
-            <Link href="/" className="text-xl font-bold">
-              Store
+            <Link href="/" className="inline-flex items-center gap-2">
+              <Logo />
             </Link>
             <p className="text-muted-foreground text-sm">
               Your one-stop shop for quality products at great prices.
@@ -83,7 +84,7 @@ export function Footer() {
         {/* Copyright */}
         <div className="mt-12 border-t pt-8">
           <p className="text-muted-foreground text-center text-sm">
-            &copy; {new Date().getFullYear()} Store. All rights reserved.
+            &copy; {new Date().getFullYear()} Mirox Shop. All rights reserved.
           </p>
         </div>
       </div>

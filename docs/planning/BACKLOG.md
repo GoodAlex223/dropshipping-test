@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-07-17
+**Last Updated**: 2026-07-18
 
 ---
 
@@ -429,6 +429,22 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 - 🟤 **Workflow resume replays the head instead of advancing the tail** — across three `resumeFromRunId` attempts, verdict count climbed 80 → 93 → 126 while **actual claim coverage stayed frozen at 81/120**. Resumes re-dispatched topics in original order, burning the concurrency budget re-verifying already-done LiqPay/WayForPay claims, and died (OOM) before reaching Fondy and Plata by mono — which ended with **zero** verification across all three runs. The raw verdict count looked reassuring and was misleading; only a topic×field join against the journal revealed the gap. Two lessons: (a) in a crash-prone environment, resume is not a reliable way to finish a fan-out — target the _missing_ work directly; (b) **verify coverage by joining results to inputs, never by counting results**. (Med value, Med effort)
 
 - 🟤 **A dozen unused MCP servers consume baseline memory in every session** — Canva, Figma, Gamma, Hugging Face, Notion, PDF Viewer, Play Sheet Music, Three.js, Chrome DevTools, Playwright, context7, github, memory are all loaded (~15 node procs, ~600 MB RSS combined, ~211 deferred tools). None of the first eight are used by this repo. This is pure headroom against the OOM ceiling above, and also churns the tool list on every reconnect. Prune the connector set for this project. (Med value, Low effort) `[relates-to: the OOM entry above]`
+
+### [2026-07-18] From: TASK-034 Task 12 (Final Verification & Docs)
+
+**Origin**: feat/task-034-design-system branch, final verification pass. All 🟤 Auto-Generated (Claude-surfaced during gate/manual verification, not user-raised).
+
+- 🟤 **`use(params)` on Next 14.2.35 breaks 4 dynamic routes, not 3** — `/admin/orders/[id]`, `/admin/products/[id]`, `/account/orders/[id]`, and **`/admin/suppliers/[id]`** (a 4th call site found by grep and confirmed live, not previously documented) all 500 with `An unsupported type was passed to use(): [object Object]`. Verified first-hand for all four via direct `page.goto()` (HTTP 500 on each) plus captured `pageerror`/server-log text matching exactly; stack traces name `SupplierDetailPage` (`src/app/(admin)/admin/suppliers/[id]/page.tsx:98`) and `EditProductPage` (`src/app/(admin)/admin/products/[id]/page.tsx:34`) alongside the two previously-known sites. Root cause: Next 14.2.35 passes `params` as a plain object to client components; `use()` requires a Promise (Next 15 semantics). Pre-existing on `main`, unrelated to this branch. The root `CLAUDE.md` and `src/app/CLAUDE.md` documented this as an intended "Async params unwrapping" pattern with no caveat — both corrected in this task's commit to name the break and list all 4 routes. (High value, Med effort)
+- 🟤 **`next-themes` is now an unused dependency** — still in `package.json` after the storefront excision (37894c8), deliberately left installed to avoid lockfile churn. Candidate for removal once nothing else in the tree needs it (showcase theming does not use it — confirmed local-wrapper-scoped, not `next-themes`-driven). (Low value, Low effort)
+- 🟤 **Supplier order status styling is still duplicated/bright** — `src/app/(admin)/admin/suppliers/[id]/page.tsx` keeps a local `STATUS_COLORS` for `SupplierOrder.status`. That field is a plain Prisma `String` with a lowercase, non-overlapping vocabulary (`pending/submitted/confirmed/shipped/delivered/cancelled/failed`), so it deliberately could not reuse `src/lib/order-status.ts` (case-sensitive, keyed to the uppercase `OrderStatus` enum). A parallel `supplier-order-status` module is the follow-up. (Med value, Low effort)
+- 🟤 **`.css` files are not covered by `lint-staged`/`format:check`** — verified directly: `package.json`'s `lint-staged` block only matches `*.{ts,tsx}`, `*.{js,jsx}`, `*.{json,md}`, and `format:check` runs `prettier --check "**/*.{ts,tsx,js,jsx,json,md}"` — neither globs `.css`. `globals.css` formatting and line-ending drift are invisible to both the pre-commit hook and CI. (Low value, Low effort)
+- 🟤 **Admin still carries bright payment-status chips** — admin inherits the Mirox tokens (colors, radius, motion vars are global) but was intentionally not restyled by TASK-034. Its **OrderStatus** chips are already monochrome — both admin orders pages were converted to the shared `getOrderStatusStyle()` in TASK-034. What remains bright is `PAYMENT_STATUS_COLORS` (`PaymentStatus`, admin-only, in both admin orders pages) plus the supplier-order status map tracked in the entry above. A future admin visual pass should adopt the monochrome policy already applied to the customer-facing surfaces. (Med value, Med effort)
+
+### [2026-07-18] From: TASK-034 PR #19 review rounds
+
+**Origin**: PR #19 code-review rounds (separate intake event from Task 12's verification pass). 🟤 Auto-Generated.
+
+- 🟤 **Automate the `docs/README.md` index-freshness check — this defect class has now recurred three consecutive times** — PR #16 (`04a2593`), PR #17 (`3207425`) and PR #19 (`8a98850`) each shipped with the sole review findings being stale index rows, despite `docs/README.md` stating the indexing rule in its own body. Three manual catches in a row is the signal to automate. Shape it like `tests/unit/no-bright-colors.test.ts` (a plain unit test, no new tooling). **Critical design note — a naive implementation is worse than nothing:** a first pass during PR #19 flagged 17 rows, and 16 were false positives. The check MUST understand two shapes before it can be trusted: (1) only tables whose column header is literally `Last Updated` hold dates — the `archive/plans/` tables carry a separate **Status** column (`COMPLETE`/`ACTIVE`) that is not a date at all; (2) specs under `superpowers/specs/` carry `**Date**:`, not `**Last Updated**:`, so "no stamp found" must mean _skip_, never _fail_. Compare a row's date only against a file that actually declares `**Last Updated**:`. Retiring this class is worth more than a fourth manual catch. (Med value, Low effort) `[relates-to: docs-hygiene entries from PR #16/#17]`
 
 ---
 

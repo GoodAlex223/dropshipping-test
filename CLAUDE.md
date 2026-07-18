@@ -113,9 +113,8 @@ src/
 │   ├── reviews/            # Review components (ReviewSection, ReviewForm, ReviewList, ReviewItem, ReviewStats, StarRating)
 │   ├── shop/               # CartDrawer
 │   ├── showcase/           # Multi-theme showcase components (bold/, luxury/, organic/)
-│   ├── theme/              # Theme switcher & config
 │   ├── ui/                 # shadcn/ui primitives (button, card, dialog, etc.)
-│   └── providers.tsx       # Context providers wrapper (auth, theme, toast, cookie consent, web vitals)
+│   └── providers.tsx       # Context providers wrapper (auth, toast, cookie consent, web vitals)
 ├── hooks/                  # Custom React hooks (use-debounce, use-toast)
 ├── lib/                    # Core utilities
 │   ├── auth.ts             # NextAuth v5 config (JWT + Prisma adapter)
@@ -235,7 +234,7 @@ prisma/
 - **GTM conditional loading**: GTM script only loads after user accepts cookies; regex validation for GTM_ID format
 - **DataLayer clearing**: Push `{ ecommerce: null }` before each event to prevent GA4 data leakage between events
 - **Cookie consent persistence**: Zustand store with localStorage persistence for consent status (pending/accepted/declined)
-- **Async params unwrapping**: Next.js 14 dynamic routes use `use(params)` to unwrap Promise-based params in client components
+- **Async params unwrapping (currently broken)**: 4 client-component pages call `use(params)` expecting Promise-based params — `/admin/orders/[id]`, `/admin/products/[id]`, `/admin/suppliers/[id]`, `/account/orders/[id]` — but the pinned Next.js 14.2.35 passes `params` as a plain object to client components, so each 500s at runtime with `An unsupported type was passed to use(): [object Object]` (Promise-based params is Next 15 behavior); see BACKLOG.md
 - **Search debouncing**: Admin list pages debounce search input (300ms) via `useDebounce` hook to reduce API calls
 - **Suspense-wrapped list pages**: Admin list pages wrap content in `<Suspense>` with loading skeleton fallbacks
 - **Social sharing pattern**: Platform-specific URL builders (`buildShareUrl`) with proper URI encoding; Web Share API detection (`canUseNativeShare`) with graceful fallback to clipboard copy on failure

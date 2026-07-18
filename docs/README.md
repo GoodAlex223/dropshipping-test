@@ -2,7 +2,7 @@
 
 Central index for all project documentation.
 
-**Last Updated**: 2026-07-17
+**Last Updated**: 2026-07-18
 
 ---
 
@@ -36,7 +36,7 @@ Central index for all project documentation.
 | [planning/WEEKLY.md](planning/WEEKLY.md)         | Current week's plan  | 2026-07-17   |
 | [planning/TODO.md](planning/TODO.md)             | Active tasks         | 2026-07-17   |
 | [planning/DONE.md](planning/DONE.md)             | Completed tasks      | 2026-07-17   |
-| [planning/BACKLOG.md](planning/BACKLOG.md)       | Unprioritized ideas  | 2026-07-17   |
+| [planning/BACKLOG.md](planning/BACKLOG.md)       | Unprioritized ideas  | 2026-07-18   |
 | [planning/ROADMAP.md](planning/ROADMAP.md)       | Long-term vision     | 2026-07-14   |
 | [planning/GOALS.md](planning/GOALS.md)           | Objectives & metrics | 2026-01-26   |
 | [planning/MILESTONES.md](planning/MILESTONES.md) | Key targets          | 2026-01-26   |
@@ -51,12 +51,15 @@ Central index for all project documentation.
 | [superpowers/specs/2026-07-15-task-038a-prework-design.md](superpowers/specs/2026-07-15-task-038a-prework-design.md)                     | TASK-038a prework: WebKit diagnosis, sharp, CI coverage                                                              | 2026-07-16   |
 | [superpowers/specs/2026-07-16-ukraine-payments-delivery-design.md](superpowers/specs/2026-07-16-ukraine-payments-delivery-design.md)     | TASK-038b spike design: scope, gateway candidates, research methodology                                              | 2026-07-17   |
 | [superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md](superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md) | **Ukraine payments & delivery decision** — gateway choice, Nova Poshta scoping, UAH strategy, TASK-048/049 blueprint | 2026-07-17   |
+| [superpowers/specs/2026-07-17-mirox-design-system-design.md](superpowers/specs/2026-07-17-mirox-design-system-design.md)                 | TASK-034 design: Mirox token model, typography/logo, animation primitives, restyle scope                             | 2026-07-17   |
 
 ---
 
 ## Implementation Plans
 
-No active implementation plans.
+| Plan                                                                                        | Task                                     | Status | Started    |
+| ------------------------------------------------------------------------------------------- | ---------------------------------------- | ------ | ---------- |
+| [2026-07-17_task-034-design-system.md](planning/plans/2026-07-17_task-034-design-system.md) | Mirox design system & rebrand foundation | ACTIVE | 2026-07-17 |
 
 ### Archived Plans
 

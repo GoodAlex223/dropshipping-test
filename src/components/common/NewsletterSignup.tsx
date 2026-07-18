@@ -41,11 +41,9 @@ export function NewsletterSignup() {
 
   if (isSuccess) {
     return (
-      <div className="flex items-start gap-2 rounded-md border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-950">
-        <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
-        <p className="text-sm text-green-800 dark:text-green-200">
-          Check your email to confirm your subscription!
-        </p>
+      <div className="border-border bg-muted flex items-start gap-2 rounded-md border p-3">
+        <CheckCircle2 className="text-foreground h-5 w-5 flex-shrink-0" />
+        <p className="text-foreground text-sm">Check your email to confirm your subscription!</p>
       </div>
     );
   }
@@ -59,7 +57,7 @@ export function NewsletterSignup() {
         onChange={(e) => setEmail(e.target.value)}
         disabled={isLoading}
         required
-        className="bg-background"
+        className="bg-card"
       />
       <Button type="submit" disabled={isLoading} className="w-full" size="sm">
         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

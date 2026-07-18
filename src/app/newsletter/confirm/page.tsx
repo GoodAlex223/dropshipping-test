@@ -54,7 +54,7 @@ function ConfirmContent() {
 
         {status === "success" && (
           <>
-            <CheckCircle2 className="mx-auto h-12 w-12 text-green-600" />
+            <CheckCircle2 className="text-foreground mx-auto h-12 w-12" />
             <h1 className="text-2xl font-bold">You&apos;re subscribed!</h1>
             <p className="text-muted-foreground">{message}</p>
             <Button asChild>
@@ -65,7 +65,7 @@ function ConfirmContent() {
 
         {status === "error" && (
           <>
-            <XCircle className="mx-auto h-12 w-12 text-red-600" />
+            <XCircle className="text-destructive mx-auto h-12 w-12" />
             <h1 className="text-2xl font-bold">Confirmation Failed</h1>
             <p className="text-muted-foreground">{message}</p>
             <Button asChild variant="outline">
