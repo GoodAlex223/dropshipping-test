@@ -35,6 +35,7 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDebounce } from "@/hooks/use-debounce";
+import { getOrderStatusStyle } from "@/lib/order-status";
 
 interface Order {
   id: string;
@@ -63,16 +64,6 @@ interface OrdersResponse {
     hasPrev: boolean;
   };
 }
-
-const STATUS_COLORS: Record<string, string> = {
-  PENDING: "bg-yellow-100 text-yellow-800",
-  CONFIRMED: "bg-blue-100 text-blue-800",
-  PROCESSING: "bg-purple-100 text-purple-800",
-  SHIPPED: "bg-indigo-100 text-indigo-800",
-  DELIVERED: "bg-green-100 text-green-800",
-  CANCELLED: "bg-red-100 text-red-800",
-  REFUNDED: "bg-gray-100 text-gray-800",
-};
 
 const PAYMENT_STATUS_COLORS: Record<string, string> = {
   PENDING: "bg-yellow-100 text-yellow-800",
@@ -379,7 +370,7 @@ function AdminOrdersContent() {
                     </TableCell>
                     <TableCell className="text-sm">{formatDate(order.createdAt)}</TableCell>
                     <TableCell>
-                      <Badge variant="secondary" className={STATUS_COLORS[order.status]}>
+                      <Badge variant="secondary" className={getOrderStatusStyle(order.status)}>
                         {order.status}
                       </Badge>
                     </TableCell>

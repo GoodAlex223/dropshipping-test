@@ -19,6 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getOrderStatusStyle, getOrderStatusLabel } from "@/lib/order-status";
 
 interface OrderItem {
   id: string;
@@ -65,26 +66,6 @@ interface Order {
   paidAt?: string;
   items: OrderItem[];
 }
-
-const STATUS_COLORS: Record<string, string> = {
-  PENDING: "bg-yellow-100 text-yellow-800",
-  CONFIRMED: "bg-blue-100 text-blue-800",
-  PROCESSING: "bg-purple-100 text-purple-800",
-  SHIPPED: "bg-indigo-100 text-indigo-800",
-  DELIVERED: "bg-green-100 text-green-800",
-  CANCELLED: "bg-red-100 text-red-800",
-  REFUNDED: "bg-gray-100 text-gray-800",
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  PENDING: "Pending",
-  CONFIRMED: "Confirmed",
-  PROCESSING: "Processing",
-  SHIPPED: "Shipped",
-  DELIVERED: "Delivered",
-  CANCELLED: "Cancelled",
-  REFUNDED: "Refunded",
-};
 
 const ORDER_TIMELINE = [
   { status: "PENDING", label: "Order Placed", icon: Clock },
@@ -201,8 +182,8 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
             <p className="text-muted-foreground text-sm">Placed on {formatDate(order.createdAt)}</p>
           </div>
         </div>
-        <Badge variant="secondary" className={`${STATUS_COLORS[order.status]} text-sm`}>
-          {STATUS_LABELS[order.status] || order.status}
+        <Badge variant="secondary" className={`${getOrderStatusStyle(order.status)} text-sm`}>
+          {getOrderStatusLabel(order.status)}
         </Badge>
       </div>
 
