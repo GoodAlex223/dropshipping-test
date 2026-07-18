@@ -11,7 +11,11 @@ export default defineConfig({
   forbidOnly: IS_CI,
   retries: IS_CI ? 2 : 0,
   workers: IS_CI ? 1 : 2,
-  reporter: IS_CI ? "github" : "html",
+  // In CI, "github" annotates failures inline on the PR but writes nothing to
+  // disk — so the ci.yml "Upload Playwright report" step had no fresh output to
+  // collect. Pair it with the html reporter so that artifact is a real report of
+  // the run. `open: "never"` keeps it from trying to launch a browser on the runner.
+  reporter: IS_CI ? [["github"], ["html", { open: "never" }]] : "html",
   timeout: IS_CI ? 30000 : 60000,
   use: {
     baseURL: BASE_URL,
