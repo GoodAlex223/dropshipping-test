@@ -36,7 +36,7 @@ export function StarRating({ value, onChange, size = "md", className }: StarRati
           <Star
             className={cn(
               sizeMap[size],
-              star <= value ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/30"
+              star <= value ? "fill-foreground text-foreground" : "text-muted-foreground/30"
             )}
           />
         </button>
