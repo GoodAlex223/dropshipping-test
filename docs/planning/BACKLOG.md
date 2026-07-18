@@ -347,7 +347,7 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 
 ### [2026-07-14] From: TASK-033 Completion
 
-- **Gitignore Playwright artifacts**: `playwright-report/` and `test-results/` are git-tracked generated outputs; every local E2E run dirties the tree (observed throughout TASK-033). Add both to `.gitignore` and remove from tracking. (Med value, Low effort)
+- [x] ~~**Gitignore Playwright artifacts**: `playwright-report/` and `test-results/` are git-tracked generated outputs; every local E2E run dirties the tree (observed throughout TASK-033). Add both to `.gitignore` and remove from tracking.~~ — **RESOLVED 2026-07-18.** Both directories added to `.gitignore` and untracked via `git rm -r --cached` (9 + 1 files); local copies preserved on disk. `.prettierignore` already covered them since `b91b332` (entry below). (Med value, Low effort)
 - **`.env` hygiene**: deduplicate the two `DATABASE_URL` keys (second points at a live-looking Neon DB alongside Vercel tokens); confirm rotation with owner. Note: `.env` is gitignored and never committed — local-file hygiene, not repo exposure. (High value, Low effort)
 - [x] ~~**Add `.superpowers/` to `.prettierignore`**: session scratch files trip `npm run format:check` locally.~~ — **RESOLVED in TASK-038a.** Commit b91b332 added `.superpowers`, `playwright-report`, and `test-results` to `.prettierignore`; `npm run format:check` passes locally again. (Low value, Low effort)
 - **CLAUDE.md E2E docs scope**: testing docs list only `navigation.spec.ts`; `cart.spec.ts` and `products.spec.ts` exist. Correct at next CLAUDE.md refresh. (Low value, Low effort)
