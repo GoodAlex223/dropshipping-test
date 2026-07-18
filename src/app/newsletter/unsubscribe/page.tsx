@@ -48,7 +48,7 @@ function UnsubscribeContent() {
     return (
       <div className="container flex min-h-[60vh] items-center justify-center py-12">
         <div className="w-full max-w-md space-y-6 text-center">
-          <XCircle className="mx-auto h-12 w-12 text-red-600" />
+          <XCircle className="text-destructive mx-auto h-12 w-12" />
           <h1 className="text-2xl font-bold">Invalid Link</h1>
           <p className="text-muted-foreground">This unsubscribe link is invalid or incomplete.</p>
           <Button asChild variant="outline">
@@ -84,7 +84,7 @@ function UnsubscribeContent() {
 
         {status === "success" && (
           <>
-            <CheckCircle2 className="mx-auto h-12 w-12 text-green-600" />
+            <CheckCircle2 className="text-foreground mx-auto h-12 w-12" />
             <h1 className="text-2xl font-bold">Unsubscribed</h1>
             <p className="text-muted-foreground">{message}</p>
             <Button asChild variant="outline">
@@ -95,7 +95,7 @@ function UnsubscribeContent() {
 
         {status === "error" && (
           <>
-            <XCircle className="mx-auto h-12 w-12 text-red-600" />
+            <XCircle className="text-destructive mx-auto h-12 w-12" />
             <h1 className="text-2xl font-bold">Something Went Wrong</h1>
             <p className="text-muted-foreground">{message}</p>
             <Button asChild variant="outline">

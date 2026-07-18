@@ -210,8 +210,8 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
                           className={`flex h-10 w-10 items-center justify-center rounded-full border-2 ${
                             isCompleted
                               ? step.status === "CANCELLED"
-                                ? "border-red-500 bg-red-500 text-white"
-                                : "border-green-500 bg-green-500 text-white"
+                                ? "border-destructive bg-destructive text-destructive-foreground"
+                                : "border-foreground bg-foreground text-background"
                               : "border-muted-foreground/30 bg-background text-muted-foreground"
                           }`}
                         >
@@ -220,7 +220,9 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
                         {index < timeline.length - 1 && (
                           <div
                             className={`absolute top-10 h-full w-0.5 ${
-                              index < currentStatusIndex ? "bg-green-500" : "bg-muted-foreground/30"
+                              index < currentStatusIndex
+                                ? "bg-foreground"
+                                : "bg-muted-foreground/30"
                             }`}
                           />
                         )}
@@ -323,7 +325,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
               {parseFloat(order.discount) > 0 && (
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Discount</span>
-                  <span className="text-green-600">-${parseFloat(order.discount).toFixed(2)}</span>
+                  <span className="text-foreground">-${parseFloat(order.discount).toFixed(2)}</span>
                 </div>
               )}
               <div className="flex justify-between text-sm">
