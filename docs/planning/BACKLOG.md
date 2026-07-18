@@ -440,6 +440,12 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 - 🟤 **`.css` files are not covered by `lint-staged`/`format:check`** — verified directly: `package.json`'s `lint-staged` block only matches `*.{ts,tsx}`, `*.{js,jsx}`, `*.{json,md}`, and `format:check` runs `prettier --check "**/*.{ts,tsx,js,jsx,json,md}"` — neither globs `.css`. `globals.css` formatting and line-ending drift are invisible to both the pre-commit hook and CI. (Low value, Low effort)
 - 🟤 **Admin still carries bright payment-status chips** — admin inherits the Mirox tokens (colors, radius, motion vars are global) but was intentionally not restyled by TASK-034. Its **OrderStatus** chips are already monochrome — both admin orders pages were converted to the shared `getOrderStatusStyle()` in TASK-034. What remains bright is `PAYMENT_STATUS_COLORS` (`PaymentStatus`, admin-only, in both admin orders pages) plus the supplier-order status map tracked in the entry above. A future admin visual pass should adopt the monochrome policy already applied to the customer-facing surfaces. (Med value, Med effort)
 
+### [2026-07-18] From: TASK-034 PR #19 review rounds
+
+**Origin**: PR #19 code-review rounds (separate intake event from Task 12's verification pass). 🟤 Auto-Generated.
+
+- 🟤 **Automate the `docs/README.md` index-freshness check — this defect class has now recurred three consecutive times** — PR #16 (`04a2593`), PR #17 (`3207425`) and PR #19 (`8a98850`) each shipped with the sole review findings being stale index rows, despite `docs/README.md` stating the indexing rule in its own body. Three manual catches in a row is the signal to automate. Shape it like `tests/unit/no-bright-colors.test.ts` (a plain unit test, no new tooling). **Critical design note — a naive implementation is worse than nothing:** a first pass during PR #19 flagged 17 rows, and 16 were false positives. The check MUST understand two shapes before it can be trusted: (1) only tables whose column header is literally `Last Updated` hold dates — the `archive/plans/` tables carry a separate **Status** column (`COMPLETE`/`ACTIVE`) that is not a date at all; (2) specs under `superpowers/specs/` carry `**Date**:`, not `**Last Updated**:`, so "no stamp found" must mean _skip_, never _fail_. Compare a row's date only against a file that actually declares `**Last Updated**:`. Retiring this class is worth more than a fourth manual catch. (Med value, Low effort) `[relates-to: docs-hygiene entries from PR #16/#17]`
+
 ---
 
 ## Technical Debt
