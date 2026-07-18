@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTheme } from "next-themes";
-import { useEffect, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Palette } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // Hydration-safe mounting check
 const emptySubscribe = () => () => {};
@@ -16,7 +16,7 @@ function useIsMounted() {
   return useSyncExternalStore(emptySubscribe, getSnapshot, getServerSnapshot);
 }
 
-// Map route to theme
+// Map route to theme class
 function getThemeFromPath(pathname: string | null): string | null {
   if (!pathname) return null;
   if (pathname.includes("/showcase/bold")) return "bold";
@@ -33,25 +33,14 @@ const themes = [
 
 export default function ShowcaseLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { setTheme } = useTheme();
   const isMounted = useIsMounted();
-
-  // Force theme based on route
-  useEffect(() => {
-    const routeTheme = getThemeFromPath(pathname);
-    if (routeTheme) {
-      setTheme(routeTheme);
-    }
-  }, [pathname, setTheme]);
-
   const currentTheme = getThemeFromPath(pathname);
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className={cn("flex min-h-screen flex-col", currentTheme ?? undefined)}>
       {/* Showcase Header */}
       <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
         <div className="container flex h-14 items-center justify-between">
-          {/* Back to main site */}
           <Link
             href="/"
             className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm transition-colors"
@@ -60,7 +49,6 @@ export default function ShowcaseLayout({ children }: { children: React.ReactNode
             <span>Back to Store</span>
           </Link>
 
-          {/* Theme indicator */}
           <div className="flex items-center gap-2">
             <Palette className="text-muted-foreground h-4 w-4" />
             <span className="text-sm font-medium">
@@ -70,7 +58,6 @@ export default function ShowcaseLayout({ children }: { children: React.ReactNode
             </span>
           </div>
 
-          {/* Theme switcher */}
           {isMounted && (
             <nav className="flex items-center gap-1">
               {themes.map((theme) => (
@@ -90,10 +77,8 @@ export default function ShowcaseLayout({ children }: { children: React.ReactNode
         </div>
       </header>
 
-      {/* Main content */}
       <main className="flex-1">{children}</main>
 
-      {/* Minimal footer */}
       <footer className="border-t py-6">
         <div className="text-muted-foreground container text-center text-sm">
           <p>Theme Showcase &middot; Demonstrating visual design capabilities</p>

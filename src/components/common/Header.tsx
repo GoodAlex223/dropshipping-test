@@ -30,7 +30,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { useCartStore } from "@/stores/cart.store";
 import { useDebounce } from "@/hooks/use-debounce";
-import { ThemeSwitcher } from "@/components/theme";
 
 interface SearchResult {
   id: string;
@@ -348,9 +347,6 @@ export function Header() {
             <Search className="h-5 w-5" />
             <span className="sr-only">Search (Ctrl+K)</span>
           </Button>
-
-          {/* Theme Switcher */}
-          <ThemeSwitcher />
 
           {/* Search Dialog */}
           <Dialog open={searchOpen} onOpenChange={setSearchOpen}>
