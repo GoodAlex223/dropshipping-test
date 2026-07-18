@@ -15,7 +15,7 @@
  * - Deferred theme font loading
  *
  * Note: force-dynamic is required because the app uses client-side contexts
- * (auth, theme) that don't work during static prerendering.
+ * (auth) that don't work during static prerendering.
  */
 export const dynamic = "force-dynamic";
 
