@@ -70,7 +70,7 @@ components/
 - **Naming**: PascalCase for component files (`ProductCard.tsx`), kebab-case for non-component files (`data-fetchers.ts`)
 - **Client directive**: Interactive components use `"use client"` at file top
 - **Barrel exports**: Each subdirectory has `index.ts` re-exporting public components
-- **UI primitives**: `ui/` directory contains shadcn/ui components — regenerate with CLI rather than editing directly
+- **UI primitives**: `ui/` directory contains shadcn/ui components — regenerate with CLI rather than editing directly. One sanctioned exception: `ui/sonner.tsx` is hand-edited (TASK-034 dropped `next-themes`, so its `useTheme()` had to go and `theme` is hardcoded to `"light"`) — re-apply that edit after any CLI regeneration, which would otherwise reintroduce the import with no provider mounted
 - **Styling**: Tailwind CSS classes with `cn()` utility for conditional class merging (clsx + tailwind-merge)
 - **CVA**: Class Variance Authority for component variants (button, badge, etc.)
 - **Forms**: react-hook-form + @hookform/resolvers/zod for form state and validation
