@@ -1,6 +1,6 @@
 # TODO
 
-**Last Updated**: 2026-07-17
+**Last Updated**: 2026-07-18
 
 Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-shop-program-design.md) · Current week: [WEEKLY.md](WEEKLY.md)
 
@@ -11,22 +11,6 @@ Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-
 _None. TASK-033 completed 2026-07-14 (PR #16) — see [DONE.md](DONE.md)._
 
 ## 📋 Planned (v1.3 — "Mirox Rebrand Demo")
-
-#### [TASK-034] Design system & rebrand foundation
-
-**Priority**: 🟠 High
-**Status**: 📋 Planned
-**Effort**: XL
-**Dependencies**: [TASK-033]
-
-**Description**: Mirox Shop black/white luxury-minimal design system: color tokens (#000000, #FFFFFF, #1A1A1A, #F5F5F5), typography, logo assets, animation primitives (fade-in, hover, skeleton loaders, transitions); restyle shared components (header, footer, buttons, cards). Token-driven so later design files re-skin tokens, not components. Candidate for Ultracode restyle-sweep workflow.
-
-**Acceptance Criteria**:
-
-- [ ] Design tokens defined and consumed by all shared components
-- [ ] Header, footer, buttons, cards restyled to the screenshot's direction
-- [ ] Animation primitives available as reusable utilities
-- [ ] No bright colors anywhere in the customer-facing theme
 
 #### [TASK-035] Homepage rebrand
 

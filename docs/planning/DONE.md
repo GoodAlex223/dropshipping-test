@@ -2,11 +2,46 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-07-17
+**Last Updated**: 2026-07-18
 
 ---
 
 ## 2026-07 (July)
+
+### [2026-07-18] TASK-034 - Mirox Design System & Rebrand Foundation
+
+**Plan**: [docs/archive/plans/2026-07-17_task-034-design-system.md](../archive/plans/2026-07-17_task-034-design-system.md)
+**Spec**: [2026-07-17-mirox-design-system-design.md](../superpowers/specs/2026-07-17-mirox-design-system-design.md)
+**PR**: [#19](https://github.com/GoodAlex223/dropshipping-test/pull/19) — merged `adaa278`
+
+**Summary**: Black/white luxury-minimal design system for the Mirox Shop rebrand, built token-first so later design files re-skin tokens rather than components. Executed as 12 TDD tasks with a per-task review gate plus a final whole-branch review.
+
+**Key changes**:
+
+- **Design tokens + section inversion** — one fixed Mirox theme on `:root`; `[data-surface="dark"]` re-skins a subtree by overriding the same variables. Radius `0.25rem`; motion tokens (`--ease-mirox`, 150/250/400ms). The `.dark` block and the storefront theme switcher are gone.
+- **Typography** — Manrope headings (variable font) + Inter body, both with `cyrillic-ext` so `₴` (U+20B4) renders for the Ukraine launch.
+- **`<Logo/>`** — code-built wordmark + bag-with-M glyph, `currentColor`-driven, link-less; drop-in slot for an official SVG.
+- **Motion primitives** — `<FadeIn>` (reads `prefers-reduced-motion` via `useSyncExternalStore`), `.animate-fade-up`, `.hover-lift`; all no-op under reduced motion.
+- **`next-themes` excised from the storefront** — closed a real contamination path where visiting `/showcase/bold` left the storefront themed; showcase now scopes its themes to its own subtree.
+- **Shared chrome** — Header and Footer as dark surfaces; monochrome stars/review bars; shared `src/lib/order-status.ts` replacing the map duplicated across 4 order pages; checkout, newsletter, 404 and account-order-detail neutralized.
+- **Two-layer colour guard** — a utility-class guard over 11 paths/38 files, plus a token-layer test asserting the Mirox tokens are achromatic. Both were proven to fail before being trusted.
+
+**Verification**: `typecheck` / `lint` (zero warnings) / `format:check` / `build` all pass. Tests **246+1 → 336+1**. CI green on `main`; production deployed by the Vercel Git integration and verified serving the rebrand.
+
+**Acceptance criteria — as shipped** (deliberately precise, not aspirational):
+
+- ✅ Tokens defined and consumed by shared components (verified in compiled CSS).
+- ⚠️ Header/Footer actively restyled; **buttons and cards were re-coloured and re-radiused via tokens only** — no bespoke treatment. The token theory holds mechanically.
+- ⚠️ Animation primitives available and reduced-motion-safe, but **zero consumers yet** — unexercised in a real browser.
+- ⚠️ Monochrome across the token layer and every TASK-034-owned surface; **4 bright utilities remain on deferred pages** (cart ×3, PDP ×1), regression-guarded and scheduled for TASK-036/043.
+
+**Learnings**:
+
+- A CSS token that is defined but **not registered in `@theme`** is a silent no-op — `text-destructive-foreground` shipped as a dead class that typecheck, lint and tests could not see. Only compiled-CSS inspection caught it; registering it also repaired 7 pre-existing broken sites.
+- `[data-surface="dark"]` re-scopes tokens for **all descendants**, so any descendant using `bg-background` collapses into the surface. This produced a real WCAG failure (newsletter input at 1.34:1) that the wrapper itself looked fine through.
+- CSS `color` inherits as an **already-resolved** value, so redefining `--foreground` on a descendant cannot retroactively change it — the inversion needed an explicit re-assertion in `@layer base`.
+- "Neutralize page X" must be enumerated **per file**: `checkout/page.tsx` was cleaned while its sibling `checkout/confirmation/page.tsx` silently escaped.
+- Six review rounds produced **zero runtime defects but repeated prose drift** — comments and docs describing the change went stale faster than the code did.
 
 ### [2026-07-17] TASK-038b - Ukraine Payments & Delivery Research Spike
 

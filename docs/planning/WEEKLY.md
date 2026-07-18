@@ -1,7 +1,7 @@
 # Weekly Plan
 
 **Week of**: 2026-07-13 to 2026-07-19
-**Last Updated**: 2026-07-17
+**Last Updated**: 2026-07-18
 
 ---
 
@@ -11,7 +11,7 @@
 
 **Secondary Goals**:
 
-- Start Track A rebrand foundation (TASK-034)
+- ✅ Start Track A rebrand foundation (TASK-034) — completed and merged, PR #19
 - Complete Track B payments/delivery research spike (TASK-038b)
 
 ---
@@ -28,9 +28,9 @@
 
 ### Should Complete (Important)
 
-| Task                     | Reference        | Status     | Notes                             |
-| ------------------------ | ---------------- | ---------- | --------------------------------- |
-| Design system foundation | TODO.md TASK-034 | 📋 Planned | Ultracode restyle sweep candidate |
+| Task                     | Reference        | Status    | Notes                                                                                                                       |
+| ------------------------ | ---------------- | --------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Design system foundation | TODO.md TASK-034 | ✅ PR #19 | Merged 2026-07-18 (`adaa278`). Token-first Mirox system; `next-themes` excised; two-layer colour guard. Tests 246+1 → 336+1 |
 
 ### Nice to Have (If Time Permits)
 
@@ -77,6 +77,13 @@
 - **Completed**: TASK-038b in full. Decision doc delivered (9 sections, no product code): two-rail model (online gateway **and** NP COD), 5-gateway × 16-field matrix, conditional decision tree + 9-item client prerequisites, NP scoping, single-UAH strategy, and a TASK-048/049 integration blueprint. Method: Ultracode fan-out + adversarial verification — **120 claims, all verified; 27.5% of the raw research was disputed**, which is the spike's central justification. Four plan-changing findings: **Fondy disqualified** (NBU licence of ТОВ «ФК "ЕЛАЄНС"» revoked 2024-07-22), **Plata by mono cannot offer installments** via the acquiring API, **monobank requires a UA-language site** (escalates TASK-039 to a payments prerequisite), and an **inverted NP postomat UUID** that would have shipped branch pickups to locker customers. PR review found 3 issues (all self-imposed-rule violations), fixed in `92b4e1f`; re-review clean; CI + Deploy green; Vercel production live.
 - **Blockers**: none for this task. **Downstream blockers now recorded**: the 9-item client prerequisites checklist (decision doc §5.3) gates TASK-048's single-gateway pick; the classic NP status-webhook question is unresolved (devportal Cloudflare-blocked) and gates TASK-049's polling design.
 - **Note**: the research workflow was OOM-killed 3× (devcontainer memory, not Docker); finished via foreground agents. Phase 1 investigation BACKLOG'd with a repro plan — do it in a separate session.
+
+#### Saturday (2026-07-18)
+
+- [x] TASK-034: Mirox design system & rebrand foundation — brainstorm → spec → plan → 12 TDD tasks → PR #19 merged (`adaa278`), completion workflow
+- **Completed**: TASK-034 in full. Token-first design system: Mirox tokens + `[data-surface="dark"]` section inversion, Manrope/Inter with `cyrillic-ext` (₴), code-built `<Logo/>`, reduced-motion-safe motion primitives, `next-themes` excised from the storefront (closing a real showcase→storefront theme-contamination path), Header/Footer as dark surfaces, shared `order-status` module replacing a 4× duplicated map, and checkout/newsletter/404/account-order-detail neutralized. Tests **246+1 → 336+1**; lint/typecheck/format/build green; CI green on `main`; production deployed by the Vercel Git integration and verified serving the rebrand. Executed via subagent-driven development: 12 implementer+reviewer pairs, then a whole-branch review.
+- **Review value**: six review rounds found **zero runtime defects** but four real latent bugs no gate could see — `[data-surface]` never re-asserted `color` (black-on-black header), the dark footer silently drove the newsletter input to 1.34:1, `text-destructive-foreground` was a **dead class** (token defined but never registered in `@theme`; fixing it repaired 7 pre-existing sites), and the colour policy had **no enforcement at the token layer** (`--primary: #0055FF` would have passed all 294 tests). Two tests that could not fail were rewritten.
+- **Blockers**: none. **Carried**: 8 BACKLOG entries, incl. a pre-existing `use(params)` break on 4 dynamic routes (Next 14.2.35 passes plain-object params; docs had encoded the broken pattern as intended) and `NEXT_PUBLIC_STORE_NAME` unset in production, so titles/OG/emails still brand as "Store".
 
 ---
 

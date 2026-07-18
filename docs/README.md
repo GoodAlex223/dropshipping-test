@@ -33,9 +33,9 @@ Central index for all project documentation.
 | Document                                         | Purpose              | Last Updated |
 | ------------------------------------------------ | -------------------- | ------------ |
 | [planning/README.md](planning/README.md)         | Planning overview    | 2026-01-05   |
-| [planning/WEEKLY.md](planning/WEEKLY.md)         | Current week's plan  | 2026-07-17   |
-| [planning/TODO.md](planning/TODO.md)             | Active tasks         | 2026-07-17   |
-| [planning/DONE.md](planning/DONE.md)             | Completed tasks      | 2026-07-17   |
+| [planning/WEEKLY.md](planning/WEEKLY.md)         | Current week's plan  | 2026-07-18   |
+| [planning/TODO.md](planning/TODO.md)             | Active tasks         | 2026-07-18   |
+| [planning/DONE.md](planning/DONE.md)             | Completed tasks      | 2026-07-18   |
 | [planning/BACKLOG.md](planning/BACKLOG.md)       | Unprioritized ideas  | 2026-07-18   |
 | [planning/ROADMAP.md](planning/ROADMAP.md)       | Long-term vision     | 2026-07-14   |
 | [planning/GOALS.md](planning/GOALS.md)           | Objectives & metrics | 2026-01-26   |
@@ -57,9 +57,7 @@ Central index for all project documentation.
 
 ## Implementation Plans
 
-| Plan                                                                                        | Task                                     | Status | Started    |
-| ------------------------------------------------------------------------------------------- | ---------------------------------------- | ------ | ---------- |
-| [2026-07-17_task-034-design-system.md](planning/plans/2026-07-17_task-034-design-system.md) | Mirox design system & rebrand foundation | ACTIVE | 2026-07-17 |
+_No active implementation plans. TASK-034 completed 2026-07-18 (PR #19) — see Archived Plans below._
 
 ### Archived Plans
 
@@ -74,6 +72,7 @@ Central index for all project documentation.
 | [2026-07-14_task-033-resumption.md](archive/plans/2026-07-14_task-033-resumption.md)                             | Post-Freeze Resumption              | COMPLETE | 2026-07-14 |
 | [2026-07-15_task-038a-prework.md](archive/plans/2026-07-15_task-038a-prework.md)                                 | TASK-038a Prework                   | COMPLETE | 2026-07-16 |
 | [2026-07-16_task-038b-payments-delivery-spike.md](archive/plans/2026-07-16_task-038b-payments-delivery-spike.md) | TASK-038b Payments & Delivery Spike | COMPLETE | 2026-07-17 |
+| [2026-07-17_task-034-design-system.md](archive/plans/2026-07-17_task-034-design-system.md)                       | TASK-034 Mirox Design System        | COMPLETE | 2026-07-18 |
 
 See [archive/README.md](archive/README.md) for more historical plans.
 
