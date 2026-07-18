@@ -4,13 +4,18 @@ import { join } from "node:path";
 
 // Surfaces TASK-034 cleaned; these must never carry bright color utilities.
 //
-// Deliberately NOT in this list (do not add without a corresponding cleanup task —
-// these are known-bright-on-purpose or owned by a different, not-yet-landed task):
-// - src/app/(shop) *page* routes for home / catalog / product / cart (page.tsx et
-//   al.) — rebuilt by TASK-035 / 036 / 037 / 043 and may legitimately still contain
-//   bright colors until those land. (The `account` subdirectory below IS scanned —
-//   unlike the other (shop) surfaces it has no separate rebuild task, and Task 10
-//   already neutralized its one offender, account/orders/[id]/page.tsx.)
+// Within src/app/(shop), only home / catalog / product / cart (page.tsx et al.) are
+// deliberately NOT in this list — they're rebuilt by TASK-035 / 036 / 037 / 043 and
+// may legitimately still contain bright colors until those land. Every other
+// customer-facing route group IS scanned, specifically because none of them has a
+// rebuild task of its own to inherit the obligation: `(shop)/account` (Task 10
+// neutralized its one offender, account/orders/[id]/page.tsx), `(shop)/checkout`
+// (this task neutralized its one offender, checkout/confirmation/page.tsx), and the
+// whole `(auth)` group (login/register — verified clean, no changes needed). Do not
+// mistake any of these three for oversights, and do not add the deferred (shop)
+// page routes above without a corresponding cleanup task landing first.
+//
+// Also deliberately NOT in this list, for unrelated reasons:
 // - src/app/(admin) — admin is inheriting design tokens but is not being restyled
 //   by TASK-034; it still has bright status/payment chips by design.
 // - src/components/ui/ — shadcn primitives. Token-driven and managed by the shadcn
@@ -27,6 +32,8 @@ const SCAN_PATHS = [
   "src/lib/order-status.ts",
   "src/app/not-found.tsx",
   "src/app/(shop)/account",
+  "src/app/(shop)/checkout",
+  "src/app/(auth)",
 ];
 
 // Numbered bright-hue utilities across every color-bearing utility prefix. gray /

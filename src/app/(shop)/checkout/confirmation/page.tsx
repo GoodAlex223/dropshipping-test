@@ -53,8 +53,8 @@ async function OrderConfirmation({ orderNumber }: { orderNumber: string }) {
       />
       <div className="mx-auto max-w-2xl">
         <div className="text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-            <CheckCircle2 className="h-10 w-10 text-green-600" />
+          <div className="bg-muted mx-auto flex h-16 w-16 items-center justify-center rounded-full">
+            <CheckCircle2 className="text-foreground h-10 w-10" />
           </div>
           <h1 className="mt-6 text-3xl font-bold">Order Confirmed!</h1>
           <p className="text-muted-foreground mt-2">
