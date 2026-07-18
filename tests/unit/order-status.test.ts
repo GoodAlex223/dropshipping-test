@@ -1,19 +1,13 @@
 import { describe, it, expect } from "vitest";
+import { OrderStatus } from "@prisma/client";
 import { getOrderStatusStyle, getOrderStatusLabel, ORDER_STATUS_STYLES } from "@/lib/order-status";
 
 describe("order-status", () => {
-  const ALL = [
-    "PENDING",
-    "CONFIRMED",
-    "PROCESSING",
-    "SHIPPED",
-    "DELIVERED",
-    "CANCELLED",
-    "REFUNDED",
-  ];
-
+  // Iterates the real Prisma enum rather than a hardcoded local list, so that
+  // adding a status to the schema (e.g. upcoming Ukraine COD work) fails this
+  // test instead of silently falling through to ORDER_STATUS_STYLES' default.
   it("defines a style for every OrderStatus value", () => {
-    for (const s of ALL) {
+    for (const s of Object.values(OrderStatus)) {
       expect(ORDER_STATUS_STYLES[s]).toBeTruthy();
     }
   });

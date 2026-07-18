@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, act } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { FadeIn } from "@/components/common/FadeIn";
 
@@ -43,18 +43,29 @@ describe("FadeIn", () => {
       constructor(c: IntersectionObserverCallback) {
         cb = c;
       }
-      observe() {
-        cb?.(
-          [{ isIntersecting: true } as IntersectionObserverEntry],
-          this as unknown as IntersectionObserver
-        );
-      }
+      // Deliberately does NOT fire the callback here (unlike the previous
+      // version of this test, which fired synchronously inside observe() and
+      // made it impossible to ever assert the pre-intersection state).
+      observe() {}
       disconnect() {}
     };
     mockMatchMedia(false);
 
     render(<FadeIn>World</FadeIn>);
+    const el = screen.getByText("World");
 
-    expect(screen.getByText("World")).toHaveClass("opacity-100");
+    // Pre-intersection: still hidden. A FadeIn gutted to always render
+    // opacity-100 would fail this half of the test.
+    expect(el).toHaveClass("opacity-0");
+    expect(el).toHaveClass("translate-y-4");
+    expect(el).not.toHaveClass("opacity-100");
+
+    act(() => {
+      cb?.([{ isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver);
+    });
+
+    // Post-intersection: revealed.
+    expect(el).toHaveClass("opacity-100");
+    expect(el).toHaveClass("translate-y-0");
   });
 });

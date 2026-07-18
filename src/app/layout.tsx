@@ -34,10 +34,13 @@ const inter = Inter({
 
 // Heading + wordmark font (Mirox design system, always loaded immediately)
 // cyrillic-ext is mandatory: it is the only subset carrying the hryvnia sign (U+20B4)
+// Manrope is a variable font (wght 200-800); no `weight` array means next/font loads
+// the full variable range instead of pinning static instances. Pinning to
+// ["500","700","800"] previously left font-semibold (600) with no matching
+// instance, so it silently resolved up to 700.
 const manrope = Manrope({
   variable: "--font-manrope",
   subsets: ["latin", "cyrillic", "cyrillic-ext"],
-  weight: ["500", "700", "800"],
 });
 
 // Monospace font for code snippets (always loaded immediately)

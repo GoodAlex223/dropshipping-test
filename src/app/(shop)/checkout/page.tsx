@@ -613,7 +613,7 @@ export default function CheckoutPage() {
                             colorText: "#1a1a1a",
                             colorDanger: "#b91c1c",
                             borderRadius: "4px",
-                            fontFamily: "Inter, system-ui, sans-serif",
+                            fontFamily: "system-ui, sans-serif",
                           },
                         },
                       }}
