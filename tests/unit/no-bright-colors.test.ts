@@ -19,7 +19,10 @@ import { join } from "node:path";
 //
 // Also deliberately NOT in this list, for unrelated reasons:
 // - src/app/(admin) — admin is inheriting design tokens but is not being restyled
-//   by TASK-034; it still has bright status/payment chips by design.
+//   by TASK-034. Note its OrderStatus chips ARE already monochrome: both admin
+//   orders pages were converted to the shared getOrderStatusStyle() in this task.
+//   What remains bright is PAYMENT_STATUS_COLORS (PaymentStatus, admin-only) and
+//   the supplier-order status map — both deliberate, both backlogged.
 // - src/components/ui/ — shadcn primitives. Token-driven and managed by the shadcn
 //   CLI, not hand-edited.
 // - src/app/showcase and the .bold/.luxury/.organic theme blocks — the showcase
