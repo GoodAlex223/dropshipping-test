@@ -56,3 +56,10 @@ next-env.d.ts
 
 # Claude Code auto-memory
 .claude/auto-memory/dirty-files
+
+# Brainstorming visual companion (local only)
+.superpowers/
+
+# Playwright generated output (every local E2E run rewrites these)
+playwright-report/
+test-results/
