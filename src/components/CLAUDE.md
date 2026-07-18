@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Shared React components organized by domain: admin panel, analytics tracking, checkout flow, common layout, product display, shop interactions, multi-theme showcase, theme configuration, and shadcn/ui primitives.
+Shared React components organized by domain: admin panel, analytics tracking, checkout flow, common layout, product display, shop interactions, multi-theme showcase, and shadcn/ui primitives.
 
 <!-- END AUTO-MANAGED -->
 
@@ -55,14 +55,10 @@ components/
 │   ├── types.ts           # Shared showcase types
 │   ├── data-fetchers.ts   # Server-side data fetching for showcase
 │   └── index.ts
-├── theme/
-│   ├── theme-config.ts    # Theme configuration and variants
-│   ├── theme-switcher.tsx # Theme toggle component
-│   └── index.ts
 ├── ui/                    # shadcn/ui primitives (DO NOT modify directly)
 │   ├── button.tsx, card.tsx, dialog.tsx, form.tsx, input.tsx, ...
 │   └── (20+ Radix-based components with Tailwind styling)
-└── providers.tsx          # App-wide context providers (theme, auth, toast, cookie consent, web vitals)
+└── providers.tsx          # App-wide context providers (auth, toast, cookie consent, web vitals)
 ```
 
 <!-- END AUTO-MANAGED -->
@@ -71,7 +67,7 @@ components/
 
 ## Module-Specific Conventions
 
-- **Naming**: PascalCase for component files (`ProductCard.tsx`), kebab-case for non-component files (`data-fetchers.ts`, `theme-config.ts`)
+- **Naming**: PascalCase for component files (`ProductCard.tsx`), kebab-case for non-component files (`data-fetchers.ts`)
 - **Client directive**: Interactive components use `"use client"` at file top
 - **Barrel exports**: Each subdirectory has `index.ts` re-exporting public components
 - **UI primitives**: `ui/` directory contains shadcn/ui components — regenerate with CLI rather than editing directly
@@ -110,7 +106,6 @@ components/
 - `@stripe/react-stripe-js` — Payment form elements
 - `react-dropzone` — File upload (ImageUploader)
 - `sonner` — Toast notifications
-- `next-themes` — Dark/light theme switching
 - `next/script` — Script component for GTM loading (CookieConsent)
 - `web-vitals` — Core Web Vitals measurement library (WebVitalsReporter)
 

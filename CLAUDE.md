@@ -113,9 +113,8 @@ src/
 │   ├── reviews/            # Review components (ReviewSection, ReviewForm, ReviewList, ReviewItem, ReviewStats, StarRating)
 │   ├── shop/               # CartDrawer
 │   ├── showcase/           # Multi-theme showcase components (bold/, luxury/, organic/)
-│   ├── theme/              # Theme switcher & config
 │   ├── ui/                 # shadcn/ui primitives (button, card, dialog, etc.)
-│   └── providers.tsx       # Context providers wrapper (auth, theme, toast, cookie consent, web vitals)
+│   └── providers.tsx       # Context providers wrapper (auth, toast, cookie consent, web vitals)
 ├── hooks/                  # Custom React hooks (use-debounce, use-toast)
 ├── lib/                    # Core utilities
 │   ├── auth.ts             # NextAuth v5 config (JWT + Prisma adapter)
