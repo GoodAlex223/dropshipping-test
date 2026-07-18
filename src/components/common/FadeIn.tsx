@@ -1,7 +1,42 @@
 "use client";
 
-import { useEffect, useRef, useState, type ElementType, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ElementType,
+  type ReactNode,
+} from "react";
 import { cn } from "@/lib/utils";
+
+const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
+
+// Hydration-safe reduced-motion read (same useSyncExternalStore idiom as
+// useIsMounted in src/app/showcase/layout.tsx): getServerSnapshot returns
+// false so the client's first render matches the server-rendered HTML,
+// then useSyncExternalStore reconciles to the real value post-mount and
+// keeps it live if the OS preference changes while mounted.
+function subscribeReducedMotion(onChange: () => void) {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+    return () => {};
+  }
+  const mql = window.matchMedia(REDUCED_MOTION_QUERY);
+  mql.addEventListener("change", onChange);
+  return () => mql.removeEventListener("change", onChange);
+}
+
+function getReducedMotionSnapshot(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia(REDUCED_MOTION_QUERY).matches
+  );
+}
+
+function getReducedMotionServerSnapshot(): boolean {
+  return false;
+}
 
 interface FadeInProps {
   children: ReactNode;
@@ -14,23 +49,17 @@ interface FadeInProps {
 
 export function FadeIn({ children, className, delay = 0, as: Component = "div" }: FadeInProps) {
   const ref = useRef<HTMLElement | null>(null);
-  const [visible, setVisible] = useState(false);
+  const prefersReduced = useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotionSnapshot,
+    getReducedMotionServerSnapshot
+  );
+  const [inView, setInView] = useState(false);
 
   useEffect(() => {
-    const prefersReduced =
-      typeof window !== "undefined" &&
-      typeof window.matchMedia === "function" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (prefersReduced || typeof IntersectionObserver === "undefined") {
-      // Mount-only bail-out (deps: []), not a cascading update: this must stay a
-      // synchronous effect (not a lazy useState initializer) because matchMedia
-      // is unavailable during SSR — computing it at initial-render time would
-      // make the client's first hydration render diverge from the server HTML.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setVisible(true);
-      return;
-    }
+    // Reduced motion is derived straight from prefersReduced below, so there's
+    // nothing to observe: bail out without creating an IntersectionObserver.
+    if (prefersReduced || typeof IntersectionObserver === "undefined") return;
 
     const el = ref.current;
     if (!el) return;
@@ -38,7 +67,7 @@ export function FadeIn({ children, className, delay = 0, as: Component = "div" }
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0]?.isIntersecting) {
-          setVisible(true);
+          setInView(true);
           observer.disconnect();
         }
       },
@@ -46,7 +75,9 @@ export function FadeIn({ children, className, delay = 0, as: Component = "div" }
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [prefersReduced]);
+
+  const visible = prefersReduced || inView;
 
   return (
     <Component
