@@ -52,6 +52,7 @@ Central index for all project documentation.
 | [superpowers/specs/2026-07-16-ukraine-payments-delivery-design.md](superpowers/specs/2026-07-16-ukraine-payments-delivery-design.md)     | TASK-038b spike design: scope, gateway candidates, research methodology                                              | 2026-07-17   |
 | [superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md](superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md) | **Ukraine payments & delivery decision** — gateway choice, Nova Poshta scoping, UAH strategy, TASK-048/049 blueprint | 2026-07-17   |
 | [superpowers/specs/2026-07-17-mirox-design-system-design.md](superpowers/specs/2026-07-17-mirox-design-system-design.md)                 | TASK-034 design: Mirox token model, typography/logo, animation primitives, restyle scope                             | 2026-07-17   |
+| [superpowers/specs/2026-07-19-task-035-homepage-design.md](superpowers/specs/2026-07-19-task-035-homepage-design.md)                     | TASK-035 design: homepage sections, content modules, bestseller definition, colour-guard extension                   | 2026-07-19   |
 
 ---
 
