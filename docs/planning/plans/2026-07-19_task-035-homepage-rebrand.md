@@ -504,7 +504,15 @@ grep -n "DATABASE_URL" .env
 node -e "require('dotenv').config(); const u=process.env.DATABASE_URL; console.log(u.replace(/:[^:@]+@/, ':***@'))"
 ```
 
-Expected: the printed URL points at **localhost/127.0.0.1** (local Docker Postgres, host port 5433). If it prints a `neon.tech` host, **stop** — remove or reorder the duplicate so the local URL wins, then re-run. Do not proceed to Step 3 until this prints a local host.
+Expected: the printed host is the local Docker Postgres. In this devcontainer the app reaches it by **Docker service name** — `postgres:5432` — not by loopback, so `localhost`/`127.0.0.1` is the wrong thing to look for. Confirm it is local by resolving the host rather than pattern-matching the string:
+
+```bash
+getent hosts postgres
+```
+
+Expected: a private address on the Docker bridge (`172.x.x.x`). If `DATABASE_URL` instead prints a `neon.tech` host, **stop** — that is the production database. Comment out or reorder the duplicate so the local URL wins, then re-run. Do not proceed to Step 7's migration until you have confirmed a local target.
+
+As of 2026-07-19 the Neon line in `.env` is commented out, so the last-wins hazard is dormant — but the line still exists, so re-check rather than assuming.
 
 - [ ] **Step 2: Write the failing test**
 
