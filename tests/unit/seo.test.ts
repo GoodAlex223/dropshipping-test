@@ -276,6 +276,15 @@ describe("SEO Utilities", () => {
     });
   });
 
+  describe("getHomeMetadata brand", () => {
+    it("falls back to the Mirox brand name, never the generic 'Store'", () => {
+      const metadata = getHomeMetadata();
+      const title = (metadata.title as { absolute: string }).absolute;
+      expect(title).toContain("Mirox Shop");
+      expect(title).not.toContain("Store |");
+    });
+  });
+
   describe("getProductsListingMetadata", () => {
     it("should return All Products title", () => {
       const metadata = getProductsListingMetadata();

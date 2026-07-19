@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
+import { BRAND_NAME, BRAND_META_SUFFIX } from "@/content/brand";
 
 // Base site configuration
 export const siteConfig = {
-  name: process.env.NEXT_PUBLIC_STORE_NAME || "Store",
+  // Env var still wins so deployments can override, but the fallback is the
+  // real brand rather than the generic "Store" placeholder. Setting
+  // NEXT_PUBLIC_STORE_NAME in production remains BACKLOG'd.
+  name: process.env.NEXT_PUBLIC_STORE_NAME || BRAND_NAME,
   description:
     "Your one-stop shop for quality products at great prices. Discover amazing deals and fast shipping.",
   url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
@@ -170,7 +174,7 @@ export function getCategoryMetadata(category: {
 export function getHomeMetadata(): Metadata {
   return {
     title: {
-      absolute: `${siteConfig.name} | Quality Products, Great Prices`,
+      absolute: `${siteConfig.name} — ${BRAND_META_SUFFIX}`,
     },
     description: siteConfig.description,
     alternates: {
