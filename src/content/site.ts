@@ -38,7 +38,14 @@ export const site = {
   name: BRAND_NAME,
   tagline: BRAND_TAGLINE,
 
-  /** CLIENT-SUPPLIED. Top announcement bar copy; null removes the bar entirely. */
+  /**
+   * PROVISIONAL — NOT CLIENT-CONFIRMED. This threshold is read off the
+   * AI-generated concept mockup (docs/reference/mirox-concept-screenshot.jpg),
+   * not the client brief, which states no shipping threshold. It also disagrees
+   * with the admin settings default (freeShippingThreshold "50", USD). Confirm
+   * with the client before production; tracked by the client-content inventory
+   * task. null removes the bar entirely.
+   */
   announcement: "Free delivery on orders over 1000 UAH" as string | null,
 
   /** CLIENT-SUPPLIED. Placeholder handles until the client confirms real URLs. */
@@ -67,7 +74,15 @@ export const site = {
     customerRating: null,
   } as ClientClaims,
 
-  /** Footer benefit strip — the concept screenshot's footer row. */
+  /**
+   * Footer benefit strip — the concept screenshot's footer row.
+   * PROVISIONAL — NOT CLIENT-CONFIRMED. The "1000 UAH" shipping threshold and
+   * "14 days" return window are read off the AI-generated concept mockup
+   * (docs/reference/mirox-concept-screenshot.jpg), not the client brief. The
+   * 14-day claim implies a /returns page that does not yet exist. Confirm both
+   * figures with the client before production; tracked by the client-content
+   * inventory task.
+   */
   footerBenefits: [
     { icon: Truck, title: "Free delivery", description: "On orders over 1000 UAH" },
     { icon: RefreshCw, title: "Easy returns", description: "14 days to change your mind" },
