@@ -11,6 +11,18 @@ export const BRAND_NAME = "Mirox Shop";
 export const BRAND_TAGLINE = "Modern clothing for those who value quality and minimalism.";
 
 /**
+ * Hero subtitle. Written out rather than composed from BRAND_NAME +
+ * BRAND_TAGLINE because the hero continues the sentence after an em dash
+ * (lowercase "modern", per design §5.2) while the footer renders the tagline
+ * as its own sentence (capital "Modern"). A runtime capitalize() would be
+ * locale-fragile for the Ukrainian and Russian locales TASK-039 adds, to save
+ * one character of duplication. These two strings are the same sentence —
+ * keep them in sync.
+ */
+export const BRAND_HERO_SUBTITLE =
+  "Mirox Shop — modern clothing for those who value quality and minimalism.";
+
+/**
  * Short form for <title>. The long tagline pushes the homepage title past 70
  * characters, which search results truncate.
  */

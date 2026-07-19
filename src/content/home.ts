@@ -1,6 +1,6 @@
 import { Truck, RefreshCw, Award, Headphones } from "lucide-react";
 import type { BenefitItem } from "./site";
-import { BRAND_NAME, BRAND_TAGLINE } from "./brand";
+import { BRAND_NAME, BRAND_HERO_SUBTITLE } from "./brand";
 
 export interface HeroImage {
   src: string;
@@ -16,7 +16,7 @@ export const home = {
     eyebrow: "NEW COLLECTION",
     /** Brief list #1: three separate lines, rendered as three lines. */
     headline: ["STYLE.", "QUALITY.", "CONFIDENCE."],
-    subtitle: `${BRAND_NAME} — ${BRAND_TAGLINE}`,
+    subtitle: BRAND_HERO_SUBTITLE,
     primaryCta: { label: "Shop the Catalog", href: "/products" },
     secondaryCta: { label: "New Arrivals", href: "/products?sort=newest" },
     /**
