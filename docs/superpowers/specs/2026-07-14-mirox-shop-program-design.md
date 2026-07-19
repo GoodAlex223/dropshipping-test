@@ -2,7 +2,9 @@
 
 **Date**: 2026-07-14
 **Status**: Approved by user (brainstorming session)
-**Source**: Client follow-up brief (Russian-language prompt + design concept screenshot `photo_2026-07-13_13-23-08.jpg`); Figma/design files to arrive later.
+**Source**: Client follow-up brief (Russian-language prompt + design concept screenshot, now
+`docs/reference/client-brief.md` and `docs/reference/mirox-concept-screenshot.jpg`); Figma/design
+files to arrive later.
 
 ---
 
