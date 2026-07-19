@@ -29,6 +29,23 @@ function row(id: string, name = `Product ${id}`) {
   };
 }
 
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+/** Slack for how long the test itself takes to run, not measurement noise. */
+const WINDOW_TOLERANCE_MS = 2000;
+
+/**
+ * Asserts `gte` sits `windowDays` days before `before` (captured immediately
+ * before the call under test), using a conversion computed independently of
+ * the implementation. A regression to hours — or to raw milliseconds — misses
+ * by orders of magnitude and fails this, unlike a bare `toBeInstanceOf(Date)`
+ * check.
+ */
+function assertWindowGte(gte: unknown, windowDays: number, before: number) {
+  expect(gte).toBeInstanceOf(Date);
+  const elapsedMs = before - (gte as Date).getTime();
+  expect(Math.abs(elapsedMs - windowDays * MS_PER_DAY)).toBeLessThanOrEqual(WINDOW_TOLERANCE_MS);
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
 });
@@ -71,6 +88,7 @@ describe("getBestsellers", () => {
     groupBy.mockResolvedValue([]);
     findMany.mockResolvedValue([]);
 
+    const before = Date.now();
     await getBestsellers(4, 90);
 
     const arg = groupBy.mock.calls[0][0];
@@ -79,8 +97,20 @@ describe("getBestsellers", () => {
     expect(arg.where.order.status.in).not.toContain("PENDING");
     expect(arg.where.order.status.in).not.toContain("CANCELLED");
     expect(arg.where.order.status.in).not.toContain("REFUNDED");
-    expect(arg.where.order.createdAt.gte).toBeInstanceOf(Date);
     expect(arg.orderBy).toEqual({ _sum: { quantity: "desc" } });
+    expect(arg.take).toBe(4);
+    assertWindowGte(arg.where.order.createdAt.gte, 90, before);
+  });
+
+  it("computes the window proportionally for a different windowDays value", async () => {
+    groupBy.mockResolvedValue([]);
+    findMany.mockResolvedValue([]);
+
+    const before = Date.now();
+    await getBestsellers(4, 30);
+
+    const arg = groupBy.mock.calls[0][0];
+    assertWindowGte(arg.where.order.createdAt.gte, 30, before);
   });
 
   it("reports source 'orders' when order data alone fills the rail", async () => {
@@ -143,6 +173,9 @@ describe("getBestsellers", () => {
     const result = await getBestsellers(2);
 
     expect(result.products.map((p) => p.id)).toEqual(["a"]);
+    // fromOrders.length (1) < limit (2) and the backfill deduped to nothing —
+    // the exact case that used to be mislabeled "mixed" (Finding 1).
+    expect(result.source).toBe("orders");
     expect(findMany.mock.calls[0][0].where).toEqual(expect.objectContaining({ isActive: true }));
   });
 });

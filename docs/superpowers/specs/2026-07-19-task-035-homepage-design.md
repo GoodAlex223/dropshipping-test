@@ -221,11 +221,20 @@ This is the definition **TASK-036 will import for its "popular" sort**.
 
 ### 6.4 Schema change
 
-`OrderItem` currently declares only `@@index([orderId])`. The bestseller `groupBy` filters and groups on `productId`, so it adds:
+`OrderItem` currently declares only `@@index([orderId])`. `productId` is a foreign key to
+`Product`, and Postgres does not auto-create an index on FK referencing columns (only on PK/unique
+constraints), so deleting or updating a `Product` forces a sequential scan of `order_items` to
+check for references. That is the real reason to add:
 
 ```prisma
 @@index([productId])
 ```
+
+Confirmed via `EXPLAIN (ANALYZE, BUFFERS)` against the real local Postgres: the bestseller
+`groupBy` itself does **not** use this index — its plan is driven by the selective
+`orders.status`/`orders.createdAt` filter joined through the pre-existing `orderId` index, with the
+small grouped result sorted in memory. A composite `Order(status, createdAt)` index is what would
+actually speed that query if it ever becomes a bottleneck.
 
 One migration via `npm run db:migrate`.
 

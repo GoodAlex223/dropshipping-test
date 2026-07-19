@@ -827,7 +827,17 @@ Expected: PASS, 9 tests.
 
 - [ ] **Step 6: Add the supporting index to the schema**
 
-The bestseller `groupBy` filters and groups on `productId`, which has no index — only `orderId` does.
+`OrderItem.productId` is a foreign key to `Product`, and Postgres only auto-creates indexes for
+primary-key and unique constraints — never for FK referencing columns — so it has no index beyond
+the pre-existing `orderId` one. That forces a sequential scan of `order_items` on every
+referential-integrity check against `Product` (notably on delete or update).
+
+**This is not what speeds the bestseller `groupBy`.** Verified via `EXPLAIN (ANALYZE, BUFFERS)`
+against the real local Postgres (with `enable_seqscan`/`enable_bitmapscan` off to force the
+alternative plans): the query's plan is driven by the selective `orders.status` /
+`orders.createdAt` filter, joined to `order_items` through the pre-existing `orderId` index, with
+the small `GROUP BY productId` result sorted in memory. A composite `Order(status, createdAt)`
+index is what would actually speed this query if it ever becomes a bottleneck — not this one.
 
 In `prisma/schema.prisma`, in `model OrderItem`, change:
 
@@ -871,7 +881,11 @@ CANCELLED and REFUNDED orders, and backfill from new arrivals when history
 is thin — reporting which source was used rather than silently passing new
 arrivals off as bestsellers. TASK-036 imports this for its popular sort.
 
-Adds the missing OrderItem.productId index the groupBy needs."
+Adds the missing index on the OrderItem.productId foreign key — Postgres doesn't
+create one automatically for FK columns the way it does for PK/unique constraints,
+so product deletes/updates were forcing a sequential scan of order_items. The
+bestseller groupBy itself doesn't use this index; its plan is driven by the
+orders.status/createdAt filter through the existing orderId index instead."
 ```
 
 ---

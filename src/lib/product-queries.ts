@@ -134,8 +134,15 @@ export async function getBestsellers(limit = 8, windowDays = 90): Promise<Bestse
     .filter((p) => !seen.has(p.id))
     .slice(0, limit - fromOrders.length);
 
+  // Label reflects what actually landed in `products`, not just whether
+  // orders alone filled the rail — a small catalog can leave the backfill
+  // empty even when fromOrders didn't reach `limit` on its own, and that
+  // case must report "orders", not "mixed".
+  const source: BestsellerSource =
+    fromOrders.length === 0 ? "backfilled" : backfill.length === 0 ? "orders" : "mixed";
+
   return {
     products: [...fromOrders, ...backfill],
-    source: fromOrders.length === 0 ? "backfilled" : "mixed",
+    source,
   };
 }
