@@ -23,6 +23,7 @@ Every task's requirements implicitly include these.
 - **TypeScript strict.** No `any`. Path alias `@/*` → `./src/*`.
 - **Images**: `next/image` only, never `<img>` (ESLint enforced). Product/hero images get `placeholder="blur"` with `DEFAULT_BLUR_DATA_URL` and an explicit `sizes` from `IMAGE_SIZES`.
 - **Bare `catch`** when the error variable is unused: `} catch {`, not `} catch (error) {`.
+- **`src/content/brand.ts` must import nothing, and `src/lib/seo.ts` must never import `src/content/site.ts`.** `site.ts` holds live Lucide component references in `footerBenefits`, which cannot be tree-shaken out of a single object literal. `seo.ts` is imported by `opengraph-image.tsx`, `robots.ts`, `sitemap.ts` and `feed/google-shopping.xml/route.ts` — all lucide-free today, and one of them runs in the constrained OG-image runtime. Brand strings for those consumers come from `brand.ts`.
 - **Components**: PascalCase filenames; non-components kebab-case. Barrel `index.ts` per component directory.
 - **Commits**: Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`, `chore:`), optional scope.
 - **Out of scope, do not fix in passing**: UAH price formatting (`ProductCard.formatPrice` hardcodes USD — that is TASK-039), product-card hover/quick-view (TASK-036), the `use(params)` break on 4 admin/account routes (BACKLOG'd).
@@ -185,6 +186,7 @@ repo root into docs/reference/."
 
 **Files:**
 
+- Create: `src/content/brand.ts`
 - Create: `src/content/site.ts`
 - Create: `src/content/home.ts`
 - Test: `tests/unit/content.test.ts`
@@ -193,6 +195,7 @@ repo root into docs/reference/."
 
 - Consumes: nothing
 - Produces:
+  - `BRAND_NAME`, `BRAND_TAGLINE`, `BRAND_META_SUFFIX` — plain string constants in `brand.ts` with **zero imports** (see Step 3 for why this file exists separately)
   - `site: SiteContent` with `.name`, `.tagline`, `.announcement: string | null`, `.socials: SocialLink[]`, `.claims: ClientClaims`, `.footerBenefits: BenefitItem[]`
   - `home: HomeContent` with `.hero`, `.benefits: BenefitItem[]`, `.whyChooseUs`, `.rails`, `.testimonials`, `.social`
   - `interface SocialLink { platform: "instagram" | "tiktok" | "telegram"; label: string; href: string; followers: number | null }`
@@ -252,10 +255,35 @@ describe("home content", () => {
 Run: `npx vitest run tests/unit/content.test.ts`
 Expected: FAIL — `Cannot find module '@/content/site'`.
 
-- [ ] **Step 3: Write `src/content/site.ts`**
+- [ ] **Step 3: Write `src/content/brand.ts`**
+
+This file exists separately, and **must import nothing**, because `src/lib/seo.ts` consumes it in Task 4 — and `seo.ts` is imported by `opengraph-image.tsx`, `robots.ts`, `sitemap.ts`, and `feed/google-shopping.xml/route.ts`, all of which are lucide-free today. `site.ts` holds live Lucide component references in `footerBenefits`, and those cannot be tree-shaken out of a single object literal, so importing `site` from `seo.ts` would pull the whole icon library into the OG-image runtime and the feed route.
+
+```ts
+/**
+ * Brand constants. Deliberately dependency-free: src/lib/seo.ts imports this,
+ * and seo.ts is consumed by the OG image route, robots, sitemap and the
+ * Google Shopping feed. Never add an import to this file — importing site.ts
+ * instead would drag lucide-react into all of them.
+ */
+
+export const BRAND_NAME = "Mirox Shop";
+
+/** Long form — hero subtitle, footer. */
+export const BRAND_TAGLINE = "Modern clothing for those who value quality and minimalism.";
+
+/**
+ * Short form for <title>. The long tagline pushes the homepage title past 70
+ * characters, which search results truncate.
+ */
+export const BRAND_META_SUFFIX = "Modern Clothing";
+```
+
+- [ ] **Step 4: Write `src/content/site.ts`**
 
 ```ts
 import { Truck, RefreshCw, ShieldCheck, MessageCircle, type LucideIcon } from "lucide-react";
+import { BRAND_NAME, BRAND_TAGLINE } from "./brand";
 
 /**
  * Site-wide content, consumed by the homepage and the Footer.
@@ -291,8 +319,8 @@ export interface BenefitItem {
 }
 
 export const site = {
-  name: "Mirox Shop",
-  tagline: "Modern clothing for those who value quality and minimalism.",
+  name: BRAND_NAME,
+  tagline: BRAND_TAGLINE,
 
   /** CLIENT-SUPPLIED. Top announcement bar copy; null removes the bar entirely. */
   announcement: "Free delivery on orders over 1000 UAH" as string | null,
@@ -335,7 +363,7 @@ export const site = {
 
 Note `customerRating` ships as `null`: unlike the sales figures, a rating claim is checkable against our own review data, so it stays dark until the client supplies a defensible number.
 
-- [ ] **Step 4: Write `src/content/home.ts`**
+- [ ] **Step 5: Write `src/content/home.ts`**
 
 ```ts
 import { Truck, RefreshCw, Award, Headphones } from "lucide-react";
@@ -417,17 +445,22 @@ export const home = {
 };
 ```
 
-- [ ] **Step 5: Run the test to verify it passes**
+- [ ] **Step 6: Run the test to verify it passes**
 
 Run: `npx vitest run tests/unit/content.test.ts`
 Expected: PASS, 9 tests.
 
-- [ ] **Step 6: Typecheck**
+- [ ] **Step 7: Verify `brand.ts` stayed dependency-free**
+
+Run: `grep -c "^import" src/content/brand.ts || true`
+Expected: `0`. Any import here defeats the file's entire purpose — see Step 3.
+
+- [ ] **Step 8: Typecheck**
 
 Run: `npm run typecheck`
 Expected: no errors.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 9: Commit**
 
 ```bash
 git add src/content tests/unit/content.test.ts
@@ -846,7 +879,7 @@ The homepage `<title>` currently renders **"Store | Quality Products, Great Pric
 
 **Interfaces:**
 
-- Consumes: `site.name`, `site.tagline` from Task 2
+- Consumes: `BRAND_NAME`, `BRAND_META_SUFFIX` from `@/content/brand` (Task 2) — **not** `site.ts`
 - Produces: no new exports; `getHomeMetadata()` behaviour changes
 
 - [ ] **Step 1: Read the existing test file first**
@@ -876,10 +909,10 @@ Expected: FAIL — title is `"Store | Quality Products, Great Prices"`.
 
 - [ ] **Step 4: Update `src/lib/seo.ts`**
 
-Add the import at the top of the file:
+Add the import at the top of the file. **Import from `@/content/brand`, never from `@/content/site`** — `site.ts` holds live Lucide component references in `footerBenefits` which cannot be tree-shaken out of a single object literal, and `seo.ts` is imported by `opengraph-image.tsx`, `robots.ts`, `sitemap.ts` and `feed/google-shopping.xml/route.ts`, all lucide-free today.
 
 ```ts
-import { site } from "@/content/site";
+import { BRAND_NAME, BRAND_META_SUFFIX } from "@/content/brand";
 ```
 
 Change line 5 from:
@@ -894,16 +927,16 @@ to:
   // Env var still wins so deployments can override, but the fallback is the
   // real brand rather than the generic "Store" placeholder. Setting
   // NEXT_PUBLIC_STORE_NAME in production remains BACKLOG'd.
-  name: process.env.NEXT_PUBLIC_STORE_NAME || site.name,
+  name: process.env.NEXT_PUBLIC_STORE_NAME || BRAND_NAME,
 ```
 
-Change `getHomeMetadata()` to use brand copy instead of the template line:
+Change `getHomeMetadata()` to use brand copy instead of the template line. Use the **short** suffix: the long tagline would push the title past 70 characters, which search results truncate.
 
 ```ts
 export function getHomeMetadata(): Metadata {
   return {
     title: {
-      absolute: `${siteConfig.name} — ${site.tagline}`,
+      absolute: `${siteConfig.name} — ${BRAND_META_SUFFIX}`,
     },
     description: siteConfig.description,
     alternates: {
@@ -920,7 +953,12 @@ Then update any pre-existing assertion in `tests/unit/seo.test.ts` that expected
 Run: `npx vitest run tests/unit/seo.test.ts`
 Expected: PASS, all tests including the pre-existing ones.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 6: Verify no icon library leaked into the metadata layer**
+
+Run: `grep -n "content/site\|lucide" src/lib/seo.ts || echo "clean"`
+Expected: `clean`. A hit means `seo.ts` now drags `lucide-react` into the OG-image route, robots, sitemap and the Google Shopping feed — import from `@/content/brand` instead.
+
+- [ ] **Step 7: Commit**
 
 ```bash
 git add src/lib/seo.ts tests/unit/seo.test.ts
