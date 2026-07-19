@@ -9,7 +9,7 @@ relaying operator's) words, transcribed exactly as they appear in the source.
 - Line 44 — list #1, header `ПРОМПТ ДЛЯ СОЗДАНИЯ САЙТА MIROX SHOP`, user message timestamp
   `2026-07-14T09:14:32.636Z`, 6194 chars.
 - Line 654 — list #2, header `Mirox Shop — План улучшений сайта`, user message timestamp
-  `2026-07-15T07:28:39.480Z`, 1792 chars (170 + 1620 across two text blocks).
+  `2026-07-15T07:28:39.480Z`, 1790 chars (170 + 1620 across two text blocks).
 
 **Concept screenshot**: [mirox-concept-screenshot.jpg](mirox-concept-screenshot.jpg) (moved here
 from the repo root, where it sat untracked as `photo_2026-07-13_13-23-08.jpg`; it is the image
@@ -148,8 +148,9 @@ Instagram; high buyer rating; fast delivery across Ukraine; we check every item 
 size exchange; support with no days off; only quality clothing; secure payment; repeat customers
 trust us.
 
-**⚠️ Not implemented.** These are fabricated real-time social-proof numbers with no
-data source. Ruled out of scope — see TASK-051.
+**Note**: Items 1–3 (OLX sales, Instagram orders, customer rating) are the client's own claims
+about their sales history, not fabricated real-time counters. TASK-035 renders them from
+`site.claims`, gated on the client actually supplying a figure — see the TASK-035 design doc §5.5.
 
 ### Каталог
 
@@ -549,51 +550,21 @@ _The client's pasted list follows, verbatim:_
 >     Акции, таймер, комплекты, SEO, высокая скорость загрузки.
 >     "
 
-_Translation_:
-
-> "Mirox Shop — Website improvement plan
->
-> 1. Smart search
->    Search by name, keywords, brand, category, color, SKU; autocomplete; typo correction.
-> 2. Favorites
->    LocalStorage, favorites page, counter, heart animation, notification.
-> 3. Side cart
->    Slide-out panel with photo, size, quantity, total, and checkout button.
-> 4. Second-item discount
->    After purchase, show a -5% offer on a second item; send SMS/Telegram/Email if integrations
->    are available.
-> 5. Recently viewed
->    A separate block with viewed products.
-> 6. Social proof
->    "X people viewing now", "bought Y times in the last 24 hours."
-> 7. Online support
->    Floating buttons for Instagram, Telegram, manager (chat).
-> 8. Discount wheel
->    Popup with a 5–15% discount after 15 seconds.
-> 9. Customer gallery
->    Real customer photos instead of placeholders.
-> 10. Detailed reviews
->     Photo, date, height, weight, size, delivery time.
-> 11. Order tracking
->     By phone number or order number.
-> 12. Stock remaining
->     Availability indicator.
-> 13. Top banner
->     Free shipping or promotions.
-> 14. Hero
->     Use real model photos instead of SVG.
-> 15. Animations
->     GSAP, smooth reveals, parallax, micro-animations.
-> 16. Social media
->     Instagram, TikTok, Telegram with counters.
-> 17. AI size finder
->     Height, weight, age, body type → recommended size.
-> 18. Colors
->     Black/white switches shown as circles.
-> 19. Product cards
->     Second photo, quick view, buy.
-> 20. Additional
->     Promotions, timer, bundles, SEO, high loading speed."
+_Translation_: "Mirox Shop — Website improvement plan. 1. Smart search: search by name, keywords,
+brand, category, color, SKU; autocomplete; typo correction. 2. Favorites: LocalStorage, favorites
+page, counter, heart animation, notification. 3. Side cart: slide-out panel with photo, size,
+quantity, total, and checkout button. 4. Second-item discount: after purchase, show a -5% offer on
+a second item; send SMS/Telegram/Email if integrations are available. 5. Recently viewed: a
+separate block with viewed products. 6. Social proof: "X people viewing now", "bought Y times in
+the last 24 hours." 7. Online support: floating buttons for Instagram, Telegram, manager (chat). 8.
+Discount wheel: popup with a 5–15% discount after 15 seconds. 9. Customer gallery: real customer
+photos instead of placeholders. 10. Detailed reviews: photo, date, height, weight, size, delivery
+time. 11. Order tracking: by phone number or order number. 12. Stock remaining: availability
+indicator. 13. Top banner: free shipping or promotions. 14. Hero: use real model photos instead of
+SVG. 15. Animations: GSAP, smooth reveals, parallax, micro-animations. 16. Social media: Instagram,
+TikTok, Telegram with counters. 17. AI size finder: height, weight, age, body type → recommended
+size. 18. Colors: black/white switches shown as circles. 19. Product cards: second photo, quick
+view, buy. 20. Additional: promotions, timer, bundles, SEO, high loading speed."
 
 ---
 
@@ -613,7 +584,7 @@ describes the page, not a mockup).
   `message.content` — an array of `{type: "text", text: ...}` blocks — joined). Not eyeballed and
   not paraphrased from memory; the transcript was fully readable.
 - **Line 44** (`type: "user"`) has one text block, 6194 characters. **Line 654** (`type: "user"`)
-  has two text blocks, 170 + 1620 = 1792 characters. Both match this task's brief within rounding
+  has two text blocks, 170 + 1620 = 1790 characters. Both match this task's brief within rounding
   (~6180 / ~1791).
 - **Numbering cross-check**: items 17–19 of list #2 were verified against independent, pre-existing
   citations already committed in this repo — `docs/planning/TODO.md:47` ("client list #2 items
