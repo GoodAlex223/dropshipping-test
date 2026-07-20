@@ -1,6 +1,6 @@
 import { Truck, RefreshCw, Award, Headphones } from "lucide-react";
 import type { BenefitItem } from "./site";
-import { BRAND_NAME, BRAND_HERO_SUBTITLE } from "./brand";
+import { BRAND_HERO_SUBTITLE } from "./brand";
 
 export interface HeroImage {
   src: string;
@@ -20,14 +20,18 @@ export const home = {
     primaryCta: { label: "Shop the Catalog", href: "/products" },
     secondaryCta: { label: "New Arrivals", href: "/products?sort=newest" },
     /**
-     * CLIENT-SUPPLIED. Set to null to render the centred typographic hero.
-     * Currently an AI-generated placeholder: unbranded clothing only, never a
-     * fabricated Mirox logo, and subject to client sign-off before production.
+     * CLIENT-SUPPLIED. null renders the centred typographic hero; the Hero
+     * component's two layouts are both fully designed, so this is a one-line
+     * content change, never a redesign.
+     *
+     * TASK-7 deviation: this was meant to hold an AI-generated placeholder
+     * (`/hero-placeholder-ai.jpg`, unbranded clothing only, never a
+     * fabricated Mirox logo) once one existed, but no image-generation tool
+     * was available in that session to produce one. Left null rather than
+     * referencing a file that doesn't exist. Pending client-supplied
+     * photography (or a regenerated AI placeholder) before this is set.
      */
-    image: {
-      src: "/hero-placeholder-ai.jpg",
-      alt: "Model wearing a black hoodie against a dark background",
-    } as HeroImage | null,
+    image: null as HeroImage | null,
   },
 
   benefits: [
