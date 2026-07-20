@@ -31,7 +31,23 @@ describe("SocialLinks", () => {
     // TikTok has 12500 and renders formatted; Instagram has null and renders none;
     // Telegram has 0 (a real value) and renders as "0".
     expect(screen.getByText("12.5K")).toBeInTheDocument();
-    expect(screen.getByText("0")).toBeInTheDocument();
+
+    // The guard under test is `social.followers !== null && <span>...</span>`.
+    // If it ever regresses to a truthy check (`social.followers &&`), the
+    // short-circuit value for Telegram's real-but-falsy 0 is not `false` — it
+    // is the number `0` itself, and JSX renders a bare number as a text node.
+    // That leaks "0" straight into the <a>, as a sibling of the label span,
+    // instead of suppressing it. `getByText("0")` alone can't tell the two
+    // shapes apart: Testing Library's default text matcher only looks at an
+    // element's own direct text-node children, and under the mutation the
+    // <a> itself has such a child (the leaked "0"), so it satisfies the query
+    // just as well as the correct <span> would. Asserting presence alone is
+    // therefore vacuous — we must also assert *which* element matched.
+    // tagName is the least brittle way to do that: it fails only if the "0"
+    // moves off the counter <span>, not if the counter's classes are
+    // restyled later.
+    const telegramCount = screen.getByText("0");
+    expect(telegramCount.tagName).toBe("SPAN");
     expect(screen.queryByText("null")).not.toBeInTheDocument();
   });
 
@@ -67,7 +83,13 @@ describe("formatFollowers boundary values", () => {
       });
 
       const { unmount } = render(<SocialLinks />);
-      expect(screen.getByText(expected)).toBeInTheDocument();
+      // Same footgun as the "shows a counter" test above applies to the
+      // `followers: 0` case here: a regressed truthy guard leaks a bare "0"
+      // text node into the <a> instead of suppressing it, and `getByText`
+      // alone can't distinguish that from the intended <span> counter.
+      // Asserting tagName keeps every case in this table honest about
+      // *where* the formatted text renders, not just that it exists.
+      expect(screen.getByText(expected).tagName).toBe("SPAN");
       unmount();
 
       mockSocials.length = 0;
