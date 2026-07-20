@@ -1,5 +1,5 @@
 import dynamic from "next/dynamic";
-import { Header, Footer } from "@/components/common";
+import { Header, Footer, AnnouncementBar } from "@/components/common";
 
 // Dynamic import CartDrawer to avoid SSR issues with zustand store
 const CartDrawer = dynamic(
@@ -12,6 +12,7 @@ const CartDrawer = dynamic(
 export default function ShopLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col">
+      <AnnouncementBar />
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />
