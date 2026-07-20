@@ -44,6 +44,9 @@ describe("WhyChooseUs", () => {
     render(<WhyChooseUs />);
     expect(screen.getByText(/300\+/)).toBeInTheDocument();
     expect(screen.getByText(/100\+/)).toBeInTheDocument();
+    // Count assertion: with 2 configured client claims + 2 static items = 4 list items.
+    // This verifies the filter step doesn't accidentally render null entries.
+    expect(screen.getAllByRole("listitem")).toHaveLength(4);
   });
 
   // Non-vacuity: the test above proves claims CAN render, so this one failing
@@ -69,6 +72,12 @@ describe("WhyChooseUs", () => {
     expect(screen.queryByText(/Instagram/i)).not.toBeInTheDocument();
     // The always-true claims must survive.
     expect(screen.getByText("Secure payment")).toBeInTheDocument();
+    // Count assertion: with 0 client claims + 2 static items = 2 list items.
+    // Text-based queries are blind to null-rendered phantom items, so a count
+    // assertion is necessary to catch regressions where the filter step is
+    // removed or mutated to accept null values. Without this, three empty
+    // <li> elements (each with Check icon + empty span) would render undetected.
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
   });
 
   it("renders the customer rating claim once it is configured", () => {
