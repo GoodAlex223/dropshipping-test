@@ -3,7 +3,7 @@ import { getHomeMetadata } from "@/lib/seo";
 import { getBestsellers, getFeaturedProducts } from "@/lib/product-queries";
 import { getTestimonials } from "@/lib/review-queries";
 import { Hero, ProductRail, WhyChooseUs, Testimonials } from "@/components/home";
-import { SocialLinks } from "@/components/common";
+import { FadeIn, SocialLinks } from "@/components/common";
 import { home } from "@/content/home";
 
 export const metadata: Metadata = getHomeMetadata();
@@ -30,6 +30,18 @@ export default async function HomePage() {
     getTestimonials(6),
   ]);
 
+  // getBestsellers() reports source: "backfilled" when zero items in the
+  // rail came from real sales — a brand-new store's day-one state, not an
+  // edge case. Labelling untested new stock "Bestsellers" would fabricate
+  // social proof, the same category of problem SocialLinks (no invented
+  // follower counts) and WhyChooseUs (gated, unverified claims) deliberately
+  // avoid elsewhere on this page. "mixed" (real bestsellers topped up with
+  // recent products) is normal, non-deceptive padding and keeps the
+  // Bestsellers heading — do not extend this swap to "mixed", and do not
+  // simplify this back into a constant.
+  const bestsellersRail =
+    bestsellers.source === "backfilled" ? home.rails.newArrivals : home.rails.bestsellers;
+
   return (
     <div className="flex flex-col">
       <Hero />
@@ -42,10 +54,10 @@ export default async function HomePage() {
       />
 
       <ProductRail
-        title={home.rails.bestsellers.title}
+        title={bestsellersRail.title}
         products={bestsellers.products}
-        viewAllHref={home.rails.bestsellers.viewAllHref}
-        viewAllLabel={home.rails.bestsellers.viewAllLabel}
+        viewAllHref={bestsellersRail.viewAllHref}
+        viewAllLabel={bestsellersRail.viewAllLabel}
       />
 
       <WhyChooseUs />
@@ -54,11 +66,13 @@ export default async function HomePage() {
 
       <section data-surface="dark" className="bg-background text-foreground">
         <div className="container py-16 text-center">
-          <h2 className="font-heading text-2xl font-bold tracking-tight sm:text-3xl">
-            {home.social.title}
-          </h2>
-          <p className="text-muted-foreground mt-4 text-sm">{home.social.subtitle}</p>
-          <SocialLinks className="mt-8 justify-center" />
+          <FadeIn>
+            <h2 className="font-heading text-2xl font-bold tracking-tight sm:text-3xl">
+              {home.social.title}
+            </h2>
+            <p className="text-muted-foreground mt-4 text-sm">{home.social.subtitle}</p>
+            <SocialLinks className="mt-8 justify-center" />
+          </FadeIn>
         </div>
       </section>
     </div>

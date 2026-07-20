@@ -38,4 +38,17 @@ describe("home content", () => {
   it("provides the seven always-true why-choose-us claims", () => {
     expect(home.whyChooseUs.items).toHaveLength(7);
   });
+
+  it("gives the backfilled-bestsellers fallback rail its own honest heading", () => {
+    // page.tsx swaps this in for home.rails.bestsellers when getBestsellers()
+    // reports source: "backfilled", so untested new stock is never labelled
+    // "Bestsellers". Must not collapse to the same title as bestsellers.
+    expect(home.rails.newArrivals.title).toBe("New Arrivals");
+    expect(home.rails.newArrivals.title).not.toBe(home.rails.bestsellers.title);
+  });
+
+  it("points the new-arrivals fallback rail at a real newest-first listing", () => {
+    expect(home.rails.newArrivals.viewAllHref).toBe("/products?sort=newest");
+    expect(home.rails.newArrivals.viewAllLabel).toBe("View all");
+  });
 });

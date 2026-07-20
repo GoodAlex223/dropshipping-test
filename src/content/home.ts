@@ -68,6 +68,17 @@ export const home = {
     bestsellers: {
       title: "Bestsellers",
       // Interim target: no "popular" sort exists until TASK-036 adds one.
+      // (Coincidentally the exact right link for `newArrivals` below, which
+      // shares this href for a real reason, not as a stand-in.)
+      viewAllHref: "/products?sort=newest",
+      viewAllLabel: "View all",
+    },
+    // Swapped in at the bestsellers call site instead of the entry above when
+    // getBestsellers() reports source: "backfilled" — i.e. zero items came
+    // from real sales, so every product in the rail is actually unsold new
+    // stock. See src/app/(shop)/page.tsx for why that swap must happen.
+    newArrivals: {
+      title: "New Arrivals",
       viewAllHref: "/products?sort=newest",
       viewAllLabel: "View all",
     },
