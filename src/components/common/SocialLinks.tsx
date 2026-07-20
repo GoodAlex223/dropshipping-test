@@ -14,11 +14,22 @@ const ICONS: Record<SocialLink["platform"], LucideIcon> = {
  * Follower counts render ONLY when a real number is configured. TODO.md's
  * acceptance criterion is explicit that counters appear only if real numbers
  * are supplied, and fabricated social proof is out of scope per TASK-051.
+ *
+ * Uses Intl.NumberFormat with compact notation for consistent rounding. For
+ * example, 999,950 rounds to 1M, not "1000K". This approach is forward-
+ * compatible with TASK-039's i18n implementation, which will pass locale
+ * dynamically to produce Ukrainian "тис." or Russian "млн" suffixes.
  */
 function formatFollowers(count: number): string {
-  if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`;
-  if (count >= 1_000) return `${(count / 1_000).toFixed(1).replace(/\.0$/, "")}K`;
-  return String(count);
+  if (count < 1_000) {
+    return String(count);
+  }
+
+  return new Intl.NumberFormat("en-US", {
+    notation: "compact",
+    compactDisplay: "short",
+    maximumFractionDigits: 1,
+  }).format(count);
 }
 
 interface SocialLinksProps {
