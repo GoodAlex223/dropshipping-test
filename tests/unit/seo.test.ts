@@ -21,7 +21,6 @@ describe("SEO Utilities", () => {
       expect(siteConfig).toHaveProperty("description");
       expect(siteConfig).toHaveProperty("url");
       expect(siteConfig).toHaveProperty("ogImage");
-      expect(siteConfig).toHaveProperty("twitterHandle");
       expect(siteConfig).toHaveProperty("locale");
     });
   });
@@ -50,7 +49,10 @@ describe("SEO Utilities", () => {
       const metadata = getDefaultMetadata();
 
       expect(metadata.twitter).toHaveProperty("card", "summary_large_image");
-      expect(metadata.twitter).toHaveProperty("creator", siteConfig.twitterHandle);
+      // No real Twitter/X handle exists for the brand (site.ts socials list
+      // only Instagram, TikTok, Telegram), so `creator` must stay absent
+      // rather than carry a fabricated handle.
+      expect(metadata.twitter).not.toHaveProperty("creator");
     });
   });
 

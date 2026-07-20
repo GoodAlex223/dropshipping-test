@@ -1,11 +1,19 @@
 import { test, expect } from "@playwright/test";
+import { BRAND_META_SUFFIX } from "@/content/brand";
 
 test.describe("Navigation", () => {
   test("homepage loads successfully", async ({ page, isMobile }) => {
     await page.goto("/");
 
-    // Check page title
-    await expect(page).toHaveTitle(/Store/);
+    // Check page title. Deliberately assert on BRAND_META_SUFFIX ("Modern
+    // Clothing"), never on a brand-name literal: siteConfig.name
+    // (src/lib/seo.ts) reads NEXT_PUBLIC_STORE_NAME with a fallback to
+    // BRAND_NAME ("Mirox Shop"). CI leaves that var unset, so the title is
+    // "Mirox Shop — Modern Clothing"; local .env sets it to "Store", so the
+    // title is "Store — Modern Clothing". Asserting /Mirox/ or /Store/ here
+    // makes this pass in exactly one of those two environments and fail in
+    // the other — do not "tighten" this back to either literal.
+    await expect(page).toHaveTitle(new RegExp(BRAND_META_SUFFIX));
 
     // Check main navigation elements (only on desktop - mobile has hamburger menu)
     if (!isMobile) {

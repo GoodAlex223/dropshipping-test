@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { BRAND_NAME, BRAND_META_SUFFIX } from "@/content/brand";
+import { BRAND_NAME, BRAND_META_SUFFIX, BRAND_DESCRIPTION } from "@/content/brand";
 
 // Base site configuration
 export const siteConfig = {
@@ -7,11 +7,13 @@ export const siteConfig = {
   // real brand rather than the generic "Store" placeholder. Setting
   // NEXT_PUBLIC_STORE_NAME in production remains BACKLOG'd.
   name: process.env.NEXT_PUBLIC_STORE_NAME || BRAND_NAME,
-  description:
-    "Your one-stop shop for quality products at great prices. Discover amazing deals and fast shipping.",
+  description: BRAND_DESCRIPTION,
   url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
   ogImage: "/og-image.png",
-  twitterHandle: "@store",
+  // No real Twitter/X account exists for the brand (the site-wide socials
+  // list carries Instagram, TikTok, and Telegram only). Absent data renders
+  // nothing rather than a fabricated handle, so there is no twitterHandle
+  // field and no `creator` line in the twitter metadata block below.
   locale: "en_US",
 };
 
@@ -54,7 +56,6 @@ export function getDefaultMetadata(): Metadata {
       title: siteConfig.name,
       description: siteConfig.description,
       images: [siteConfig.ogImage],
-      creator: siteConfig.twitterHandle,
     },
     robots: {
       index: true,
