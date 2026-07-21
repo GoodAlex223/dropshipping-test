@@ -2,11 +2,51 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-07-18
+**Last Updated**: 2026-07-21
 
 ---
 
 ## 2026-07 (July)
+
+### [2026-07-21] TASK-035 - Homepage Rebrand
+
+**Plan**: [docs/archive/plans/2026-07-19_task-035-homepage-rebrand.md](../archive/plans/2026-07-19_task-035-homepage-rebrand.md)
+**Spec**: [2026-07-19-task-035-homepage-design.md](../superpowers/specs/2026-07-19-task-035-homepage-design.md)
+**Client brief**: [reference/client-brief.md](../reference/client-brief.md)
+**PR**: [#21](https://github.com/GoodAlex223/dropshipping-test/pull/21) — merged `0992851`
+**Prod hotfix**: [#22](https://github.com/GoodAlex223/dropshipping-test/pull/22) — merged `e89060d` (see "Post-merge production incident" below)
+
+**Summary**: Rebuilt the customer homepage on the TASK-034 Mirox design system — dark typographic hero, benefit strip, "Why choose us", featured + real-bestsellers rails (with a new-arrivals fallback), a testimonials rail from genuine reviews, a social section, an announcement-bar slot, and a rebranded footer. `src/app/(shop)/page.tsx` went from a 255-line generic template to ~66 lines composing tested section components. Copy ships in English, extraction-ready for TASK-039 i18n. Executed subagent-driven: a fresh implementer + independent reviewer per task, then a whole-branch review.
+
+**Key changes**:
+
+- **Content config layer** — `src/content/{brand,site,home}.ts` centralises brand constants, site config (socials, claims, announcement, footer), and homepage copy. `brand.ts` is deliberately **import-free** (it feeds the OG/robots/sitemap/feed runtimes via `seo.ts`); provenance comments mark every client-supplied value as PROVISIONAL.
+- **Home sections** — `src/components/home/{Hero,ProductRail,WhyChooseUs,Testimonials}` + shared `common/{AnnouncementBar,BenefitStrip,SocialLinks}`. Hero has two layouts (typographic-complete when `home.hero.image` is `null`, additive photo slot when supplied). Each rail/section renders nothing on empty data.
+- **Data layer** — `src/lib/product-queries.ts` (`getFeaturedProducts`, `getNewArrivals`, `getBestsellers` with a `source: "orders"|"backfilled"|"mixed"` flag so new arrivals are never mislabelled as bestsellers) and `src/lib/review-queries.ts` (`getTestimonials`). New `@@index([productId])` on `OrderItem` (migration `20260719104108`), shared with TASK-036.
+- **SEO/branding** — `seo.ts` falls back to `BRAND_NAME` not `"Store"`; a site-wide code-generated `src/app/opengraph-image.tsx` (fixed in a PR #21 code-review round to actually render — `getDefaultMetadata()` had been pinning the stale PNG); `public/manifest.json` rebranded.
+- **Footer** — Mirox tagline, reuses `SocialLinks`/`BenefitStrip`, 7 dead links removed (routes spawned as TASK-055).
+
+**Verification**: typecheck / lint / build / `format:check` all pass. Tests **336+1 → 415+1** on the branch (+2 → **417+1** with the hotfix). CI green on `main`; Vercel Git-integration production deploy verified.
+
+**Acceptance criteria — as shipped** (precise, not aspirational):
+
+- ✅ First screen: slogan ("STYLE. QUALITY. CONFIDENCE."), subtitle, two CTAs.
+- ✅ Benefit strip and "Why choose us" blocks present.
+- ✅ Social section (Instagram, TikTok, Telegram).
+- ✅ Announcement-bar slot built (dismissible, cross-tab) — ships with `site.announcement = null` because its only candidate copy was an unimplemented free-delivery promise; renders nothing until the client supplies real copy.
+- ⚠️ Hero real photography **not supplied** — ships typographic-complete with `home.hero.image = null`; the photo is a one-line addition once the client provides one (tracked in TASK-056).
+- ✅ Follower counters gated on real numbers (tested); none supplied, so none render.
+
+**Post-merge production incident** (→ PR #22): the homepage 500'd on every prod request while `/products`/`/categories` were fine. Root cause (Vercel runtime logs, `P2021`): `getTestimonials()` queried a `reviews` table that **did not exist in production** — the prod DB schema had silently drifted since Feb because **nothing applied `prisma migrate deploy` on deploy** (`build` was `generate && next build`; the Actions deploy job is a no-op). TASK-035 was simply the first code to put a server-side review query in the homepage render path. Fixed two ways: (1) `safeSection()` wraps each homepage query so a failed section degrades to hidden, never a 500; (2) a `vercel-build` script runs `prisma migrate deploy` (via `DIRECT_URL`, non-fatal) on every Vercel deploy. Verified: prod `/` 200, all 5 pending migrations applied, zero runtime errors, `reviews`/`subscribers` tables now queryable. Incidentally restored reviews + newsletter, silently broken in prod since February.
+
+**Learnings**:
+
+- A CI-green, well-reviewed PR still took prod down: **CI runs plain Postgres with a clean seed, production runs the Neon adapter against a drifted schema** — the one path CI never exercises. Green checks proved the code, not the deployed database.
+- **"Deploy succeeded" ≠ "deployed"**: the Actions Deploy badge is a validated no-op; the real deploy is the Vercel Git integration. Always verify the actual production URL and a DB-backed route, not the badge. (See [[claude-md-auto-managed-no-regeneration]] for the parallel "green artifact ≠ real" lesson.)
+- A decorative section must never be able to 500 the whole page — resilient composition (`safeSection`) is the default posture for a render path that fans out data queries.
+- Several "tests that cannot fail" were caught by the review loop, incl. one only CI could surface (a later doc/config change silently invalidated an E2E assertion).
+
+**Note**: during the branch a subagent deleted `_liqpay_check_tmp.mjs`, an untracked user scratch file at the repo root (never git-tracked, not in any stash) — unrecoverable. Disclosed rather than buried.
 
 ### [2026-07-18] TASK-034 - Mirox Design System & Rebrand Foundation
 

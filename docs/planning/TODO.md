@@ -1,6 +1,6 @@
 # TODO
 
-**Last Updated**: 2026-07-20
+**Last Updated**: 2026-07-21
 
 Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-shop-program-design.md) · Current week: [WEEKLY.md](WEEKLY.md)
 
@@ -8,27 +8,9 @@ Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-
 
 ## 🔄 In Progress
 
-_None. TASK-033 completed 2026-07-14 (PR #16) — see [DONE.md](DONE.md)._
+_None. TASK-035 completed 2026-07-21 (PR #21; prod hotfix PR #22) — see [DONE.md](DONE.md)._
 
 ## 📋 Planned (v1.3 — "Mirox Rebrand Demo")
-
-#### [TASK-035] Homepage rebrand
-
-**Priority**: 🟠 High
-**Status**: 📋 Planned
-**Effort**: L
-**Dependencies**: [TASK-034]
-
-**Description**: Hero banner (model photo, "STYLE. QUALITY. CONFIDENCE.", catalog + new-arrivals CTAs), benefit cards (delivery, size exchange, quality, 24/7 support), "Why choose us" block, featured/hits sections, social links, rebranded footer.
-
-**Acceptance Criteria**:
-
-- [ ] First screen matches brief: slogan, subtitle, two CTAs
-- [ ] Benefit cards and "Why choose us" blocks present
-- [ ] Social section (Instagram, TikTok, Telegram) present
-- [ ] Top announcement banner slot (free delivery/promo text) — client list #2 item 13
-- [ ] Hero uses real model photography (client to supply; placeholder until then) — item 14
-- [ ] Social follower counters only if real numbers supplied — item 16
 
 #### [TASK-036] Catalog redesign + filters
 
