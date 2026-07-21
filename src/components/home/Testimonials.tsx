@@ -25,7 +25,7 @@ export function Testimonials({ testimonials }: TestimonialsProps) {
 
         <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {testimonials.map((testimonial) => (
-            <Card key={testimonial.id} className="hover-lift">
+            <Card key={testimonial.id} className="hover-lift" data-testid="testimonial-card">
               <CardContent className="p-6">
                 <StarRating value={testimonial.rating} size="sm" />
                 <p className="mt-4 text-sm leading-relaxed">{testimonial.comment}</p>

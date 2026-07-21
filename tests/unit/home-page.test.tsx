@@ -109,3 +109,48 @@ describe("HomePage bestsellers rail title", () => {
     );
   });
 });
+
+// ---------------------------------------------------------------------------
+// Page composition
+// ---------------------------------------------------------------------------
+// The tests above only ever exercise the bestsellers-rail title logic — none
+// of them notice if a whole section were deleted from src/app/(shop)/page.tsx,
+// since every other assertion happens to still hold with Hero, WhyChooseUs, or
+// Testimonials missing. This block closes that gap: it asserts each section
+// actually renders as part of the composed page, not just in its own
+// component-level test file (Hero and WhyChooseUs already have those; this is
+// the one place that also covers Testimonials mounting on the real page,
+// since the beforeEach default above (`getTestimonials` -> `[]`) makes
+// Testimonials render null everywhere else in this file).
+describe("HomePage composition", () => {
+  it("renders Hero, WhyChooseUs, and Testimonials as part of the page", async () => {
+    vi.mocked(getBestsellers).mockResolvedValue({ products: [product("b1")], source: "orders" });
+    vi.mocked(getTestimonials).mockResolvedValue([
+      {
+        id: "t1",
+        rating: 5,
+        comment: "Great fit and fast shipping.",
+        authorName: "Nadiya",
+        productName: "Product f1",
+        productSlug: "product-f1",
+        createdAt: "2026-06-10T00:00:00.000Z",
+      },
+    ]);
+
+    render(await HomePage());
+
+    // Hero renders the real src/content/home.ts copy (this file never mocks
+    // @/content/home) as the page's only h1 — every other section heading
+    // below is an h2.
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("STYLE.");
+
+    // WhyChooseUs: its own heading, real content.
+    expect(screen.getByRole("heading", { name: "Why choose us" })).toBeInTheDocument();
+
+    // Testimonials only renders once getTestimonials() resolves real reviews
+    // (see Testimonials.tsx) — asserting its heading and the review's author
+    // both prove the section mounted, not just that the mock was called.
+    expect(screen.getByRole("heading", { name: "What our customers say" })).toBeInTheDocument();
+    expect(screen.getByText("Nadiya")).toBeInTheDocument();
+  });
+});

@@ -16,6 +16,18 @@ const products: ProductCardData[] = [
     category: { name: "Hoodies", slug: "hoodies" },
     images: [{ url: "https://example.com/a.jpg", alt: null }],
   },
+  {
+    id: "b",
+    name: "Mirox Relaxed Tee",
+    slug: "mirox-relaxed-tee",
+    shortDesc: null,
+    price: "690.00",
+    comparePrice: null,
+    stock: 12,
+    isFeatured: false,
+    category: { name: "T-Shirts", slug: "t-shirts" },
+    images: [{ url: "https://example.com/b.jpg", alt: null }],
+  },
 ];
 
 describe("ProductRail", () => {
@@ -36,7 +48,7 @@ describe("ProductRail", () => {
   });
 
   it("renders a card per product", () => {
-    render(
+    const { container } = render(
       <ProductRail
         title="Featured"
         products={products}
@@ -44,7 +56,15 @@ describe("ProductRail", () => {
         viewAllLabel="View all"
       />
     );
+    // Fixture has two products with distinct names — a fixture of one can't
+    // tell "renders a card per product" apart from "renders at most one
+    // card", e.g. a stray `.slice(0, 1)` would still pass. Assert both names
+    // render AND that the rendered card count matches the input count.
     expect(screen.getByText("Mirox Basic Hoodie")).toBeInTheDocument();
+    expect(screen.getByText("Mirox Relaxed Tee")).toBeInTheDocument();
+    expect(container.querySelectorAll('[data-testid="product-card"]')).toHaveLength(
+      products.length
+    );
   });
 
   it("renders nothing at all when there are no products", () => {
