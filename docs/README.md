@@ -34,7 +34,7 @@ Central index for all project documentation.
 | ------------------------------------------------ | -------------------- | ------------ |
 | [planning/README.md](planning/README.md)         | Planning overview    | 2026-01-05   |
 | [planning/WEEKLY.md](planning/WEEKLY.md)         | Current week's plan  | 2026-07-18   |
-| [planning/TODO.md](planning/TODO.md)             | Active tasks         | 2026-07-21   |
+| [planning/TODO.md](planning/TODO.md)             | Active tasks         | 2026-07-20   |
 | [planning/DONE.md](planning/DONE.md)             | Completed tasks      | 2026-07-18   |
 | [planning/BACKLOG.md](planning/BACKLOG.md)       | Unprioritized ideas  | 2026-07-18   |
 | [planning/ROADMAP.md](planning/ROADMAP.md)       | Long-term vision     | 2026-07-14   |
