@@ -122,6 +122,51 @@ describe("HomePage bestsellers rail title", () => {
 // the one place that also covers Testimonials mounting on the real page,
 // since the beforeEach default above (`getTestimonials` -> `[]`) makes
 // Testimonials render null everywhere else in this file).
+// ---------------------------------------------------------------------------
+// Resilience
+// ---------------------------------------------------------------------------
+// A single section's data query throwing (e.g. the production `reviews` table
+// missing, which is what caused the real homepage outage) must degrade to a
+// missing section, never a 500 for the whole page. Before safeSection() wrapped
+// the queries, a rejected getTestimonials() rejected Promise.all and threw out
+// of HomePage() — `await HomePage()` below would reject and fail these tests,
+// which is the mutation guard: remove a wrapper and the matching case fails.
+describe("HomePage resilience", () => {
+  it("still renders the page when getTestimonials() rejects (the real outage)", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.mocked(getBestsellers).mockResolvedValue({ products: [product("b1")], source: "orders" });
+    vi.mocked(getTestimonials).mockRejectedValue(
+      new Error("The table `public.reviews` does not exist in the current database.")
+    );
+
+    render(await HomePage());
+
+    // Rest of the page is intact; the testimonials section simply doesn't mount.
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("STYLE.");
+    expect(screen.getByRole("heading", { name: "Why choose us" })).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "What our customers say" })
+    ).not.toBeInTheDocument();
+    // The failure is logged, not swallowed silently.
+    expect(errorSpy).toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
+
+  it("still renders the page when getFeaturedProducts() rejects", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.mocked(getFeaturedProducts).mockRejectedValue(new Error("db down"));
+    vi.mocked(getBestsellers).mockResolvedValue({ products: [product("b1")], source: "orders" });
+
+    render(await HomePage());
+
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("STYLE.");
+    // Bestsellers rail (independent query) still renders.
+    expect(screen.getByRole("heading", { name: "Bestsellers" })).toBeInTheDocument();
+    expect(errorSpy).toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
+});
+
 describe("HomePage composition", () => {
   it("renders Hero, WhyChooseUs, and Testimonials as part of the page", async () => {
     vi.mocked(getBestsellers).mockResolvedValue({ products: [product("b1")], source: "orders" });
