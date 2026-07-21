@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import { getHomeMetadata } from "@/lib/seo";
-import { getBestsellers, getFeaturedProducts } from "@/lib/product-queries";
-import { getTestimonials } from "@/lib/review-queries";
+import {
+  getBestsellers,
+  getFeaturedProducts,
+  type BestsellerResult,
+  type ProductCardData,
+} from "@/lib/product-queries";
+import { getTestimonials, type Testimonial } from "@/lib/review-queries";
 import { Hero, ProductRail, WhyChooseUs, Testimonials } from "@/components/home";
 import { FadeIn, SocialLinks } from "@/components/common";
 import { home } from "@/content/home";
@@ -23,11 +28,29 @@ export const metadata: Metadata = getHomeMetadata();
 // decision well outside a homepage-composition task.
 export const dynamic = "force-dynamic";
 
+// One section's data query failing must not 500 the whole homepage: every
+// rail and the testimonials block already render nothing when handed an empty
+// result, so a failed query degrades to a missing section instead. This is
+// exactly the failure that took the homepage down once a server-side review
+// query landed here — the production `reviews` table had never been migrated,
+// so getTestimonials() threw and Promise.all rejected the entire render. With
+// `dynamic = "force-dynamic"` this runs per request, so a transient DB blip
+// also self-heals on the next load rather than sticking.
+async function safeSection<T>(query: Promise<T>, fallback: T, label: string): Promise<T> {
+  try {
+    return await query;
+  } catch (error) {
+    console.error(`[home] "${label}" section query failed; rendering without it:`, error);
+    return fallback;
+  }
+}
+
 export default async function HomePage() {
+  const emptyBestsellers: BestsellerResult = { products: [], source: "backfilled" };
   const [featured, bestsellers, testimonials] = await Promise.all([
-    getFeaturedProducts(8),
-    getBestsellers(8),
-    getTestimonials(6),
+    safeSection<ProductCardData[]>(getFeaturedProducts(8), [], "featured"),
+    safeSection<BestsellerResult>(getBestsellers(8), emptyBestsellers, "bestsellers"),
+    safeSection<Testimonial[]>(getTestimonials(6), [], "testimonials"),
   ]);
 
   // getBestsellers() reports source: "backfilled" when zero items in the
