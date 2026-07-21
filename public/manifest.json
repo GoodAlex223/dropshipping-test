@@ -1,7 +1,7 @@
 {
-  "name": "Store",
-  "short_name": "Store",
-  "description": "Your one-stop shop for quality products at great prices.",
+  "name": "Mirox Shop",
+  "short_name": "Mirox Shop",
+  "description": "Mirox Shop — modern clothing for those who value quality and minimalism. Every item checked before shipping, with fast delivery across Ukraine.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
