@@ -42,10 +42,15 @@ describe("SEO Utilities", () => {
 
       expect(metadata.openGraph).toHaveProperty("type", "website");
       expect(metadata.openGraph).toHaveProperty("siteName", siteConfig.name);
-      expect(metadata.openGraph).toHaveProperty("images");
+      // Must NOT set openGraph.images: the root app/opengraph-image.tsx card is
+      // only merged in by Next when this same-segment metadata leaves images
+      // unset (mergeStaticMetadata's `!source.openGraph.hasOwnProperty('images')`
+      // guard). Setting it here would suppress the generated card and pin every
+      // route to the stale static PNG. Same convention as getProductMetadata.
+      expect(metadata.openGraph).not.toHaveProperty("images");
     });
 
-    it("should include Twitter card configuration", () => {
+    it("should include Twitter card configuration without pinning an image", () => {
       const metadata = getDefaultMetadata();
 
       expect(metadata.twitter).toHaveProperty("card", "summary_large_image");
@@ -53,6 +58,9 @@ describe("SEO Utilities", () => {
       // only Instagram, TikTok, Telegram), so `creator` must stay absent
       // rather than carry a fabricated handle.
       expect(metadata.twitter).not.toHaveProperty("creator");
+      // Leave twitter.images unset so postProcessMetadata auto-fills it from
+      // the generated OG card rather than the stale static PNG.
+      expect(metadata.twitter).not.toHaveProperty("images");
     });
   });
 

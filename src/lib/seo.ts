@@ -35,6 +35,15 @@ export function getDefaultMetadata(): Metadata {
       address: false,
       telephone: false,
     },
+    // Deliberately no `images` here. Next merges a segment's opengraph-image
+    // file only when that segment's metadata export does NOT already set
+    // openGraph.images (resolve-metadata.ts `mergeStaticMetadata`, guarded by
+    // `!source.openGraph.hasOwnProperty('images')`). This object lives on the
+    // root app/ segment — the same segment as app/opengraph-image.tsx — so
+    // setting images here silently suppressed the generated card and pinned
+    // every route to the stale public/og-image.png (the old "Store" PNG the
+    // rebrand was meant to retire). Omitting it lets the file convention win
+    // site-wide, inherited by any route without its own opengraph-image.
     openGraph: {
       type: "website",
       locale: siteConfig.locale,
@@ -42,20 +51,14 @@ export function getDefaultMetadata(): Metadata {
       siteName: siteConfig.name,
       title: siteConfig.name,
       description: siteConfig.description,
-      images: [
-        {
-          url: siteConfig.ogImage,
-          width: 1200,
-          height: 630,
-          alt: siteConfig.name,
-        },
-      ],
     },
+    // No `images` here either: postProcessMetadata auto-fills twitter.images
+    // from the resolved openGraph.images (the generated card) whenever twitter
+    // has no images of its own, so the X card matches the OG card.
     twitter: {
       card: "summary_large_image",
       title: siteConfig.name,
       description: siteConfig.description,
-      images: [siteConfig.ogImage],
     },
     robots: {
       index: true,
