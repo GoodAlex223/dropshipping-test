@@ -2,20 +2,24 @@ import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
-// Surfaces TASK-034 cleaned; these must never carry bright color utilities.
+// Surfaces TASK-034 and TASK-035 cleaned; these must never carry bright color
+// utilities.
 //
-// Within src/app/(shop), only home / catalog / product / cart (page.tsx et al.) are
-// deliberately NOT in this list — they're rebuilt by TASK-035 / 036 / 037 / 043 and
-// may legitimately still contain bright colors until those land. Every other
-// customer-facing route group IS scanned, specifically because none of them has a
-// rebuild task of its own to inherit the obligation: `(shop)/account` (Task 10
-// neutralized its one offender, account/orders/[id]/page.tsx), `(shop)/checkout`
-// (this task neutralized its one offender, checkout/confirmation/page.tsx), the
-// whole `(auth)` group (login/register — verified clean, no changes needed), and
-// the shared root-level files every route tree passes through — `(shop)/layout.tsx`,
-// the root `error.tsx`, and the root `layout.tsx` (all three verified clean). Do not
-// mistake any of these for oversights, and do not add the deferred (shop) page
-// routes above without a corresponding cleanup task landing first.
+// Within src/app/(shop), only catalog / product / cart (page.tsx et al.) are
+// deliberately NOT in this list — they're rebuilt by TASK-036 / 037 / 043 and
+// may legitimately still contain bright colors until those land. The home page
+// WAS in that deferred set; TASK-035 rebuilt it, so `(shop)/page.tsx`,
+// `src/components/home` and `src/content` joined the scan as part of that task.
+// Every other customer-facing route group IS scanned, specifically because none
+// of them has a rebuild task of its own to inherit the obligation:
+// `(shop)/account` (TASK-034 neutralized its one offender,
+// account/orders/[id]/page.tsx), `(shop)/checkout` (TASK-034 neutralized its one
+// offender, checkout/confirmation/page.tsx), the whole `(auth)` group
+// (login/register — verified clean, no changes needed), and the shared
+// root-level files every route tree passes through — `(shop)/layout.tsx`, the
+// root `error.tsx`, and the root `layout.tsx` (all three verified clean). Do not
+// mistake any of these for oversights, and do not add the remaining deferred
+// (shop) page routes above without a corresponding cleanup task landing first.
 //
 // Also deliberately NOT in this list, for unrelated reasons:
 // - src/app/(admin) — admin is inheriting design tokens but is not being restyled
@@ -29,13 +33,16 @@ import { join } from "node:path";
 //   demo intentionally keeps its bright theme variants.
 const SCAN_PATHS = [
   "src/components/common",
+  "src/components/home",
   "src/components/reviews",
   "src/components/products",
   "src/components/shop",
   "src/components/checkout",
+  "src/content",
   "src/app/newsletter",
   "src/lib/order-status.ts",
   "src/app/not-found.tsx",
+  "src/app/(shop)/page.tsx",
   "src/app/(shop)/account",
   "src/app/(shop)/checkout",
   "src/app/(shop)/layout.tsx",

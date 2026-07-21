@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
   siteConfig,
   getDefaultMetadata,
@@ -21,7 +21,6 @@ describe("SEO Utilities", () => {
       expect(siteConfig).toHaveProperty("description");
       expect(siteConfig).toHaveProperty("url");
       expect(siteConfig).toHaveProperty("ogImage");
-      expect(siteConfig).toHaveProperty("twitterHandle");
       expect(siteConfig).toHaveProperty("locale");
     });
   });
@@ -43,14 +42,25 @@ describe("SEO Utilities", () => {
 
       expect(metadata.openGraph).toHaveProperty("type", "website");
       expect(metadata.openGraph).toHaveProperty("siteName", siteConfig.name);
-      expect(metadata.openGraph).toHaveProperty("images");
+      // Must NOT set openGraph.images: the root app/opengraph-image.tsx card is
+      // only merged in by Next when this same-segment metadata leaves images
+      // unset (mergeStaticMetadata's `!source.openGraph.hasOwnProperty('images')`
+      // guard). Setting it here would suppress the generated card and pin every
+      // route to the stale static PNG. Same convention as getProductMetadata.
+      expect(metadata.openGraph).not.toHaveProperty("images");
     });
 
-    it("should include Twitter card configuration", () => {
+    it("should include Twitter card configuration without pinning an image", () => {
       const metadata = getDefaultMetadata();
 
       expect(metadata.twitter).toHaveProperty("card", "summary_large_image");
-      expect(metadata.twitter).toHaveProperty("creator", siteConfig.twitterHandle);
+      // No real Twitter/X handle exists for the brand (site.ts socials list
+      // only Instagram, TikTok, Telegram), so `creator` must stay absent
+      // rather than carry a fabricated handle.
+      expect(metadata.twitter).not.toHaveProperty("creator");
+      // Leave twitter.images unset so postProcessMetadata auto-fills it from
+      // the generated OG card rather than the stale static PNG.
+      expect(metadata.twitter).not.toHaveProperty("images");
     });
   });
 
@@ -273,6 +283,43 @@ describe("SEO Utilities", () => {
     it("should include canonical URL", () => {
       const metadata = getHomeMetadata();
       expect(metadata.alternates?.canonical).toBe(siteConfig.url);
+    });
+  });
+
+  describe("getHomeMetadata brand", () => {
+    // siteConfig.name (src/lib/seo.ts) is `process.env.NEXT_PUBLIC_STORE_NAME
+    // || BRAND_NAME`, read once at module load. Asserting against the
+    // statically-imported getHomeMetadata above would only prove whatever
+    // .env happens to set locally (it sets NEXT_PUBLIC_STORE_NAME="Store"),
+    // which is exactly the environment-dependent trap
+    // tests/e2e/navigation.spec.ts documents and deliberately avoids. Instead,
+    // delete the var, reset the module registry, and dynamically re-import so
+    // the module re-evaluates siteConfig.name with the var genuinely unset —
+    // that's the only way to actually exercise the `|| BRAND_NAME` fallback
+    // rather than assume it works. Env save/restore follows the repo's
+    // documented convention (see tests/unit/newsletter.test.ts).
+    const originalStoreName = process.env.NEXT_PUBLIC_STORE_NAME;
+
+    beforeEach(() => {
+      delete process.env.NEXT_PUBLIC_STORE_NAME;
+    });
+
+    afterEach(() => {
+      if (originalStoreName === undefined) {
+        delete process.env.NEXT_PUBLIC_STORE_NAME;
+      } else {
+        process.env.NEXT_PUBLIC_STORE_NAME = originalStoreName;
+      }
+      vi.resetModules();
+    });
+
+    it("falls back to the Mirox brand name when NEXT_PUBLIC_STORE_NAME is unset, never the generic 'Store'", async () => {
+      vi.resetModules();
+      const freshSeo = await import("@/lib/seo");
+      const metadata = freshSeo.getHomeMetadata();
+      const title = (metadata.title as { absolute: string }).absolute;
+      expect(title).toContain("Mirox Shop");
+      expect(title).not.toContain("Store |");
     });
   });
 

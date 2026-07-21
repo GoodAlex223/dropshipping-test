@@ -1,13 +1,19 @@
 import type { Metadata } from "next";
+import { BRAND_NAME, BRAND_META_SUFFIX, BRAND_DESCRIPTION } from "@/content/brand";
 
 // Base site configuration
 export const siteConfig = {
-  name: process.env.NEXT_PUBLIC_STORE_NAME || "Store",
-  description:
-    "Your one-stop shop for quality products at great prices. Discover amazing deals and fast shipping.",
+  // Env var still wins so deployments can override, but the fallback is the
+  // real brand rather than the generic "Store" placeholder. Setting
+  // NEXT_PUBLIC_STORE_NAME in production remains BACKLOG'd.
+  name: process.env.NEXT_PUBLIC_STORE_NAME || BRAND_NAME,
+  description: BRAND_DESCRIPTION,
   url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
   ogImage: "/og-image.png",
-  twitterHandle: "@store",
+  // No real Twitter/X account exists for the brand (the site-wide socials
+  // list carries Instagram, TikTok, and Telegram only). Absent data renders
+  // nothing rather than a fabricated handle, so there is no twitterHandle
+  // field and no `creator` line in the twitter metadata block below.
   locale: "en_US",
 };
 
@@ -29,6 +35,15 @@ export function getDefaultMetadata(): Metadata {
       address: false,
       telephone: false,
     },
+    // Deliberately no `images` here. Next merges a segment's opengraph-image
+    // file only when that segment's metadata export does NOT already set
+    // openGraph.images (resolve-metadata.ts `mergeStaticMetadata`, guarded by
+    // `!source.openGraph.hasOwnProperty('images')`). This object lives on the
+    // root app/ segment — the same segment as app/opengraph-image.tsx — so
+    // setting images here silently suppressed the generated card and pinned
+    // every route to the stale public/og-image.png (the old "Store" PNG the
+    // rebrand was meant to retire). Omitting it lets the file convention win
+    // site-wide, inherited by any route without its own opengraph-image.
     openGraph: {
       type: "website",
       locale: siteConfig.locale,
@@ -36,21 +51,14 @@ export function getDefaultMetadata(): Metadata {
       siteName: siteConfig.name,
       title: siteConfig.name,
       description: siteConfig.description,
-      images: [
-        {
-          url: siteConfig.ogImage,
-          width: 1200,
-          height: 630,
-          alt: siteConfig.name,
-        },
-      ],
     },
+    // No `images` here either: postProcessMetadata auto-fills twitter.images
+    // from the resolved openGraph.images (the generated card) whenever twitter
+    // has no images of its own, so the X card matches the OG card.
     twitter: {
       card: "summary_large_image",
       title: siteConfig.name,
       description: siteConfig.description,
-      images: [siteConfig.ogImage],
-      creator: siteConfig.twitterHandle,
     },
     robots: {
       index: true,
@@ -170,7 +178,7 @@ export function getCategoryMetadata(category: {
 export function getHomeMetadata(): Metadata {
   return {
     title: {
-      absolute: `${siteConfig.name} | Quality Products, Great Prices`,
+      absolute: `${siteConfig.name} — ${BRAND_META_SUFFIX}`,
     },
     description: siteConfig.description,
     alternates: {

@@ -1,6 +1,6 @@
 # TODO
 
-**Last Updated**: 2026-07-18
+**Last Updated**: 2026-07-20
 
 Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-shop-program-design.md) · Current week: [WEEKLY.md](WEEKLY.md)
 
@@ -102,4 +102,38 @@ _None._
 
 ## 🔀 Spawned
 
-_None yet — audit findings from TASK-033 may add entries here or to BACKLOG.md._
+#### [TASK-055] Content & legal pages
+
+**Priority**: 🟠 High
+**Status**: 📋 Planned
+**Effort**: M
+**Dependencies**: [TASK-035]
+
+**Description**: Build the seven footer routes that TASK-035 stopped linking to because they don't exist yet and 404 (`/contact`, `/faq`, `/shipping`, `/returns`, `/about`, `/privacy`, `/terms`; see `Footer.tsx`'s `shopLinks` comment). Three of them — public offer/terms, privacy policy, and return policy — are payment-gateway onboarding prerequisites per the [Ukraine payments & delivery decision](../superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md) §5.3, and block TASK-048 until they exist. Copy for all seven must come from the client or a lawyer; this task builds the pages, it cannot originate the legal content.
+
+**Acceptance Criteria**:
+
+- [ ] All seven routes exist and render real, client/lawyer-approved copy (no lorem ipsum placeholders)
+- [ ] Public offer/terms, privacy policy, and return policy specifically reviewed against §5.3's onboarding checklist before TASK-048 depends on them
+- [ ] `Footer.tsx`'s `shopLinks` restored to link to these pages once live, and its "removed links" comment updated
+
+#### [TASK-056] Client content inventory
+
+**Priority**: 🟠 High
+**Status**: 📋 Planned
+**Effort**: S
+**Dependencies**: None
+
+**Description**: Single consolidated ask covering everything the client still owes for the Mirox rebrand to leave placeholder/retracted state, spawned by TASK-035's final review so these don't dribble out piecemeal across TASK-036/037/039. This task is the checklist and the client round-trip, not implementation.
+
+**Acceptance Criteria**:
+
+- [ ] Hero photography confirmed or supplied (currently `home.hero.image = null` in `src/content/home.ts`)
+- [ ] Logo vector/source file (current `<Logo/>` is code-drawn per TASK-034)
+- [ ] Real social URLs and follower counts for Instagram, TikTok, Telegram (`site.socials` in `src/content/site.ts`)
+- [ ] The three client claim figures re-confirmed (`site.claims`: OLX sales, Instagram orders, customer rating)
+- [ ] Announcement banner copy, once a real promotion exists (`site.announcement`, currently `null`)
+- [ ] Free-shipping threshold/currency and the return window (currently unconfirmed "14 days") — see TASK-035's Finding 1 for why the current codebase can't invent either
+- [ ] Contact details (phone/email/address) for the `/contact` page (feeds TASK-055)
+- [ ] Size charts (feeds TASK-037/TASK-045)
+- [ ] Legal-page content or lawyer engagement (feeds TASK-055)
