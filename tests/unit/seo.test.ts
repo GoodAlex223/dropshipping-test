@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
   siteConfig,
   getDefaultMetadata,
@@ -279,8 +279,36 @@ describe("SEO Utilities", () => {
   });
 
   describe("getHomeMetadata brand", () => {
-    it("falls back to the Mirox brand name, never the generic 'Store'", () => {
-      const metadata = getHomeMetadata();
+    // siteConfig.name (src/lib/seo.ts) is `process.env.NEXT_PUBLIC_STORE_NAME
+    // || BRAND_NAME`, read once at module load. Asserting against the
+    // statically-imported getHomeMetadata above would only prove whatever
+    // .env happens to set locally (it sets NEXT_PUBLIC_STORE_NAME="Store"),
+    // which is exactly the environment-dependent trap
+    // tests/e2e/navigation.spec.ts documents and deliberately avoids. Instead,
+    // delete the var, reset the module registry, and dynamically re-import so
+    // the module re-evaluates siteConfig.name with the var genuinely unset —
+    // that's the only way to actually exercise the `|| BRAND_NAME` fallback
+    // rather than assume it works. Env save/restore follows the repo's
+    // documented convention (see tests/unit/newsletter.test.ts).
+    const originalStoreName = process.env.NEXT_PUBLIC_STORE_NAME;
+
+    beforeEach(() => {
+      delete process.env.NEXT_PUBLIC_STORE_NAME;
+    });
+
+    afterEach(() => {
+      if (originalStoreName === undefined) {
+        delete process.env.NEXT_PUBLIC_STORE_NAME;
+      } else {
+        process.env.NEXT_PUBLIC_STORE_NAME = originalStoreName;
+      }
+      vi.resetModules();
+    });
+
+    it("falls back to the Mirox brand name when NEXT_PUBLIC_STORE_NAME is unset, never the generic 'Store'", async () => {
+      vi.resetModules();
+      const freshSeo = await import("@/lib/seo");
+      const metadata = freshSeo.getHomeMetadata();
       const title = (metadata.title as { absolute: string }).absolute;
       expect(title).toContain("Mirox Shop");
       expect(title).not.toContain("Store |");
