@@ -34,8 +34,18 @@ export const home = {
     image: null as HeroImage | null,
   },
 
+  /**
+   * "1–3 days" was retracted, not merely unconfirmed: SHIPPING_METHODS
+   * (src/lib/stripe.ts) has no method matching that window — standard is
+   * 5-7 business days, express 2-3, overnight 1 — so the claim was false
+   * today, not just unverified. Kept the "across Ukraine" scope claim
+   * (unfalsifiable brand voice, same as the identical phrase in
+   * whyChooseUs.items below) and dropped the specific day-range. Title
+   * unchanged: TODO.md's TASK-035 AC only requires the benefit cards to be
+   * present, not this specific promise.
+   */
   benefits: [
-    { icon: Truck, title: "Fast delivery", description: "1–3 days across Ukraine" },
+    { icon: Truck, title: "Fast delivery", description: "Across Ukraine" },
     { icon: RefreshCw, title: "Size exchange", description: "Wrong fit? Swap it" },
     { icon: Award, title: "Premium quality", description: "Only the best fabrics" },
     { icon: Headphones, title: "Support 24/7", description: "We're always in touch" },

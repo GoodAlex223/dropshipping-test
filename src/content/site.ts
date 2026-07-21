@@ -39,14 +39,24 @@ export const site = {
   tagline: BRAND_TAGLINE,
 
   /**
-   * PROVISIONAL — NOT CLIENT-CONFIRMED. This threshold is read off the
-   * AI-generated concept mockup (docs/reference/mirox-concept-screenshot.jpg),
-   * not the client brief, which states no shipping threshold. It also disagrees
-   * with the admin settings default (freeShippingThreshold "50", USD). Confirm
-   * with the client before production; tracked by the client-content inventory
-   * task. null removes the bar entirely.
+   * RETRACTED, not merely unconfirmed — was "Free delivery on orders over
+   * 1000 UAH", read off the AI-generated concept mockup
+   * (docs/reference/mirox-concept-screenshot.jpg). Set to null because no
+   * free-shipping threshold exists anywhere in the order path, at any
+   * subtotal or currency: calculateOrderTotals() (src/lib/stripe.ts) and the
+   * checkout confirm-order route both always charge
+   * `shippingMethod?.price ?? 0`, never 0 for a real method. That made this a
+   * false claim today, not an unverified one, so "pending client
+   * confirmation" was the wrong framing regardless of what the client says.
+   *
+   * TODO.md's TASK-035 AC requires this banner's *slot* to exist, not any
+   * specific promised text — AnnouncementBar already renders nothing when
+   * this is null (see its test), which satisfies that AC. Only restore real
+   * copy once a threshold is both implemented in code and confirmed with the
+   * client; tracked by the client content inventory task (docs/planning/
+   * TODO.md Spawned section).
    */
-  announcement: "Free delivery on orders over 1000 UAH" as string | null,
+  announcement: null as string | null,
 
   /** CLIENT-SUPPLIED. Placeholder handles until the client confirms real URLs. */
   socials: [
@@ -76,17 +86,30 @@ export const site = {
 
   /**
    * Footer benefit strip — the concept screenshot's footer row.
-   * PROVISIONAL — NOT CLIENT-CONFIRMED. The "1000 UAH" shipping threshold and
-   * "14 days" return window are read off the AI-generated concept mockup
-   * (docs/reference/mirox-concept-screenshot.jpg), not the client brief. The
-   * 14-day claim implies a /returns page that does not yet exist. Confirm both
-   * figures with the client before production; tracked by the client-content
-   * inventory task.
+   *
+   * "Free delivery" and "Secure payment" had their descriptions RETRACTED,
+   * not merely flagged unconfirmed. "On orders over 1000 UAH" has no
+   * implementing logic anywhere in the order path — calculateOrderTotals()
+   * (src/lib/stripe.ts) and the checkout confirm-order route always charge
+   * `shippingMethod?.price ?? 0`, at any subtotal. "Online or on delivery"
+   * names a payment method — cash on delivery — that does not exist; it is
+   * TASK-049, per the TASK-038b payments decision doc. Both descriptions were
+   * rewritten to claim nothing the checkout contradicts. The four titles are
+   * unchanged: TODO.md's TASK-035 AC only requires the benefit cards to be
+   * present, not these specific promises.
+   *
+   * "Easy returns" / "14 days" is a different kind of gap and was left as-is:
+   * it isn't contradicted by any code path, just unconfirmed with the client
+   * and missing its /returns destination page (see the content & legal pages
+   * spawned task). Confirm with the client before production.
+   *
+   * Tracked by the client content inventory task (docs/planning/TODO.md
+   * Spawned section).
    */
   footerBenefits: [
-    { icon: Truck, title: "Free delivery", description: "On orders over 1000 UAH" },
+    { icon: Truck, title: "Free delivery", description: "Calculated at checkout" },
     { icon: RefreshCw, title: "Easy returns", description: "14 days to change your mind" },
-    { icon: ShieldCheck, title: "Secure payment", description: "Online or on delivery" },
+    { icon: ShieldCheck, title: "Secure payment", description: "Encrypted checkout" },
     { icon: MessageCircle, title: "Support 24/7", description: "We're always here" },
   ] as BenefitItem[],
 };
