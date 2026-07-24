@@ -45,7 +45,7 @@ export function ProductCard({ product, showCategory = true }: ProductCardProps) 
 
   return (
     <Card
-      className="group overflow-hidden transition-shadow hover:shadow-lg"
+      className="group hover-lift overflow-hidden shadow-[var(--shadow-soft)]"
       data-testid="product-card"
     >
       <Link href={`/products/${product.slug}`}>
