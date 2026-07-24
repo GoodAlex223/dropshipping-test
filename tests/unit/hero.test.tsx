@@ -78,4 +78,21 @@ describe("Hero", () => {
     expect(screen.getByRole("link", { name: "Shop the Catalog" })).toBeInTheDocument();
     expect(screen.queryByRole("img")).not.toBeInTheDocument();
   });
+
+  it("shows the ghosted brand watermark only in the no-photo hero", () => {
+    mockHero.image = null;
+    const { rerender } = render(<Hero />);
+    expect(screen.getByTestId("hero-watermark")).toBeInTheDocument();
+
+    // With a photo, the art-directed backdrop (and its watermark) gives way to
+    // the two-column image layout.
+    mockHero.image = defaultHeroImage;
+    rerender(<Hero />);
+    expect(screen.queryByTestId("hero-watermark")).not.toBeInTheDocument();
+  });
+
+  it("staggers the headline lines with an entrance animation", () => {
+    render(<Hero />);
+    expect(screen.getByText("STYLE.")).toHaveClass("animate-fade-up");
+  });
 });
