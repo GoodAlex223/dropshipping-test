@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { ProductCard } from "@/components/products/ProductCard";
 
@@ -19,5 +19,17 @@ describe("ProductCard", () => {
     expect(screen.getByText("-20%")).toBeInTheDocument();
     // No element on the card uses the destructive (red) badge variant.
     expect(container.querySelector(".bg-destructive")).toBeNull();
+  });
+
+  it("shows the branded fallback when an image fails to load", () => {
+    render(<ProductCard product={base} />);
+    const img = screen.getByAltText("Hoodie");
+    fireEvent.error(img);
+    expect(screen.getByTestId("product-image-fallback")).toBeInTheDocument();
+  });
+
+  it("shows the branded fallback when no image is provided", () => {
+    render(<ProductCard product={{ ...base, images: [] }} />);
+    expect(screen.getByTestId("product-image-fallback")).toBeInTheDocument();
   });
 });

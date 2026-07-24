@@ -1,10 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
-import { Package } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { DEFAULT_BLUR_DATA_URL, IMAGE_SIZES } from "@/lib/image-utils";
+import { IMAGE_SIZES } from "@/lib/image-utils";
+import { ProductImage } from "./ProductImage";
 
 interface ProductCardProps {
   product: {
@@ -51,21 +50,11 @@ export function ProductCard({ product, showCategory = true }: ProductCardProps) 
     >
       <Link href={`/products/${product.slug}`}>
         <div className="bg-muted relative aspect-square overflow-hidden">
-          {product.images[0] ? (
-            <Image
-              src={product.images[0].url}
-              alt={product.images[0].alt || product.name}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-              sizes={IMAGE_SIZES.productCard}
-              placeholder="blur"
-              blurDataURL={DEFAULT_BLUR_DATA_URL}
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center">
-              <Package className="text-muted-foreground h-12 w-12" />
-            </div>
-          )}
+          <ProductImage
+            src={product.images[0]?.url}
+            alt={product.images[0]?.alt || product.name}
+            sizes={IMAGE_SIZES.productCard}
+          />
 
           {/* Badges */}
           <div className="absolute top-2 left-2 flex flex-col gap-1">
