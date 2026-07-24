@@ -28,7 +28,7 @@ export function WhyChooseUs() {
           </h2>
 
           {stats.length > 0 && (
-            <dl className="mx-auto mt-12 grid max-w-3xl gap-8 sm:grid-cols-3">
+            <dl className="mx-auto mt-12 flex max-w-3xl flex-wrap justify-center gap-12 sm:gap-20">
               {stats.map((stat) => (
                 <div key={stat.label} className="text-center">
                   <dt className="sr-only">{stat.label}</dt>
