@@ -1,22 +1,10 @@
 "use client";
 
-import {
-  useEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type ElementType,
-  type ReactNode,
-} from "react";
+import { useSyncExternalStore, type ElementType, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
-// Hydration-safe reduced-motion read (same useSyncExternalStore idiom as
-// useIsMounted in src/app/showcase/layout.tsx): getServerSnapshot returns
-// false so the client's first render matches the server-rendered HTML,
-// then useSyncExternalStore reconciles to the real value post-mount and
-// keeps it live if the OS preference changes while mounted.
 function subscribeReducedMotion(onChange: () => void) {
   if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
     return () => {};
@@ -41,53 +29,31 @@ function getReducedMotionServerSnapshot(): boolean {
 interface FadeInProps {
   children: ReactNode;
   className?: string;
-  /** Extra delay before the reveal transition, in ms. */
+  /** Stagger delay for the entrance animation, in ms. */
   delay?: number;
   /** Element/tag to render as. Defaults to "div". */
   as?: ElementType;
 }
 
+/**
+ * Visible-by-default entrance. Children render at rest (`opacity-100`) so the
+ * server HTML is never hidden (motion invariant I1); when motion is allowed a
+ * one-shot `.animate-fade-up` plays. Reduced motion drops the animation class
+ * entirely (globals.css also disables the keyframe as a belt-and-braces).
+ * No IntersectionObserver — deep sections animate on load, which is why nothing
+ * is ever left stuck hidden waiting on a scroll that may not happen.
+ */
 export function FadeIn({ children, className, delay = 0, as: Component = "div" }: FadeInProps) {
-  const ref = useRef<HTMLElement | null>(null);
   const prefersReduced = useSyncExternalStore(
     subscribeReducedMotion,
     getReducedMotionSnapshot,
     getReducedMotionServerSnapshot
   );
-  const [inView, setInView] = useState(false);
-
-  useEffect(() => {
-    // Reduced motion is derived straight from prefersReduced below, so there's
-    // nothing to observe: bail out without creating an IntersectionObserver.
-    if (prefersReduced || typeof IntersectionObserver === "undefined") return;
-
-    const el = ref.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting) {
-          setInView(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [prefersReduced]);
-
-  const visible = prefersReduced || inView;
 
   return (
     <Component
-      ref={ref}
-      className={cn(
-        "transition-all duration-[var(--duration-slow)] ease-[var(--ease-mirox)] motion-reduce:opacity-100 motion-reduce:transition-none",
-        visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0",
-        className
-      )}
-      style={delay ? { transitionDelay: `${delay}ms` } : undefined}
+      className={cn("opacity-100", !prefersReduced && "animate-fade-up", className)}
+      style={!prefersReduced && delay ? { animationDelay: `${delay}ms` } : undefined}
     >
       {children}
     </Component>

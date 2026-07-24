@@ -109,9 +109,11 @@ describe("token-layer color policy (globals.css Mirox tokens are achromatic)", (
   const css = readFileSync(GLOBALS_CSS_PATH, "utf8");
 
   // Non-color custom properties that legitimately live inside the same :root
-  // block as the color tokens (radius, font-family refs, motion timing).
-  // They aren't colors at all, so they're exempt rather than expected to
-  // pass a color check.
+  // (and [data-surface="dark"]) block as the color tokens: radius, font-family
+  // refs, motion timing, and box-shadow values. They aren't colors at all, so
+  // they're exempt rather than expected to pass a color check. --shadow-soft is
+  // a multi-layer box-shadow (achromatic rgb(0 0 0 / a) drops), re-skinned under
+  // dark — not a color token, so it is exempt like the timing tokens.
   const NON_COLOR_PROPS = new Set([
     "--radius",
     "--font-heading",
@@ -121,6 +123,7 @@ describe("token-layer color policy (globals.css Mirox tokens are achromatic)", (
     "--duration-fast",
     "--duration-base",
     "--duration-slow",
+    "--shadow-soft",
   ]);
 
   // --chart-1..5 and --sidebar-* are declared inside the very same :root block

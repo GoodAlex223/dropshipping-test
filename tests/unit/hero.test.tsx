@@ -78,4 +78,26 @@ describe("Hero", () => {
     expect(screen.getByRole("link", { name: "Shop the Catalog" })).toBeInTheDocument();
     expect(screen.queryByRole("img")).not.toBeInTheDocument();
   });
+
+  it("shows the ghosted brand watermark only in the no-photo hero", () => {
+    mockHero.image = null;
+    const { rerender } = render(<Hero />);
+    expect(screen.getByTestId("hero-watermark")).toBeInTheDocument();
+
+    // With a photo, the art-directed backdrop (and its watermark) gives way to
+    // the two-column image layout.
+    mockHero.image = defaultHeroImage;
+    rerender(<Hero />);
+    expect(screen.queryByTestId("hero-watermark")).not.toBeInTheDocument();
+  });
+
+  it("staggers the headline lines with an entrance animation", () => {
+    render(<Hero />);
+    const lines = ["STYLE.", "QUALITY.", "CONFIDENCE."].map((t) => screen.getByText(t));
+    lines.forEach((el) => expect(el).toHaveClass("animate-fade-up"));
+    // Per-line delay must actually increase, or it isn't a stagger — a
+    // regression that flattened all lines to one delay would pass a
+    // class-only check but fail here.
+    expect(lines.map((el) => el.style.animationDelay)).toEqual(["0ms", "90ms", "180ms"]);
+  });
 });

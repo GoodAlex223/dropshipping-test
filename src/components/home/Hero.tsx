@@ -5,6 +5,7 @@ import { BenefitStrip } from "@/components/common/BenefitStrip";
 import { DEFAULT_BLUR_DATA_URL } from "@/lib/image-utils";
 import { cn } from "@/lib/utils";
 import { home } from "@/content/home";
+import { Logo } from "@/components/common/Logo";
 
 /**
  * Hero — client brief list #1, first screen. The single most visible surface
@@ -29,8 +30,33 @@ export function Hero() {
   const hasImage = image !== null;
 
   return (
-    <section data-surface="dark" className="bg-background text-foreground">
-      <div className="container py-16 md:py-24">
+    <section data-surface="dark" className="bg-background text-foreground relative overflow-hidden">
+      {!hasImage && (
+        <>
+          {/* Layered near-black gradient backdrop. Inline style, not a Tailwind
+              arbitrary value, so the gradient can't trip the utility parser. */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0"
+            style={{ background: "radial-gradient(120% 120% at 50% 0%, #1a1a1a 0%, #000 70%)" }}
+          />
+          {/* Fine grain texture (see .grain in globals.css). */}
+          <div
+            aria-hidden="true"
+            className="grain pointer-events-none absolute inset-0 opacity-[0.035]"
+          />
+          {/* Oversized ghosted Mirox mark bleeding off the corner — the signature
+              motif. aria-hidden keeps its role="img" out of the a11y tree. */}
+          <div
+            data-testid="hero-watermark"
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-16 -bottom-24 opacity-[0.04]"
+          >
+            <Logo showText={false} size="lg" className="origin-bottom-right scale-[16]" />
+          </div>
+        </>
+      )}
+      <div className="relative container py-16 md:py-24">
         <div
           className={cn(
             "gap-12",
@@ -42,8 +68,12 @@ export function Hero() {
 
             {/* Single h1: three content lines, not three headings. */}
             <h1 className="font-heading mt-6 text-5xl leading-[0.95] font-extrabold tracking-tight sm:text-6xl lg:text-7xl">
-              {headline.map((line) => (
-                <span key={line} className="block">
+              {headline.map((line, i) => (
+                <span
+                  key={line}
+                  className="animate-fade-up block"
+                  style={{ animationDelay: `${i * 90}ms` }}
+                >
                   {line}
                 </span>
               ))}

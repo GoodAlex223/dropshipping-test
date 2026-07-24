@@ -64,6 +64,9 @@
   --duration-base: 250ms;
   --duration-slow: 400ms;
 
+  /* Elevation */
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px -8px rgb(0 0 0 / 0.12);
+
   /* Semantic tokens */
   --background: #ffffff;
   --foreground: #1a1a1a;
@@ -128,6 +131,9 @@
   --border: #262626;
   --input: #262626;
   --ring: #ffffff;
+
+  /* Elevation — shadows read heavier on dark surfaces */
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 32px -8px rgb(0 0 0 / 0.6);
 }
 
 /* ========================================
@@ -431,7 +437,13 @@
   }
 
   /* Apply theme-specific heading fonts */
-  h1, h2, h3, h4, h5, h6, [data-slot="card-title"] {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  [data-slot="card-title"] {
     font-family: var(--font-heading);
   }
 }
@@ -491,6 +503,21 @@
   .hover-lift:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 24px -8px rgb(0 0 0 / 0.15);
+  }
+  .glass {
+    background-color: color-mix(in oklch, var(--background) 72%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+  }
+  /* Fine desaturated fractal-noise grain. Sourced from a static asset
+     (public/grain.svg) rather than an inline data-URI: Next's production CSS
+     minifier drops a rule whose data-URI contains a nested url(#id), so the
+     data-URI version compiled to nothing (a silent no-op). A plain url() the
+     minifier leaves alone. Decorative only — always paired with aria-hidden
+     and a low opacity. */
+  .grain {
+    background-image: url("/grain.svg");
   }
   @media (prefers-reduced-motion: reduce) {
     .animate-fade-up {
