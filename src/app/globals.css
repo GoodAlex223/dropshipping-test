@@ -510,11 +510,14 @@
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--border);
   }
-  /* Fine fractal-noise grain, kept in CSS (not a Tailwind arbitrary class) so
-     the SVG data-URI's quotes/percent-signs can't trip the utility parser.
-     Decorative only — always paired with aria-hidden + a low opacity. */
+  /* Fine desaturated fractal-noise grain. Sourced from a static asset
+     (public/grain.svg) rather than an inline data-URI: Next's production CSS
+     minifier drops a rule whose data-URI contains a nested url(#id), so the
+     data-URI version compiled to nothing (a silent no-op). A plain url() the
+     minifier leaves alone. Decorative only — always paired with aria-hidden
+     and a low opacity. */
   .grain {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-image: url("/grain.svg");
   }
   @media (prefers-reduced-motion: reduce) {
     .animate-fade-up {

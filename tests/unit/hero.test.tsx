@@ -93,6 +93,11 @@ describe("Hero", () => {
 
   it("staggers the headline lines with an entrance animation", () => {
     render(<Hero />);
-    expect(screen.getByText("STYLE.")).toHaveClass("animate-fade-up");
+    const lines = ["STYLE.", "QUALITY.", "CONFIDENCE."].map((t) => screen.getByText(t));
+    lines.forEach((el) => expect(el).toHaveClass("animate-fade-up"));
+    // Per-line delay must actually increase, or it isn't a stagger — a
+    // regression that flattened all lines to one delay would pass a
+    // class-only check but fail here.
+    expect(lines.map((el) => el.style.animationDelay)).toEqual(["0ms", "90ms", "180ms"]);
   });
 });
