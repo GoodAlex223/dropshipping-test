@@ -70,7 +70,10 @@ export function ProductCard({ product, showCategory = true }: ProductCardProps) 
           {/* Badges */}
           <div className="absolute top-2 left-2 flex flex-col gap-1">
             {discount && (
-              <Badge variant="destructive" className="text-xs">
+              <Badge
+                variant="default"
+                className="rounded-none px-2 py-0.5 text-[0.65rem] font-semibold tracking-wider uppercase"
+              >
                 -{discount}%
               </Badge>
             )}
