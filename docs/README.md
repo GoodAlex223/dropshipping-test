@@ -2,7 +2,7 @@
 
 Central index for all project documentation.
 
-**Last Updated**: 2026-07-24
+**Last Updated**: 2026-07-27
 
 ---
 
@@ -35,7 +35,7 @@ Central index for all project documentation.
 | [planning/README.md](planning/README.md)         | Planning overview    | 2026-01-05   |
 | [planning/WEEKLY.md](planning/WEEKLY.md)         | Current week's plan  | 2026-07-21   |
 | [planning/TODO.md](planning/TODO.md)             | Active tasks         | 2026-07-21   |
-| [planning/DONE.md](planning/DONE.md)             | Completed tasks      | 2026-07-21   |
+| [planning/DONE.md](planning/DONE.md)             | Completed tasks      | 2026-07-27   |
 | [planning/BACKLOG.md](planning/BACKLOG.md)       | Unprioritized ideas  | 2026-07-24   |
 | [planning/ROADMAP.md](planning/ROADMAP.md)       | Long-term vision     | 2026-07-14   |
 | [planning/GOALS.md](planning/GOALS.md)           | Objectives & metrics | 2026-01-26   |
@@ -60,9 +60,7 @@ Central index for all project documentation.
 
 ## Implementation Plans
 
-| Plan                                                                                                      | Task                            | Status             | Started    |
-| --------------------------------------------------------------------------------------------------------- | ------------------------------- | ------------------ | ---------- |
-| [2026-07-24_homepage-polish-art-direction.md](planning/plans/2026-07-24_homepage-polish-art-direction.md) | Homepage polish & art direction | IN REVIEW (PR #23) | 2026-07-24 |
+_No active implementation plans. Homepage Polish & Art Direction completed 2026-07-27 (PR #23) — see Archived Plans below._
 
 ### Archived Plans
 
@@ -79,6 +77,7 @@ Central index for all project documentation.
 | [2026-07-16_task-038b-payments-delivery-spike.md](archive/plans/2026-07-16_task-038b-payments-delivery-spike.md) | TASK-038b Payments & Delivery Spike | COMPLETE | 2026-07-17 |
 | [2026-07-17_task-034-design-system.md](archive/plans/2026-07-17_task-034-design-system.md)                       | TASK-034 Mirox Design System        | COMPLETE | 2026-07-18 |
 | [2026-07-19_task-035-homepage-rebrand.md](archive/plans/2026-07-19_task-035-homepage-rebrand.md)                 | TASK-035 Homepage Rebrand           | COMPLETE | 2026-07-21 |
+| [2026-07-24_homepage-polish-art-direction.md](archive/plans/2026-07-24_homepage-polish-art-direction.md)         | Homepage Polish & Art Direction     | COMPLETE | 2026-07-27 |
 
 See [archive/README.md](archive/README.md) for more historical plans.
 

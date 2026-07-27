@@ -2,11 +2,39 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-07-21
+**Last Updated**: 2026-07-27
 
 ---
 
 ## 2026-07 (July)
+
+### [2026-07-27] Homepage Polish & Art Direction
+
+**Plan**: [docs/archive/plans/2026-07-24_homepage-polish-art-direction.md](../archive/plans/2026-07-24_homepage-polish-art-direction.md)
+**Spec**: [2026-07-24-mirox-homepage-polish-design.md](../superpowers/specs/2026-07-24-mirox-homepage-polish-design.md)
+**PR**: [#23](https://github.com/GoodAlex223/dropshipping-test/pull/23) — merged `987831e`
+
+**Origin**: A post-completion **visual audit** (screenshot-vs-concept, Playwright against live prod) of the TASK-035 homepage — the user observed the deployed page didn't match `docs/reference/mirox-concept-screenshot.jpg`. The audit's headline finding: the "empty void below the hero" was **scroll-reveal working as designed, not a dead page** — `FadeIn` started every section at `opacity:0` and its `IntersectionObserver` never fired on load, so the page _looked_ broken. Nine findings, split content-blocked (real photos/catalog → TASK-056/036/039) vs. buildable-now. This task shipped the buildable-now craft.
+
+**Summary**: `FadeIn` flipped to visible-by-default (fixes blank-until-scroll); monochrome discount badge (was red `destructive`); branded Mirox "M" fallback for missing/broken product images; `--shadow-soft` token + moderate `.glass` utility, with soft resting elevation + `hover-lift` on cards; "Why choose us" rebuilt as a dark by-the-numbers stats block (real gated `site.claims`); "Follow us" as glass social tiles distinct from the footer; art-directed no-photo hero (gradient + desaturated grain + ghosted "M" watermark + staggered headline). Executed subagent-driven — a fresh implementer + independent spec/quality reviewer per task, then an opus whole-branch review.
+
+**Key changes**:
+
+- **Motion (F2)** — `FadeIn` renders `opacity-100` in SSR and adds a CSS `.animate-fade-up` entrance only when motion is allowed; the `IntersectionObserver` gate is gone. Invariants: no-JS-safe, nothing stuck hidden, reduced-motion honoured, `[data-testid='product-card']` E2E signal preserved.
+- **Palette (F4)** — discount badge → `variant="default"` monochrome pill.
+- **New file** — `src/components/products/ProductImage.tsx` (`"use client"`) owns the image + blur placeholder and renders the branded "M" fallback on `onError`; `ProductCard` stays a server component.
+- **Sections** — `WhyChooseUs` dark stats block; `SocialLinks` gained a `variant: "inline" | "tiles"` prop (footer inline unchanged, homepage tiles); `Hero` `!hasImage` branch art-directed. `public/grain.svg` static asset.
+- **Tokens** — `--shadow-soft` (+ dark re-skin) and `.glass` in globals.css; `[data-surface="dark"] .hover-lift:hover` white-glow override (black shadow is invisible on black).
+
+**Verification**: unit **415+1 → 423+1**; lint / typecheck / build green; opus whole-branch review merge-ready (its one Important finding — a dead `--shadow-soft` token — fixed in-branch). CI green on `main`; **prod deploy verified serving the fix** — screenshot of `dropshipping-test.vercel.app` shows the whole page visible on load (`hiddenTextBlocks: 0`, was 4), art-directed hero, monochrome badges, branded image fallbacks, stats block and social tiles.
+
+**Acceptance — as shipped**: all buildable-now craft ✅. Still content-blocked (unchanged, tracked): real hero photography + real clothing catalog (TASK-056), UAH pricing (TASK-039), rich card interactions (TASK-036). The deployed catalog is still placeholder electronics with 404'd images (now shown as the branded "M" fallback rather than blank).
+
+**Learnings**:
+
+- **Green CI ≠ visual fidelity.** TASK-035 passed every automated gate and six review rounds yet shipped a page that _looked broken_ on load — because acceptance was textual and nobody compared the rendered page to the concept. The **visual-fidelity sign-off** (a human comparing the deployed page to the reference) is now the standing prevention for design tasks; backlogged.
+- **`grep | head` masks grep's exit code → false-green compiled-CSS checks**, and Next's prod CSS minifier silently drops an inline-`data:`-URI rule with a nested `url(#id)` (use a static asset). See [[css-verification-and-next-minifier-gotchas]]. Verify the _compiled_ output with grep's real exit status.
+- **Per-task reviews can't see a created-but-never-consumed token** — `--shadow-soft` was added in task 1 and wired to nothing until the whole-branch review caught it. Cross-task dead code is the final review's job.
 
 ### [2026-07-21] TASK-035 - Homepage Rebrand
 
