@@ -38,7 +38,10 @@ export function Hero() {
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0"
-            style={{ background: "radial-gradient(120% 120% at 50% 0%, #1a1a1a 0%, #000 70%)" }}
+            style={{
+              background:
+                "radial-gradient(120% 120% at 50% 0%, var(--card) 0%, var(--background) 70%)",
+            }}
           />
           {/* Fine grain texture (see .grain in globals.css). */}
           <div
