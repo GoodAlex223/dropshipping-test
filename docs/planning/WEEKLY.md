@@ -1,7 +1,7 @@
 # Weekly Plan
 
 **Week of**: 2026-07-20 to 2026-07-26
-**Last Updated**: 2026-07-21
+**Last Updated**: 2026-07-27
 
 ---
 
@@ -68,6 +68,13 @@ _(TASK-035 spec + plan were authored 2026-07-19, in the prior week — see DONE.
 - [x] TASK-035 shipped + production incident hotfix + completion workflow
 - **Completed**: PR #21 code-review round (OG card was silently suppressed by `getDefaultMetadata()` pinning the stale PNG — fixed so the generated Mirox card renders site-wide; docs index date) then merged (`0992851`). **Post-merge prod incident**: homepage 500 on every request — root-caused via Vercel runtime logs to a `reviews` table that had never been migrated to production (schema drifted since Feb; nothing ran `migrate deploy` on deploy). Hotfix **PR #22** (`e89060d`): `safeSection()` resilience so a failed section can't 500 the page, plus a `vercel-build` step that applies migrations on every Vercel deploy (via `DIRECT_URL`). Verified: prod `/` 200, all 5 pending migrations applied, zero runtime errors, reviews + newsletter restored. Completion workflow (extract/archive/transition/commit/memory).
 - **Blockers**: none. **Carried**: 8 BACKLOG entries (testimonials under-fill, `?sort=newest` inert until TASK-036, USD-vs-UAH copy, migration-drift guard, post-deploy smoke test, `DIRECT_URL` docs, …)
+
+#### Thursday (2026-07-24) — unplanned, audit-driven
+
+- [x] **Homepage Polish & Art Direction** (PR #23, merged 2026-07-27 `987831e`) — not a pre-planned task; spawned when the user observed TASK-035's deployed homepage didn't match `docs/reference/mirox-concept-screenshot.jpg`.
+- **Completed**: a screenshot-vs-concept **visual audit** (Playwright vs live prod) reframed the "empty void below the hero" as scroll-reveal working-as-designed (`FadeIn` at `opacity:0`, observer never fired on load) — the page only _looked_ broken. Shipped the buildable-now craft: FadeIn visible-by-default (fixes blank-until-scroll), monochrome badge, branded "M" image fallback, `--shadow-soft`/`.glass` tokens + card elevation, dark by-the-numbers WhyChooseUs, glass social tiles, art-directed no-photo hero. Subagent-driven per task + opus whole-branch review; two automated PR reviews clean. Unit 415+1 → 423+1. **Prod verified serving the fix** (`hiddenTextBlocks: 0`, was 4). Completion workflow done (extract/archive/transition/commit/memory).
+- **Prevention added**: the **visual-fidelity sign-off gate** (human compares rendered page to the concept) is now standing for design tasks — green CI proved the code, not the look. Applies to TASK-036/037.
+- **Blockers**: none. Still content-blocked (unchanged): real catalog + hero photo (TASK-056), UAH (TASK-039).
 
 ---
 

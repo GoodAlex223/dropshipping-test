@@ -1,6 +1,6 @@
 # TODO
 
-**Last Updated**: 2026-07-21
+**Last Updated**: 2026-07-27
 
 Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-shop-program-design.md) · Current week: [WEEKLY.md](WEEKLY.md)
 
@@ -8,7 +8,7 @@ Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-
 
 ## 🔄 In Progress
 
-_None. TASK-035 completed 2026-07-21 (PR #21; prod hotfix PR #22) — see [DONE.md](DONE.md)._
+_None. Homepage Polish & Art Direction completed 2026-07-27 (PR #23) — see [DONE.md](DONE.md). (Prior: TASK-035 PR #21 + hotfix PR #22.)_
 
 ## 📋 Planned (v1.3 — "Mirox Rebrand Demo")
 
