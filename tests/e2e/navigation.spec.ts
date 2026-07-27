@@ -4,18 +4,20 @@ test.describe("Navigation", () => {
   test("homepage loads successfully", async ({ page, isMobile }) => {
     await page.goto("/");
 
-    // Check page title. Deliberately matches only BRAND_META_SUFFIX's text
-    // ("Modern Clothing"), never the brand-name segment: siteConfig.name
-    // (src/lib/seo.ts) reads NEXT_PUBLIC_STORE_NAME and falls back to
-    // BRAND_NAME. CI leaves that var unset, so the title is "Mirox Shop —
-    // Modern Clothing"; a local .env may set it, e.g. to "Store — Modern
-    // Clothing". Asserting /Mirox/ or /Store/ passes in exactly one of those
-    // environments and fails in the other — do not "tighten" this to either.
-    // Kept as a literal rather than importing BRAND_META_SUFFIX: this is the
-    // only E2E spec that would import app source, and brand.ts's zero-import
-    // rule is a comment, not an enforced invariant — if it ever gained an
-    // import this would fail at transform time instead of as a readable diff.
-    await expect(page).toHaveTitle(/Modern Clothing/);
+    // Check page title. Deliberately matches only the brand-name segment
+    // ("Mirox"), never BRAND_META_SUFFIX's text: that suffix is now Ukrainian
+    // ("Сучасний одяг", src/content/brand.ts) and locale work (TASK-039) may
+    // change it again, while siteConfig.name (src/lib/seo.ts) reads
+    // NEXT_PUBLIC_STORE_NAME and falls back to BRAND_NAME — CI leaves that
+    // var unset, so the title is "Mirox Shop — Сучасний одяг"; a local .env
+    // may override the name to something else entirely. /Mirox/ is the one
+    // substring stable across both environments and future locale changes —
+    // do not "tighten" this to the suffix text.
+    // Kept as a literal rather than importing BRAND_NAME: this is the only
+    // E2E spec that would import app source, and brand.ts's zero-import rule
+    // is a comment, not an enforced invariant — if it ever gained an import
+    // this would fail at transform time instead of as a readable diff.
+    await expect(page).toHaveTitle(/Mirox/);
 
     // Check main navigation elements (only on desktop - mobile has hamburger menu)
     if (!isMobile) {

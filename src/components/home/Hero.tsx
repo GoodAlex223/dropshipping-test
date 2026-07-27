@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { BenefitStrip } from "@/components/common/BenefitStrip";
 import { DEFAULT_BLUR_DATA_URL } from "@/lib/image-utils";
 import { cn } from "@/lib/utils";
 import { home } from "@/content/home";
@@ -119,8 +118,6 @@ export function Hero() {
             </div>
           )}
         </div>
-
-        <BenefitStrip items={home.benefits} className="border-border mt-16 border-t pt-10" />
       </div>
     </section>
   );

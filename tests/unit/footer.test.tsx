@@ -11,7 +11,7 @@ describe("Footer", () => {
   it("uses the Mirox tagline, not the generic template copy", () => {
     render(<Footer />);
     expect(screen.queryByText(/one-stop shop for quality products/i)).not.toBeInTheDocument();
-    expect(screen.getByText(/value quality and minimalism/i)).toBeInTheDocument();
+    expect(screen.getByText(/цінує якість і мінімалізм/)).toBeInTheDocument();
   });
 
   it("links to the social profiles", () => {

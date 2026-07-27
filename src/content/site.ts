@@ -1,4 +1,4 @@
-import { Truck, RefreshCw, ShieldCheck, MessageCircle, type LucideIcon } from "lucide-react";
+import { Truck, CreditCard, ShieldCheck, Headphones, type LucideIcon } from "lucide-react";
 import { BRAND_NAME, BRAND_TAGLINE } from "./brand";
 
 /**
@@ -87,29 +87,23 @@ export const site = {
   /**
    * Footer benefit strip — the concept screenshot's footer row.
    *
-   * "Free delivery" and "Secure payment" had their descriptions RETRACTED,
-   * not merely flagged unconfirmed. "On orders over 1000 UAH" has no
-   * implementing logic anywhere in the order path — calculateOrderTotals()
-   * (src/lib/stripe.ts) and the checkout confirm-order route always charge
-   * `shippingMethod?.price ?? 0`, at any subtotal. "Online or on delivery"
-   * names a payment method — cash on delivery — that does not exist; it is
-   * TASK-049, per the TASK-038b payments decision doc. Both descriptions were
-   * rewritten to claim nothing the checkout contradicts. The four titles are
-   * unchanged: TODO.md's TASK-035 AC only requires the benefit cards to be
-   * present, not these specific promises.
-   *
-   * "Easy returns" / "14 days" is a different kind of gap and was left as-is:
-   * it isn't contradicted by any code path, just unconfirmed with the client
-   * and missing its /returns destination page (see the content & legal pages
-   * spawned task). Confirm with the client before production.
+   * "Free delivery" (threshold) had its description RETRACTED, not merely
+   * flagged unconfirmed: calculateOrderTotals() (src/lib/stripe.ts) and the
+   * checkout confirm-order route always charge `shippingMethod?.price ?? 0`,
+   * at any subtotal — no free-shipping threshold exists anywhere in the order
+   * path. «Обмін розміру» / "Easy returns" was REMOVED outright (not just
+   * reworded) per the client, 26.07.2026 — no such service exists, and it had
+   * no destination page either. «Оплата при отриманні» (pay on delivery) is
+   * confirmed by the client (26.07.2026) as the offer being made; the payment
+   * method itself ships in TASK-049, per the TASK-038b payments decision doc.
    *
    * Tracked by the client content inventory task (docs/planning/TODO.md
    * Spawned section).
    */
   footerBenefits: [
-    { icon: Truck, title: "Free delivery", description: "Calculated at checkout" },
-    { icon: RefreshCw, title: "Easy returns", description: "14 days to change your mind" },
-    { icon: ShieldCheck, title: "Secure payment", description: "Encrypted checkout" },
-    { icon: MessageCircle, title: "Support 24/7", description: "We're always here" },
+    { icon: Truck, title: "Швидка доставка", description: "Розрахунок при оформленні" },
+    { icon: CreditCard, title: "Оплата при отриманні", description: "Без передоплати" },
+    { icon: ShieldCheck, title: "Безпечна оплата", description: "Захищений checkout" },
+    { icon: Headphones, title: "Підтримка 24/7", description: "Ми завжди на зв'язку" },
   ] as BenefitItem[],
 };

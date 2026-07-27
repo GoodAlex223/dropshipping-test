@@ -7,27 +7,35 @@ test.describe("Homepage", () => {
 
   test("renders the Mirox hero slogan", async ({ page }) => {
     const heading = page.getByRole("heading", { level: 1 });
-    await expect(heading).toContainText("STYLE.");
-    await expect(heading).toContainText("QUALITY.");
-    await expect(heading).toContainText("CONFIDENCE.");
+    await expect(heading).toContainText("СТИЛЬ.");
+    await expect(heading).toContainText("ЯКІСТЬ.");
+    await expect(heading).toContainText("ВПЕВНЕНІСТЬ.");
   });
 
   test("primary CTA navigates to the catalog", async ({ page }) => {
-    await page.getByRole("link", { name: "Shop the Catalog" }).click();
+    await page.getByRole("link", { name: "ПЕРЕЙТИ В КАТАЛОГ" }).click();
     await expect(page).toHaveURL(/\/products$/);
   });
 
   test("secondary CTA navigates to new arrivals", async ({ page }) => {
-    await page.getByRole("link", { name: "New Arrivals" }).first().click();
-    await expect(page).toHaveURL(/sort=newest/);
+    await page.getByRole("link", { name: "ПЕРЕГЛЯНУТИ НОВИНКИ" }).first().click();
+    await expect(page).toHaveURL(/sortBy=createdAt&sortOrder=desc/);
   });
 
   test("shows the why-choose-us block", async ({ page }) => {
-    await expect(page.getByRole("heading", { name: /why choose us/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /чому обирають нас/i })).toBeVisible();
   });
 
   test("shows social links", async ({ page }) => {
-    await expect(page.getByRole("link", { name: /Instagram/ }).first()).toBeVisible();
+    // Social links live in the footer only since TASK-057's homepage
+    // restructure removed the dedicated tiles section — scope the locator so
+    // this doesn't accidentally match a future header/nav Instagram link.
+    await expect(
+      page
+        .locator("footer")
+        .getByRole("link", { name: /Instagram/i })
+        .first()
+    ).toBeVisible();
   });
 
   test("announcement bar dismisses and stays dismissed when configured", async ({ page }) => {

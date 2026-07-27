@@ -23,6 +23,7 @@ describe("WhyChooseUs", () => {
 
   it("renders the supporting brand-voice items", () => {
     render(<WhyChooseUs />);
-    expect(screen.getByText("Secure payment")).toBeInTheDocument();
+    expect(screen.getByText("Безпечна оплата")).toBeInTheDocument();
+    expect(screen.getAllByRole("listitem")).toHaveLength(6);
   });
 });
