@@ -94,7 +94,7 @@ export default async function HomePage() {
               {home.social.title}
             </h2>
             <p className="text-muted-foreground mt-4 text-sm">{home.social.subtitle}</p>
-            <SocialLinks className="mt-8 justify-center" />
+            <SocialLinks variant="tiles" className="mt-8" />
           </FadeIn>
         </div>
       </section>

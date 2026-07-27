@@ -57,6 +57,11 @@ describe("SocialLinks", () => {
     expect(link).toHaveAttribute("target", "_blank");
     expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
   });
+
+  it("renders glass tiles in the tiles variant", () => {
+    const { container } = render(<SocialLinks variant="tiles" />);
+    expect(container.querySelector(".glass")).not.toBeNull();
+  });
 });
 
 describe("formatFollowers boundary values", () => {

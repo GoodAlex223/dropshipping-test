@@ -34,11 +34,18 @@ function formatFollowers(count: number): string {
 
 interface SocialLinksProps {
   className?: string;
+  variant?: "inline" | "tiles";
 }
 
-export function SocialLinks({ className }: SocialLinksProps) {
+export function SocialLinks({ className, variant = "inline" }: SocialLinksProps) {
+  const isTiles = variant === "tiles";
   return (
-    <ul className={cn("flex flex-wrap items-center gap-4", className)}>
+    <ul
+      className={cn(
+        isTiles ? "flex flex-wrap justify-center gap-4" : "flex flex-wrap items-center gap-4",
+        className
+      )}
+    >
       {site.socials.map((social) => {
         const Icon = ICONS[social.platform];
         return (
@@ -49,15 +56,21 @@ export function SocialLinks({ className }: SocialLinksProps) {
               fixed on the announcement bar's dismiss button). `py-2` grows the
               hit area to 36px; the matching `-my-2` cancels it back out of flow
               so the visible row height and the `gap-4` spacing to neighboring
-              links are unchanged.
+              links are unchanged. Only applies to the inline variant; the
+              tiles variant's larger px-8 py-6 hit area already clears 24x24.
             */}
             <a
               href={social.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-muted-foreground -my-2 inline-flex items-center gap-2 py-2 text-sm transition-colors"
+              className={cn(
+                "transition-colors",
+                isTiles
+                  ? "glass hover-lift flex flex-col items-center gap-2 rounded-lg px-8 py-6 text-sm"
+                  : "hover:text-muted-foreground -my-2 inline-flex items-center gap-2 py-2 text-sm"
+              )}
             >
-              <Icon className="h-5 w-5" aria-hidden="true" />
+              <Icon className={isTiles ? "h-6 w-6" : "h-5 w-5"} aria-hidden="true" />
               <span>{social.label}</span>
               {social.followers !== null && (
                 <span className="text-muted-foreground text-xs">

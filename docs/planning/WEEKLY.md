@@ -1,18 +1,19 @@
 # Weekly Plan
 
-**Week of**: 2026-07-13 to 2026-07-19
-**Last Updated**: 2026-07-18
+**Week of**: 2026-07-20 to 2026-07-26
+**Last Updated**: 2026-07-21
 
 ---
 
 ## 🎯 Weekly Focus
 
-**Primary Goal**: Resume development post-freeze (TASK-033) and start Mirox Shop v1.3 tracks.
+**Primary Goal**: Ship the v1.3 Mirox customer-facing rebrand — homepage (done), then catalog and product page.
 
 **Secondary Goals**:
 
-- ✅ Start Track A rebrand foundation (TASK-034) — completed and merged, PR #19
-- Complete Track B payments/delivery research spike (TASK-038b)
+- ✅ Homepage rebrand (TASK-035) — completed and merged, PR #21
+- ✅ Harden the deploy pipeline — migrations now applied on every Vercel deploy (PR #22), after a post-merge prod incident exposed months of silent schema drift
+- Start i18n foundation (TASK-039) — also a payments prerequisite (monobank requires a UA-language site)
 
 ---
 
@@ -20,32 +21,33 @@
 
 ### Must Complete (Critical)
 
-| Task                      | Reference         | Status    | Notes                                                                                                                                                                     |
-| ------------------------- | ----------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Resumption validation     | TODO.md TASK-033  | ✅ PR #16 | Merged 2026-07-14                                                                                                                                                         |
-| Prework (WebKit/sharp/CI) | TODO.md TASK-038a | ✅ PR #17 | Branch B (test artifact, not a product bug) — WebKit `fill()` before hydration; no product code changed                                                                   |
-| Payments & delivery spike | TODO.md TASK-038b | ✅ PR #18 | Decision doc; 120 claims verified (27.5% disputed). Fondy disqualified (NBU licence revoked); LiqPay = safest default. Unblocks v1.4 Track B pending client prerequisites |
+| Task             | Reference        | Status    | Notes                                                                                                                                                              |
+| ---------------- | ---------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Homepage rebrand | TODO.md TASK-035 | ✅ PR #21 | Merged 2026-07-21 (`0992851`). Mirox homepage on the TASK-034 tokens; content-config layer; real-bestsellers rail. Prod hotfix PR #22 (`e89060d`) — see Daily Log. |
 
 ### Should Complete (Important)
 
-| Task                     | Reference        | Status    | Notes                                                                                                                       |
-| ------------------------ | ---------------- | --------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Design system foundation | TODO.md TASK-034 | ✅ PR #19 | Merged 2026-07-18 (`adaa278`). Token-first Mirox system; `next-themes` excised; two-layer colour guard. Tests 246+1 → 336+1 |
+| Task                  | Reference        | Status     | Notes                                                                                              |
+| --------------------- | ---------------- | ---------- | -------------------------------------------------------------------------------------------------- |
+| Catalog redesign      | TODO.md TASK-036 | 📋 Planned | Filters + sorting; must preserve/replace the E2E hydration gate; imports `getBestsellers` for sort |
+| Product page redesign | TODO.md TASK-037 | 📋 Planned | Gallery, size/color, stock counter, related + recently-viewed                                      |
 
 ### Nice to Have (If Time Permits)
 
-| Task          | Reference        | Status     | Notes                              |
-| ------------- | ---------------- | ---------- | ---------------------------------- |
-| CI extensions | TODO.md TASK-040 | 📋 Planned | Lighthouse budget, preview deploys |
+| Task            | Reference        | Status     | Notes                                                            |
+| --------------- | ---------------- | ---------- | ---------------------------------------------------------------- |
+| i18n foundation | TODO.md TASK-039 | 📋 Planned | UA default / RU toggle, UAH formatting; hard prereq for payments |
+| CI extensions   | TODO.md TASK-040 | 📋 Planned | Lighthouse budget, preview deploys, post-deploy smoke test       |
 
 ---
 
 ## 🚧 Blockers & Risks
 
-| Blocker                        | Impact                      | Mitigation                              | Owner  |
-| ------------------------------ | --------------------------- | --------------------------------------- | ------ |
-| 5-month dependency drift       | Unknown vulnerabilities     | TASK-033 audit with conservative policy | Claude |
-| Design files not yet delivered | Possible rework in TASK-035 | Token-driven components in TASK-034     | User   |
+| Blocker                          | Impact                                       | Mitigation                                                   | Owner |
+| -------------------------------- | -------------------------------------------- | ------------------------------------------------------------ | ----- |
+| Design files not yet delivered   | Possible rework in TASK-036/037              | Token-driven components from TASK-034; build to the brief    | User  |
+| Client content inventory pending | Hero photo, logo vector, real socials/claims | TASK-056 consolidates the ask; placeholders/gates until then | User  |
+| Client payments prerequisites    | TASK-048 gateway pick blocked                | 9-item checklist (decision doc §5.3) — chase before v1.4     | User  |
 
 ---
 
@@ -53,50 +55,31 @@
 
 ### Daily Log
 
-#### Tuesday (2026-07-14)
+_(TASK-035 spec + plan were authored 2026-07-19, in the prior week — see DONE.md.)_
 
-- [x] TASK-033: environment bring-up, audit, validation baseline, planning docs
-- **Completed**: TASK-033 in full — env bring-up, audit (32→6 vulns, commit 3a3ec75), validation baseline (unit/build green; E2E 83/85, WebKit-only pre-existing bug), planning docs, review fixes, PR #16 merged (c07e474)
-- **Blockers**: none (open decision: WebKit E2E fix-vs-defer before v1.3 feature work)
+#### Monday (2026-07-20)
 
-#### Wednesday (2026-07-15)
+- [x] TASK-035: homepage implementation (subagent-driven — fresh implementer + independent reviewer per task)
+- **Completed**: the homepage rebuilt on the Mirox tokens — content-config layer (`src/content/{brand,site,home}.ts`), home sections (`Hero`, `ProductRail`, `WhyChooseUs`, `Testimonials`) + shared `AnnouncementBar`/`BenefitStrip`/`SocialLinks`, data layer (`product-queries.ts` real-bestsellers with fallback, `review-queries.ts` testimonials), site-wide code-generated OG card, rebranded footer. English copy, extraction-ready for i18n.
+- **Blockers**: none (hero ships typographic-complete; real photography deferred to the client — TASK-056)
 
-- [x] Post-merge verification: CI + Deploy green on merge (c07e474) and completion docs (35819dc); Vercel production deploy live
-- **Completed**: TASK-033 completion workflow (extract/archive/transition/commit/memory); 2 new BACKLOG entries from verification (`sharp` missing in standalone mode; Actions deploy job is a validated no-op without secrets)
-- **Blockers**: none (open decisions for user: WebKit fix-vs-defer; add `sharp` now vs backlog)
+#### Tuesday (2026-07-21)
 
-#### Thursday (2026-07-16)
-
-- [x] TASK-038a: diagnosed WebKit E2E search-filter failure, added `sharp`, added `webkit` to CI, completion workflow
-- **Completed**: TASK-038a in full — diagnosis proved the WebKit failure is a test artifact (pre-hydration `fill()` race), not a product bug, per Branch B of spec §4.3; `tests/e2e/products.spec.ts` now waits for a hydration signal before interacting; `sharp ^0.35.3` added to `dependencies`; `webkit` added to the CI E2E matrix; BACKLOG `:345`/`:361` resolved, 6 new entries added; `.prettierignore` fixed so `format:check` is usable locally again. Full verification: unit 246+1 todo, lint/typecheck/build/format:check all PASS, E2E 84/85 (both previously-failing WebKit/Mobile Safari tests now pass; 1 pre-existing unrelated chromium dev-server flake remains, BACKLOG'd)
-- **Blockers**: none. Both open decisions from 2026-07-15 (WebKit fix-vs-defer, `sharp` add-vs-backlog) are resolved. PR #17 opened from `feat/task-038a-prework`; that run is the first execution of the new `webkit` CI job, which is spec §8's one criterion not verifiable locally
-
-#### Friday (2026-07-17)
-
-- [x] TASK-038b: Ukraine payments & delivery research spike — brainstorm → spec → plan → research → decision doc → PR #18 merged (`cebbbe5`), completion workflow
-- **Completed**: TASK-038b in full. Decision doc delivered (9 sections, no product code): two-rail model (online gateway **and** NP COD), 5-gateway × 16-field matrix, conditional decision tree + 9-item client prerequisites, NP scoping, single-UAH strategy, and a TASK-048/049 integration blueprint. Method: Ultracode fan-out + adversarial verification — **120 claims, all verified; 27.5% of the raw research was disputed**, which is the spike's central justification. Four plan-changing findings: **Fondy disqualified** (NBU licence of ТОВ «ФК "ЕЛАЄНС"» revoked 2024-07-22), **Plata by mono cannot offer installments** via the acquiring API, **monobank requires a UA-language site** (escalates TASK-039 to a payments prerequisite), and an **inverted NP postomat UUID** that would have shipped branch pickups to locker customers. PR review found 3 issues (all self-imposed-rule violations), fixed in `92b4e1f`; re-review clean; CI + Deploy green; Vercel production live.
-- **Blockers**: none for this task. **Downstream blockers now recorded**: the 9-item client prerequisites checklist (decision doc §5.3) gates TASK-048's single-gateway pick; the classic NP status-webhook question is unresolved (devportal Cloudflare-blocked) and gates TASK-049's polling design.
-- **Note**: the research workflow was OOM-killed 3× (devcontainer memory, not Docker); finished via foreground agents. Phase 1 investigation BACKLOG'd with a repro plan — do it in a separate session.
-
-#### Saturday (2026-07-18)
-
-- [x] TASK-034: Mirox design system & rebrand foundation — brainstorm → spec → plan → 12 TDD tasks → PR #19 merged (`adaa278`), completion workflow
-- **Completed**: TASK-034 in full. Token-first design system: Mirox tokens + `[data-surface="dark"]` section inversion, Manrope/Inter with `cyrillic-ext` (₴), code-built `<Logo/>`, reduced-motion-safe motion primitives, `next-themes` excised from the storefront (closing a real showcase→storefront theme-contamination path), Header/Footer as dark surfaces, shared `order-status` module replacing a 4× duplicated map, and checkout/newsletter/404/account-order-detail neutralized. Tests **246+1 → 336+1**; lint/typecheck/format/build green; CI green on `main`; production deployed by the Vercel Git integration and verified serving the rebrand. Executed via subagent-driven development: 12 implementer+reviewer pairs, then a whole-branch review.
-- **Review value**: six review rounds found **zero runtime defects** but four real latent bugs no gate could see — `[data-surface]` never re-asserted `color` (black-on-black header), the dark footer silently drove the newsletter input to 1.34:1, `text-destructive-foreground` was a **dead class** (token defined but never registered in `@theme`; fixing it repaired 7 pre-existing sites), and the colour policy had **no enforcement at the token layer** (`--primary: #0055FF` would have passed all 294 tests). Two tests that could not fail were rewritten.
-- **Blockers**: none. **Carried**: 8 BACKLOG entries, incl. a pre-existing `use(params)` break on 4 dynamic routes (Next 14.2.35 passes plain-object params; docs had encoded the broken pattern as intended) and `NEXT_PUBLIC_STORE_NAME` unset in production, so titles/OG/emails still brand as "Store".
+- [x] TASK-035 shipped + production incident hotfix + completion workflow
+- **Completed**: PR #21 code-review round (OG card was silently suppressed by `getDefaultMetadata()` pinning the stale PNG — fixed so the generated Mirox card renders site-wide; docs index date) then merged (`0992851`). **Post-merge prod incident**: homepage 500 on every request — root-caused via Vercel runtime logs to a `reviews` table that had never been migrated to production (schema drifted since Feb; nothing ran `migrate deploy` on deploy). Hotfix **PR #22** (`e89060d`): `safeSection()` resilience so a failed section can't 500 the page, plus a `vercel-build` step that applies migrations on every Vercel deploy (via `DIRECT_URL`). Verified: prod `/` 200, all 5 pending migrations applied, zero runtime errors, reviews + newsletter restored. Completion workflow (extract/archive/transition/commit/memory).
+- **Blockers**: none. **Carried**: 8 BACKLOG entries (testimonials under-fill, `?sort=newest` inert until TASK-036, USD-vs-UAH copy, migration-drift guard, post-deploy smoke test, `DIRECT_URL` docs, …)
 
 ---
 
 ## 🔮 Next Week Preview
 
-**Tentative Focus**: TASK-035 homepage + TASK-036 catalog (Track A); TASK-039 i18n foundation (Track B).
+**Tentative Focus**: Finish TASK-036 catalog + TASK-037 product page; begin TASK-039 i18n (Track B payments prerequisite).
 
 **Preparation Needed**:
 
 - [ ] Client design files (Figma) — chase if still missing
-- [ ] Client asset chase-list: hero model photos, customer/gallery photos (w/ consent), vector logo, real follower counts, size charts — see BACKLOG "Content dependencies" note
-- [ ] Client decision: discount wheel — present recorded doubts (BACKLOG) before any build
-- [ ] **Client answers to the 9-item prerequisites checklist** ([decision doc §5.3](../superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md)) — legal form (ФОП/ТОВ), tax group, turnover vs the 10,091,049 UAH Group 3 cap, VAT status, current bank (the Plata-vs-LiqPay switch), installments wanted?, РРО/ПРРО status (**accountant, not us**), NovaPay account?, site prerequisites (public offer + return policy; UA-language version). Until these land, TASK-048 has a decision tree but no single gateway.
+- [ ] Client content inventory (TASK-056): hero model photos, vector logo, real follower counts/claim figures, announcement copy, free-shipping threshold, return window, size charts, legal copy
+- [ ] **Client answers to the 9-item prerequisites checklist** ([decision doc §5.3](../superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md)) — legal form, tax group, turnover, VAT, current bank, installments, РРО/ПРРО (accountant), NovaPay account, site prerequisites. Until these land, TASK-048 has a decision tree but no single gateway.
 - [ ] **Open the Cloudflare-blocked `developers.novaposhta.ua` from an unblocked network** to settle whether the classic API has a status webhook — gates TASK-049's polling design (decision doc §6.6)
 
 ---
