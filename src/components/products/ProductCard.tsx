@@ -3,6 +3,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { IMAGE_SIZES } from "@/lib/image-utils";
+import { formatPrice } from "@/lib/format";
 import { ProductImage } from "./ProductImage";
 
 interface ProductCardProps {
@@ -33,13 +34,6 @@ export function ProductCard({ product, showCategory = true }: ProductCardProps) 
     comparePrice && comparePrice > price
       ? Math.round(((comparePrice - price) / comparePrice) * 100)
       : null;
-
-  const formatPrice = (value: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(value);
-  };
 
   const isOutOfStock = product.stock <= 0;
 

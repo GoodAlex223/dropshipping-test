@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Package, ShoppingCart, Zap } from "lucide-react";
+import { formatPrice } from "@/lib/format";
 import type { ProductGridProps, ShowcaseProduct } from "../types";
 
 function BoldProductCard({ product }: { product: ShowcaseProduct }) {
@@ -73,11 +74,11 @@ function BoldProductCard({ product }: { product: ShowcaseProduct }) {
           {/* Price */}
           <div className="mt-3 flex items-baseline gap-2">
             <span className="text-foreground text-2xl font-extrabold">
-              ${parseFloat(product.price).toFixed(2)}
+              {formatPrice(product.price)}
             </span>
             {hasDiscount && (
               <span className="text-muted-foreground text-sm line-through">
-                ${parseFloat(product.comparePrice!).toFixed(2)}
+                {formatPrice(product.comparePrice!)}
               </span>
             )}
           </div>

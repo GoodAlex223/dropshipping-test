@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Package } from "lucide-react";
+import { formatPrice } from "@/lib/format";
 import type { ProductGridProps, ShowcaseProduct } from "../types";
 
 function LuxuryProductCard({ product }: { product: ShowcaseProduct }) {
@@ -54,11 +55,11 @@ function LuxuryProductCard({ product }: { product: ShowcaseProduct }) {
           {/* Price - elegant */}
           <div className="mt-4 flex items-baseline justify-center gap-3">
             <span className="text-foreground text-lg font-medium tracking-wide">
-              ${parseFloat(product.price).toFixed(2)}
+              {formatPrice(product.price)}
             </span>
             {hasDiscount && (
               <span className="text-muted-foreground text-sm line-through">
-                ${parseFloat(product.comparePrice!).toFixed(2)}
+                {formatPrice(product.comparePrice!)}
               </span>
             )}
           </div>

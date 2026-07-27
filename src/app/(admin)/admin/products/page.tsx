@@ -52,6 +52,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { ProductImportDialog } from "@/components/admin";
+import { formatPrice } from "@/lib/format";
 import { toast } from "sonner";
 
 interface Product {
@@ -200,13 +201,6 @@ function ProductsContent() {
       setIsDeleting(false);
       setDeleteId(null);
     }
-  };
-
-  const formatPrice = (price: string) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(parseFloat(price));
   };
 
   return (

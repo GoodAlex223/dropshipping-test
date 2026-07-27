@@ -286,8 +286,8 @@ function ProductsContentInner() {
                     className="mt-2"
                   />
                   <div className="flex items-center justify-between text-sm">
-                    <span>${priceRange[0]}</span>
-                    <span>${priceRange[1]}</span>
+                    <span>{priceRange[0]} грн</span>
+                    <span>{priceRange[1]} грн</span>
                   </div>
                   <Button
                     variant="outline"
@@ -376,8 +376,8 @@ function ProductsContentInner() {
           )}
           {(searchParams?.get("minPrice") || searchParams?.get("maxPrice")) && (
             <Badge variant="secondary" className="gap-1">
-              Price: ${searchParams?.get("minPrice") || "0"} - $
-              {searchParams?.get("maxPrice") || "∞"}
+              Price: {searchParams?.get("minPrice") || "0"} грн -{" "}
+              {searchParams?.get("maxPrice") || "∞"} грн
               <button onClick={() => updateFilters({ minPrice: null, maxPrice: null })}>
                 <X className="h-3 w-3" />
               </button>

@@ -238,7 +238,7 @@ describe("SEO Utilities", () => {
 
       expect(jsonLd.offers["@type"]).toBe("Offer");
       expect(jsonLd.offers.price).toBe("29.99");
-      expect(jsonLd.offers.priceCurrency).toBe("USD");
+      expect(jsonLd.offers.priceCurrency).toBe("UAH");
     });
 
     it("should set InStock availability when stock > 0", () => {

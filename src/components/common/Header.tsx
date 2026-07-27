@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { formatPrice } from "@/lib/format";
 import { Logo } from "@/components/common/Logo";
 import { useCartStore } from "@/stores/cart.store";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -397,7 +398,7 @@ export function Header() {
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-medium">{result.name}</p>
                         <p className="text-muted-foreground text-sm">
-                          {result.category.name} · ${parseFloat(result.price).toFixed(2)}
+                          {result.category.name} · {formatPrice(result.price)}
                         </p>
                       </div>
                     </button>

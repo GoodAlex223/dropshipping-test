@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { prisma } from "@/lib/db";
 import { siteConfig } from "@/lib/seo";
+import { formatPrice } from "@/lib/format";
 
 export const alt = "Product";
 export const size = { width: 1200, height: 630 };
@@ -43,10 +44,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
     );
   }
 
-  const formattedPrice = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(Number(product.price));
+  const formattedPrice = formatPrice(Number(product.price));
 
   const imageUrl = product.images[0]?.url;
   const displayName = product.name.length > 80 ? product.name.slice(0, 77) + "..." : product.name;

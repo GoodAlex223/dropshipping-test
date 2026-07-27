@@ -23,6 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { formatPrice } from "@/lib/format";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -542,9 +543,9 @@ export default function AdminOrderDetailPage({ params }: AdminOrderDetailPagePro
                     <p className="text-muted-foreground text-sm">SKU: {item.productSku}</p>
                     <div className="mt-2 flex items-center justify-between">
                       <p className="text-sm">
-                        ${parseFloat(item.unitPrice).toFixed(2)} × {item.quantity}
+                        {formatPrice(item.unitPrice)} × {item.quantity}
                       </p>
-                      <p className="font-medium">${parseFloat(item.totalPrice).toFixed(2)}</p>
+                      <p className="font-medium">{formatPrice(item.totalPrice)}</p>
                     </div>
                   </div>
                 </div>
@@ -627,7 +628,7 @@ export default function AdminOrderDetailPage({ params }: AdminOrderDetailPagePro
                       )}
                       {so.cost && (
                         <p className="text-muted-foreground mt-1 text-sm">
-                          Cost: ${parseFloat(so.cost).toFixed(2)}
+                          Cost: {formatPrice(so.cost)}
                         </p>
                       )}
                     </div>
@@ -664,26 +665,26 @@ export default function AdminOrderDetailPage({ params }: AdminOrderDetailPagePro
             <CardContent className="space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span>${parseFloat(order.subtotal).toFixed(2)}</span>
+                <span>{formatPrice(order.subtotal)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Shipping</span>
-                <span>${parseFloat(order.shippingCost).toFixed(2)}</span>
+                <span>{formatPrice(order.shippingCost)}</span>
               </div>
               {parseFloat(order.discount) > 0 && (
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Discount</span>
-                  <span className="text-green-600">-${parseFloat(order.discount).toFixed(2)}</span>
+                  <span className="text-green-600">-{formatPrice(order.discount)}</span>
                 </div>
               )}
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Tax</span>
-                <span>${parseFloat(order.tax).toFixed(2)}</span>
+                <span>{formatPrice(order.tax)}</span>
               </div>
               <Separator />
               <div className="flex justify-between font-semibold">
                 <span>Total</span>
-                <span>${parseFloat(order.total).toFixed(2)}</span>
+                <span>{formatPrice(order.total)}</span>
               </div>
             </CardContent>
           </Card>

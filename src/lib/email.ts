@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { generateNewsletterConfirmationHtml } from "./email-templates/newsletter-confirmation";
+import { formatPrice } from "./format";
 
 const resendApiKey = process.env.RESEND_API_KEY;
 const emailFrom = process.env.EMAIL_FROM || "noreply@yourdomain.com";
@@ -46,7 +47,7 @@ function generateOrderConfirmationHtml(data: OrderEmailData): string {
           <div style="color: #6b7280; font-size: 14px;">Qty: ${item.quantity}</div>
         </td>
         <td style="padding: 12px 0; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 500;">
-          $${item.totalPrice.toFixed(2)}
+          ${formatPrice(item.totalPrice)}
         </td>
       </tr>
     `
@@ -96,19 +97,19 @@ function generateOrderConfirmationHtml(data: OrderEmailData): string {
   <table style="width: 100%; margin-bottom: 32px;">
     <tr>
       <td style="color: #6b7280;">Subtotal</td>
-      <td style="text-align: right;">$${data.subtotal.toFixed(2)}</td>
+      <td style="text-align: right;">${formatPrice(data.subtotal)}</td>
     </tr>
     <tr>
       <td style="color: #6b7280;">Shipping</td>
-      <td style="text-align: right;">$${data.shippingCost.toFixed(2)}</td>
+      <td style="text-align: right;">${formatPrice(data.shippingCost)}</td>
     </tr>
     <tr>
       <td style="color: #6b7280;">Tax</td>
-      <td style="text-align: right;">$${data.tax.toFixed(2)}</td>
+      <td style="text-align: right;">${formatPrice(data.tax)}</td>
     </tr>
     <tr>
       <td style="border-top: 1px solid #e5e7eb; padding-top: 12px; font-weight: 600;">Total</td>
-      <td style="border-top: 1px solid #e5e7eb; padding-top: 12px; text-align: right; font-weight: 600;">$${data.total.toFixed(2)}</td>
+      <td style="border-top: 1px solid #e5e7eb; padding-top: 12px; text-align: right; font-weight: 600;">${formatPrice(data.total)}</td>
     </tr>
   </table>
 

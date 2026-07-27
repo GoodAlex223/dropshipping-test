@@ -22,6 +22,7 @@ import { ProductCard, SocialShareButtons } from "@/components/products";
 import { ReviewSection } from "@/components/reviews";
 import { useCartStore } from "@/stores/cart.store";
 import { cn } from "@/lib/utils";
+import { formatPrice } from "@/lib/format";
 import { trackViewItem, trackAddToCart } from "@/lib/analytics";
 import { DEFAULT_BLUR_DATA_URL, IMAGE_SIZES } from "@/lib/image-utils";
 import type { ReviewWithUser, RatingDistribution } from "@/types";
@@ -283,10 +284,10 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
           {/* Price */}
           <div className="flex items-baseline gap-3">
-            <span className="text-3xl font-bold">${currentPrice.toFixed(2)}</span>
+            <span className="text-3xl font-bold">{formatPrice(currentPrice)}</span>
             {hasDiscount && (
               <span className="text-muted-foreground text-xl line-through">
-                ${comparePrice.toFixed(2)}
+                {formatPrice(comparePrice)}
               </span>
             )}
           </div>

@@ -285,8 +285,8 @@ export function CategoryClient({ category }: CategoryClientProps) {
                   className="mt-2"
                 />
                 <div className="flex items-center justify-between text-sm">
-                  <span>${priceRange[0]}</span>
-                  <span>${priceRange[1]}</span>
+                  <span>{priceRange[0]} грн</span>
+                  <span>{priceRange[1]} грн</span>
                 </div>
                 <Button variant="outline" size="sm" className="w-full" onClick={applyPriceFilter}>
                   Apply Price Filter
@@ -307,7 +307,7 @@ export function CategoryClient({ category }: CategoryClientProps) {
           <div className="hidden flex-wrap items-center gap-2 md:flex">
             {appliedPriceRange && (
               <Badge variant="secondary" className="gap-1">
-                Price: ${appliedPriceRange[0]} - ${appliedPriceRange[1]}
+                Price: {appliedPriceRange[0]} грн - {appliedPriceRange[1]} грн
                 <button onClick={() => setAppliedPriceRange(null)}>
                   <X className="h-3 w-3" />
                 </button>

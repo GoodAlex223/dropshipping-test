@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
+import { formatPrice } from "@/lib/format";
 
 interface Customer {
   id: string;
@@ -101,13 +102,6 @@ export default function AdminCustomersPage() {
       month: "short",
       day: "numeric",
     });
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
   };
 
   return (
@@ -209,7 +203,7 @@ export default function AdminCustomersPage() {
                     </div>
                   </TableCell>
                   <TableCell className="text-right font-medium">
-                    {formatCurrency(customer.totalSpent)}
+                    {formatPrice(customer.totalSpent)}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">

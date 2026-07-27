@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { PurchaseTracker } from "@/components/analytics/PurchaseTracker";
+import { formatPrice } from "@/lib/format";
 
 interface ConfirmationPageProps {
   searchParams: Promise<{ order?: string }>;
@@ -82,10 +83,10 @@ async function OrderConfirmation({ orderNumber }: { orderNumber: string }) {
                       <p className="text-muted-foreground text-sm">{item.variantInfo}</p>
                     )}
                     <p className="text-muted-foreground text-sm">
-                      Qty: {item.quantity} × ${Number(item.unitPrice).toFixed(2)}
+                      Qty: {item.quantity} × {formatPrice(Number(item.unitPrice))}
                     </p>
                   </div>
-                  <p className="font-medium">${Number(item.totalPrice).toFixed(2)}</p>
+                  <p className="font-medium">{formatPrice(Number(item.totalPrice))}</p>
                 </div>
               ))}
             </div>
@@ -96,20 +97,20 @@ async function OrderConfirmation({ orderNumber }: { orderNumber: string }) {
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span>${Number(order.subtotal).toFixed(2)}</span>
+                <span>{formatPrice(Number(order.subtotal))}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Shipping</span>
-                <span>${Number(order.shippingCost).toFixed(2)}</span>
+                <span>{formatPrice(Number(order.shippingCost))}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Tax</span>
-                <span>${Number(order.tax).toFixed(2)}</span>
+                <span>{formatPrice(Number(order.tax))}</span>
               </div>
               <Separator />
               <div className="flex justify-between font-semibold">
                 <span>Total</span>
-                <span>${Number(order.total).toFixed(2)}</span>
+                <span>{formatPrice(Number(order.total))}</span>
               </div>
             </div>
 

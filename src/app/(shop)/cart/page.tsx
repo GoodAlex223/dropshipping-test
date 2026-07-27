@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useCartStore, CartItem } from "@/stores/cart.store";
 import { cn } from "@/lib/utils";
+import { formatPrice } from "@/lib/format";
 import { trackViewCart } from "@/lib/analytics";
 
 interface StockInfo {
@@ -125,8 +126,7 @@ export default function CartPage() {
   };
 
   const subtotal = getTotalPrice();
-  const shipping = subtotal > 100 ? 0 : 9.99;
-  const total = subtotal + shipping;
+  const total = subtotal;
 
   if (!mounted) {
     return <CartPageSkeleton />;
@@ -196,7 +196,7 @@ export default function CartPage() {
                           <div>
                             <h3 className="font-medium">{item.name}</h3>
                             <p className="text-muted-foreground text-sm">
-                              ${item.price.toFixed(2)} each
+                              {formatPrice(item.price)} each
                             </p>
                             {stockStatus && (
                               <p
@@ -253,7 +253,7 @@ export default function CartPage() {
                         </div>
                       </TableCell>
                       <TableCell className="text-right font-medium">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        {formatPrice(item.price * item.quantity)}
                       </TableCell>
                       <TableCell>
                         <Button
@@ -296,7 +296,7 @@ export default function CartPage() {
                       <div className="flex items-start justify-between">
                         <div>
                           <h3 className="font-medium">{item.name}</h3>
-                          <p className="text-muted-foreground text-sm">${item.price.toFixed(2)}</p>
+                          <p className="text-muted-foreground text-sm">{formatPrice(item.price)}</p>
                         </div>
                         <Button
                           variant="ghost"
@@ -345,7 +345,7 @@ export default function CartPage() {
                         <Plus className="h-3 w-3" />
                       </Button>
                     </div>
-                    <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="font-medium">{formatPrice(item.price * item.quantity)}</p>
                   </div>
                 </div>
               );
@@ -396,27 +396,16 @@ export default function CartPage() {
             <div className="mt-4 space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>{formatPrice(subtotal)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Shipping</span>
-                <span>
-                  {shipping === 0 ? (
-                    <span className="text-green-600">Free</span>
-                  ) : (
-                    `$${shipping.toFixed(2)}`
-                  )}
-                </span>
+                <span>Calculated at checkout</span>
               </div>
-              {subtotal < 100 && (
-                <p className="text-muted-foreground text-sm">
-                  Add ${(100 - subtotal).toFixed(2)} more for free shipping
-                </p>
-              )}
               <Separator />
               <div className="flex justify-between font-semibold">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>{formatPrice(total)}</span>
               </div>
             </div>
 

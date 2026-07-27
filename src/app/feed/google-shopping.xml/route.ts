@@ -19,10 +19,12 @@ function escapeXml(text: string): string {
 
 /**
  * Format a Prisma Decimal value as a Google Shopping price string.
- * Google Shopping requires format: "29.99 USD"
+ * Google Shopping requires format: "29.99 UAH". Distinct from the shared
+ * display formatter (@/lib/format) — this is the machine feed format, kept
+ * as its own function (renamed from `formatPrice`) to prevent import confusion.
  */
-function formatPrice(price: { toString(): string }): string {
-  return `${Number(price).toFixed(2)} USD`;
+function formatFeedPrice(price: { toString(): string }): string {
+  return `${Number(price).toFixed(2)} UAH`;
 }
 
 /**
@@ -61,15 +63,15 @@ function transformProduct(
     description: (product.description || product.shortDesc || product.name).slice(0, 5000),
     link: `${baseUrl}/products/${product.slug}`,
     image_link: product.images[0]?.url || `${baseUrl}/og-image.png`,
-    price: formatPrice(product.price),
+    price: formatFeedPrice(product.price),
     availability: product.stock > 0 ? "in stock" : "out of stock",
     condition: "new",
   };
 
   // Optional: sale_price (only if comparePrice exists and is higher than price)
   if (product.comparePrice && Number(product.comparePrice) > Number(product.price)) {
-    item.sale_price = formatPrice(product.price);
-    item.price = formatPrice(product.comparePrice);
+    item.sale_price = formatFeedPrice(product.price);
+    item.price = formatFeedPrice(product.comparePrice);
   }
 
   // Optional product identifiers

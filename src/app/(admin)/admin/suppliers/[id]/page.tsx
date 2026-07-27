@@ -41,6 +41,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { formatPrice } from "@/lib/format";
 import { toast } from "sonner";
 
 interface Product {
@@ -185,13 +186,6 @@ export default function SupplierDetailPage({ params }: { params: Promise<{ id: s
     } finally {
       setIsTesting(false);
     }
-  };
-
-  const formatPrice = (price: string) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(parseFloat(price));
   };
 
   const formatDate = (dateString: string) => {
