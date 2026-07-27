@@ -5,16 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import {
-  ShoppingCart,
-  Menu,
-  Search,
-  User,
-  LogOut,
-  Settings,
-  Loader2,
-  ChevronDown,
-} from "lucide-react";
+import { ShoppingCart, Menu, Search, User, LogOut, Settings, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -29,7 +20,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { formatPrice } from "@/lib/format";
-import { Logo } from "@/components/common/Logo";
 import { useCartStore } from "@/stores/cart.store";
 import { useDebounce } from "@/hooks/use-debounce";
 
@@ -49,8 +39,9 @@ interface Category {
 }
 
 const navigation = [
-  { name: "Home", href: "/" },
-  { name: "Products", href: "/products" },
+  { name: "Каталог", href: "/products" },
+  { name: "Новинки", href: "/products?sortBy=createdAt&sortOrder=desc" },
+  { name: "Бестселери", href: "/products?featured=true" },
 ];
 
 export function Header() {
@@ -179,7 +170,7 @@ export function Header() {
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
   return (
-    <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
+    <header className="bg-background/90 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
       <div className="container flex h-16 items-center justify-between">
         {/* Mobile menu */}
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -294,7 +285,14 @@ export function Header() {
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <Logo />
+          <Image
+            src="/images/logo.png"
+            alt="Mirox Shop"
+            width={262}
+            height={128}
+            priority
+            className="h-9 w-auto md:h-[42px]"
+          />
         </Link>
 
         {/* Desktop navigation */}
@@ -303,39 +301,16 @@ export function Header() {
             <Link
               key={item.name}
               href={item.href}
-              className="hover:text-muted-foreground text-sm font-medium transition-colors"
+              className="text-muted-foreground hover:text-foreground text-sm font-semibold transition-colors"
             >
               {item.name}
             </Link>
           ))}
 
-          {/* Categories Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger className="hover:text-muted-foreground flex items-center gap-1 text-sm font-medium transition-colors outline-none">
-              Categories
-              <ChevronDown className="h-4 w-4" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" className="w-48">
-              {categories.map((category) => (
-                <DropdownMenuItem key={category.id} asChild>
-                  <Link href={`/categories/${category.slug}`} className="cursor-pointer">
-                    {category.name}
-                  </Link>
-                </DropdownMenuItem>
-              ))}
-              {categories.length > 0 && <DropdownMenuSeparator />}
-              <DropdownMenuItem asChild>
-                <Link href="/categories" className="cursor-pointer font-medium">
-                  View All Categories
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
           {isAdmin && (
             <Link
               href="/admin"
-              className="hover:text-muted-foreground text-sm font-medium transition-colors"
+              className="text-muted-foreground hover:text-foreground text-sm font-semibold transition-colors"
             >
               Admin Panel
             </Link>

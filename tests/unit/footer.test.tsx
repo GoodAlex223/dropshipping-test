@@ -38,4 +38,19 @@ describe("Footer", () => {
       expect(hrefs).not.toContain(route);
     }
   });
+
+  it("uses the Ukrainian copyright-row link labels", () => {
+    render(<Footer />);
+    expect(screen.getByRole("link", { name: "Каталог" })).toHaveAttribute("href", "/products");
+    expect(screen.getByRole("link", { name: "Категорії" })).toHaveAttribute("href", "/categories");
+    expect(screen.getByRole("link", { name: "Новинки" })).toHaveAttribute(
+      "href",
+      "/products?sortBy=createdAt&sortOrder=desc"
+    );
+  });
+
+  it("invites visitors to follow along on social", () => {
+    render(<Footer />);
+    expect(screen.getByText("Слідкуйте за нами")).toBeInTheDocument();
+  });
 });
