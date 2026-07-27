@@ -84,7 +84,7 @@ export function AnnouncementBar() {
   if (!site.announcement || dismissed) return null;
 
   return (
-    <div data-surface="dark" className="bg-background text-foreground">
+    <div className="bg-background text-foreground">
       <div className="container flex items-center justify-center gap-4 py-2">
         <p className="text-center text-xs tracking-wide">{site.announcement}</p>
         <button

@@ -87,7 +87,7 @@ export default async function HomePage() {
 
       <Testimonials testimonials={testimonials} />
 
-      <section data-surface="dark" className="bg-background text-foreground">
+      <section className="bg-background text-foreground">
         <div className="container py-16 text-center">
           <FadeIn>
             <h2 className="font-heading text-2xl font-bold tracking-tight sm:text-3xl">

@@ -20,7 +20,7 @@ export function WhyChooseUs() {
   ].filter((s): s is { value: string; label: string } => Boolean(s));
 
   return (
-    <section data-surface="dark" className="bg-background text-foreground py-20">
+    <section className="bg-background text-foreground py-20">
       <div className="container">
         <FadeIn>
           <h2 className="font-heading text-center text-2xl font-bold tracking-tight sm:text-3xl">

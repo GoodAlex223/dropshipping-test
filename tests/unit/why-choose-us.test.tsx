@@ -16,9 +16,9 @@ describe("WhyChooseUs", () => {
     expect(screen.queryByText(/customer rating/i)).toBeNull();
   });
 
-  it("renders on a dark surface", () => {
+  it("relies on the dark default surface (no data-surface attribute)", () => {
     const { container } = render(<WhyChooseUs />);
-    expect(container.querySelector('[data-surface="dark"]')).not.toBeNull();
+    expect(container.querySelector("[data-surface]")).toBeNull();
   });
 
   it("renders the supporting brand-voice items", () => {

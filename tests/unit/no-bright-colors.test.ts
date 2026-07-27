@@ -109,11 +109,11 @@ describe("token-layer color policy (globals.css Mirox tokens are achromatic)", (
   const css = readFileSync(GLOBALS_CSS_PATH, "utf8");
 
   // Non-color custom properties that legitimately live inside the same :root
-  // (and [data-surface="dark"]) block as the color tokens: radius, font-family
-  // refs, motion timing, and box-shadow values. They aren't colors at all, so
-  // they're exempt rather than expected to pass a color check. --shadow-soft is
-  // a multi-layer box-shadow (achromatic rgb(0 0 0 / a) drops), re-skinned under
-  // dark — not a color token, so it is exempt like the timing tokens.
+  // block as the color tokens: radius, font-family refs, motion timing, and
+  // box-shadow values. They aren't colors at all, so they're exempt rather
+  // than expected to pass a color check. --shadow-soft is a multi-layer
+  // box-shadow (achromatic rgb(0 0 0 / a) drops) — not a color token, so it
+  // is exempt like the timing tokens.
   const NON_COLOR_PROPS = new Set([
     "--radius",
     "--font-heading",
@@ -179,16 +179,14 @@ describe("token-layer color policy (globals.css Mirox tokens are achromatic)", (
       });
   }
 
-  // Neither block has nested rules inside it (flat custom-property
+  // The block has no nested rules inside it (flat custom-property
   // declarations only), so matching up to the first `}` safely captures the
-  // whole block. `[data-surface="dark"]` is reused later in the file inside
-  // `@layer base` purely for a background-color/color rule — but since these
-  // patterns are non-global, `.exec()` returns only the FIRST match, which is
-  // the token-definition block, not that later reuse.
+  // whole block. `data-surface` no longer exists in this file (TASK-057
+  // folded the section-inversion tokens into `:root` and deleted the
+  // override block), so `:root` is the only block left to parse.
   const rootDeclarations = parseDeclarations(extractBlock(/:root\s*{([^}]*)}/));
-  const darkDeclarations = parseDeclarations(extractBlock(/\[data-surface="dark"\]\s*{([^}]*)}/));
 
-  const colorDeclarations = [...rootDeclarations, ...darkDeclarations].filter(
+  const colorDeclarations = rootDeclarations.filter(
     ({ prop }) => !NON_COLOR_PROPS.has(prop) && !ADMIN_ONLY_PROPS.has(prop)
   );
 

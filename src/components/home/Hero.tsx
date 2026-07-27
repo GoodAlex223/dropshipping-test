@@ -18,10 +18,10 @@ import { Logo } from "@/components/common/Logo";
  *
  * Every descendant here reads colour only from the semantic tokens
  * (background/foreground/muted-foreground/primary/...), never a hard-coded
- * shade — those token pairs invert together under `data-surface="dark"`
- * (see globals.css), which is what keeps this safe against the collapsing
- * bug documented for TASK-034 (a fixed-shade descendant going invisible
- * against an inverted surface). `BenefitStrip` was audited on the same basis:
+ * shade — those tokens are the dark palette by default (see globals.css),
+ * which is what keeps this safe against the collapsing bug documented for
+ * TASK-034 (a fixed-shade descendant going invisible against the surface).
+ * `BenefitStrip` was audited on the same basis:
  * it only ever uses `text-muted-foreground` or inherited text colour, no
  * background of its own, so it carries no risk when nested in here.
  */
@@ -30,7 +30,7 @@ export function Hero() {
   const hasImage = image !== null;
 
   return (
-    <section data-surface="dark" className="bg-background text-foreground relative overflow-hidden">
+    <section className="bg-background text-foreground relative overflow-hidden">
       {!hasImage && (
         <>
           {/* Layered near-black gradient backdrop. Inline style, not a Tailwind

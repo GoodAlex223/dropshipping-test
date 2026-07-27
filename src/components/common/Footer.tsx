@@ -17,7 +17,7 @@ const shopLinks = [
 
 export function Footer() {
   return (
-    <footer data-surface="dark" className="bg-background text-foreground border-t">
+    <footer className="bg-background text-foreground border-t">
       <div className="container py-12">
         <BenefitStrip items={site.footerBenefits} className="border-border border-b pb-10" />
 

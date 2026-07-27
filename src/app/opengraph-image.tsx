@@ -11,7 +11,7 @@ import { BRAND_NAME, BRAND_META_SUFFIX, BRAND_TAGLINE } from "@/content/brand";
 // overrides a less specific one.
 //
 // Deliberately monochrome (Mirox tokens: #000000 / #ffffff, the same
-// dark-surface pair `[data-surface="dark"]` uses in globals.css) with no
+// dark palette `:root` uses by default in globals.css) with no
 // custom font fetch — next/og's default sans already reads as a plain
 // geometric face at this weight/tracking, and fetching a font file over the
 // network for a build-time image adds a fragile dependency for a purely
