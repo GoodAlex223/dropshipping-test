@@ -100,4 +100,17 @@ describe("Hero", () => {
     // class-only check but fail here.
     expect(lines.map((el) => el.style.animationDelay)).toEqual(["0ms", "90ms", "180ms"]);
   });
+
+  it("renders the vignette overlay above the hero photo", () => {
+    mockHero.image = { src: "/images/hero-model-2.png", alt: "Модель Mirox" };
+    render(<Hero />);
+    const vignette = screen.getByTestId("hero-vignette");
+    expect(vignette).toHaveAttribute("aria-hidden", "true");
+    expect(vignette.className).toContain("pointer-events-none");
+  });
+
+  it("no longer renders the benefit strip inside the hero", () => {
+    render(<Hero />);
+    expect(screen.queryByText("Швидка доставка")).not.toBeInTheDocument();
+  });
 });

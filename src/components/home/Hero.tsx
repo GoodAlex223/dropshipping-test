@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { DEFAULT_BLUR_DATA_URL } from "@/lib/image-utils";
-import { cn } from "@/lib/utils";
 import { home } from "@/content/home";
 import { Logo } from "@/components/common/Logo";
 
@@ -11,25 +10,28 @@ import { Logo } from "@/components/common/Logo";
  * in the rebrand, and the page's LCP element (PageSpeed 95+ target).
  *
  * One component, two layouts. With no configured image it renders centred and
- * typographic; with an image it renders two-column. Both states are built to
- * look deliberate and finished on their own, so dropping the photo is a
- * one-line content change (`home.hero.image = null`), never a redesign.
+ * typographic; with an image it renders a full-bleed split (text-left,
+ * photo-right on desktop; photo-as-backdrop with bottom-anchored text on
+ * mobile) with a CSS vignette over the photo. Both states are built to look
+ * deliberate and finished on their own, so dropping the photo is a one-line
+ * content change (`home.hero.image = null`), never a redesign.
+ *
+ * `BenefitStrip` is rendered by the page, not here (see page.tsx) — it moved
+ * out of Hero so it can sit in its own bordered section between Hero and the
+ * rest of the homepage.
  *
  * Every descendant here reads colour only from the semantic tokens
  * (background/foreground/muted-foreground/primary/...), never a hard-coded
  * shade — those tokens are the dark palette by default (see globals.css),
  * which is what keeps this safe against the collapsing bug documented for
  * TASK-034 (a fixed-shade descendant going invisible against the surface).
- * `BenefitStrip` was audited on the same basis:
- * it only ever uses `text-muted-foreground` or inherited text colour, no
- * background of its own, so it carries no risk when nested in here.
  */
 export function Hero() {
   const { eyebrow, headline, subtitle, primaryCta, secondaryCta, image } = home.hero;
   const hasImage = image !== null;
 
   return (
-    <section className="bg-background text-foreground relative overflow-hidden">
+    <section className="border-border bg-background text-foreground relative overflow-hidden border-b">
       {!hasImage && (
         <>
           {/* Layered near-black gradient backdrop. Inline style, not a Tailwind
@@ -58,14 +60,71 @@ export function Hero() {
           </div>
         </>
       )}
-      <div className="relative container py-16 md:py-24">
-        <div
-          className={cn(
-            "gap-12",
-            hasImage ? "grid items-center lg:grid-cols-2" : "mx-auto max-w-3xl text-center"
-          )}
-        >
-          <div>
+      {hasImage ? (
+        <div className="relative lg:grid lg:grid-cols-[1fr_minmax(400px,44%)]">
+          <div className="relative z-10 flex min-h-[560px] flex-col justify-end px-5 pb-10 lg:min-h-[620px] lg:justify-center lg:px-12 lg:pb-16 xl:pl-20">
+            <p className="text-muted-foreground flex items-center gap-3 text-xs font-medium tracking-[0.2em]">
+              <span aria-hidden="true" className="bg-border-strong inline-block h-px w-6" />
+              {eyebrow}
+            </p>
+
+            {/* Single h1: three content lines, not three headings. */}
+            <h1 className="font-heading mt-6 text-4xl leading-[1.08] font-extrabold tracking-tight sm:text-5xl lg:text-[64px] lg:leading-[1.05]">
+              {headline.map((line, i) => (
+                <span
+                  key={line}
+                  className="animate-fade-up block"
+                  style={{ animationDelay: `${i * 90}ms` }}
+                >
+                  {line}
+                </span>
+              ))}
+            </h1>
+
+            <p className="text-muted-foreground mt-6 max-w-[420px] text-base lg:text-lg">
+              {subtitle}
+            </p>
+
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+              <Button asChild size="lg">
+                <Link href={primaryCta.href}>{primaryCta.label}</Link>
+              </Button>
+              <Button asChild variant="outline" size="lg">
+                <Link href={secondaryCta.href}>{secondaryCta.label}</Link>
+              </Button>
+            </div>
+          </div>
+
+          <div className="absolute inset-0 lg:static lg:order-2 lg:min-h-[620px]">
+            <Image
+              src={image.src}
+              alt={image.alt}
+              fill
+              // This is the LCP element: eager-loaded, explicitly sized, blurred-in.
+              priority
+              // From lg upward this image only occupies the 44% column, not
+              // the full viewport width — requesting a full-width image there
+              // over-fetches and costs LCP against the PageSpeed 95+ target.
+              sizes="(max-width: 1024px) 100vw, 44vw"
+              placeholder="blur"
+              blurDataURL={DEFAULT_BLUR_DATA_URL}
+              className="object-cover object-top"
+            />
+            {/* CSS vignette per the handoff — photo is swappable, effect persists */}
+            <div
+              data-testid="hero-vignette"
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(to top, var(--background) 0%, rgb(0 0 0 / 0.9) 9%, rgb(0 0 0 / 0) 45%), linear-gradient(to bottom, rgb(0 0 0 / 0.7) 0%, rgb(0 0 0 / 0) 16%), linear-gradient(to right, var(--background) 0%, rgb(0 0 0 / 0.55) 6%, rgb(0 0 0 / 0) 20%), linear-gradient(to left, var(--background) 0%, rgb(0 0 0 / 0.55) 6%, rgb(0 0 0 / 0) 20%)",
+              }}
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="relative container py-16 md:py-24">
+          <div className="mx-auto max-w-3xl text-center">
             <p className="text-muted-foreground text-xs font-medium tracking-[0.2em]">{eyebrow}</p>
 
             {/* Single h1: three content lines, not three headings. */}
@@ -83,12 +142,7 @@ export function Hero() {
 
             <p className="text-muted-foreground mt-6 text-base sm:text-lg">{subtitle}</p>
 
-            <div
-              className={cn(
-                "mt-10 flex flex-col gap-4 sm:flex-row",
-                !hasImage && "sm:justify-center"
-              )}
-            >
+            <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center">
               <Button asChild size="lg">
                 <Link href={primaryCta.href}>{primaryCta.label}</Link>
               </Button>
@@ -97,28 +151,8 @@ export function Hero() {
               </Button>
             </div>
           </div>
-
-          {hasImage && (
-            <div className="relative aspect-[4/5] w-full overflow-hidden lg:aspect-[3/4]">
-              <Image
-                src={image.src}
-                alt={image.alt}
-                fill
-                // This is the LCP element: eager-loaded, explicitly sized, blurred-in.
-                priority
-                // Deliberately NOT IMAGE_SIZES.hero ("100vw") — from lg upward
-                // this image only occupies half the viewport width, and
-                // requesting a full-width image there over-fetches and costs
-                // LCP against the PageSpeed 95+ target.
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                placeholder="blur"
-                blurDataURL={DEFAULT_BLUR_DATA_URL}
-                className="object-cover"
-              />
-            </div>
-          )}
         </div>
-      </div>
+      )}
     </section>
   );
 }
