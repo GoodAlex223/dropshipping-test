@@ -504,6 +504,14 @@
     transform: translateY(-4px);
     box-shadow: 0 12px 24px -8px rgb(0 0 0 / 0.15);
   }
+  /* On a dark surface a black drop shadow is invisible, so a lifted element
+     (e.g. the Follow-us social tiles) loses its hover feedback. Swap in a faint
+     light glow that actually reads on black. Reset under reduced motion below,
+     alongside the base rule — this override is more specific, so it must be
+     named there too or it would reintroduce the shadow. */
+  [data-surface="dark"] .hover-lift:hover {
+    box-shadow: 0 10px 30px -6px rgb(255 255 255 / 0.1);
+  }
   .glass {
     background-color: color-mix(in oklch, var(--background) 72%, transparent);
     backdrop-filter: blur(10px);
@@ -524,7 +532,8 @@
       animation: none;
     }
     .hover-lift,
-    .hover-lift:hover {
+    .hover-lift:hover,
+    [data-surface="dark"] .hover-lift:hover {
       transform: none;
       box-shadow: none;
       transition: none;

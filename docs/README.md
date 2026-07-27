@@ -2,7 +2,7 @@
 
 Central index for all project documentation.
 
-**Last Updated**: 2026-07-21
+**Last Updated**: 2026-07-24
 
 ---
 
@@ -36,7 +36,7 @@ Central index for all project documentation.
 | [planning/WEEKLY.md](planning/WEEKLY.md)         | Current week's plan  | 2026-07-21   |
 | [planning/TODO.md](planning/TODO.md)             | Active tasks         | 2026-07-21   |
 | [planning/DONE.md](planning/DONE.md)             | Completed tasks      | 2026-07-21   |
-| [planning/BACKLOG.md](planning/BACKLOG.md)       | Unprioritized ideas  | 2026-07-21   |
+| [planning/BACKLOG.md](planning/BACKLOG.md)       | Unprioritized ideas  | 2026-07-24   |
 | [planning/ROADMAP.md](planning/ROADMAP.md)       | Long-term vision     | 2026-07-14   |
 | [planning/GOALS.md](planning/GOALS.md)           | Objectives & metrics | 2026-01-26   |
 | [planning/MILESTONES.md](planning/MILESTONES.md) | Key targets          | 2026-01-26   |
@@ -53,13 +53,16 @@ Central index for all project documentation.
 | [superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md](superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md) | **Ukraine payments & delivery decision** — gateway choice, Nova Poshta scoping, UAH strategy, TASK-048/049 blueprint | 2026-07-17   |
 | [superpowers/specs/2026-07-17-mirox-design-system-design.md](superpowers/specs/2026-07-17-mirox-design-system-design.md)                 | TASK-034 design: Mirox token model, typography/logo, animation primitives, restyle scope                             | 2026-07-17   |
 | [superpowers/specs/2026-07-19-task-035-homepage-design.md](superpowers/specs/2026-07-19-task-035-homepage-design.md)                     | TASK-035 design: homepage sections, content modules, bestseller definition, colour-guard extension                   | 2026-07-19   |
+| [superpowers/specs/2026-07-24-mirox-homepage-polish-design.md](superpowers/specs/2026-07-24-mirox-homepage-polish-design.md)             | Homepage polish & art direction: motion invariants, monochrome badge, dark stats block, social tiles, hero           | 2026-07-24   |
 | [reference/client-brief.md](reference/client-brief.md)                                                                                   | **Client brief (verbatim)** — Mirox Shop requirement lists #1 and #2, RU + EN                                        | 2026-07-19   |
 
 ---
 
 ## Implementation Plans
 
-_No active implementation plans. TASK-035 completed 2026-07-21 (PR #21) — see Archived Plans below._
+| Plan                                                                                                      | Task                            | Status             | Started    |
+| --------------------------------------------------------------------------------------------------------- | ------------------------------- | ------------------ | ---------- |
+| [2026-07-24_homepage-polish-art-direction.md](planning/plans/2026-07-24_homepage-polish-art-direction.md) | Homepage polish & art direction | IN REVIEW (PR #23) | 2026-07-24 |
 
 ### Archived Plans
 

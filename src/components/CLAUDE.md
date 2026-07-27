@@ -34,7 +34,8 @@ components/
 │   ├── ResourceHints.tsx  # Resource hints (preconnect/dns-prefetch for third-party domains)
 │   └── index.ts
 ├── products/
-│   ├── ProductCard.tsx    # Product card with blur placeholders and responsive sizes
+│   ├── ProductCard.tsx    # Product card (server): monochrome discount badge, price, CTA, soft-shadow + hover-lift; delegates the image to ProductImage
+│   ├── ProductImage.tsx   # "use client" product image: blur placeholder + responsive sizes; renders the branded Mirox "M" fallback on missing/broken src (onError)
 │   ├── SocialShareButtons.tsx  # Social media sharing buttons (Facebook, Twitter, Pinterest, WhatsApp, Telegram, copy link, native share)
 │   └── index.ts
 ├── reviews/               # Review components
@@ -82,7 +83,7 @@ components/
 - **Custom icons**: Use lucide-react for icons; for platforms without lucide support (e.g., Pinterest), create custom SVG components
 - **Web Vitals**: `WebVitalsReporter` uses dynamic import (`ssr: false`) to ensure client-only execution; captures CLS, LCP, FCP, TTFB, INP via `web-vitals` library; reports to GA4 via GTM dataLayer with dataLayer clearing pattern (`{ ecommerce: null }`) for consistency; console logs in development; uses bare `catch` syntax for error handling
 - **Resource hints**: `ResourceHints` component exports `PRECONNECT_DOMAINS` (Stripe, GTM), `DNS_PREFETCH_DOMAINS` (Google Analytics, Google Fonts), and helper function `getResourceHintTags()` for server-side rendering
-- **Image optimization**: `ProductCard` uses `DEFAULT_BLUR_DATA_URL` and `IMAGE_SIZES.productCard` from `@/lib/image-utils` for optimized loading with blur placeholders
+- **Image optimization**: `ProductImage` (rendered by `ProductCard`) uses `DEFAULT_BLUR_DATA_URL` and the `IMAGE_SIZES.productCard` sizes passed by `ProductCard` from `@/lib/image-utils` for optimized loading with blur placeholders; on a missing/broken `src` it renders the branded Mirox "M" fallback instead of a blank box
 - **Deferred font loading**: Theme-specific fonts (Playfair Display, Lora) loaded in root layout with `preload: false` and `display: swap` for optimal performance; saves ~60-80KB on initial load for users on default theme
 - **Review eligibility pattern**: `ReviewSection` handles eligibility checking client-side; fetches `/api/reviews/eligibility?productId=xxx` on mount to determine if form should render; displays form only if user has delivered order containing product and hasn't already reviewed it
 - **Newsletter signup pattern**: `NewsletterSignup` component manages subscription flow with local state (email, loading, success); success state replaces form with confirmation message (monochrome `bg-muted` box, checkmark icon, no green); integrated into Footer component for site-wide visibility
