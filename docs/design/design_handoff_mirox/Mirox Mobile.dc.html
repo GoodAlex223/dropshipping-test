@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+  html,body{margin:0;padding:0;background:#0a0a0a;color:#fff;font-family:'Manrope',sans-serif;}
+  a{color:#fff;text-decoration:none;}
+  a:hover{color:#d4d4d4;}
+</style>
+</helmet>
+<div style="display:flex;gap:48px;padding:48px;align-items:flex-start;background:#0a0a0a;width:max-content">
+
+  <!-- Mobile: Home -->
+  <div>
+    <div style="font-size:12px;font-weight:700;color:#737373;letter-spacing:0.1em;margin-bottom:12px">MOBILE · ГОЛОВНА · 390px</div>
+    <div data-screen-label="Mobile Головна" style="width:390px;background:#000;border:1px solid #262626;border-radius:32px;overflow:hidden">
+      <header style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #1a1a1a">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+        <span style="display:inline-flex;align-items:center;gap:8px">
+          <img src="images/logo.png" alt="Mirox Shop" style="height:36px;display:block">
+        </span>
+        <span style="position:relative;display:inline-flex">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l-1 12H7L6 8z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg>
+          <span style="position:absolute;top:-6px;right:-8px;background:#fff;color:#000;font-size:9px;font-weight:800;border-radius:99px;padding:1px 4.5px">2</span>
+        </span>
+      </header>
+      <div style="position:relative;height:440px">
+        <image-slot id="m-hero" src="images/hero-model-2.png" shape="rect" placeholder="Фото моделі (mobile hero)"></image-slot>
+        <div style="position:absolute;inset:auto 0 0 0;padding:80px 24px 28px;background:linear-gradient(transparent, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.88));pointer-events:none">
+          <div style="font-size:10.5px;font-weight:700;letter-spacing:0.2em;color:#d4d4d4;margin-bottom:10px">НОВА КОЛЕКЦІЯ</div>
+          <div style="font-size:34px;line-height:1.08;font-weight:800;letter-spacing:-0.02em;margin-bottom:12px">СТИЛЬ. ЯКІСТЬ.<br>ВПЕВНЕНІСТЬ.</div>
+          <div style="font-size:13.5px;color:#d4d4d4;line-height:1.5;margin-bottom:18px">Mirox Shop — сучасний одяг для тих, хто цінує якість і мінімалізм.</div>
+          <div style="display:flex;flex-direction:column;gap:10px;pointer-events:auto">
+            <span style="background:#fff;color:#000;font-size:12.5px;font-weight:800;letter-spacing:0.06em;padding:15px;border-radius:10px;text-align:center">ПЕРЕЙТИ В КАТАЛОГ</span>
+            <span style="border:1px solid #555;color:#fff;font-size:12.5px;font-weight:700;letter-spacing:0.06em;padding:14px;border-radius:10px;text-align:center">ПЕРЕГЛЯНУТИ НОВИНКИ</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#1a1a1a;border-top:1px solid #1a1a1a;border-bottom:1px solid #1a1a1a">
+        <div style="background:#000;padding:16px 20px;position:relative;overflow:hidden"><svg viewBox="0 0 24 24" width="52" height="52" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);opacity:0.22;filter:blur(1.5px);pointer-events:none"><path d="M1 8h13v9H1z"></path><path d="M14 11h4l3 3v3h-7z"></path><circle cx="6" cy="19" r="1.8"></circle><circle cx="17" cy="19" r="1.8"></circle></svg><div style="font-size:12.5px;font-weight:700;position:relative">Швидка доставка</div><div style="font-size:11px;color:#a3a3a3;margin-top:2px;position:relative">По всій Україні</div></div>
+        <div style="background:#000;padding:16px 20px;position:relative;overflow:hidden"><svg viewBox="0 0 24 24" width="52" height="52" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);opacity:0.22;filter:blur(1.5px);pointer-events:none"><path d="M12 3l8 3v6c0 4.6-3.4 7.6-8 9-4.6-1.4-8-4.4-8-9V6z"></path><path d="M9 12l2 2 4-4"></path></svg><div style="font-size:12.5px;font-weight:700;position:relative">Преміум якість</div><div style="font-size:11px;color:#a3a3a3;margin-top:2px;position:relative">Тільки найкращі матеріали</div></div>
+        <div style="background:#000;padding:16px 20px;position:relative;overflow:hidden"><svg viewBox="0 0 24 24" width="52" height="52" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);opacity:0.22;filter:blur(1.5px);pointer-events:none"><path d="M4 14v-2a8 8 0 0 1 16 0v2"></path><rect x="3" y="14" width="4" height="6" rx="1.5"></rect><rect x="17" y="14" width="4" height="6" rx="1.5"></rect></svg><div style="font-size:12.5px;font-weight:700;position:relative">Підтримка 24/7</div><div style="font-size:11px;color:#a3a3a3;margin-top:2px;position:relative">Ми завжди на зв'язку</div></div>
+        <div style="background:#000;padding:16px 20px;position:relative;overflow:hidden"><svg viewBox="0 0 24 24" width="52" height="52" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);opacity:0.22;filter:blur(1.5px);pointer-events:none"><rect x="2" y="5" width="20" height="14" rx="3"></rect><path d="M2 10h20"></path></svg><div style="font-size:12.5px;font-weight:700;position:relative">Оплата при отриманні</div><div style="font-size:11px;color:#a3a3a3;margin-top:2px;position:relative">Без передоплати</div></div>
+      </div>
+      <div style="padding:24px 20px 28px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px">
+          <span style="font-size:20px;font-weight:800">Новинки</span>
+          <span style="font-size:12px;font-weight:700;color:#a3a3a3">Дивитись все →</span>
+        </div>
+        <div style="display:flex;gap:12px;overflow:hidden">
+          <div style="width:160px;flex-shrink:0;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:14px;overflow:hidden">
+            <div style="height:170px"><image-slot id="m-p1" src="images/p-hudi-basic.png" shape="rect" placeholder="Худі Basic"></image-slot></div>
+            <div style="padding:12px"><div style="font-size:12.5px;font-weight:700">Худі Mirox Basic</div><div style="font-size:13px;font-weight:800;margin-top:4px">1 290 грн</div></div>
+          </div>
+          <div style="width:160px;flex-shrink:0;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:14px;overflow:hidden">
+            <div style="height:170px"><image-slot id="m-p2" src="images/p-tshirt.png" shape="rect" placeholder="Футболка"></image-slot></div>
+            <div style="padding:12px"><div style="font-size:12.5px;font-weight:700">Футболка Mirox</div><div style="font-size:13px;font-weight:800;margin-top:4px">590 грн</div></div>
+          </div>
+          <div style="width:160px;flex-shrink:0;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:14px;overflow:hidden">
+            <div style="height:170px"><image-slot id="m-p3" src="images/p-olimp.png" shape="rect" placeholder="Олімпійка"></image-slot></div>
+            <div style="padding:12px"><div style="font-size:12.5px;font-weight:700">Олімпійка Mirox</div><div style="font-size:13px;font-weight:800;margin-top:4px">1 490 грн</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile: Catalog -->
+  <div>
+    <div style="font-size:12px;font-weight:700;color:#737373;letter-spacing:0.1em;margin-bottom:12px">MOBILE · КАТАЛОГ · 390px</div>
+    <div data-screen-label="Mobile Каталог" style="width:390px;background:#000;border:1px solid #262626;border-radius:32px;overflow:hidden">
+      <header style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #1a1a1a">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+        <span style="font-weight:800;font-size:17px">Каталог</span>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.5-4.5"></path></svg>
+      </header>
+      <div style="display:flex;gap:8px;padding:14px 20px;overflow:hidden;border-bottom:1px solid #1a1a1a">
+        <span style="display:inline-flex;gap:6px;align-items:center;border:1px solid #333;border-radius:9px;padding:8px 13px;font-size:12px;font-weight:700;white-space:nowrap">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"></path></svg>Фільтри</span>
+        <span style="border:1px solid #262626;border-radius:9px;padding:8px 13px;font-size:12px;font-weight:600;color:#a3a3a3;white-space:nowrap">Розмір ▾</span>
+        <span style="border:1px solid #262626;border-radius:9px;padding:8px 13px;font-size:12px;font-weight:600;color:#a3a3a3;white-space:nowrap">Колір ▾</span>
+        <span style="border:1px solid #262626;border-radius:9px;padding:8px 13px;font-size:12px;font-weight:600;color:#a3a3a3;white-space:nowrap">Ціна ▾</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px 20px 28px">
+        <div style="background:#0d0d0d;border:1px solid #1a1a1a;border-radius:14px;overflow:hidden">
+          <div style="position:relative;height:180px"><image-slot id="m-c1" src="images/p-hudi-basic.png" shape="rect" placeholder="Худі Basic"></image-slot>
+            <span style="position:absolute;top:8px;left:8px;background:#fff;color:#000;font-size:9px;font-weight:800;padding:3px 8px;border-radius:99px;pointer-events:none">НОВИНКА</span></div>
+          <div style="padding:12px"><div style="font-size:12.5px;font-weight:700">Худі Mirox Basic</div><div style="font-size:13px;font-weight:800;margin-top:4px">1 290 грн</div><div style="font-size:10px;color:#a3a3a3;font-weight:600;margin-top:4px">S · M · L · XL</div></div>
+        </div>
+        <div style="background:#0d0d0d;border:1px solid #1a1a1a;border-radius:14px;overflow:hidden">
+          <div style="position:relative;height:180px"><image-slot id="m-c2" src="images/p-tshirt.png" shape="rect" placeholder="Футболка"></image-slot>
+            <span style="position:absolute;top:8px;left:8px;background:#1a1a1a;border:1px solid #333;color:#fff;font-size:9px;font-weight:800;padding:3px 8px;border-radius:99px;pointer-events:none">-15%</span></div>
+          <div style="padding:12px"><div style="font-size:12.5px;font-weight:700">Футболка Mirox</div><div style="display:flex;gap:6px;align-items:baseline;margin-top:4px"><span style="font-size:13px;font-weight:800">590 грн</span><span style="font-size:10.5px;color:#737373;text-decoration:line-through">690</span></div><div style="font-size:10px;color:#a3a3a3;font-weight:600;margin-top:4px">S · M · L · XL</div></div>
+        </div>
+        <div style="background:#0d0d0d;border:1px solid #1a1a1a;border-radius:14px;overflow:hidden">
+          <div style="height:180px"><image-slot id="m-c3" src="images/p-olimp.png" shape="rect" placeholder="Олімпійка"></image-slot></div>
+          <div style="padding:12px"><div style="font-size:12.5px;font-weight:700">Олімпійка Mirox</div><div style="font-size:13px;font-weight:800;margin-top:4px">1 490 грн</div><div style="font-size:10px;color:#a3a3a3;font-weight:600;margin-top:4px">S · M · L · XL</div></div>
+        </div>
+        <div style="background:#0d0d0d;border:1px solid #1a1a1a;border-radius:14px;overflow:hidden">
+          <div style="height:180px"><image-slot id="m-c4" src="images/p-hudi-white.png" shape="rect" placeholder="Худі White"></image-slot></div>
+          <div style="padding:12px"><div style="font-size:12.5px;font-weight:700">Худі Mirox White</div><div style="font-size:13px;font-weight:800;margin-top:4px">1 290 грн</div><div style="font-size:10px;color:#a3a3a3;font-weight:600;margin-top:4px">S · M · L · XL</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile: Product -->
+  <div>
+    <div style="font-size:12px;font-weight:700;color:#737373;letter-spacing:0.1em;margin-bottom:12px">MOBILE · ТОВАР · 390px</div>
+    <div data-screen-label="Mobile Товар" style="width:390px;background:#000;border:1px solid #262626;border-radius:32px;overflow:hidden">
+      <header style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #1a1a1a">
+        <span style="font-size:18px">←</span>
+        <span style="font-weight:800;font-size:15px">Худі Mirox Basic</span>
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5l-7.2-7.2a4.8 4.8 0 0 1 6.8-6.8l.4.4.4-.4a4.8 4.8 0 0 1 6.8 6.8z"></path></svg>
+      </header>
+      <div style="height:400px"><image-slot id="m-pd" src="images/pd-main.png" shape="rect" placeholder="Фото товару"></image-slot></div>
+      <div style="display:flex;gap:6px;justify-content:center;padding:12px 0">
+        <span style="width:18px;height:4px;border-radius:99px;background:#fff"></span>
+        <span style="width:4px;height:4px;border-radius:99px;background:#404040"></span>
+        <span style="width:4px;height:4px;border-radius:99px;background:#404040"></span>
+        <span style="width:4px;height:4px;border-radius:99px;background:#404040"></span>
+      </div>
+      <div style="padding:8px 20px 24px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+          <span style="font-size:19px;font-weight:800">Худі Mirox Basic</span>
+          <span style="font-size:18px;font-weight:800">1 290 грн</span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:18px">
+          <span style="color:#fbbf24;font-size:12px;letter-spacing:1.5px">★★★★<span style="color:#525252">★</span></span>
+          <span style="font-size:12px;color:#a3a3a3">128 відгуків</span>
+          <span style="margin-left:auto;color:#4ade80;font-size:11.5px;font-weight:700">● В наявності</span>
+        </div>
+        <div style="font-size:12px;font-weight:600;color:#a3a3a3;margin-bottom:8px">Колір: <span style="color:#fff">Чорний</span></div>
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+          <span style="width:30px;height:30px;border-radius:99px;background:#111;border:2px solid #fff"></span>
+          <span style="width:30px;height:30px;border-radius:99px;background:#f5f5f5;border:1px solid #333"></span>
+        </div>
+        <div style="font-size:12px;font-weight:600;color:#a3a3a3;margin-bottom:8px">Розмір:</div>
+        <div style="display:flex;gap:8px;margin-bottom:20px">
+          <span style="flex:1;text-align:center;padding:11px 0;border-radius:9px;border:1px solid #333;font-size:12.5px;font-weight:700">S</span>
+          <span style="flex:1;text-align:center;padding:11px 0;border-radius:9px;border:1px solid #333;font-size:12.5px;font-weight:700">M</span>
+          <span style="flex:1;text-align:center;padding:11px 0;border-radius:9px;border:1px solid #fff;background:#fff;color:#000;font-size:12.5px;font-weight:700">L</span>
+          <span style="flex:1;text-align:center;padding:11px 0;border-radius:9px;border:1px solid #333;font-size:12.5px;font-weight:700">XL</span>
+          <span style="flex:1;text-align:center;padding:11px 0;border-radius:9px;border:1px solid #333;font-size:12.5px;font-weight:700">XXL</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <span style="background:#fff;color:#000;font-size:13px;font-weight:800;letter-spacing:0.06em;padding:16px;border-radius:10px;text-align:center">ДОДАТИ В КОШИК</span>
+          <span style="border:1px solid #333;color:#fff;font-size:13px;font-weight:700;letter-spacing:0.06em;padding:15px;border-radius:10px;text-align:center">КУПИТИ В 1 КЛІК</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

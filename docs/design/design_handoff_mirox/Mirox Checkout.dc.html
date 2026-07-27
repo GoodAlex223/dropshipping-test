@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+  html,body{margin:0;padding:0;background:#000;color:#fff;font-family:'Manrope',sans-serif;}
+  a{color:#fff;text-decoration:none;}
+  a:hover{color:#d4d4d4;}
+</style>
+</helmet>
+<div style="background:#000;color:#fff;font-family:'Manrope',sans-serif;min-height:100vh">
+  <header style="display:flex;align-items:center;justify-content:space-between;gap:32px;padding:18px 48px;border-bottom:1px solid #1a1a1a">
+    <a href="Mirox Home.dc.html" style="display:inline-flex;align-items:center;gap:10px">
+      <img src="images/logo.png" alt="Mirox Shop" style="height:42px;display:block">
+    </a>
+    <div style="display:flex;gap:8px;align-items:center;color:#737373;font-size:12.5px;font-weight:600">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+      Захищене оформлення
+    </div>
+  </header>
+
+  <section style="padding:48px 80px 80px;display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,400px);gap:32px;align-items:start">
+    <div>
+      <h1 style="margin:0 0 24px;font-size:36px;font-weight:800;letter-spacing:-0.02em">Оформлення замовлення</h1>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:32px;font-size:13px;font-weight:700">
+        <sc-for list="{{ steps }}" as="st" hint-placeholder-count="3">
+          <button onClick="{{ st.go }}" style="display:flex;gap:8px;align-items:center;background:transparent;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color: {{ st.color }};padding:0">
+            <span style="width:24px;height:24px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-size:11.5px;background: {{ st.numBg }};color: {{ st.numColor }};border:1px solid {{ st.numBorder }}">{{ st.num }}</span>
+            {{ st.label }}
+            <sc-if value="{{ st.arrow }}" hint-placeholder-val="{{ true }}"><span style="color:#525252;margin:0 4px">→</span></sc-if>
+          </button>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ isStep1 }}" hint-placeholder-val="{{ true }}">
+        <div style="background:#0d0d0d;border:1px solid #1a1a1a;border-radius:20px;padding:32px">
+          <h2 style="margin:0 0 24px;font-size:20px;font-weight:800">Контактні дані</h2>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:#a3a3a3;font-weight:600">Ім'я
+              <input placeholder="Олександр" style="background:#000;border:1px solid #333;border-radius:10px;padding:13px 14px;color:#fff;font-size:14px;font-family:inherit"></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:#a3a3a3;font-weight:600">Прізвище
+              <input placeholder="Коваленко" style="background:#000;border:1px solid #333;border-radius:10px;padding:13px 14px;color:#fff;font-size:14px;font-family:inherit"></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:#a3a3a3;font-weight:600">Телефон
+              <input placeholder="+380 __ ___ __ __" style="background:#000;border:1px solid #333;border-radius:10px;padding:13px 14px;color:#fff;font-size:14px;font-family:inherit"></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:#a3a3a3;font-weight:600">Email
+              <input placeholder="you@example.com" style="background:#000;border:1px solid #333;border-radius:10px;padding:13px 14px;color:#fff;font-size:14px;font-family:inherit"></label>
+          </div>
+          <button onClick="{{ toStep2 }}" style="margin-top:24px;background:#fff;color:#000;border:none;border-radius:10px;padding:15px 28px;font-size:13px;font-weight:800;letter-spacing:0.06em;cursor:pointer;font-family:inherit" style-hover="background:#e5e5e5">ДАЛІ — ДОСТАВКА</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isStep2 }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#0d0d0d;border:1px solid #1a1a1a;border-radius:20px;padding:32px">
+          <h2 style="margin:0 0 24px;font-size:20px;font-weight:800">Доставка</h2>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+            <sc-for list="{{ shipping }}" as="sh" hint-placeholder-count="3">
+              <button onClick="{{ sh.pick }}" style="display:flex;justify-content:space-between;align-items:center;gap:16px;background:#000;border:1px solid {{ sh.border }};border-radius:14px;padding:18px 20px;cursor:pointer;font-family:inherit;color:#fff;text-align:left">
+                <span style="display:flex;gap:14px;align-items:center">
+                  <span style="width:18px;height:18px;border-radius:99px;border:2px solid {{ sh.dotBorder }};display:flex;align-items:center;justify-content:center"><span style="width:8px;height:8px;border-radius:99px;background: {{ sh.dotFill }}"></span></span>
+                  <span><span style="display:block;font-size:14.5px;font-weight:700">{{ sh.name }}</span><span style="display:block;font-size:12.5px;color:#a3a3a3;margin-top:2px">{{ sh.desc }}</span></span>
+                </span>
+                <span style="font-size:14px;font-weight:800">{{ sh.price }}</span>
+              </button>
+            </sc-for>
+          </div>
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:#a3a3a3;font-weight:600;margin-bottom:16px">Місто
+            <input placeholder="Київ" style="background:#000;border:1px solid #333;border-radius:10px;padding:13px 14px;color:#fff;font-size:14px;font-family:inherit"></label>
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:#a3a3a3;font-weight:600">Відділення / адреса
+            <input placeholder="Відділення №12" style="background:#000;border:1px solid #333;border-radius:10px;padding:13px 14px;color:#fff;font-size:14px;font-family:inherit"></label>
+          <div style="display:flex;gap:12px;margin-top:24px">
+            <button onClick="{{ toStep1 }}" style="background:transparent;color:#fff;border:1px solid #333;border-radius:10px;padding:15px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" style-hover="border-color:#666">← НАЗАД</button>
+            <button onClick="{{ toStep3 }}" style="background:#fff;color:#000;border:none;border-radius:10px;padding:15px 28px;font-size:13px;font-weight:800;letter-spacing:0.06em;cursor:pointer;font-family:inherit" style-hover="background:#e5e5e5">ДАЛІ — ОПЛАТА</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isStep3 }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#0d0d0d;border:1px solid #1a1a1a;border-radius:20px;padding:32px">
+          <h2 style="margin:0 0 24px;font-size:20px;font-weight:800">Оплата</h2>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+            <sc-for list="{{ payments }}" as="pm" hint-placeholder-count="2">
+              <button onClick="{{ pm.pick }}" style="display:flex;gap:14px;align-items:center;background:#000;border:1px solid {{ pm.border }};border-radius:14px;padding:18px 20px;cursor:pointer;font-family:inherit;color:#fff;text-align:left;width:100%">
+                <span style="width:18px;height:18px;border-radius:99px;border:2px solid {{ pm.dotBorder }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="width:8px;height:8px;border-radius:99px;background: {{ pm.dotFill }}"></span></span>
+                <span style="flex:1"><span style="display:block;font-size:14.5px;font-weight:700">{{ pm.name }}</span><span style="display:block;font-size:12.5px;color:#a3a3a3;margin-top:2px">{{ pm.desc }}</span></span>
+              </button>
+            </sc-for>
+          </div>
+          <sc-if value="{{ isCard }}" hint-placeholder-val="{{ true }}">
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px">
+              <input placeholder="Номер картки" style="background:#000;border:1px solid #333;border-radius:10px;padding:13px 14px;color:#fff;font-size:14px;font-family:inherit">
+              <input placeholder="ММ/РР" style="background:#000;border:1px solid #333;border-radius:10px;padding:13px 14px;color:#fff;font-size:14px;font-family:inherit">
+              <input placeholder="CVC" style="background:#000;border:1px solid #333;border-radius:10px;padding:13px 14px;color:#fff;font-size:14px;font-family:inherit">
+            </div>
+          </sc-if>
+          <div style="display:flex;gap:12px;margin-top:24px;align-items:center">
+            <button onClick="{{ toStep2 }}" style="background:transparent;color:#fff;border:1px solid #333;border-radius:10px;padding:15px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" style-hover="border-color:#666">← НАЗАД</button>
+            <button style="background:#fff;color:#000;border:none;border-radius:10px;padding:15px 28px;font-size:13px;font-weight:800;letter-spacing:0.06em;cursor:pointer;font-family:inherit" style-hover="background:#e5e5e5">ПІДТВЕРДИТИ ЗАМОВЛЕННЯ — {{ total }} ГРН</button>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="background:#0d0d0d;border:1px solid #1a1a1a;border-radius:20px;padding:28px;position:sticky;top:24px">
+      <h2 style="margin:0 0 20px;font-size:18px;font-weight:800">Ваше замовлення</h2>
+      <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px">
+        <div style="display:flex;gap:14px;align-items:center">
+          <div style="width:56px;height:64px;border-radius:10px;overflow:hidden;flex-shrink:0"><image-slot id="p-hudi-basic" src="images/p-hudi-basic.png" shape="rect" placeholder="Худі"></image-slot></div>
+          <div style="flex:1"><div style="font-size:13.5px;font-weight:700">Худі Mirox Basic</div><div style="font-size:12px;color:#a3a3a3">Чорний · L · 1 шт</div></div>
+          <span style="font-size:13.5px;font-weight:800">1 290 грн</span>
+        </div>
+        <div style="display:flex;gap:14px;align-items:center">
+          <div style="width:56px;height:64px;border-radius:10px;overflow:hidden;flex-shrink:0"><image-slot id="p-tshirt" src="images/p-tshirt.png" shape="rect" placeholder="Футболка"></image-slot></div>
+          <div style="flex:1"><div style="font-size:13.5px;font-weight:700">Футболка Mirox</div><div style="font-size:12px;color:#a3a3a3">Білий · M · 1 шт</div></div>
+          <span style="font-size:13.5px;font-weight:800">590 грн</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:13.5px;border-top:1px solid #1a1a1a;padding-top:16px">
+        <div style="display:flex;justify-content:space-between"><span style="color:#a3a3a3">Товари</span><span style="font-weight:700;white-space:nowrap">1 880 грн</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#a3a3a3">Доставка</span><span style="font-weight:700;white-space:nowrap">{{ shippingPrice }}</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:16px;margin-top:6px"><span style="font-weight:700">До сплати</span><span style="font-weight:800;white-space:nowrap">{{ total }} грн</span></div>
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { step: 1, ship: "np-office", pay: "card" };
+  payMethods = [
+    { id: "card", name: "Карткою онлайн", desc: "Visa / Mastercard · захищений платіж" },
+    { id: "cod", name: "Оплата при отриманні", desc: "Без передоплати · готівкою або карткою у відділенні" },
+  ];
+  methods = [
+    { id: "np-office", name: "Нова Пошта — відділення", desc: "1-3 дні", price: 80 },
+    { id: "np-courier", name: "Нова Пошта — кур'єр", desc: "1-3 дні, до дверей", price: 120 },
+    { id: "np-postomat", name: "Нова Пошта — поштомат", desc: "1-3 дні", price: 70 },
+  ];
+  renderVals() {
+    const { step, ship } = this.state;
+    const m = this.methods.find(x => x.id === ship);
+    const total = (1880 + m.price).toLocaleString("uk-UA");
+    return {
+      steps: [[1,"Контакти"],[2,"Доставка"],[3,"Оплата"]].map(([n, label]) => ({
+        num: n, label,
+        arrow: n < 3,
+        color: step === n ? "#fff" : "#737373",
+        numBg: step === n ? "#fff" : step > n ? "#1a1a1a" : "transparent",
+        numColor: step === n ? "#000" : "#a3a3a3",
+        numBorder: step >= n ? "#fff" : "#333",
+        go: () => this.setState({ step: n }),
+      })),
+      isStep1: step === 1, isStep2: step === 2, isStep3: step === 3,
+      toStep1: () => this.setState({ step: 1 }),
+      toStep2: () => this.setState({ step: 2 }),
+      toStep3: () => this.setState({ step: 3 }),
+      shipping: this.methods.map(x => ({
+        ...x,
+        price: x.price + " грн",
+        border: ship === x.id ? "#fff" : "#262626",
+        dotBorder: ship === x.id ? "#fff" : "#525252",
+        dotFill: ship === x.id ? "#fff" : "transparent",
+        pick: () => this.setState({ ship: x.id }),
+      })),
+      shippingPrice: m.price + " грн",
+      total,
+      isCard: this.state.pay === "card",
+      payments: this.payMethods.map(x => ({
+        ...x,
+        border: this.state.pay === x.id ? "#fff" : "#262626",
+        dotBorder: this.state.pay === x.id ? "#fff" : "#525252",
+        dotFill: this.state.pay === x.id ? "#fff" : "transparent",
+        pick: () => this.setState({ pay: x.id }),
+      })),
+    };
+  }
+}
+</script>
+</body>
+</html>
