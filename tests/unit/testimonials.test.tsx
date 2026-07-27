@@ -1,4 +1,4 @@
-import { render, within } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import type { Testimonial } from "@/lib/review-queries";
 
@@ -48,11 +48,11 @@ describe("Testimonials", () => {
       "/products/mirox-basic-hoodie"
     );
     // Verify the correct number of stars are filled per card. We count
-    // elements with the `fill-foreground` class rather than querying by role
+    // elements with the `fill-rating` class rather than querying by role
     // or text because StarRating uses the same aria-label for all stars
     // regardless of value, so there is no accessible name to distinguish
     // them. Class-based counting is the reliable signal.
-    expect(cards[0].querySelectorAll(".fill-foreground")).toHaveLength(3);
+    expect(cards[0].querySelectorAll(".fill-rating")).toHaveLength(3);
 
     const second = within(cards[1] as HTMLElement);
     expect(second.getByText(/Perfect fit/)).toBeInTheDocument();
@@ -61,11 +61,19 @@ describe("Testimonials", () => {
       "href",
       "/products/mirox-relaxed-tee"
     );
-    expect(cards[1].querySelectorAll(".fill-foreground")).toHaveLength(5);
+    expect(cards[1].querySelectorAll(".fill-rating")).toHaveLength(5);
   });
 
   it("renders nothing when no reviews qualify", () => {
     const { container } = render(<Testimonials testimonials={[]} />);
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it("renders an initial avatar and a uk-UA date for each testimonial", () => {
+    render(<Testimonials testimonials={testimonials} />);
+    expect(screen.getByText(testimonials[0].authorName[0])).toBeInTheDocument(); // «O» for Oleksandr
+    expect(
+      screen.getByText(new Date(testimonials[0].createdAt).toLocaleDateString("uk-UA"))
+    ).toBeInTheDocument();
   });
 });

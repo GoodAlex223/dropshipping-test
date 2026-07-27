@@ -156,9 +156,11 @@ describe("token-layer color policy (globals.css Mirox tokens are achromatic)", (
     "--sidebar-ring",
   ]);
 
-  // The one sanctioned hue: destructive red. Must still resolve to a valid
-  // hex color, just not required to be achromatic.
-  const SANCTIONED_HUE_PROPS = new Set(["--destructive", "--destructive-foreground"]);
+  // The sanctioned hues: destructive red, and amber for star ratings (used by
+  // StarRating site-wide, reviews pages included — intended, per design).
+  // Must still resolve to a valid hex color, just not required to be
+  // achromatic.
+  const SANCTIONED_HUE_PROPS = new Set(["--destructive", "--destructive-foreground", "--rating"]);
 
   function extractBlock(selectorPattern: RegExp): string {
     const match = selectorPattern.exec(css);

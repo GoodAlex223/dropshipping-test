@@ -13,7 +13,7 @@ describe("WhyChooseUs", () => {
     expect(screen.getByText("300+")).toBeInTheDocument();
     expect(screen.getByText("100+")).toBeInTheDocument();
     // customerRating is null → its label must not appear.
-    expect(screen.queryByText(/customer rating/i)).toBeNull();
+    expect(screen.queryByText(/середня оцінка/)).toBeNull();
   });
 
   it("relies on the dark default surface (no data-surface attribute)", () => {

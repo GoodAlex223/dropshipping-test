@@ -42,6 +42,7 @@
   --color-card: var(--card);
   --color-border-strong: var(--border-strong);
   --color-faint: var(--text-faint);
+  --color-rating: var(--rating);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -87,6 +88,8 @@
   --accent-foreground: #ffffff;
   --destructive: #f87171;
   --destructive-foreground: #000000;
+  /* Sanctioned amber hue, alongside --destructive — star ratings only. */
+  --rating: #fbbf24;
   --border: #1a1a1a;
   --input: #1a1a1a;
   --ring: #ffffff;

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
 // Imported directly rather than via the reviews barrel: the barrel also pulls
 // in ReviewForm/ReviewList/ReviewSection and their dependencies, which a unit
 // test rendering this component would otherwise have to load.
@@ -17,27 +16,41 @@ export function Testimonials({ testimonials }: TestimonialsProps) {
   if (testimonials.length === 0) return null;
 
   return (
-    <section className="container py-16">
+    <section className="border-border container border-t py-16 lg:py-[72px]">
       <FadeIn>
-        <h2 className="font-heading text-center text-2xl font-bold tracking-tight sm:text-3xl">
+        <h2 className="font-heading text-2xl font-extrabold tracking-tight sm:text-[32px]">
           {home.testimonials.title}
         </h2>
 
-        <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid gap-5 md:grid-cols-2">
           {testimonials.map((testimonial) => (
-            <Card key={testimonial.id} className="hover-lift" data-testid="testimonial-card">
-              <CardContent className="p-6">
-                <StarRating value={testimonial.rating} size="sm" />
-                <p className="mt-4 text-sm leading-relaxed">{testimonial.comment}</p>
-                <p className="mt-4 text-sm font-medium">{testimonial.authorName}</p>
-                <Link
-                  href={`/products/${testimonial.productSlug}`}
-                  className="text-muted-foreground hover:text-foreground text-xs transition-colors"
-                >
-                  {testimonial.productName}
-                </Link>
-              </CardContent>
-            </Card>
+            <div
+              key={testimonial.id}
+              className="bg-card border-border hover-lift rounded-2xl border p-7"
+              data-testid="testimonial-card"
+            >
+              <div className="mb-3.5 flex items-center gap-3">
+                <span className="bg-secondary flex h-10 w-10 items-center justify-center rounded-full text-[15px] font-extrabold">
+                  {testimonial.authorName.charAt(0)}
+                </span>
+                <div>
+                  <div className="text-sm font-bold">{testimonial.authorName}</div>
+                  <StarRating value={testimonial.rating} size="sm" />
+                </div>
+                <span className="text-faint ml-auto text-[12.5px]">
+                  {new Date(testimonial.createdAt).toLocaleDateString("uk-UA")}
+                </span>
+              </div>
+              <p className="text-foreground/85 text-sm leading-relaxed">{testimonial.comment}</p>
+              {/* Documented deviation from the mockup: ties the real review to
+                  its product. */}
+              <Link
+                href={`/products/${testimonial.productSlug}`}
+                className="text-faint hover:text-foreground mt-3 block text-xs transition-colors"
+              >
+                {testimonial.productName}
+              </Link>
+            </div>
           ))}
         </div>
       </FadeIn>
