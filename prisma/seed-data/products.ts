@@ -72,12 +72,6 @@ export const products: ProductSeed[] = [
     brand: "Mirox",
     images: [
       { url: "/images/products/p-tshirt.png", alt: "Футболка Mirox — вид спереду", position: 0 },
-      { url: "/images/products/pd-main.png", alt: "Футболка Mirox — основне фото", position: 1 },
-      { url: "/images/products/pd-thumb-1.png", alt: "Футболка Mirox — деталь 1", position: 2 },
-      { url: "/images/products/pd-thumb-2.png", alt: "Футболка Mirox — деталь 2", position: 3 },
-      { url: "/images/products/pd-thumb-3.png", alt: "Футболка Mirox — деталь 3", position: 4 },
-      { url: "/images/products/pd-thumb-4.png", alt: "Футболка Mirox — деталь 4", position: 5 },
-      { url: "/images/products/pd-thumb-5.png", alt: "Футболка Mirox — деталь 5", position: 6 },
     ],
     variants: [
       { name: "Size", value: "S", stock: 20 },
@@ -102,12 +96,6 @@ export const products: ProductSeed[] = [
     brand: "Mirox",
     images: [
       { url: "/images/products/p-olimp.png", alt: "Олімпійка Mirox — вид спереду", position: 0 },
-      { url: "/images/products/pd-main.png", alt: "Олімпійка Mirox — основне фото", position: 1 },
-      { url: "/images/products/pd-thumb-1.png", alt: "Олімпійка Mirox — деталь 1", position: 2 },
-      { url: "/images/products/pd-thumb-2.png", alt: "Олімпійка Mirox — деталь 2", position: 3 },
-      { url: "/images/products/pd-thumb-3.png", alt: "Олімпійка Mirox — деталь 3", position: 4 },
-      { url: "/images/products/pd-thumb-4.png", alt: "Олімпійка Mirox — деталь 4", position: 5 },
-      { url: "/images/products/pd-thumb-5.png", alt: "Олімпійка Mirox — деталь 5", position: 6 },
     ],
     variants: [
       { name: "Size", value: "S", stock: 10 },
@@ -136,12 +124,6 @@ export const products: ProductSeed[] = [
         alt: "Худі Mirox White — вид спереду",
         position: 0,
       },
-      { url: "/images/products/pd-main.png", alt: "Худі Mirox White — основне фото", position: 1 },
-      { url: "/images/products/pd-thumb-1.png", alt: "Худі Mirox White — деталь 1", position: 2 },
-      { url: "/images/products/pd-thumb-2.png", alt: "Худі Mirox White — деталь 2", position: 3 },
-      { url: "/images/products/pd-thumb-3.png", alt: "Худі Mirox White — деталь 3", position: 4 },
-      { url: "/images/products/pd-thumb-4.png", alt: "Худі Mirox White — деталь 4", position: 5 },
-      { url: "/images/products/pd-thumb-5.png", alt: "Худі Mirox White — деталь 5", position: 6 },
     ],
     variants: [
       { name: "Size", value: "S", stock: 8 },
@@ -169,36 +151,6 @@ export const products: ProductSeed[] = [
         alt: "Худі Mirox Oversize — вид спереду",
         position: 0,
       },
-      {
-        url: "/images/products/pd-main.png",
-        alt: "Худі Mirox Oversize — основне фото",
-        position: 1,
-      },
-      {
-        url: "/images/products/pd-thumb-1.png",
-        alt: "Худі Mirox Oversize — деталь 1",
-        position: 2,
-      },
-      {
-        url: "/images/products/pd-thumb-2.png",
-        alt: "Худі Mirox Oversize — деталь 2",
-        position: 3,
-      },
-      {
-        url: "/images/products/pd-thumb-3.png",
-        alt: "Худі Mirox Oversize — деталь 3",
-        position: 4,
-      },
-      {
-        url: "/images/products/pd-thumb-4.png",
-        alt: "Худі Mirox Oversize — деталь 4",
-        position: 5,
-      },
-      {
-        url: "/images/products/pd-thumb-5.png",
-        alt: "Худі Mirox Oversize — деталь 5",
-        position: 6,
-      },
     ],
     variants: [
       { name: "Size", value: "M", stock: 10 },
@@ -222,12 +174,6 @@ export const products: ProductSeed[] = [
     brand: "Mirox",
     images: [
       { url: "/images/products/p-cargo.png", alt: "Штани Mirox Cargo — вид спереду", position: 0 },
-      { url: "/images/products/pd-main.png", alt: "Штани Mirox Cargo — основне фото", position: 1 },
-      { url: "/images/products/pd-thumb-1.png", alt: "Штани Mirox Cargo — деталь 1", position: 2 },
-      { url: "/images/products/pd-thumb-2.png", alt: "Штани Mirox Cargo — деталь 2", position: 3 },
-      { url: "/images/products/pd-thumb-3.png", alt: "Штани Mirox Cargo — деталь 3", position: 4 },
-      { url: "/images/products/pd-thumb-4.png", alt: "Штани Mirox Cargo — деталь 4", position: 5 },
-      { url: "/images/products/pd-thumb-5.png", alt: "Штани Mirox Cargo — деталь 5", position: 6 },
     ],
     variants: [
       { name: "Size", value: "S", stock: 8 },
@@ -254,12 +200,6 @@ export const products: ProductSeed[] = [
         alt: "Лонгслів Mirox — вид спереду",
         position: 0,
       },
-      { url: "/images/products/pd-main.png", alt: "Лонгслів Mirox — основне фото", position: 1 },
-      { url: "/images/products/pd-thumb-1.png", alt: "Лонгслів Mirox — деталь 1", position: 2 },
-      { url: "/images/products/pd-thumb-2.png", alt: "Лонгслів Mirox — деталь 2", position: 3 },
-      { url: "/images/products/pd-thumb-3.png", alt: "Лонгслів Mirox — деталь 3", position: 4 },
-      { url: "/images/products/pd-thumb-4.png", alt: "Лонгслів Mirox — деталь 4", position: 5 },
-      { url: "/images/products/pd-thumb-5.png", alt: "Лонгслів Mirox — деталь 5", position: 6 },
     ],
     variants: [
       { name: "Size", value: "S", stock: 10 },
@@ -281,15 +221,7 @@ export const products: ProductSeed[] = [
     isFeatured: false,
     categorySlug: "kepky",
     brand: "Mirox",
-    images: [
-      { url: "/images/products/p-cap.png", alt: "Кепка Mirox — вид спереду", position: 0 },
-      { url: "/images/products/pd-main.png", alt: "Кепка Mirox — основне фото", position: 1 },
-      { url: "/images/products/pd-thumb-1.png", alt: "Кепка Mirox — деталь 1", position: 2 },
-      { url: "/images/products/pd-thumb-2.png", alt: "Кепка Mirox — деталь 2", position: 3 },
-      { url: "/images/products/pd-thumb-3.png", alt: "Кепка Mirox — деталь 3", position: 4 },
-      { url: "/images/products/pd-thumb-4.png", alt: "Кепка Mirox — деталь 4", position: 5 },
-      { url: "/images/products/pd-thumb-5.png", alt: "Кепка Mirox — деталь 5", position: 6 },
-    ],
+    images: [{ url: "/images/products/p-cap.png", alt: "Кепка Mirox — вид спереду", position: 0 }],
     variants: [
       { name: "Size", value: "One size", stock: 60 },
       { name: "Color", value: "Чорний", stock: 60 },
