@@ -607,12 +607,17 @@ export default function CheckoutPage() {
                       options={{
                         clientSecret,
                         appearance: {
-                          theme: "flat",
+                          theme: "night",
                           variables: {
-                            colorPrimary: "#000000",
-                            colorBackground: "#ffffff",
-                            colorText: "#1a1a1a",
-                            colorDanger: "#b91c1c",
+                            // Stripe Elements renders in an iframe and can't read our
+                            // CSS custom properties, so these are literal hex values
+                            // matching the Mirox dark :root tokens (globals.css):
+                            // --primary, --input (form field fill, distinct from the
+                            // --card panel it sits on), --foreground, --destructive.
+                            colorPrimary: "#ffffff",
+                            colorBackground: "#1a1a1a",
+                            colorText: "#ffffff",
+                            colorDanger: "#f87171",
                             borderRadius: "4px",
                             fontFamily: "system-ui, sans-serif",
                           },

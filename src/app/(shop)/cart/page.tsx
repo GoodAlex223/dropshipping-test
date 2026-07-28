@@ -204,7 +204,7 @@ export default function CartPage() {
                                   "mt-1 flex items-center gap-1 text-sm",
                                   stockStatus.type === "error"
                                     ? "text-destructive"
-                                    : "text-orange-600"
+                                    : "text-muted-foreground"
                                 )}
                               >
                                 <AlertCircle className="h-3 w-3" />
@@ -311,7 +311,9 @@ export default function CartPage() {
                         <p
                           className={cn(
                             "mt-1 flex items-center gap-1 text-sm",
-                            stockStatus.type === "error" ? "text-destructive" : "text-orange-600"
+                            stockStatus.type === "error"
+                              ? "text-destructive"
+                              : "text-muted-foreground"
                           )}
                         >
                           <AlertCircle className="h-3 w-3" />

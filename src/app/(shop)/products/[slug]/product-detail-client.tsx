@@ -335,7 +335,9 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Quantity</span>
               {currentStock > 0 && currentStock <= 10 && (
-                <span className="text-sm text-orange-600">Only {currentStock} left in stock</span>
+                <span className="text-muted-foreground text-sm">
+                  Only {currentStock} left in stock
+                </span>
               )}
             </div>
             <div className="flex items-center gap-3">

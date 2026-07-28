@@ -385,8 +385,8 @@ export default function SupplierDetailPage({ params }: { params: Promise<{ id: s
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardContent className="flex items-center gap-4 p-6">
-            <div className="rounded-full bg-blue-100 p-3">
-              <Package className="h-6 w-6 text-blue-600" />
+            <div className="bg-muted rounded-full p-3">
+              <Package className="text-foreground h-6 w-6" />
             </div>
             <div>
               <p className="text-2xl font-bold">{supplier._count.products}</p>
@@ -396,8 +396,8 @@ export default function SupplierDetailPage({ params }: { params: Promise<{ id: s
         </Card>
         <Card>
           <CardContent className="flex items-center gap-4 p-6">
-            <div className="rounded-full bg-green-100 p-3">
-              <ShoppingCart className="h-6 w-6 text-green-600" />
+            <div className="bg-muted rounded-full p-3">
+              <ShoppingCart className="text-foreground h-6 w-6" />
             </div>
             <div>
               <p className="text-2xl font-bold">{supplier._count.supplierOrders}</p>
