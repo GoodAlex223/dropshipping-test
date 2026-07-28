@@ -19,35 +19,76 @@ test.describe("Navigation", () => {
     // this would fail at transform time instead of as a readable diff.
     await expect(page).toHaveTitle(/Mirox/);
 
-    // Check main navigation elements (only on desktop - mobile has hamburger menu)
+    // Check main navigation elements (only on desktop - mobile has hamburger
+    // menu). Header.tsx's `navigation` array (Task 6, per this branch's
+    // design handoff) is Ukrainian and matches Mirox Home.dc.html:28-34
+    // exactly, including that the prototype's desktop nav has no Categories
+    // link at all (the desktop Categories dropdown was removed, not
+    // relabeled) — /categories is still a real route, just no longer
+    // reachable from the desktop header (only from the mobile menu, see the
+    // "can navigate to categories page via mobile menu" test below).
+    // Scoped to the <header> landmark: Footer.tsx has its own "Каталог" /
+    // "Новинки" links (to the same hrefs), so an unscoped getByRole match
+    // resolves to 2 elements and throws a strict-mode violation.
     if (!isMobile) {
-      await expect(page.getByRole("link", { name: "Products", exact: true })).toBeVisible();
-      await expect(page.getByRole("link", { name: "Categories", exact: true })).toBeVisible();
+      const header = page.getByRole("banner");
+      await expect(header.getByRole("link", { name: "Каталог", exact: true })).toHaveAttribute(
+        "href",
+        "/products"
+      );
+      await expect(header.getByRole("link", { name: "Новинки", exact: true })).toHaveAttribute(
+        "href",
+        "/products?sortBy=createdAt&sortOrder=desc"
+      );
+      await expect(header.getByRole("link", { name: "Бестселери", exact: true })).toHaveAttribute(
+        "href",
+        "/products?featured=true"
+      );
+      await expect(header.getByRole("link", { name: "Categories", exact: true })).toHaveCount(0);
     }
 
     // Check hero section
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 
-  test("can navigate to products page", async ({ page }) => {
+  test("can navigate to products page", async ({ page, isMobile }) => {
     await page.goto("/");
 
-    await page
-      .getByRole("link", { name: /products/i })
-      .first()
-      .click();
+    // "Каталог" ("Catalog") is the nav item that links to the bare /products
+    // route; "Новинки"/"Бестселери" also point at /products but with query
+    // params (new-arrivals / featured sort), so this must match the exact
+    // label rather than a generic /products/i or /catalog/i regex. On mobile
+    // viewports the desktop <nav> is `md:hidden` (genuinely not visible, not
+    // just off-screen) — real mobile users reach it via the hamburger menu
+    // instead, so open that first rather than clicking an invisible element.
+    if (isMobile) {
+      await page.getByRole("button", { name: /menu/i }).click();
+      await page.getByRole("dialog").getByRole("link", { name: "Каталог", exact: true }).click();
+    } else {
+      // Scoped to <header>: Footer.tsx has its own "Каталог" link too.
+      await page.getByRole("banner").getByRole("link", { name: "Каталог", exact: true }).click();
+    }
 
-    await expect(page).toHaveURL(/\/products/);
+    // Anchored at the end: distinguishes the bare /products landing from the
+    // query-string variants the other two nav items would also satisfy.
+    await expect(page).toHaveURL(/\/products$/);
     await expect(page.getByRole("heading", { name: /products/i })).toBeVisible();
   });
 
-  test("can navigate to categories page", async ({ page }) => {
+  test("can navigate to categories page via mobile menu", async ({ page }) => {
+    // The desktop header has no Categories entry point (see the absence
+    // assertion above) — the mobile Sheet menu is the only surviving nav
+    // path to /categories (Header.tsx's mobile-only "Categories" link,
+    // kept in English as a documented deliberate deviation from the design
+    // handoff, which has no categories page at all). Scoped to the sheet's
+    // role="dialog" so this doesn't also match Footer.tsx's own categories
+    // link ("Категорії", a different word, so it wouldn't collide with the
+    // exact English match here — scoping regardless, for robustness).
+    await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/");
 
-    await page
-      .getByRole("link", { name: /categories/i })
-      .first()
-      .click();
+    await page.getByRole("button", { name: /menu/i }).click();
+    await page.getByRole("dialog").getByRole("link", { name: "Categories", exact: true }).click();
 
     await expect(page).toHaveURL(/\/categories/);
     await expect(page.getByRole("heading", { level: 1, name: /categories/i })).toBeVisible();
@@ -72,8 +113,15 @@ test.describe("Navigation", () => {
     if (await menuButton.isVisible()) {
       await menuButton.click();
 
-      // Navigation links should become visible
-      await expect(page.getByRole("link", { name: /products/i })).toBeVisible();
+      // Navigation links should become visible: the Ukrainian nav items
+      // (Каталог/Новинки/Бестселери) plus the mobile-only Categories entry.
+      // Scoped to the sheet's role="dialog": Footer.tsx (always in the DOM,
+      // regardless of scroll position) has its own Каталог/Новинки links.
+      const sheet = page.getByRole("dialog");
+      await expect(sheet.getByRole("link", { name: "Каталог", exact: true })).toBeVisible();
+      await expect(sheet.getByRole("link", { name: "Новинки", exact: true })).toBeVisible();
+      await expect(sheet.getByRole("link", { name: "Бестселери", exact: true })).toBeVisible();
+      await expect(sheet.getByRole("link", { name: "Categories", exact: true })).toBeVisible();
     }
   });
 });
