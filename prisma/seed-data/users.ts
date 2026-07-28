@@ -3,28 +3,28 @@
 export const adminUser = {
   email: "admin@store.com",
   password: "admin123",
-  name: "Admin User",
+  name: "Адміністратор Mirox",
 };
 
 export const testCustomers = [
   {
     email: "customer@example.com",
     password: "customer123",
-    name: "John Smith",
+    name: "Олександр Петренко",
   },
   {
     email: "sarah.wilson@example.com",
     password: "password123",
-    name: "Sarah Wilson",
+    name: "Дмитро Коваленко",
   },
   {
     email: "mike.johnson@example.com",
     password: "password123",
-    name: "Mike Johnson",
+    name: "Марія Шевченко",
   },
   {
     email: "emily.chen@example.com",
     password: "password123",
-    name: "Emily Chen",
+    name: "Ірина Бондаренко",
   },
 ];
