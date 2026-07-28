@@ -68,9 +68,19 @@
     "REDIS_URL": "redis://redis:6379",
     "NEXTAUTH_URL": "http://localhost:3000",
     "NEXTAUTH_SECRET": "dev-secret-change-in-production-min-32-chars"
-  },
-
-  "containerEnv": {
-    "NODE_ENV": "development"
   }
+
+  // containerEnv.NODE_ENV="development" was removed here (TASK-057 Task 12
+  // fix loop, 2026-07-28): Next.js manages NODE_ENV internally per command
+  // ("development" for `next dev`, "production" for `next build`/`next
+  // start"). A container-wide NODE_ENV leaks into every process regardless,
+  // and corrupted `next build`'s CSS pipeline — Tailwind v4 + Lightning CSS
+  // (via @tailwindcss/postcss) silently dropped every sm:/md:/lg:/xl:
+  // responsive utility's declaration, merging them into an unrelated
+  // selector instead (confirmed via compiled-CSS diff: dev build correct,
+  // NODE_ENV-contaminated prod build broken, NODE_ENV-clean prod build
+  // correct and byte-matching the live Vercel deploy). Vercel was never
+  // affected — the platform sets its own NODE_ENV=production before this
+  // file is read. Do not re-add a NODE_ENV entry to containerEnv or
+  // remoteEnv; requires a container rebuild to take effect for this session.
 }
