@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { BRAND_NAME, BRAND_META_SUFFIX, BRAND_TAGLINE } from "@/content/brand";
+import { loadManropeForOg } from "@/lib/og-fonts";
 
 // Site-wide share card, generated with code instead of a static PNG so the
 // rebrand can never drift from src/content/brand.ts again (the old
@@ -11,16 +12,20 @@ import { BRAND_NAME, BRAND_META_SUFFIX, BRAND_TAGLINE } from "@/content/brand";
 // overrides a less specific one.
 //
 // Deliberately monochrome (Mirox tokens: #000000 / #ffffff, the same
-// dark palette `:root` uses by default in globals.css) with no
-// custom font fetch — next/og's default sans already reads as a plain
-// geometric face at this weight/tracking, and fetching a font file over the
-// network for a build-time image adds a fragile dependency for a purely
-// stylistic gain.
+// dark palette `:root` uses by default in globals.css). BRAND_META_SUFFIX
+// and BRAND_TAGLINE are Ukrainian text, and Satori's bundled fallback font
+// is Latin-only, so a Cyrillic-capable font must be fetched at render time
+// (see src/lib/og-fonts.ts) — this route renders tofu, not a Latin
+// transliteration, if that fetch fails, so the fetch is best-effort with a
+// safe fallback rather than a hard dependency.
 export const alt = BRAND_NAME;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function Image() {
+  const text = `${BRAND_META_SUFFIX}${BRAND_NAME}${BRAND_TAGLINE}`;
+  const fonts = await loadManropeForOg(text);
+
   return new ImageResponse(
     <div
       style={{
@@ -32,6 +37,7 @@ export default async function Image() {
         justifyContent: "center",
         background: "#000000",
         color: "#ffffff",
+        fontFamily: "Manrope",
       }}
     >
       <div
@@ -82,6 +88,6 @@ export default async function Image() {
         {BRAND_TAGLINE}
       </div>
     </div>,
-    { ...size }
+    { ...size, ...(fonts.length ? { fonts } : {}) }
   );
 }
