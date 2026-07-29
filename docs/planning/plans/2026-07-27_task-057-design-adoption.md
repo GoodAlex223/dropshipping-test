@@ -10,6 +10,8 @@
 
 **Spec:** [2026-07-27-mirox-design-adoption-design.md](../../superpowers/specs/2026-07-27-mirox-design-adoption-design.md) · Pixel source of truth: the `.dc.html` prototypes in `docs/design/design_handoff_mirox/` (open in a browser; inline styles are the spec).
 
+_Execution log: this plan was executed 2026-07-27..29 via subagent-driven development; per-task progress, review verdicts, and fix rounds were tracked in the SDD ledger (`.superpowers/sdd/2026-07-27_task-057-design-adoption/progress.md`, git-ignored) rather than these checkboxes. All 13 tasks completed; visual gate signed off 2026-07-29._
+
 ## Global Constraints
 
 - **Monochrome only**: no color utilities/hexes outside the palette; sanctioned hues are exactly `--destructive` (#f87171 on dark) and `--rating` (#fbbf24, added in Task 8). Status green `#4ADE80` is deferred to TASK-037 (no chunk-1 consumer) — do not add it.
