@@ -55,8 +55,32 @@ export function WhyChooseUs() {
           )}
         </FadeIn>
 
-        <FadeIn>
-          <ul className="grid content-center gap-3 sm:grid-cols-2">
+        {/*
+          lg:grid lg:items-center lives on the WRAPPER, not the <ul> — this is
+          the fix for a gate-round-2 bug where the checklist sat top-anchored
+          instead of centered against the left column's (taller) height. The
+          outer grid above already stretches this FadeIn to match the left
+          column (default align-items:stretch), but FadeIn just renders a
+          plain block <div>: a block child (the <ul>) never auto-fills a
+          parent's height, so the <ul> only ever grows to its own content's
+          height and sits at the top of the stretched-but-otherwise-empty
+          wrapper. `content-center` on the <ul> itself (the original, broken
+          attempt) computes fine but is a total no-op, because the <ul>'s own
+          box is already exactly as tall as its content — there is no extra
+          space *inside* the <ul> for align-content to redistribute; the
+          extra space is one level up, in this wrapper, which the <ul>'s own
+          alignment can never reach. Making the wrapper itself lg:grid
+          lg:items-center centers the <ul> (a single item, natural height)
+          within the wrapper's already-stretched box instead — matching the
+          handoff (Mirox Home.dc.html:158's align-content:center, which works
+          there because that prototype has no such wrapper in between).
+          justify-items defaults to stretch in a grid container, so the <ul>
+          keeps its full width with no extra class needed. lg:-gated so
+          mobile's single-column stacking (each side its own row, nothing to
+          center against) is untouched.
+        */}
+        <FadeIn className="lg:grid lg:items-center">
+          <ul className="grid gap-3 sm:grid-cols-2">
             {items.map((item) => (
               <li key={item} className="flex items-center gap-2.5">
                 <span
