@@ -13,10 +13,13 @@ test.describe("Shopping Cart", () => {
     // Wait for products to load
     await page.waitForSelector("[data-testid='product-card']");
 
-    // Click on "View Product" and wait for navigation
+    // Click on the product card link and wait for navigation. The whole
+    // card is a single <a> (no separate "View Product" button — see
+    // TASK-057 item E), so target it the same resilient way lines 56/78/99
+    // in this file already do.
     await Promise.all([
       page.waitForURL(/\/products\/[^/]+$/),
-      page.getByRole("link", { name: "View Product" }).first().click(),
+      page.locator("[data-testid='product-card'] a").first().click(),
     ]);
 
     // Click add to cart
