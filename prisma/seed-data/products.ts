@@ -1,5 +1,18 @@
 // Product seed data — Mirox clothing catalog (UA, UAH)
 
+// Same pattern as seed-data/orders.ts: `now` is captured once at module load
+// (i.e. whenever `npm run db:seed` runs), and every product's `createdAt` is
+// expressed relative to it. That keeps the RELATIVE recency ordering between
+// products stable across reseeds (Basic is always "newer" than White by 12
+// days, whatever day the seed actually runs) — which is all the homepage's
+// "Новинки" rail (orderBy createdAt desc) actually needs. Explicit, strictly
+// decreasing values here are what makes the rail order deterministic instead
+// of depending on insertion order or DB default timestamps: the first four —
+// Basic, Футболка, Олімпійка, White — are the mockup's featured four, in the
+// mockup's exact order (handoff rail: Task 6 / TASK-057).
+const now = new Date();
+const daysAgo = (days: number) => new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+
 export interface ProductSeed {
   name: string;
   slug: string;
@@ -20,6 +33,7 @@ export interface ProductSeed {
   mpn?: string;
   images: { url: string; alt: string; position: number }[];
   variants?: { name: string; value: string; stock: number }[];
+  createdAt: Date;
 }
 
 export const products: ProductSeed[] = [
@@ -35,6 +49,7 @@ export const products: ProductSeed[] = [
     isFeatured: true,
     categorySlug: "hudi",
     brand: "Mirox",
+    createdAt: daysAgo(4),
     images: [
       {
         url: "/images/products/p-hudi-basic.png",
@@ -70,6 +85,7 @@ export const products: ProductSeed[] = [
     isFeatured: true,
     categorySlug: "futbolky",
     brand: "Mirox",
+    createdAt: daysAgo(8),
     images: [
       { url: "/images/products/p-tshirt.png", alt: "Футболка Mirox — вид спереду", position: 0 },
     ],
@@ -94,6 +110,7 @@ export const products: ProductSeed[] = [
     isFeatured: true,
     categorySlug: "olimpiyky",
     brand: "Mirox",
+    createdAt: daysAgo(12),
     images: [
       { url: "/images/products/p-olimp.png", alt: "Олімпійка Mirox — вид спереду", position: 0 },
     ],
@@ -118,6 +135,7 @@ export const products: ProductSeed[] = [
     isFeatured: true,
     categorySlug: "hudi",
     brand: "Mirox",
+    createdAt: daysAgo(16),
     images: [
       {
         url: "/images/products/p-hudi-white.png",
@@ -145,6 +163,7 @@ export const products: ProductSeed[] = [
     isFeatured: false,
     categorySlug: "hudi",
     brand: "Mirox",
+    createdAt: daysAgo(30),
     images: [
       {
         url: "/images/products/p-hudi-oversize.png",
@@ -172,6 +191,7 @@ export const products: ProductSeed[] = [
     isFeatured: false,
     categorySlug: "shtany",
     brand: "Mirox",
+    createdAt: daysAgo(35),
     images: [
       { url: "/images/products/p-cargo.png", alt: "Штани Mirox Cargo — вид спереду", position: 0 },
     ],
@@ -194,6 +214,7 @@ export const products: ProductSeed[] = [
     isFeatured: false,
     categorySlug: "longslivy",
     brand: "Mirox",
+    createdAt: daysAgo(40),
     images: [
       {
         url: "/images/products/p-longsleeve.png",
@@ -221,6 +242,7 @@ export const products: ProductSeed[] = [
     isFeatured: false,
     categorySlug: "kepky",
     brand: "Mirox",
+    createdAt: daysAgo(45),
     images: [{ url: "/images/products/p-cap.png", alt: "Кепка Mirox — вид спереду", position: 0 }],
     variants: [
       { name: "Size", value: "One size", stock: 60 },

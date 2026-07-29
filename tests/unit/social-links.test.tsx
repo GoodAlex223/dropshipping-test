@@ -62,6 +62,25 @@ describe("SocialLinks", () => {
     const { container } = render(<SocialLinks variant="tiles" />);
     expect(container.querySelector(".glass")).not.toBeNull();
   });
+
+  it("hides the inline (footer) variant's label visually but keeps it accessible", () => {
+    const { container } = render(<SocialLinks />);
+    // Accessible name must still resolve — this is sr-only text, not a
+    // removed label; getByRole's name computation reads it regardless of
+    // the visual-hiding class.
+    const link = screen.getByRole("link", { name: /Instagram/ });
+    expect(link).toHaveAttribute("title", "Instagram");
+    const label = container.querySelector("a span.sr-only");
+    expect(label).not.toBeNull();
+    expect(label?.textContent).toBe("Instagram");
+  });
+
+  it("keeps the tiles variant's label visible (no sr-only, no tooltip)", () => {
+    const { container } = render(<SocialLinks variant="tiles" />);
+    expect(container.querySelector("a span.sr-only")).toBeNull();
+    expect(screen.getByText("Instagram")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Instagram/ })).not.toHaveAttribute("title");
+  });
 });
 
 describe("formatFollowers boundary values", () => {

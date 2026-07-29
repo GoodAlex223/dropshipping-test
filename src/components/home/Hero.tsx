@@ -63,10 +63,12 @@ export function Hero() {
       {hasImage ? (
         <div className="relative lg:grid lg:grid-cols-[1fr_minmax(400px,44%)]">
           <div className="relative z-10 flex min-h-[560px] flex-col justify-end px-5 pb-10 lg:min-h-[620px] lg:justify-center lg:px-12 lg:pb-16 xl:pl-20">
-            <p className="text-muted-foreground flex items-center gap-3 text-xs font-medium tracking-[0.2em]">
-              <span aria-hidden="true" className="bg-border-strong inline-block h-px w-6" />
-              {eyebrow}
-            </p>
+            {eyebrow !== null && (
+              <p className="text-muted-foreground flex items-center gap-3 text-xs font-medium tracking-[0.2em]">
+                <span aria-hidden="true" className="bg-border-strong inline-block h-px w-6" />
+                {eyebrow}
+              </p>
+            )}
 
             {/* Single h1: three content lines, not three headings. */}
             <h1 className="font-heading mt-6 text-4xl leading-[1.08] font-extrabold tracking-tight sm:text-5xl lg:text-[64px] lg:leading-[1.05]">
@@ -95,37 +97,70 @@ export function Hero() {
             </div>
           </div>
 
-          <div className="absolute inset-0 lg:static lg:order-2 lg:min-h-[620px]">
-            <Image
-              src={image.src}
-              alt={image.alt}
-              fill
-              // This is the LCP element: eager-loaded, explicitly sized, blurred-in.
-              priority
-              // From lg upward this image only occupies the 44% column, not
-              // the full viewport width — requesting a full-width image there
-              // over-fetches and costs LCP against the PageSpeed 95+ target.
-              sizes="(max-width: 1024px) 100vw, 44vw"
-              placeholder="blur"
-              blurDataURL={DEFAULT_BLUR_DATA_URL}
-              className="object-cover object-top"
-            />
-            {/* CSS vignette per the handoff — photo is swappable, effect persists */}
-            <div
-              data-testid="hero-vignette"
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(to top, var(--background) 0%, rgb(0 0 0 / 0.9) 9%, rgb(0 0 0 / 0) 45%), linear-gradient(to bottom, rgb(0 0 0 / 0.7) 0%, rgb(0 0 0 / 0) 16%), linear-gradient(to right, var(--background) 0%, rgb(0 0 0 / 0.55) 6%, rgb(0 0 0 / 0) 20%), linear-gradient(to left, var(--background) 0%, rgb(0 0 0 / 0.55) 6%, rgb(0 0 0 / 0) 20%)",
-              }}
-            />
+          {/*
+            Outer photo column: mobile keeps the current full-bleed backdrop
+            (absolute inset-0, matching the mobile mockup); from lg upward it
+            becomes a normal grid cell in the 44% column, with lg:pr-20
+            reserving the prototype's `padding:0 80px 0 0` mat between the
+            photo and the viewport edge (handoff lines 60-61). It stays
+            `lg:relative` (never `lg:static`) so it remains a positioned
+            ancestor in its own right — with `static` here, the inner wrapper
+            below would still size correctly, but a future absolutely
+            positioned child added directly to this div would escape to the
+            grid container (which spans BOTH columns) instead of staying
+            inside this 44% column, which is exactly the "photo bleeds behind
+            the text" bug this task fixes.
+          */}
+          <div className="absolute inset-0 lg:relative lg:order-2 lg:min-h-[620px] lg:pr-20">
+            {/*
+              Inner wrapper is the actual containing block for the `fill`
+              image and the vignette. This extra layer is required, not
+              decorative: a `position:relative` ancestor's padding does NOT
+              constrain an absolutely-positioned `inset:0` child (the child's
+              containing block is the padding EDGE, i.e. padding is included
+              in — not subtracted from — the box the child fills). Without
+              this inner div, `lg:pr-20` above would reserve dead space but
+              the photo would still render edge-to-edge over it. Sizing this
+              div to 100%/100% of the outer div's *content* box (the normal
+              behavior of an in-flow percentage-sized block) is what actually
+              applies the padding to the photo.
+            */}
+            <div className="relative h-full w-full lg:min-h-[620px]">
+              <Image
+                src={image.src}
+                alt={image.alt}
+                fill
+                // This is the LCP element: eager-loaded, explicitly sized, blurred-in.
+                priority
+                // From lg upward this image only occupies the 44% column, not
+                // the full viewport width — requesting a full-width image there
+                // over-fetches and costs LCP against the PageSpeed 95+ target.
+                sizes="(max-width: 1024px) 100vw, 44vw"
+                placeholder="blur"
+                blurDataURL={DEFAULT_BLUR_DATA_URL}
+                className="object-cover object-top"
+              />
+              {/* CSS vignette per the handoff — photo is swappable, effect persists */}
+              <div
+                data-testid="hero-vignette"
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(to top, var(--background) 0%, rgb(0 0 0 / 0.9) 9%, rgb(0 0 0 / 0) 45%), linear-gradient(to bottom, rgb(0 0 0 / 0.7) 0%, rgb(0 0 0 / 0) 16%), linear-gradient(to right, var(--background) 0%, rgb(0 0 0 / 0.55) 6%, rgb(0 0 0 / 0) 20%), linear-gradient(to left, var(--background) 0%, rgb(0 0 0 / 0.55) 6%, rgb(0 0 0 / 0) 20%)",
+                }}
+              />
+            </div>
           </div>
         </div>
       ) : (
         <div className="relative container py-16 md:py-24">
           <div className="mx-auto max-w-3xl text-center">
-            <p className="text-muted-foreground text-xs font-medium tracking-[0.2em]">{eyebrow}</p>
+            {eyebrow !== null && (
+              <p className="text-muted-foreground text-xs font-medium tracking-[0.2em]">
+                {eyebrow}
+              </p>
+            )}
 
             {/* Single h1: three content lines, not three headings. */}
             <h1 className="font-heading mt-6 text-5xl leading-[0.95] font-extrabold tracking-tight sm:text-6xl lg:text-7xl">

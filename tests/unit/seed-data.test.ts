@@ -55,4 +55,17 @@ describe("seed data integrity (mirrors seed.ts fail-fast guards)", () => {
     expect(products.filter((p) => p.isFeatured).length).toBeGreaterThanOrEqual(4);
     expect(reviews.filter((r) => r.rating >= 4 && r.comment).length).toBeGreaterThanOrEqual(2);
   });
+
+  // TASK-057 (Task 6): the homepage "Новинки" rail orders by createdAt desc —
+  // this locks in the mockup's exact featured order (Худі Basic, Футболка,
+  // Олімпійка, Худі White) against a future reordering/edit of the seed data.
+  it("the four newest products by createdAt are exactly MRX-001..004, in order", () => {
+    const sorted = [...products].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    expect(sorted.slice(0, 4).map((p) => p.sku)).toEqual([
+      "MRX-001",
+      "MRX-002",
+      "MRX-003",
+      "MRX-004",
+    ]);
+  });
 });

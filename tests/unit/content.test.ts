@@ -22,8 +22,12 @@ describe("site content", () => {
 });
 
 describe("home content", () => {
-  it("splits the slogan into the three briefed lines", () => {
-    expect(home.hero.headline).toEqual(["СТИЛЬ.", "ЯКІСТЬ.", "ВПЕВНЕНІСТЬ."]);
+  it("wraps the slogan into the mockup's two lines (client brief's three-line split was not used)", () => {
+    expect(home.hero.headline).toEqual(["СТИЛЬ. ЯКІСТЬ.", "ВПЕВНЕНІСТЬ."]);
+  });
+
+  it("has no eyebrow — removed 2026-07-28 for the multi-brand store, kept config-gated", () => {
+    expect(home.hero.eyebrow).toBeNull();
   });
 
   it("uses the homepage-section CTA labels, not the mockup-prompt ones", () => {

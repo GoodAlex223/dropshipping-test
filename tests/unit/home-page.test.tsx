@@ -37,6 +37,7 @@ function product(id: string): ProductCardData {
     isFeatured: true,
     category: { name: "Hoodies", slug: "hoodies" },
     images: [{ url: "https://example.com/x.jpg", alt: null }],
+    variants: [],
   };
 }
 

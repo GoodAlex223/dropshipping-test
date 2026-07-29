@@ -15,6 +15,7 @@ const products: ProductCardData[] = [
     isFeatured: true,
     category: { name: "Hoodies", slug: "hoodies" },
     images: [{ url: "https://example.com/a.jpg", alt: null }],
+    variants: [],
   },
   {
     id: "b",
@@ -27,6 +28,7 @@ const products: ProductCardData[] = [
     isFeatured: false,
     category: { name: "T-Shirts", slug: "t-shirts" },
     images: [{ url: "https://example.com/b.jpg", alt: null }],
+    variants: [],
   },
 ];
 

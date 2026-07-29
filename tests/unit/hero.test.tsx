@@ -5,7 +5,7 @@ import { Truck } from "lucide-react";
 const defaultHeroImage = { src: "/hero-placeholder-ai.jpg", alt: "Model wearing a black hoodie" };
 
 const mockHero = {
-  eyebrow: "NEW COLLECTION",
+  eyebrow: "NEW COLLECTION" as string | null,
   headline: ["STYLE.", "QUALITY.", "CONFIDENCE."],
   subtitle: "Mirox Shop — modern clothing for those who value quality and minimalism.",
   primaryCta: { label: "Shop the Catalog", href: "/products" },
@@ -31,6 +31,7 @@ import { Hero } from "@/components/home/Hero";
 // as null for whatever test happens to run next.
 beforeEach(() => {
   mockHero.image = defaultHeroImage;
+  mockHero.eyebrow = "NEW COLLECTION";
 });
 
 describe("Hero", () => {
@@ -112,5 +113,22 @@ describe("Hero", () => {
   it("no longer renders the benefit strip inside the hero", () => {
     render(<Hero />);
     expect(screen.queryByText("Швидка доставка")).not.toBeInTheDocument();
+  });
+
+  it("renders the eyebrow row when one is configured", () => {
+    render(<Hero />);
+    expect(screen.getByText("NEW COLLECTION")).toBeInTheDocument();
+  });
+
+  it("renders no eyebrow row when eyebrow is null, in both hero layouts", () => {
+    mockHero.eyebrow = null;
+    const { rerender } = render(<Hero />);
+    expect(screen.queryByText("NEW COLLECTION")).not.toBeInTheDocument();
+
+    mockHero.image = null;
+    rerender(<Hero />);
+    expect(screen.queryByText("NEW COLLECTION")).not.toBeInTheDocument();
+    // The rest of the no-photo hero still renders around the missing eyebrow.
+    expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
   });
 });

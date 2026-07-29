@@ -13,9 +13,13 @@ export interface HeroImage {
  */
 export const home = {
   hero: {
-    eyebrow: "НОВА КОЛЕКЦІЯ",
-    /** Brief list #1: three separate lines, rendered as three lines. */
-    headline: ["СТИЛЬ.", "ЯКІСТЬ.", "ВПЕВНЕНІСТЬ."],
+    // Removed 2026-07-28 — multi-brand store, user decision. Field kept
+    // (config-gated) so a future single-brand campaign can set a string here
+    // without a Hero code change; Hero renders the eyebrow row only when set.
+    eyebrow: null as string | null,
+    // Client brief specified three lines; user chose the mockup's 2-line
+    // wrap instead on 2026-07-28 ("СТИЛЬ. ЯКІСТЬ." / "ВПЕВНЕНІСТЬ.").
+    headline: ["СТИЛЬ. ЯКІСТЬ.", "ВПЕВНЕНІСТЬ."],
     subtitle: BRAND_HERO_SUBTITLE,
     primaryCta: { label: "ПЕРЕЙТИ В КАТАЛОГ", href: "/products" },
     secondaryCta: {

@@ -169,6 +169,7 @@ async function main() {
       barcode: p.barcode,
       mpn: p.mpn,
       isActive: true,
+      createdAt: p.createdAt,
     };
 
     const product = await prisma.product.upsert({

@@ -16,6 +16,8 @@ export interface ProductCardData {
   isFeatured: boolean;
   category: { name: string; slug: string };
   images: { url: string; alt: string | null }[];
+  /** Every variant row (Size and Color alike) — <ProductCard> filters to Size itself. */
+  variants: { name: string; value: string }[];
 }
 
 /**
@@ -41,6 +43,7 @@ const PRODUCT_CARD_SELECT = {
     orderBy: { position: "asc" as const },
     take: 1,
   },
+  variants: { select: { name: true, value: true } },
 };
 
 type RawProduct = Omit<ProductCardData, "price" | "comparePrice"> & {
