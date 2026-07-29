@@ -11,10 +11,12 @@ export const googleShoppingItemSchema = z.object({
     .max(5000, "Description must be 5000 characters or less"),
   link: z.string().url("Invalid product URL"),
   image_link: z.string().url("Invalid image URL"),
-  price: z.string().regex(/^\d+\.\d{2} [A-Z]{3}$/, 'Price must be formatted as "XX.XX USD"'),
+  price: z
+    .string()
+    .regex(/^\d+\.\d{2} [A-Z]{3}$/, 'Price must be formatted as "XX.XX CUR" (ISO 4217)'),
   sale_price: z
     .string()
-    .regex(/^\d+\.\d{2} [A-Z]{3}$/, 'Sale price must be formatted as "XX.XX USD"')
+    .regex(/^\d+\.\d{2} [A-Z]{3}$/, 'Sale price must be formatted as "XX.XX CUR" (ISO 4217)')
     .optional(),
   availability: z.enum(["in stock", "out of stock", "preorder", "backorder"]),
   condition: z.enum(["new", "refurbished", "used"]),

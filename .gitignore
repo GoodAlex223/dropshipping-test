@@ -63,3 +63,6 @@ next-env.d.ts
 # Playwright generated output (every local E2E run rewrites these)
 playwright-report/
 test-results/
+
+# Playwright MCP browser session artifacts (screenshots, page snapshots)
+.playwright-mcp/

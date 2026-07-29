@@ -20,6 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { ProductCard } from "@/components/products";
 import { trackViewItemList, trackSelectItem, type GA4Item } from "@/lib/analytics";
+import { formatPrice } from "@/lib/format";
 
 interface Product {
   id: string;
@@ -77,11 +78,11 @@ export function CategoryClient({ category }: CategoryClientProps) {
   // Filter state
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState("desc");
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
   const [appliedPriceRange, setAppliedPriceRange] = useState<[number, number] | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
-  const maxPriceLimit = 1000;
+  const maxPriceLimit = 2000;
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -285,8 +286,8 @@ export function CategoryClient({ category }: CategoryClientProps) {
                   className="mt-2"
                 />
                 <div className="flex items-center justify-between text-sm">
-                  <span>{priceRange[0]} грн</span>
-                  <span>{priceRange[1]} грн</span>
+                  <span>{formatPrice(priceRange[0])}</span>
+                  <span>{formatPrice(priceRange[1])}</span>
                 </div>
                 <Button variant="outline" size="sm" className="w-full" onClick={applyPriceFilter}>
                   Apply Price Filter
@@ -307,7 +308,7 @@ export function CategoryClient({ category }: CategoryClientProps) {
           <div className="hidden flex-wrap items-center gap-2 md:flex">
             {appliedPriceRange && (
               <Badge variant="secondary" className="gap-1">
-                Price: {appliedPriceRange[0]} грн - {appliedPriceRange[1]} грн
+                Price: {formatPrice(appliedPriceRange[0])} - {formatPrice(appliedPriceRange[1])}
                 <button onClick={() => setAppliedPriceRange(null)}>
                   <X className="h-3 w-3" />
                 </button>

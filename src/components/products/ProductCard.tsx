@@ -67,8 +67,13 @@ export function ProductCard({ product, showCategory = true }: ProductCardProps) 
     >
       {/* Whole card is one link, per the design handoff (its product card is
           a single <a>) — no separate footer CTA, no nested category link
-          (nesting an <a> inside this one would be invalid HTML). */}
-      <Link href={`/products/${product.slug}`} className="block">
+          (nesting an <a> inside this one would be invalid HTML). aria-label
+          pins the link's accessible name to just the product name; without
+          it, the computed name would be the concatenation of every nested
+          text node (category, description, both prices, size row) — a much
+          noisier announcement than a screen reader needs for "go to this
+          product's page". */}
+      <Link href={`/products/${product.slug}`} className="block" aria-label={product.name}>
         <div className="bg-muted relative aspect-square overflow-hidden">
           <ProductImage
             src={product.images[0]?.url}

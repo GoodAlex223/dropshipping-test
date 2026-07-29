@@ -47,6 +47,16 @@ describe("ProductCard", () => {
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
 
+  it("gives the whole-card link an accessible name equal to just the product name", () => {
+    render(<ProductCard product={base} />);
+    // aria-label overrides the link's nested text content (category, price,
+    // size row, ...) as its accessible name — this specifically proves a
+    // screen reader announces "Mirox Hoodie", not the entire card's text.
+    const link = screen.getByRole("link", { name: base.name });
+    expect(link).toHaveAttribute("href", "/products/mirox-hoodie");
+    expect(screen.getAllByRole("link")).toHaveLength(1);
+  });
+
   it("renders the whole card as a single link even when out of stock", () => {
     render(<ProductCard product={{ ...base, stock: 0 }} />);
     expect(screen.getAllByRole("link")).toHaveLength(1);

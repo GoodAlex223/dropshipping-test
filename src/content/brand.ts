@@ -10,6 +10,8 @@ export const BRAND_NAME = "Mirox Shop";
 /** Long form — hero subtitle, footer. */
 export const BRAND_TAGLINE = "Сучасний одяг для тих, хто цінує якість і мінімалізм.";
 
+// BRAND_HERO_SUBTITLE is the same sentence as BRAND_TAGLINE, just prefixed
+// with the brand name for the hero's context — keep both in sync.
 export const BRAND_HERO_SUBTITLE =
   "Mirox Shop — сучасний одяг для тих, хто цінує якість і мінімалізм.";
 

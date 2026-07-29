@@ -57,11 +57,15 @@ export const products: ProductSeed[] = [
         position: 0,
       },
       { url: "/images/products/pd-main.png", alt: "Худі Mirox Basic — основне фото", position: 1 },
-      { url: "/images/products/pd-thumb-1.png", alt: "Худі Mirox Basic — деталь 1", position: 2 },
-      { url: "/images/products/pd-thumb-2.png", alt: "Худі Mirox Basic — деталь 2", position: 3 },
-      { url: "/images/products/pd-thumb-3.png", alt: "Худі Mirox Basic — деталь 3", position: 4 },
-      { url: "/images/products/pd-thumb-4.png", alt: "Худі Mirox Basic — деталь 4", position: 5 },
-      { url: "/images/products/pd-thumb-5.png", alt: "Худі Mirox Basic — деталь 5", position: 6 },
+      // pd-thumb-1.png removed (TASK-057 fix wave): it was byte-identical to
+      // pd-main.png above, duplicating the same frame in the gallery. The
+      // remaining pd-thumb-2..5 files already carry "деталь 2".."деталь 5" alt
+      // text and slot into position 2..5 unchanged — no renumbering needed
+      // beyond removing this one entry.
+      { url: "/images/products/pd-thumb-2.png", alt: "Худі Mirox Basic — деталь 2", position: 2 },
+      { url: "/images/products/pd-thumb-3.png", alt: "Худі Mirox Basic — деталь 3", position: 3 },
+      { url: "/images/products/pd-thumb-4.png", alt: "Худі Mirox Basic — деталь 4", position: 4 },
+      { url: "/images/products/pd-thumb-5.png", alt: "Худі Mirox Basic — деталь 5", position: 5 },
     ],
     variants: [
       { name: "Size", value: "S", stock: 8 },

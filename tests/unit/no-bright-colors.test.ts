@@ -18,6 +18,12 @@ import { join } from "node:path";
 // through — `(shop)/layout.tsx`, the root `error.tsx`, and the root
 // `layout.tsx` — were already verified clean too.
 //
+// Coverage predating all three of the above tasks (added 2026-07-18, before
+// TASK-034 existed) that this narrative doesn't otherwise mention:
+// `src/app/newsletter`, `src/app/not-found.tsx`, and `src/lib/order-status.ts`
+// are also in SCAN_PATHS below and verified clean — listed here so the
+// account above isn't read as the complete map of what's scanned.
+//
 // Also deliberately NOT in this list, for unrelated reasons:
 // - src/app/(admin) — admin is inheriting design tokens but is not being restyled
 //   by TASK-034/057 (BACKLOG'd, no rebuild task owns it yet), so it's still not in
