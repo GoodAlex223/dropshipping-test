@@ -13,11 +13,39 @@ test.describe("Homepage", () => {
   });
 
   test("primary CTA navigates to the catalog", async ({ page }) => {
+    // Root-caused a non-deterministic failure here (and on the secondary CTA
+    // test below): in isolated repeat runs it alternated which test failed —
+    // sometimes this one, sometimes the other, sometimes neither — on BOTH
+    // Mobile Safari and Mobile Chrome. That alternating pattern rules out a
+    // fixed CSS overlay/z-index bug (which would fail the same element every
+    // time); it's the signature of a hydration-timing race instead. The CTA
+    // links are static <a> tags already present in the SSR HTML — visible,
+    // and passing Playwright's actionability checks, well before React has
+    // hydrated and next/link's client-side router is ready. A click that
+    // lands in that window can have its native navigation prevented without
+    // the router completing the replacement navigation, silently dropping
+    // it (no error is thrown — the click "succeeds", the URL just never
+    // changes). Same class of bug as webkit-pre-hydration-e2e-testing (that
+    // one was fill()-specific to WebKit; this one is click-based and not
+    // engine-specific, since it reproduced on Chrome too).
+    //
+    // Fix: wait for a signal that's provably POST-hydration, not just
+    // post-paint. CookieConsent (mounted globally) renders `null` until its
+    // own `useEffect` fires — which cannot happen before hydration commits —
+    // then shows this banner when consent is still "pending" (the default
+    // for every fresh Playwright browser context). Waiting for it first,
+    // before interacting with anything else on the page, is a reliable
+    // "hydration has definitely happened" gate without touching product code.
+    await page.getByRole("button", { name: "Decline" }).waitFor();
     await page.getByRole("link", { name: "ПЕРЕЙТИ В КАТАЛОГ" }).click();
     await expect(page).toHaveURL(/\/products$/);
   });
 
   test("secondary CTA navigates to new arrivals", async ({ page }) => {
+    // Same hydration-race root cause as the primary CTA test above — see its
+    // comment for the full diagnosis. Same fix: wait for the post-hydration-
+    // only cookie-consent banner before clicking.
+    await page.getByRole("button", { name: "Decline" }).waitFor();
     await page.getByRole("link", { name: "ПЕРЕГЛЯНУТИ НОВИНКИ" }).first().click();
     await expect(page).toHaveURL(/sortBy=createdAt&sortOrder=desc/);
   });
