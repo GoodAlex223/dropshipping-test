@@ -108,13 +108,18 @@ src/
 │   ├── admin/              # Admin panel components (sidebar, forms, dialogs)
 │   ├── analytics/          # Analytics tracking components (PurchaseTracker, WebVitalsReporter)
 │   ├── checkout/           # Payment form components
-│   ├── common/             # Header, Footer (with NewsletterSignup), CookieConsent, ResourceHints
+│   ├── common/             # Header, Footer, AnnouncementBar, BenefitStrip, SocialLinks, FadeIn, Logo, NewsletterSignup, CookieConsent, ResourceHints
+│   ├── home/               # Homepage sections: Hero, ProductRail, WhyChooseUs, Testimonials
 │   ├── products/           # ProductCard, SocialShareButtons
 │   ├── reviews/            # Review components (ReviewSection, ReviewForm, ReviewList, ReviewItem, ReviewStats, StarRating)
 │   ├── shop/               # CartDrawer
 │   ├── showcase/           # Multi-theme showcase components (bold/, luxury/, organic/)
 │   ├── ui/                 # shadcn/ui primitives (button, card, dialog, etc.)
 │   └── providers.tsx       # Context providers wrapper (auth, toast, cookie consent, web vitals)
+├── content/                # Typed content-config layer (Ukrainian copy, extraction-ready for TASK-039 i18n)
+│   ├── brand.ts            # Brand name/tagline constants — deliberately import-free (consumed by seo.ts)
+│   ├── home.ts             # Homepage copy (hero, benefits, whyChooseUs, rails, testimonials)
+│   └── site.ts             # Site-wide config (announcement, socials, client claims, footer benefits)
 ├── hooks/                  # Custom React hooks (use-debounce, use-toast)
 ├── lib/                    # Core utilities
 │   ├── auth.ts             # NextAuth v5 config (JWT + Prisma adapter)
@@ -123,7 +128,9 @@ src/
 │   ├── stripe.ts           # Stripe server-side
 │   ├── stripe-client.ts    # Stripe client-side
 │   ├── email.ts            # Resend email service (order confirmations, newsletter)
+│   ├── format.ts           # formatPrice() — the only sanctioned UAH price formatter (uk-UA, Intl.NumberFormat)
 │   ├── newsletter.ts       # Newsletter utilities (token generation, URL builders, HMAC unsubscribe)
+│   ├── og-fonts.ts         # Fetches Cyrillic-subset Manrope TTFs for next/og (Satori) OG image routes; fails safe to []
 │   ├── queue.ts            # BullMQ queue setup
 │   ├── redis.ts            # Redis/ioredis connection
 │   ├── s3.ts               # AWS S3 image storage
@@ -263,7 +270,8 @@ prisma/
 - **HMAC-based unsubscribe tokens**: Deterministic unsubscribe URLs use HMAC-SHA256 with NEXTAUTH_SECRET to prevent token forgery; token verifies subscriber ID ownership before allowing unsubscribe; no database storage required for unsubscribe tokens
 - **Newsletter admin management**: Admin dashboard with search (email), status filter (PENDING/ACTIVE/UNSUBSCRIBED), pagination (20 per page), status toggle (activate/unsubscribe), delete functionality, and CSV export with formula injection prevention
 - **Email normalization pattern**: Newsletter subscribe endpoint normalizes emails to lowercase and trims whitespace before database operations to prevent duplicate subscriptions with different casing
-- **Seed data modularization**: Database seed split into domain modules in `prisma/seed-data/` (users, categories, products, orders, reviews, subscribers); seed.ts orchestrates imports and manages entity relationships via Map<string, string> for foreign keys; supports upsert operations for idempotent seeding; includes comprehensive demo data (4 customers, 16 categories, 50+ products, 6+ orders, 8 reviews, 6 newsletter subscribers) for E2E testing and feature validation
+- **Seed data modularization**: Database seed split into domain modules in `prisma/seed-data/` (users, categories, products, orders, reviews, subscribers); seed.ts orchestrates imports and manages entity relationships via Map<string, string> for foreign keys; supports upsert operations for idempotent seeding. Since TASK-057 the catalog is the **Mirox Ukrainian clothing range** (8 products across 2 top-level + 6 sub categories, UAH-denominated prices, `brand: "Mirox"`), with 4 test customers, 7 orders, 8 Ukrainian-language reviews, and 7 newsletter subscribers, for E2E testing and feature validation. **Destructive by design**: `main()` calls `assertLocalDatabase()` first and deletes the whole catalog/transactional tree (reviews, supplier orders, order items, orders, cart items, variants, images, products, categories) before reseeding — refuses to run against a non-local `DATABASE_URL` host unless `SEED_ALLOW_REMOTE=1` is explicitly set, reserved for a deliberate, user-approved production re-seed
+- **UAH price display**: `formatPrice()` in `src/lib/format.ts` is the only sanctioned money formatter (per the Ukraine payments decision doc §7.4) — `Intl.NumberFormat("uk-UA", …)` with non-breaking-space thousands separators, comma decimals shown only for fractional amounts, and a `"грн"` suffix joined by a non-breaking space (e.g. `"1 290 грн"`); every customer-facing price render (ProductCard, PDP, cart, checkout summary, account orders) uses it — never hand-roll a price string. Stripe still charges test-mode `currency: "usd"` on the same numeric amount until TASK-048; this is a documented, deliberate mismatch, not a bug
 - **Conservative dependency updates**: During freeze periods or stability phases, update only patch/minor versions within semver ranges (`npm update`); defer major version upgrades requiring migration guides; explicitly document packages kept at older versions with reasoning; verify all checks pass after updates (lint, typecheck, tests, build)
 - **Stripe API version sync**: Stripe SDK minor updates can change expected `apiVersion` type string in stripe.ts; after updating `stripe` package, check TypeScript errors in stripe.ts and update `apiVersion` to match SDK expectations (e.g., 2025-12-15 → 2026-01-28 when upgrading stripe 20.1→20.3)
 - **Vitest API test pattern**: `createNextRequest()` helper builds NextRequest with method/body/searchParams for testing API routes; `createRouteParams()` wraps params as Promise for Next.js 14 dynamic route handlers; all API tests mock `@/lib/auth` and `@/lib/db` via `vi.mock()` before imports
@@ -292,7 +300,7 @@ prisma/
 - **Commit style**: Conventional commits (`feat:`, `fix:`, `docs:`, `chore:`) with optional scope (`feat(seo):`, `feat(perf):`, `fix(ci):`, `fix(e2e):`, `feat(deploy):`)
 - **Branch naming**: `feat/task-NNN-description` pattern
 - **Recent focus**: Project freeze completed (2026-02-09 to 2026-02-12) with all stability and cleanup tasks finished; code quality sweep (ESLint warnings → 0, dead code removal), documentation finalization (16 files updated), test coverage improvement (246 tests, 89.82% coverage), technical debt cleanup, dependency audit (30 packages updated, 1 HIGH vulnerability fixed); post-freeze code review added 2 backlog items (DONE.md statistics accuracy, precise test counts in docs)
-- **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability (React.cache not available in React 18); NextAuth requires `AUTH_TRUST_HOST=true` in CI E2E tests; E2E tests need seeded database with categories and active products
+- **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability (React.cache not available in React 18); NextAuth requires `AUTH_TRUST_HOST=true` in CI E2E tests; E2E tests need seeded database with categories and active products; a container-wide `NODE_ENV=development` (devcontainer `containerEnv` + `.env.example`'s own line) silently corrupted every responsive (`sm:`/`md:`/`lg:`/`xl:`) Tailwind utility in a **local** `next build`'s compiled CSS (Vercel unaffected — the platform sets its own `NODE_ENV=production` first) — fixed by removing both (TASK-057); do not re-add a `NODE_ENV` line to either file
 - **CI improvements**: E2E infrastructure overhaul with global setup validation, separated build and test jobs, PostgreSQL 16 + Redis 7 services with health checks; deployment workflow with graceful secret validation, dual-target support (Vercel/VPS), conditional job execution, and comprehensive deployment documentation; JS files auto-formatted on commit via lint-staged; E2E tests run chromium + webkit in CI (webkit added in TASK-038a — CI was chromium-only, which is why a WebKit-only failure went unnoticed) with port 3000, pre-built app, and optimized timeouts
 - **Deployment strategy**: Dual-path deployment via `DEPLOYMENT_TARGET` variable (vercel/vps); graceful degradation when secrets missing (skip with notice if unset, fail with error if explicitly set); Vercel path uses CLI for pull/build/deploy + migrations; VPS path uses SSH action with git pull + pm2 restart; both paths validate secrets before execution. **In practice the Actions Vercel job is a no-op (secrets unset); production is deployed by the Vercel Git integration, and migrations are applied by the `vercel-build` script (`scripts/vercel-build.sh` → `prisma migrate deploy` via `DIRECT_URL`), added in PR #22.** See the "Operative reality" note under Deployment pipeline above
 - **Latest release**: v1.2.0 (2026-02-12, tag at commit 1ab109a) - Freeze complete with all MVP features (TASK-001 through TASK-016), post-MVP enhancements (TASK-017 through TASK-024), and freeze cleanup (TASK-027 through TASK-032) finished; project tagged and ready for post-freeze resumption
