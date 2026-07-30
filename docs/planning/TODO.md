@@ -17,7 +17,7 @@ Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-
 **Branch**: `feat/task-057-design-adoption`
 **Spec**: [2026-07-27-mirox-design-adoption-design.md](../superpowers/specs/2026-07-27-mirox-design-adoption-design.md)
 **Plan**: [2026-07-27_task-057-design-adoption.md](plans/2026-07-27_task-057-design-adoption.md)
-**PR**: _pending — filled in by the completion workflow_
+**PR**: [#24](https://github.com/GoodAlex223/dropshipping-test/pull/24) (in review)
 
 **Description**: Dark-theme token flip (`:root` → the Mirox dark palette; `[data-surface="dark"]` inversion machinery removed as dead code), homepage/header/footer realignment to `docs/design/design_handoff_mirox/` (`Mirox Home.dc.html`), a Mirox Ukrainian clothing seed replacing the electronics catalog (destructive reset guarded by `assertLocalDatabase()` / `SEED_ALLOW_REMOTE=1`), and UAH price display via a shared `formatPrice()`. Supersedes the homepage _visuals_ of TASK-035/PR #23 — its content-config layer and section architecture survive. Also revises the v1.3/v1.4 task map (see TASK-036/037/039 re-scopes and the TASK-055/056 annotations below; TASK-043/048/049 annotations recorded in BACKLOG.md pending their v1.4 promotion).
 
