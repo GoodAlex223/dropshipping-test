@@ -140,14 +140,18 @@ export function Hero() {
                 blurDataURL={DEFAULT_BLUR_DATA_URL}
                 className="object-cover object-top"
               />
-              {/* CSS vignette per the handoff — photo is swappable, effect persists */}
+              {/* CSS vignette per the handoff — photo is swappable, effect persists.
+                  Every stop derives from --background via color-mix (translucent
+                  steps of the same token), honouring this file's no-hard-coded-shade
+                  invariant; identical pixels to the prototype's rgba() stops while
+                  the palette is black, and it tracks the token if that ever changes. */}
               <div
                 data-testid="hero-vignette"
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-0"
                 style={{
                   background:
-                    "linear-gradient(to top, var(--background) 0%, rgb(0 0 0 / 0.9) 9%, rgb(0 0 0 / 0) 45%), linear-gradient(to bottom, rgb(0 0 0 / 0.7) 0%, rgb(0 0 0 / 0) 16%), linear-gradient(to right, var(--background) 0%, rgb(0 0 0 / 0.55) 6%, rgb(0 0 0 / 0) 20%), linear-gradient(to left, var(--background) 0%, rgb(0 0 0 / 0.55) 6%, rgb(0 0 0 / 0) 20%)",
+                    "linear-gradient(to top, var(--background) 0%, color-mix(in srgb, var(--background) 90%, transparent) 9%, color-mix(in srgb, var(--background) 0%, transparent) 45%), linear-gradient(to bottom, color-mix(in srgb, var(--background) 70%, transparent) 0%, color-mix(in srgb, var(--background) 0%, transparent) 16%), linear-gradient(to right, var(--background) 0%, color-mix(in srgb, var(--background) 55%, transparent) 6%, color-mix(in srgb, var(--background) 0%, transparent) 20%), linear-gradient(to left, var(--background) 0%, color-mix(in srgb, var(--background) 55%, transparent) 6%, color-mix(in srgb, var(--background) 0%, transparent) 20%)",
                 }}
               />
             </div>

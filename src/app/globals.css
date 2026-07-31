@@ -56,7 +56,7 @@
    MIROX THEME — dark surface (default)
    ======================================== */
 :root {
-  --radius: 0.625rem; /* 10px: buttons/inputs rounded-lg; cards rounded-xl (14px); panels use rounded-[20px] where the prototype demands exact 20 */
+  --radius: 0.625rem; /* 10px base. shadcn buttons/inputs render rounded-md (8px — nearest step to the prototype's 10px; ui/ primitives stay unmodified); cards rounded-xl (14px); the prototype's exact-20px panels arrive with their pages (TASK-043+) */
   --font-heading: var(--font-manrope);
   --font-body: var(--font-manrope);
   --font-serif: var(--font-playfair);

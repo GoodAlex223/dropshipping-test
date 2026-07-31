@@ -11,7 +11,7 @@ Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-
 #### [TASK-057] Mirox design adoption — dark theme, homepage realignment, task-map revision
 
 **Priority**: 🟠 High
-**Status**: 🔄 In Progress — build complete, user sign-off granted 2026-07-29; PR not yet opened
+**Status**: 🔄 In Progress — build complete, user sign-off granted 2026-07-29; PR #24 in review
 **Effort**: L
 **Dependencies**: [TASK-034], [TASK-035]
 **Branch**: `feat/task-057-design-adoption`

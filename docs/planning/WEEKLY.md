@@ -20,9 +20,9 @@
 
 ### Must Complete (Critical)
 
-| Task                  | Reference        | Status         | Notes                                                                                                                                                                                       |
-| --------------------- | ---------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Mirox design adoption | TODO.md TASK-057 | ⏳ In Progress | Build complete; visual-fidelity gate signed off (v3, 2026-07-29) after 3 revision rounds. Branch `feat/task-057-design-adoption`; PR not yet opened. Also revises TASK-036/037/039/055/056. |
+| Task                  | Reference        | Status         | Notes                                                                                                                                                                                                                                                  |
+| --------------------- | ---------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Mirox design adoption | TODO.md TASK-057 | ⏳ In Progress | Build complete; visual-fidelity gate signed off (v3, 2026-07-29) after 3 revision rounds. Branch `feat/task-057-design-adoption`; [PR #24](https://github.com/GoodAlex223/dropshipping-test/pull/24) in review. Also revises TASK-036/037/039/055/056. |
 
 ### Should Complete (Important)
 
@@ -42,11 +42,11 @@
 
 ## 🚧 Blockers & Risks
 
-| Blocker                          | Impact                                                                                        | Mitigation                                                                                            | Owner  |
-| -------------------------------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------ |
-| TASK-057 not yet pushed/PR'd     | TASK-036/037 can't cleanly build on the new tokens/content-config until this merges to `main` | Push branch, open PR, run `/code-review` per project policy (this docs commit is the last local step) | Claude |
-| Client content inventory pending | Real photography, logo vector, real socials/claims, size charts, legal copy                   | TASK-056 consolidates the ask; TASK-057 shipped generated placeholders as an interim                  | User   |
-| Client payments prerequisites    | TASK-048 gateway pick blocked                                                                 | 9-item checklist (decision doc §5.3) — chase before v1.4                                              | User   |
+| Blocker                          | Impact                                                                                        | Mitigation                                                                           | Owner  |
+| -------------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ------ |
+| TASK-057 not yet merged          | TASK-036/037 can't cleanly build on the new tokens/content-config until this merges to `main` | PR #24 opened + `/code-review` posted; awaiting review resolution and merge          | Claude |
+| Client content inventory pending | Real photography, logo vector, real socials/claims, size charts, legal copy                   | TASK-056 consolidates the ask; TASK-057 shipped generated placeholders as an interim | User   |
+| Client payments prerequisites    | TASK-048 gateway pick blocked                                                                 | 9-item checklist (decision doc §5.3) — chase before v1.4                             | User   |
 
 ---
 
@@ -70,7 +70,7 @@
 
 - [x] TASK-057 gate revision waves (3 rounds) → Task 12 sign-off → Task 13 docs housekeeping
 - **Completed**: implemented all revisions from Tuesday's verdict across 3 rounds (`6f1877e`, `7c06be8`, `ea39abd`, `92bfe0e`) — round 1 addressed all 9 items A–I and, along the way, found+fixed a `next/og` static-prerender bug (a build-time self-fetch of a local asset by absolute URL silently fails during `next build`'s prerender; switched to an embedded base64 `data:` URI); round 2 fixed an E2E cart-spec locator; a v2 gate re-presentation (noting a Chromium `fullPage`-capture artifact that drops the hero's composited image layer — worked around with a tall-viewport, non-fullPage capture instead); round 3 fixed WhyChooseUs checklist vertical centering. **USER SIGN-OFF GRANTED (v3)** — Task 12 complete. Task 13 (docs housekeeping): TASK-057 added to TODO.md; TASK-036/037/039 re-scoped and TASK-055/056 annotated per the design-adoption spec §4; WEEKLY.md rolled to this week; new BACKLOG intake group filed; docs/README.md indexed; the 2026-07-14 program spec noted; CLAUDE.md propagation check applied.
-- **Blockers**: none. PR not yet opened — next step is push + PR + `/code-review` per `superpowers:finishing-a-development-branch`; the user-approved prod re-seed happens only after the Vercel deploy is verified serving the merged branch.
+- **Blockers**: none. PR #24 opened with `/code-review` posted (review findings fixed in-branch); the user-approved prod re-seed happens only after the Vercel deploy is verified serving the merged branch.
 
 ---
 
@@ -80,7 +80,7 @@
 
 **Preparation Needed**:
 
-- [ ] Push `feat/task-057-design-adoption`, open the PR, run `/code-review` (list sub-threshold findings in chat — the ≥80 gate understates doc/visual findings)
+- [x] Push `feat/task-057-design-adoption`, open the PR (#24), run `/code-review` (sub-threshold findings listed in chat and addressed)
 - [ ] User-approved prod re-seed (`SEED_ALLOW_REMOTE=1` against the prod `DIRECT_URL`) — only after the Vercel deploy is verified serving the merged branch
 - [ ] Client content inventory (TASK-056): real photography, logo vector, real follower counts/claim figures, announcement copy, free-shipping threshold, size charts, legal copy — hero/products/logo now have generated placeholders as an interim
 - [ ] **Client answers to the 9-item prerequisites checklist** ([decision doc §5.3](../superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md)) — legal form, tax group, turnover, VAT, current bank, installments, РРО/ПРРО (accountant), NovaPay account, site prerequisites. Until these land, TASK-048 has a decision tree but no single gateway.
