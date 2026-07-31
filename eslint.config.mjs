@@ -14,6 +14,10 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Generated output:
     "coverage/**",
+    // Third-party exports, not project source (Figma-generated vendor JS in the
+    // design handoff). Flat config makes `eslint .` lint .js too — the lint
+    // script's `--ext .ts,.tsx` no longer restricts anything under ESLint v9.
+    "docs/**",
   ]),
 ]);
 
