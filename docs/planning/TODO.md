@@ -17,14 +17,14 @@ _TASK-057 (Mirox design adoption) completed 2026-07-31 — PR [#24](https://gith
 **Effort**: L
 **Dependencies**: [TASK-034]
 
-**Description** (re-scoped by TASK-057, 2026-07-27 — spec §4): Re-scope to `Mirox Catalog.dc.html`: filter bar (Фільтри, Ціна, Бренд, Розмір chips S–XXL, Колір, Наявність), white-active sort buttons, grid `auto-fill minmax(240px,1fr)`, 36px square pagination, card badges (НОВИНКА white / -15% dark-bordered), sizes row «S · M · L · XL». Design shows 3 sort orders (Новинки / Ціна ↑ / Ціна ↓) vs the TODO's 4 incl. "popular" — reconcile in the task plan. Client-brief extras (second image on hover, quick-view, quick-buy, colour swatches) and the **hydration-gate AC stay**. _(Variants and `brand` field already exist in the Prisma schema.)_
+**Description** (re-scoped by TASK-057, 2026-07-27 — spec §4): Re-scope to [`Mirox Catalog.dc.html`](../design/design_handoff_mirox/Mirox%20Catalog.dc.html): filter bar (Фільтри, Ціна, Бренд, Розмір chips S–XXL, Колір, Наявність), white-active sort buttons, grid `auto-fill minmax(240px,1fr)`, 36px square pagination, card badges (НОВИНКА white / -15% dark-bordered), sizes row «S · M · L · XL». Design shows 3 sort orders (Новинки / Ціна ↑ / Ціна ↓) vs the TODO's 4 incl. "popular" — reconcile in the task plan. Client-brief extras (second image on hover, quick-view, quick-buy, colour swatches) and the **hydration-gate AC stay**. _(Variants and `brand` field already exist in the Prisma schema.)_
 
 **Acceptance Criteria**:
 
 - [ ] All five filters functional and combinable
-- [ ] Sort orders functional — design (`Mirox Catalog.dc.html`) shows 3 (Новинки / Ціна ↑ / Ціна ↓) vs. this TODO's previous 4 incl. "popular"; reconcile the exact set in this task's own plan (`getBestsellers()` in `src/lib/product-queries.ts` is the ready-made "popular" definition if kept)
+- [ ] Sort orders functional — design ([`Mirox Catalog.dc.html`](../design/design_handoff_mirox/Mirox%20Catalog.dc.html)) shows 3 (Новинки / Ціна ↑ / Ціна ↓) vs. this TODO's previous 4 incl. "popular"; reconcile the exact set in this task's own plan (`getBestsellers()` in `src/lib/product-queries.ts` is the ready-made "popular" definition if kept)
 - [ ] Filter state reflected in the URL (shareable)
-- [ ] ProductCard: second image on hover, quick-view, quick-buy, circular color swatches — client list #2 items 18/19 — plus card badges (НОВИНКА white / -15% dark-bordered) and a sizes row («S · M · L · XL») per `Mirox Catalog.dc.html`
+- [ ] ProductCard: second image on hover, quick-view, quick-buy, circular color swatches — client list #2 items 18/19 — plus card badges (НОВИНКА white / -15% dark-bordered) and a sizes row («S · M · L · XL») per [`Mirox Catalog.dc.html`](../design/design_handoff_mirox/Mirox%20Catalog.dc.html)
 - [ ] Hydration invariant preserved or replaced: the E2E hydration gate in `tests/e2e/products.spec.ts` (`waitForSelector("[data-testid='product-card']")`) relies on product cards being client-rendered by a post-hydration `useEffect` fetch. If this rewrite moves product rendering to server components or streaming SSR, that gate stops being a valid hydration signal — replace it with an equivalent readiness signal, or the WebKit `fill()`-before-hydration race diagnosed in TASK-038a returns undetected.
 
 #### [TASK-037] Product page redesign
@@ -34,11 +34,11 @@ _TASK-057 (Mirox design adoption) completed 2026-07-31 — PR [#24](https://gith
 **Effort**: L
 **Dependencies**: [TASK-034]
 
-**Description** (re-scoped by TASK-057, 2026-07-27 — spec §4): Re-scope to `Mirox Product.dc.html`: 96px thumbnail rail, `clamp(420px,100vh−190px,620px)` photo, colour swatches (active white 2px border), size buttons 52px, «Відкрити фото замірів», stock line + «Доставка Новою Поштою», ДОДАТИ В КОШИК → «✓ ДОДАНО В КОШИК» state. New components: **`SizePicker.tsx`** (formula: XXL h≥190\|w≥95; XL h≥184\|w≥85; L h≥176\|w≥72; M h≥168\|w≥60; else S — placeholder until client size charts arrive; TASK-045 later upgrades it) and **`BoughtTogether.tsx`** (3 items, struck-through sum → bundle price). «Купити в 1 клік» overlaps TASK-043 quick-order — decide there or in TASK-037's plan.
+**Description** (re-scoped by TASK-057, 2026-07-27 — spec §4): Re-scope to [`Mirox Product.dc.html`](../design/design_handoff_mirox/Mirox%20Product.dc.html): 96px thumbnail rail, `clamp(420px,100vh−190px,620px)` photo, colour swatches (active white 2px border), size buttons 52px, «Відкрити фото замірів», stock line + «Доставка Новою Поштою», ДОДАТИ В КОШИК → «✓ ДОДАНО В КОШИК» state. New components: **`SizePicker.tsx`** (formula: XXL h≥190\|w≥95; XL h≥184\|w≥85; L h≥176\|w≥72; M h≥168\|w≥60; else S — placeholder until client size charts arrive; TASK-045 later upgrades it) and **`BoughtTogether.tsx`** (3 items, struck-through sum → bundle price). «Купити в 1 клік» overlaps TASK-043 quick-order — decide there or in TASK-037's plan.
 
 **Acceptance Criteria**:
 
-- [ ] Gallery, size/color selection, size table implemented per `Mirox Product.dc.html`
+- [ ] Gallery, size/color selection, size table implemented per [`Mirox Product.dc.html`](../design/design_handoff_mirox/Mirox%20Product.dc.html)
 - [ ] Stock counter shows real inventory below a threshold
 - [ ] Related + recently-viewed sections implemented
 - [ ] `SizePicker.tsx` implements the placeholder height/weight formula (XXL h≥190\|w≥95; XL h≥184\|w≥85; L h≥176\|w≥72; M h≥168\|w≥60; else S) pending client size charts (TASK-045 upgrades it later)
@@ -94,7 +94,7 @@ _None._
 
 **Description**: Build the seven footer routes that TASK-035 stopped linking to because they don't exist yet and 404 (`/contact`, `/faq`, `/shipping`, `/returns`, `/about`, `/privacy`, `/terms`; see `Footer.tsx`'s `shopLinks` comment). Three of them — public offer/terms, privacy policy, and return policy — are payment-gateway onboarding prerequisites per the [Ukraine payments & delivery decision](../superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md) §5.3, and block TASK-048 until they exist. Copy for all seven must come from the client or a lawyer; this task builds the pages, it cannot originate the legal content.
 
-**📐 Design update (TASK-057, 2026-07-27 — spec §4)**: `/contact` layout is now designed (`Mirox Contacts.dc.html` — social cards, delivery/payment + returns blocks, about + stat cards). Still blocked on client/lawyer copy; legal pages remain gateway-onboarding prerequisites. Two decisions recorded during TASK-057's visual-gate review: (1) per user decision (2026-07-28), the header/footer info links (Про нас, Доставка, Контакти, etc.) stay hidden until this page ships — TASK-057 did not add dead links, per the established no-dead-links rule; (2) the return window is **USER-APPROVED as «14 днів»** (2026-07-28) for use on this page once built — see the TASK-056 update below.
+**📐 Design update (TASK-057, 2026-07-27 — spec §4)**: `/contact` layout is now designed ([`Mirox Contacts.dc.html`](../design/design_handoff_mirox/Mirox%20Contacts.dc.html) — social cards, delivery/payment + returns blocks, about + stat cards). Still blocked on client/lawyer copy; legal pages remain gateway-onboarding prerequisites. Two decisions recorded during TASK-057's visual-gate review: (1) per user decision (2026-07-28), the header/footer info links (Про нас, Доставка, Контакти, etc.) stay hidden until this page ships — TASK-057 did not add dead links, per the established no-dead-links rule; (2) the return window is **USER-APPROVED as «14 днів»** (2026-07-28) for use on this page once built — see the TASK-056 update below.
 
 **Acceptance Criteria**:
 
