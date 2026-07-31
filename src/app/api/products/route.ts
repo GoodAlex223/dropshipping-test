@@ -61,6 +61,29 @@ export async function GET(request: NextRequest) {
       where.isFeatured = true;
     }
 
+    // Filter by variants (size, color)
+    const size = searchParams.get("size");
+    const color = searchParams.get("color");
+    const brand = searchParams.get("brand");
+    const inStock = searchParams.get("inStock");
+
+    const variantConditions: Prisma.ProductWhereInput[] = [];
+    if (size) {
+      variantConditions.push({ variants: { some: { name: "Size", value: size } } });
+    }
+    if (color) {
+      variantConditions.push({ variants: { some: { name: "Color", value: color } } });
+    }
+    if (variantConditions.length > 0) {
+      where.AND = variantConditions;
+    }
+    if (brand) {
+      where.brand = brand;
+    }
+    if (inStock === "true") {
+      where.stock = { gt: 0 };
+    }
+
     // Build order by
     const orderBy: Prisma.ProductOrderByWithRelationInput = {};
     const validSortFields = ["name", "price", "createdAt"];
@@ -82,12 +105,14 @@ export async function GET(request: NextRequest) {
           comparePrice: true,
           stock: true,
           isFeatured: true,
+          createdAt: true,
           category: { select: { id: true, name: true, slug: true } },
           images: {
             select: { id: true, url: true, alt: true },
             orderBy: { position: "asc" },
-            take: 1,
+            take: 2,
           },
+          variants: { select: { id: true, name: true, value: true, stock: true, price: true } },
         },
         orderBy,
         skip,
