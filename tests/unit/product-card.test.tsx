@@ -169,6 +169,27 @@ describe("ProductCard — TASK-036 upgrades", () => {
     expect(screen.queryByRole("button", { name: "В кошик" })).not.toBeInTheDocument();
   });
 
+  it("stops quick-action clicks bubbling to a wrapping click handler (card link area still bubbles)", () => {
+    const wrapperClick = vi.fn();
+    render(
+      <div onClick={wrapperClick}>
+        <ProductCard product={base} onQuickView={vi.fn()} />
+      </div>
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Швидкий перегляд" }));
+    expect(wrapperClick).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "В кошик" }));
+    expect(wrapperClick).not.toHaveBeenCalled();
+
+    // Control assertion: the card's link area is expected to bubble — proves
+    // the wrapper's click handler is actually wired up and would have fired
+    // for the buttons above if they hadn't stopped propagation.
+    fireEvent.click(screen.getByRole("link", { name: base.name }));
+    expect(wrapperClick).toHaveBeenCalledTimes(1);
+  });
+
   it("renders a second image element only when images[1] exists", () => {
     const two = {
       ...base,

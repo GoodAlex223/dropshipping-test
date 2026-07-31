@@ -185,7 +185,13 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
         <div className="pointer-events-none absolute inset-x-0 top-0 hidden aspect-square items-end justify-center gap-2 p-3 opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100 md:flex">
           <button
             type="button"
-            onClick={() => onQuickView({ focusSizes: false })}
+            onClick={(e) => {
+              // Card sits inside catalog/rail wrappers with their own click
+              // handlers (e.g. GA4 select_item tracking) — opening quick
+              // view isn't a product-page navigation, so it must not bubble.
+              e.stopPropagation();
+              onQuickView({ focusSizes: false });
+            }}
             className="border-border-strong pointer-events-auto rounded-[10px] border bg-black/80 px-3 py-2 text-[12px] font-bold backdrop-blur-sm hover:border-white"
           >
             Швидкий перегляд
@@ -193,7 +199,10 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
           {!isOutOfStock && (
             <button
               type="button"
-              onClick={() => onQuickView({ focusSizes: true })}
+              onClick={(e) => {
+                e.stopPropagation();
+                onQuickView({ focusSizes: true });
+              }}
               className="pointer-events-auto rounded-[10px] bg-white px-3 py-2 text-[12px] font-extrabold text-black hover:bg-[#e5e5e5]"
             >
               В кошик
