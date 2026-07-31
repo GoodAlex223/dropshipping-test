@@ -18,6 +18,16 @@ const nextConfig = {
   // Performance optimizations
   experimental: {
     optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
+    // The PDP OG route reads public/images/og-logo-ghost.png via
+    // fs.readFileSync at module scope (data-URI embedding for Satori), but
+    // Vercel's function bundle doesn't trace public/ assets — prod 500'd with
+    // ENOENT /var/task/public/images/og-logo-ghost.png. Force-include it for
+    // the products subtree (route key is a glob; the OG route's generated
+    // name carries a hash suffix, so match the whole subtree rather than a
+    // brittle exact path).
+    outputFileTracingIncludes: {
+      "/products/**": ["./public/images/og-logo-ghost.png"],
+    },
   },
   // Compression
   compress: true,
