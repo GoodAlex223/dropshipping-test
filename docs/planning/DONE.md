@@ -2,11 +2,46 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-07-27
+**Last Updated**: 2026-07-31
 
 ---
 
 ## 2026-07 (July)
+
+### [2026-07-31] TASK-057 - Mirox Design Adoption
+
+**Plan**: [docs/archive/plans/2026-07-27_task-057-design-adoption.md](../archive/plans/2026-07-27_task-057-design-adoption.md)
+**Spec**: [2026-07-27-mirox-design-adoption-design.md](../superpowers/specs/2026-07-27-mirox-design-adoption-design.md)
+**PR**: [#24](https://github.com/GoodAlex223/dropshipping-test/pull/24) — merged `f9ceb97` (2026-07-31)
+**SDD ledger**: `.superpowers/sdd/2026-07-27_task-057-design-adoption/progress.md`
+
+**Origin**: The client supplied a more accurate mockup (`docs/reference/reference.png`); a full design handoff was produced in Claude Design (`docs/design/design_handoff_mirox/` — 7 screen prototypes + spec + generated imagery) and adopted as the canonical design source. TASK-057 = the replan + first build: dark-theme flip, homepage realignment, Mirox clothing seed, and the v1.3/v1.4 task-map revision. Supersedes the homepage _visuals_ of TASK-035/PR #23; their content-config layer and section architecture survive.
+
+**Summary**: `:root` flipped to the Mirox dark palette (whole app, `[data-surface="dark"]` inversion machinery deleted as dead code); homepage/header/footer realigned to `Mirox Home.dc.html` with Ukrainian copy; the electronics seed replaced by the Mirox Ukrainian clothing range (8 products, UAH, `brand: "Mirox"`, destructive reset guarded by `assertLocalDatabase()`/`SEED_ALLOW_REMOTE=1`); UAH display via the shared `formatPrice()` (`src/lib/format.ts`, decision doc §7.4); Cyrillic-capable OG cards with a ghosted brand mark on both root and PDP routes. Executed subagent-driven (13 tasks, fresh implementer + independent reviewer each), then a 3-round user visual-fidelity gate and a whole-branch final review.
+
+**Key changes**:
+
+- **Theme** — dark `:root` (background `#000000`, card `#0d0d0d`, `--border-strong`, `--text-faint`, amber `--rating`); two-layer colour guard re-pointed at the new palette; hover-lift white glow folded into the base rule.
+- **Homepage** — image-variant hero (contained photo column desktop / backdrop mobile, token-derived `color-mix` vignette), 2-line «СТИЛЬ. ЯКІСТЬ. / ВПЕВНЕНІСТЬ.» headline, bordered benefit strip, «Новинки» rail, WhyChooseUs checklist + stat cards, testimonial cards, icons-only glass social tiles.
+- **ProductCard** — whole-card link, sizes row from Size variants, discount pill; "View Product" button removed.
+- **Content/config** — `src/content/{brand,home,site}.ts` rewritten in Ukrainian; header/footer nav realigned; info-page links stay hidden until TASK-055 (user decision, no dead links); return window «14 днів» user-approved for future TASK-055 use.
+- **Seed** — `prisma/seed-data/*` rewritten (8 Mirox products MRX-001..008 with own galleries, 4 customers, 7 orders, 8 Ukrainian reviews, 6 subscribers); FK-ordered destructive reset with local-DB guard.
+- **OG** — `src/lib/og-fonts.ts` (runtime Cyrillic Manrope TTF fetch, fail-safe `[]`); ghost-logo watermark embedded as base64 data URI at module scope on both cards.
+- **Task map** — TASK-036/037/039 re-scoped to the handoff screens; TASK-055/056 annotated; TASK-043/048/049 design pointers filed in BACKLOG.
+
+**Verification**: unit **423+1 → 451+1**; E2E **115/115** across all five local projects; local prod build clean; user visual sign-off (v3, after 3 revision rounds). PR review: round 1 — 4 findings, all verified real and fixed (`8166e47`); round 2 — reviewer caught **CI red on every push of the branch**: ESLint failed on the Figma-exported vendor JS because flat config ignores the lint script's inert `--ext .ts,.tsx`, and the `build: needs [lint, test]` cascade meant **Build and E2E had never run on the branch**. Fixed by ignoring `docs/**` (`38ce2c0`) → first fully-green CI run (all five checks; reviewer independently verified the jobs executed and the 46-test CI E2E count reconciles with 115 local). Reviewer's final ruling: 7 fixed + 1 accepted, `CLEAN`/`MERGEABLE`.
+
+**Post-merge deploy**: prod verified serving the rebrand (homepage 200 + Ukrainian headline ~2 min after merge; root OG card 200). **The PDP `og:image` 500'd in prod** — Vercel runtime logs show `ENOENT /var/task/public/images/og-logo-ghost.png`: serverless file tracing doesn't include `public/` assets read via `fs.readFileSync`, and only the dynamic PDP route hits it (the root card is statically prerendered at build time, where the file exists). This was an anticipated risk with a prepared fix: `experimental.outputFileTracingIncludes` → follow-up PR #25. Prod DB still carries the electronics catalog — the user-approved destructive re-seed (`SEED_ALLOW_REMOTE=1`) is a separate, explicitly-gated step.
+
+**Acceptance — as shipped** (hedged, per the standing rule): all five ACs ✅, but imagery is **generated placeholder** (hero model + all 8 product galleries + logo PNG — real client photography/vector still owed, TASK-056); announcement slot ships `null`; info-page nav links hidden until TASK-055; Stripe still charges test-mode `usd` (TASK-048). Pre-existing bugs incidentally fixed and disclosed: PDP OG relative-URL crash (Satori needs absolute URLs — this route 500'd in prod for every seeded product before this task), the container-wide `NODE_ENV=development` leak corrupting responsive CSS in local prod builds, and white-on-dark Stripe Elements. Pre-existing bugs found and BACKLOG'd, not fixed: admin Customers/Categories infinite fetch loop, `use(params)` 500s on 4 admin/account routes, the dead `dark:` variant app-wide.
+
+**Learnings**:
+
+- **ESLint `--ext` is inert under v9 flat config** — `eslint .` lints `.js` too, so committed third-party/vendor JS must be `globalIgnores`-ignored, not extension-filtered. The CI-red state was invisible to the code-review skill by design (it scopes out build signal): merge-readiness needs its own check of the actual check-runs, not just review findings.
+- **A failing first step in a multi-step CI job silently un-runs everything after it** — lint failing meant typecheck/format:check never executed, and the `needs:` cascade kept Build/E2E from ever running. "Which jobs actually executed?" is a distinct question from "is the badge green?"
+- **`public/` assets are not traced into Vercel function bundles** — `fs.readFileSync(public/…)` works locally and in statically-prerendered routes (build-time disk) but ENOENTs in dynamic serverless routes; `outputFileTracingIncludes` is the fix. The root/PDP OG asymmetry (static vs dynamic) is why only one of two identical-looking routes broke.
+- **Chromium `fullPage` screenshots can drop GPU-composited layers** (the hero photo vanished from the stitched capture while live DOM was correct) — capture with a tall viewport instead; don't debug the page for a screenshot artifact.
+- **Playwright clicks racing hydration** silently no-op on `next/link` before the router attaches — wait for a post-hydration-only signal (here: the CookieConsent banner) before interacting; same family as the WebKit pre-hydration `fill()` lesson.
 
 ### [2026-07-27] Homepage Polish & Art Direction
 

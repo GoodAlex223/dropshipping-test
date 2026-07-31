@@ -2,7 +2,7 @@
 
 Central index for all project documentation.
 
-**Last Updated**: 2026-07-29
+**Last Updated**: 2026-07-31
 
 ---
 
@@ -62,9 +62,9 @@ Central index for all project documentation.
 
 ## Implementation Plans
 
-| Plan                                                                                            | Task                                                                        | Status | Started    |
-| ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------ | ---------- |
-| [2026-07-27_task-057-design-adoption.md](planning/plans/2026-07-27_task-057-design-adoption.md) | Mirox design adoption — dark theme, homepage realignment, task-map revision | ACTIVE | 2026-07-27 |
+| Plan                | Task | Status | Started |
+| ------------------- | ---- | ------ | ------- |
+| _(no active plans)_ | —    | —      | —       |
 
 ### Archived Plans
 
@@ -82,6 +82,7 @@ Central index for all project documentation.
 | [2026-07-17_task-034-design-system.md](archive/plans/2026-07-17_task-034-design-system.md)                       | TASK-034 Mirox Design System        | COMPLETE | 2026-07-18 |
 | [2026-07-19_task-035-homepage-rebrand.md](archive/plans/2026-07-19_task-035-homepage-rebrand.md)                 | TASK-035 Homepage Rebrand           | COMPLETE | 2026-07-21 |
 | [2026-07-24_homepage-polish-art-direction.md](archive/plans/2026-07-24_homepage-polish-art-direction.md)         | Homepage Polish & Art Direction     | COMPLETE | 2026-07-27 |
+| [2026-07-27_task-057-design-adoption.md](archive/plans/2026-07-27_task-057-design-adoption.md)                   | TASK-057 Mirox Design Adoption      | COMPLETE | 2026-07-31 |
 
 See [archive/README.md](archive/README.md) for more historical plans.
 

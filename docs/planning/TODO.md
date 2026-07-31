@@ -1,35 +1,14 @@
 # TODO
 
-**Last Updated**: 2026-07-29
+**Last Updated**: 2026-07-31
 
 Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-shop-program-design.md) · Current week: [WEEKLY.md](WEEKLY.md)
 
 ---
 
-## 🔄 In Progress
-
-#### [TASK-057] Mirox design adoption — dark theme, homepage realignment, task-map revision
-
-**Priority**: 🟠 High
-**Status**: 🔄 In Progress — build complete, user sign-off granted 2026-07-29; PR #24 in review
-**Effort**: L
-**Dependencies**: [TASK-034], [TASK-035]
-**Branch**: `feat/task-057-design-adoption`
-**Spec**: [2026-07-27-mirox-design-adoption-design.md](../superpowers/specs/2026-07-27-mirox-design-adoption-design.md)
-**Plan**: [2026-07-27_task-057-design-adoption.md](plans/2026-07-27_task-057-design-adoption.md)
-**PR**: [#24](https://github.com/GoodAlex223/dropshipping-test/pull/24) (in review)
-
-**Description**: Dark-theme token flip (`:root` → the Mirox dark palette; `[data-surface="dark"]` inversion machinery removed as dead code), homepage/header/footer realignment to `docs/design/design_handoff_mirox/` (`Mirox Home.dc.html`), a Mirox Ukrainian clothing seed replacing the electronics catalog (destructive reset guarded by `assertLocalDatabase()` / `SEED_ALLOW_REMOTE=1`), and UAH price display via a shared `formatPrice()`. Supersedes the homepage _visuals_ of TASK-035/PR #23 — its content-config layer and section architecture survive. Also revises the v1.3/v1.4 task map (see TASK-036/037/039 re-scopes and the TASK-055/056 annotations below; TASK-043/048/049 annotations recorded in BACKLOG.md pending their v1.4 promotion).
-
-**Acceptance Criteria**:
-
-- [x] Token flip: dark `:root` default, `data-surface` machinery removed, colour guard re-pointed at the new palette
-- [x] Homepage realigned to `Mirox Home.dc.html` (header, hero, benefit strip, "Новинки" rail, WhyChooseUs, testimonials, footer) with Ukrainian copy
-- [x] Mirox clothing seed (8 products, UAH prices, `brand: "Mirox"`) replaces the electronics catalog, with a guarded destructive reset
-- [x] UAH display via shared `formatPrice()` (`src/lib/format.ts`) across all customer-facing price renders
-- [x] Visual-fidelity gate: rendered homepage vs `Mirox Home.dc.html` / `reference.png`, explicit user sign-off (granted v3, 2026-07-29, after 3 revision rounds)
-
 ## 📋 Planned (v1.3 — "Mirox Rebrand Demo")
+
+_TASK-057 (Mirox design adoption) completed 2026-07-31 — PR [#24](https://github.com/GoodAlex223/dropshipping-test/pull/24) merged `f9ceb97`; see [DONE.md](DONE.md). The user-approved **prod re-seed** (`SEED_ALLOW_REMOTE=1`) remains a separate explicitly-gated step — prod still serves the electronics catalog until it runs._
 
 #### [TASK-036] Catalog redesign + filters
 
