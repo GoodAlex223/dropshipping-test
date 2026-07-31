@@ -14,6 +14,7 @@ export interface ProductCardData {
   comparePrice: string | null;
   stock: number;
   isFeatured: boolean;
+  createdAt: Date | string;
   category: { name: string; slug: string };
   images: { url: string; alt: string | null }[];
   /** Every variant row (Size and Color alike) — <ProductCard> filters to Size itself. */
@@ -37,6 +38,7 @@ const PRODUCT_CARD_SELECT = {
   comparePrice: true,
   stock: true,
   isFeatured: true,
+  createdAt: true,
   category: { select: { name: true, slug: true } },
   images: {
     select: { url: true, alt: true },

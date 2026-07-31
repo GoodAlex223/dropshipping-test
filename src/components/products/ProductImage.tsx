@@ -4,11 +4,13 @@ import { useState } from "react";
 import Image from "next/image";
 import { Logo } from "@/components/common/Logo";
 import { DEFAULT_BLUR_DATA_URL } from "@/lib/image-utils";
+import { cn } from "@/lib/utils";
 
 interface ProductImageProps {
   src?: string;
   alt: string;
   sizes: string;
+  className?: string;
 }
 
 /**
@@ -18,14 +20,17 @@ interface ProductImageProps {
  * deliberate. Client component so it can catch the load error; the parent
  * ProductCard stays a server component.
  */
-export function ProductImage({ src, alt, sizes }: ProductImageProps) {
+export function ProductImage({ src, alt, sizes, className }: ProductImageProps) {
   const [failed, setFailed] = useState(false);
 
   if (!src || failed) {
     return (
       <div
         data-testid="product-image-fallback"
-        className="bg-muted text-muted-foreground/40 flex h-full items-center justify-center"
+        className={cn(
+          "bg-muted text-muted-foreground/40 flex h-full items-center justify-center",
+          className
+        )}
         aria-hidden="true"
       >
         <Logo showText={false} size="lg" className="scale-[2.5] opacity-70" />
@@ -38,7 +43,10 @@ export function ProductImage({ src, alt, sizes }: ProductImageProps) {
       src={src}
       alt={alt}
       fill
-      className="object-cover transition-transform duration-300 group-hover:scale-105"
+      className={cn(
+        "object-cover transition-transform duration-300 group-hover:scale-105",
+        className
+      )}
       sizes={sizes}
       placeholder="blur"
       blurDataURL={DEFAULT_BLUR_DATA_URL}
