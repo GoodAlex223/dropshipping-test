@@ -38,11 +38,11 @@ test.describe("Navigation", () => {
       );
       await expect(header.getByRole("link", { name: "Новинки", exact: true })).toHaveAttribute(
         "href",
-        "/products?sortBy=createdAt&sortOrder=desc"
+        "/products?sort=new"
       );
       await expect(header.getByRole("link", { name: "Бестселери", exact: true })).toHaveAttribute(
         "href",
-        "/products?featured=true"
+        "/products?sort=popular"
       );
       await expect(header.getByRole("link", { name: "Categories", exact: true })).toHaveCount(0);
     }

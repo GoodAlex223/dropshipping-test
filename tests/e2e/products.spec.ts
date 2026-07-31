@@ -65,9 +65,20 @@ test.describe("Product Browsing", () => {
     // Wait for products to load
     await page.waitForSelector("[data-testid='product-card']");
 
-    // Click on first product link
-    const productLink = page.locator("[data-testid='product-card'] a").first();
-    await productLink.click();
+    // Click the product name inside the first card's link, not a blind
+    // center-of-card click: the whole card is one <a>, but ProductCard's
+    // desktop hover overlay (quick-view/quick-buy buttons) absolutely
+    // covers the image area and legitimately becomes pointer-events-auto
+    // once the mouse actually hovers there — same as a real user's cursor
+    // would trigger it. Playwright's default click point is the bounding
+    // box's geometric center, which for this card layout lands inside the
+    // image, right where those buttons sit, so it would hover-reveal and
+    // then click the button instead of navigating. The heading text sits
+    // in CardContent, below the image, outside the overlay's aspect-square
+    // footprint (see ProductCard.tsx) — clicking there is unambiguously
+    // "click the product link," bubbling up to the enclosing <a>.
+    const productCard = page.locator("[data-testid='product-card']").first();
+    await productCard.getByRole("heading").click();
 
     // Should be on product detail page
     await expect(page).toHaveURL(/\/products\/[^/]+$/);
@@ -79,8 +90,9 @@ test.describe("Product Browsing", () => {
   test("product detail shows price", async ({ page }) => {
     await page.goto("/products");
 
-    // Navigate to first product
-    await page.locator("[data-testid='product-card'] a").first().click();
+    // Navigate to first product — see the comment on "can view product
+    // details" above for why this clicks the heading rather than the card.
+    await page.locator("[data-testid='product-card']").first().getByRole("heading").click();
 
     // Wait for product page to load
     await expect(page).toHaveURL(/\/products\/[^/]+$/);
@@ -94,7 +106,7 @@ test.describe("Product Browsing", () => {
 
     // Wait for products and navigate to first product
     await page.waitForSelector("[data-testid='product-card']");
-    await page.locator("[data-testid='product-card'] a").first().click();
+    await page.locator("[data-testid='product-card']").first().getByRole("heading").click();
 
     // Wait for product page to load
     await expect(page).toHaveURL(/\/products\/[^/]+$/);
