@@ -11,6 +11,7 @@ vi.mock("@/lib/product-queries", () => ({
 
 import { prisma } from "@/lib/db";
 import { GET } from "@/app/api/products/route";
+import { GET as GET_BRANDS } from "@/app/api/products/brands/route";
 import { createNextRequest } from "../helpers/api-test-utils";
 import { getSalesRanking } from "@/lib/product-queries";
 const salesRanking = getSalesRanking as unknown as ReturnType<typeof vi.fn>;
@@ -149,5 +150,19 @@ describe("GET /api/products — sort", () => {
       "unranked-old",
     ]);
     expect(body.pagination.total).toBe(4);
+  });
+});
+
+describe("GET /api/products/brands", () => {
+  it("returns distinct non-null brands of active products, alphabetical", async () => {
+    findMany.mockResolvedValue([{ brand: "Mirox" }]);
+    const res = await GET_BRANDS();
+    expect(await res.json()).toEqual(["Mirox"]);
+    expect(findMany).toHaveBeenCalledWith({
+      where: { isActive: true, brand: { not: null } },
+      distinct: ["brand"],
+      select: { brand: true },
+      orderBy: { brand: "asc" },
+    });
   });
 });
