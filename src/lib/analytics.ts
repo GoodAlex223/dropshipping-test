@@ -62,7 +62,7 @@ export function trackViewItem(item: GA4Item): void {
   pushDataLayer({
     event: "view_item",
     ecommerce: {
-      currency: "USD",
+      currency: "UAH",
       value: item.price * item.quantity,
       items: [item],
     },
@@ -73,7 +73,7 @@ export function trackAddToCart(item: GA4Item): void {
   pushDataLayer({
     event: "add_to_cart",
     ecommerce: {
-      currency: "USD",
+      currency: "UAH",
       value: item.price * item.quantity,
       items: [item],
     },
@@ -84,7 +84,7 @@ export function trackViewCart(items: GA4Item[], value: number): void {
   pushDataLayer({
     event: "view_cart",
     ecommerce: {
-      currency: "USD",
+      currency: "UAH",
       value,
       items,
     },
@@ -95,7 +95,7 @@ export function trackBeginCheckout(items: GA4Item[], value: number): void {
   pushDataLayer({
     event: "begin_checkout",
     ecommerce: {
-      currency: "USD",
+      currency: "UAH",
       value,
       items,
     },
@@ -106,7 +106,7 @@ export function trackAddShippingInfo(items: GA4Item[], value: number, shippingTi
   pushDataLayer({
     event: "add_shipping_info",
     ecommerce: {
-      currency: "USD",
+      currency: "UAH",
       value,
       shipping_tier: shippingTier,
       items,
@@ -118,7 +118,7 @@ export function trackAddPaymentInfo(items: GA4Item[], value: number, paymentType
   pushDataLayer({
     event: "add_payment_info",
     ecommerce: {
-      currency: "USD",
+      currency: "UAH",
       value,
       payment_type: paymentType,
       items,
@@ -137,7 +137,7 @@ export function trackPurchase(
     event: "purchase",
     ecommerce: {
       transaction_id: transactionId,
-      currency: "USD",
+      currency: "UAH",
       value,
       shipping,
       tax,

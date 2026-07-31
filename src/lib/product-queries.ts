@@ -16,6 +16,8 @@ export interface ProductCardData {
   isFeatured: boolean;
   category: { name: string; slug: string };
   images: { url: string; alt: string | null }[];
+  /** Every variant row (Size and Color alike) — <ProductCard> filters to Size itself. */
+  variants: { name: string; value: string }[];
 }
 
 /**
@@ -41,6 +43,7 @@ const PRODUCT_CARD_SELECT = {
     orderBy: { position: "asc" as const },
     take: 1,
   },
+  variants: { select: { name: true, value: true } },
 };
 
 type RawProduct = Omit<ProductCardData, "price" | "comparePrice"> & {
@@ -95,6 +98,7 @@ export interface BestsellerResult {
  * This is the shared definition of "popular"; TASK-036 imports it for the
  * catalog sort rather than defining a second one.
  */
+// No homepage consumer since TASK-057; TASK-036's "popular" sort is the intended next consumer.
 export async function getBestsellers(limit = 8, windowDays = 90): Promise<BestsellerResult> {
   const since = new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000);
 

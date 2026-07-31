@@ -13,16 +13,17 @@ describe("WhyChooseUs", () => {
     expect(screen.getByText("300+")).toBeInTheDocument();
     expect(screen.getByText("100+")).toBeInTheDocument();
     // customerRating is null → its label must not appear.
-    expect(screen.queryByText(/customer rating/i)).toBeNull();
+    expect(screen.queryByText(/середня оцінка/)).toBeNull();
   });
 
-  it("renders on a dark surface", () => {
+  it("relies on the dark default surface (no data-surface attribute)", () => {
     const { container } = render(<WhyChooseUs />);
-    expect(container.querySelector('[data-surface="dark"]')).not.toBeNull();
+    expect(container.querySelector("[data-surface]")).toBeNull();
   });
 
   it("renders the supporting brand-voice items", () => {
     render(<WhyChooseUs />);
-    expect(screen.getByText("Secure payment")).toBeInTheDocument();
+    expect(screen.getByText("Безпечна оплата")).toBeInTheDocument();
+    expect(screen.getAllByRole("listitem")).toHaveLength(6);
   });
 });

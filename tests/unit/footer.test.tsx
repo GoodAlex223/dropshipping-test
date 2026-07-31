@@ -11,7 +11,7 @@ describe("Footer", () => {
   it("uses the Mirox tagline, not the generic template copy", () => {
     render(<Footer />);
     expect(screen.queryByText(/one-stop shop for quality products/i)).not.toBeInTheDocument();
-    expect(screen.getByText(/value quality and minimalism/i)).toBeInTheDocument();
+    expect(screen.getByText(/цінує якість і мінімалізм/)).toBeInTheDocument();
   });
 
   it("links to the social profiles", () => {
@@ -37,5 +37,20 @@ describe("Footer", () => {
     for (const route of dead) {
       expect(hrefs).not.toContain(route);
     }
+  });
+
+  it("uses the Ukrainian copyright-row link labels", () => {
+    render(<Footer />);
+    expect(screen.getByRole("link", { name: "Каталог" })).toHaveAttribute("href", "/products");
+    expect(screen.getByRole("link", { name: "Категорії" })).toHaveAttribute("href", "/categories");
+    expect(screen.getByRole("link", { name: "Новинки" })).toHaveAttribute(
+      "href",
+      "/products?sortBy=createdAt&sortOrder=desc"
+    );
+  });
+
+  it("invites visitors to follow along on social", () => {
+    render(<Footer />);
+    expect(screen.getByText("Слідкуйте за нами")).toBeInTheDocument();
   });
 });

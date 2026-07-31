@@ -15,13 +15,16 @@ export function BenefitStrip({ items, className }: BenefitStripProps) {
   if (items.length === 0) return null;
 
   return (
-    <ul className={cn("grid gap-6 sm:grid-cols-2 lg:grid-cols-4", className)}>
+    <ul className={cn("bg-border grid grid-cols-2 gap-px lg:grid-cols-4", className)}>
       {items.map(({ icon: Icon, title, description }) => (
-        <li key={title} className="flex items-start gap-3">
-          <Icon className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
+        <li
+          key={title}
+          className="bg-background flex items-center gap-4 px-5 py-5 lg:px-10 lg:py-7"
+        >
+          <Icon className="h-6 w-6 shrink-0" strokeWidth={1.5} aria-hidden="true" />
           <div>
-            <p className="text-sm font-medium">{title}</p>
-            <p className="text-muted-foreground text-xs">{description}</p>
+            <p className="text-sm font-bold">{title}</p>
+            <p className="text-muted-foreground mt-0.5 text-xs">{description}</p>
           </div>
         </li>
       ))}

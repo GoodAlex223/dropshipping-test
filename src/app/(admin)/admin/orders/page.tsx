@@ -36,6 +36,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDebounce } from "@/hooks/use-debounce";
 import { getOrderStatusStyle } from "@/lib/order-status";
+import { formatPrice } from "@/lib/format";
 
 interface Order {
   id: string;
@@ -383,7 +384,7 @@ function AdminOrdersContent() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right font-medium">
-                      ${parseFloat(order.total).toFixed(2)}
+                      {formatPrice(order.total)}
                     </TableCell>
                     <TableCell>
                       <Button variant="ghost" size="icon" asChild>

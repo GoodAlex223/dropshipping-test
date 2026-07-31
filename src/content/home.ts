@@ -1,4 +1,4 @@
-import { Truck, RefreshCw, Award, Headphones } from "lucide-react";
+import { Truck, ShieldCheck, Headphones, CreditCard } from "lucide-react";
 import type { BenefitItem } from "./site";
 import { BRAND_HERO_SUBTITLE } from "./brand";
 
@@ -13,91 +13,58 @@ export interface HeroImage {
  */
 export const home = {
   hero: {
-    eyebrow: "NEW COLLECTION",
-    /** Brief list #1: three separate lines, rendered as three lines. */
-    headline: ["STYLE.", "QUALITY.", "CONFIDENCE."],
+    // Removed 2026-07-28 — multi-brand store, user decision. Field kept
+    // (config-gated) so a future single-brand campaign can set a string here
+    // without a Hero code change; Hero renders the eyebrow row only when set.
+    eyebrow: null as string | null,
+    // Client brief specified three lines; user chose the mockup's 2-line
+    // wrap instead on 2026-07-28 ("СТИЛЬ. ЯКІСТЬ." / "ВПЕВНЕНІСТЬ.").
+    headline: ["СТИЛЬ. ЯКІСТЬ.", "ВПЕВНЕНІСТЬ."],
     subtitle: BRAND_HERO_SUBTITLE,
-    primaryCta: { label: "Shop the Catalog", href: "/products" },
-    secondaryCta: { label: "New Arrivals", href: "/products?sort=newest" },
-    /**
-     * CLIENT-SUPPLIED. null renders the centred typographic hero; the Hero
-     * component's two layouts are both fully designed, so this is a one-line
-     * content change, never a redesign.
-     *
-     * TASK-7 deviation: this was meant to hold an AI-generated placeholder
-     * (`/hero-placeholder-ai.jpg`, unbranded clothing only, never a
-     * fabricated Mirox logo) once one existed, but no image-generation tool
-     * was available in that session to produce one. Left null rather than
-     * referencing a file that doesn't exist. Pending client-supplied
-     * photography (or a regenerated AI placeholder) before this is set.
-     */
-    image: null as HeroImage | null,
+    primaryCta: { label: "ПЕРЕЙТИ В КАТАЛОГ", href: "/products" },
+    secondaryCta: {
+      label: "ПЕРЕГЛЯНУТИ НОВИНКИ",
+      href: "/products?sortBy=createdAt&sortOrder=desc",
+    },
+    // Generated placeholder from the design handoff; client photography
+    // replaces the file (same path) via TASK-056 — content stays untouched.
+    image: {
+      src: "/images/hero-model-2.png",
+      alt: "Модель у чорному худі Mirox",
+    } as HeroImage | null,
   },
 
-  /**
-   * "1–3 days" was retracted, not merely unconfirmed: SHIPPING_METHODS
-   * (src/lib/stripe.ts) has no method matching that window — standard is
-   * 5-7 business days, express 2-3, overnight 1 — so the claim was false
-   * today, not just unverified. Kept the "across Ukraine" scope claim
-   * (unfalsifiable brand voice, same as the identical phrase in
-   * whyChooseUs.items below) and dropped the specific day-range. Title
-   * unchanged: TODO.md's TASK-035 AC only requires the benefit cards to be
-   * present, not this specific promise.
-   */
+  // Handoff §4: «Безкоштовна доставка від 1000 грн» stays retracted;
+  // «Обмін розміру» removed (no such service — client, 26.07.2026);
+  // «Оплата при отриманні» confirmed by the client (26.07.2026), payment
+  // method itself ships in TASK-049 — the benefit states the offer, честно.
   benefits: [
-    { icon: Truck, title: "Fast delivery", description: "Across Ukraine" },
-    { icon: RefreshCw, title: "Size exchange", description: "Wrong fit? Swap it" },
-    { icon: Award, title: "Premium quality", description: "Only the best fabrics" },
-    { icon: Headphones, title: "Support 24/7", description: "We're always in touch" },
+    { icon: Truck, title: "Швидка доставка", description: "По всій Україні" },
+    { icon: ShieldCheck, title: "Преміум якість", description: "Тільки найкращі матеріали" },
+    { icon: Headphones, title: "Підтримка 24/7", description: "Ми завжди на зв'язку" },
+    { icon: CreditCard, title: "Оплата при отриманні", description: "Без передоплати" },
   ] as BenefitItem[],
 
   whyChooseUs: {
-    title: "Why choose us",
-    /**
-     * Seven statements true by construction, or unfalsifiable brand voice.
-     * The brief's three checkable claims live in site.claims and are rendered
-     * separately, gated on being configured.
-     */
+    title: "Чому обирають нас",
+    intro: "Перевіряємо кожну річ перед відправкою і завжди на зв'язку.",
     items: [
-      "Fast delivery across Ukraine",
-      "Every item checked before shipping",
-      "Size exchange",
-      "Support seven days a week",
-      "Quality clothing only",
-      "Secure payment",
-      "Trusted by returning customers",
+      "Швидка доставка по Україні",
+      "Перевірка кожної речі",
+      "Підтримка без вихідних",
+      "Тільки якісний одяг",
+      "Безпечна оплата",
+      "Нам довіряють постійні клієнти",
     ],
   },
 
   rails: {
-    featured: {
-      title: "Featured",
-      viewAllHref: "/products?featured=true",
-      viewAllLabel: "View all",
-    },
-    bestsellers: {
-      title: "Bestsellers",
-      // Interim target: no "popular" sort exists until TASK-036 adds one.
-      // (Coincidentally the exact right link for `newArrivals` below, which
-      // shares this href for a real reason, not as a stand-in.)
-      viewAllHref: "/products?sort=newest",
-      viewAllLabel: "View all",
-    },
-    // Swapped in at the bestsellers call site instead of the entry above when
-    // getBestsellers() reports source: "backfilled" — i.e. zero items came
-    // from real sales, so every product in the rail is actually unsold new
-    // stock. See src/app/(shop)/page.tsx for why that swap must happen.
     newArrivals: {
-      title: "New Arrivals",
-      viewAllHref: "/products?sort=newest",
-      viewAllLabel: "View all",
+      title: "Новинки",
+      viewAllHref: "/products",
+      viewAllLabel: "Дивитись все",
     },
   },
 
-  testimonials: { title: "What our customers say" },
-
-  social: {
-    title: "Follow us",
-    subtitle: "Follow along to hear about new arrivals first.",
-  },
+  testimonials: { title: "Відгуки покупців" },
 };

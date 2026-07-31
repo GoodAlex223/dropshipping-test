@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ProductCard } from "@/components/products";
 import { trackViewItemList, trackSelectItem, type GA4Item } from "@/lib/analytics";
+import { formatPrice } from "@/lib/format";
 
 interface Product {
   id: string;
@@ -73,8 +74,8 @@ function ProductsContentInner() {
   const [category, setCategory] = useState(searchParams?.get("category") || "");
   const [sortBy, setSortBy] = useState(searchParams?.get("sortBy") || "createdAt");
   const [sortOrder, setSortOrder] = useState(searchParams?.get("sortOrder") || "desc");
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
-  const [maxPriceLimit] = useState(1000);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
+  const [maxPriceLimit] = useState(2000);
 
   const fetchProducts = useCallback(async () => {
     setIsLoading(true);
@@ -286,8 +287,8 @@ function ProductsContentInner() {
                     className="mt-2"
                   />
                   <div className="flex items-center justify-between text-sm">
-                    <span>${priceRange[0]}</span>
-                    <span>${priceRange[1]}</span>
+                    <span>{formatPrice(priceRange[0])}</span>
+                    <span>{formatPrice(priceRange[1])}</span>
                   </div>
                   <Button
                     variant="outline"
@@ -376,8 +377,10 @@ function ProductsContentInner() {
           )}
           {(searchParams?.get("minPrice") || searchParams?.get("maxPrice")) && (
             <Badge variant="secondary" className="gap-1">
-              Price: ${searchParams?.get("minPrice") || "0"} - $
-              {searchParams?.get("maxPrice") || "∞"}
+              {/* "∞" has no currency unit of its own — formatPrice() only wraps the
+                  numeric bound, never a hand-rolled digit string. */}
+              Price: {formatPrice(searchParams?.get("minPrice") || 0)} -{" "}
+              {searchParams?.get("maxPrice") ? formatPrice(searchParams.get("maxPrice")!) : "∞"}
               <button onClick={() => updateFilters({ minPrice: null, maxPrice: null })}>
                 <X className="h-3 w-3" />
               </button>

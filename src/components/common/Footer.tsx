@@ -1,68 +1,57 @@
 import Link from "next/link";
-import { Logo } from "@/components/common/Logo";
 import { BenefitStrip } from "@/components/common/BenefitStrip";
 import { SocialLinks } from "@/components/common/SocialLinks";
 import { NewsletterSignup } from "./NewsletterSignup";
 import { site } from "@/content/site";
 
-// Only routes that actually exist. The seven former links (/contact, /faq,
-// /shipping, /returns, /about, /privacy, /terms) all 404 — those pages are a
-// separate task, and three of them are payment-gateway onboarding
-// prerequisites needing client and legal copy we cannot write.
+// Only routes that actually exist. The mockup's info links («Доставка та
+// оплата», «Повернення», «Контакти») point at the TASK-055 pages and 404
+// today — they join when those pages ship. Same rule as TASK-035.
 const shopLinks = [
-  { name: "All Products", href: "/products" },
-  { name: "Categories", href: "/categories" },
-  { name: "New Arrivals", href: "/products?sort=newest" },
+  { name: "Каталог", href: "/products" },
+  { name: "Категорії", href: "/categories" },
+  { name: "Новинки", href: "/products?sortBy=createdAt&sortOrder=desc" },
 ];
 
 export function Footer() {
   return (
-    <footer data-surface="dark" className="bg-background text-foreground border-t">
-      <div className="container py-12">
-        <BenefitStrip items={site.footerBenefits} className="border-border border-b pb-10" />
-
-        <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-          <div className="space-y-4">
-            <Link href="/" className="inline-flex items-center gap-2">
-              <Logo />
-            </Link>
-            <p className="text-muted-foreground text-sm">{site.tagline}</p>
-          </div>
-
-          <div>
-            <h3 className="mb-4 text-sm font-semibold">Shop</h3>
-            <ul className="space-y-2">
-              {shopLinks.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="text-muted-foreground hover:text-foreground text-sm transition-colors"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="mb-4 text-sm font-semibold">Follow us</h3>
-            <SocialLinks className="flex-col items-start gap-3" />
-          </div>
-
-          <div>
-            <h3 className="mb-4 text-sm font-semibold">Newsletter</h3>
-            <p className="text-muted-foreground mb-4 text-sm">
-              Get exclusive offers and updates delivered to your inbox.
-            </p>
-            <NewsletterSignup />
-          </div>
+    <footer className="border-border bg-background text-foreground border-t">
+      {/* Benefit row + socials (handoff footer, row 1) */}
+      <div className="container flex flex-col gap-8 py-8 lg:flex-row lg:items-center lg:justify-between">
+        <BenefitStrip
+          items={site.footerBenefits}
+          className="grow gap-6 bg-transparent lg:grid-cols-4 [&>li]:bg-transparent [&>li]:px-0 [&>li]:py-0"
+        />
+        <div className="flex items-center gap-4">
+          <span className="text-muted-foreground text-xs font-semibold">Слідкуйте за нами</span>
+          <SocialLinks className="flex items-center gap-4" />
         </div>
+      </div>
 
-        <div className="border-border mt-12 border-t pt-8">
-          <p className="text-muted-foreground text-center text-sm">
-            &copy; {new Date().getFullYear()} {site.name}. All rights reserved.
+      {/* Newsletter — deviation from the mockup: the double-opt-in feature
+          exists and keeps its entry point; slim row instead of a column. */}
+      <div className="border-border border-t">
+        <div className="container flex flex-col items-start justify-between gap-4 py-6 lg:flex-row lg:items-center">
+          <p className="text-muted-foreground text-sm">
+            Підпишіться на новини — знижки та новинки першими.
           </p>
+          <NewsletterSignup />
+        </div>
+      </div>
+
+      {/* Copyright row */}
+      <div className="border-border text-faint border-t">
+        <div className="container flex flex-col items-start justify-between gap-3 py-5 text-[12.5px] lg:flex-row lg:items-center">
+          <span>
+            &copy; {new Date().getFullYear()} {site.name}. {site.tagline}
+          </span>
+          <nav className="flex gap-6">
+            {shopLinks.map((l) => (
+              <Link key={l.href} href={l.href} className="hover:text-foreground transition-colors">
+                {l.name}
+              </Link>
+            ))}
+          </nav>
         </div>
       </div>
     </footer>

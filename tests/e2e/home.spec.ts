@@ -7,27 +7,63 @@ test.describe("Homepage", () => {
 
   test("renders the Mirox hero slogan", async ({ page }) => {
     const heading = page.getByRole("heading", { level: 1 });
-    await expect(heading).toContainText("STYLE.");
-    await expect(heading).toContainText("QUALITY.");
-    await expect(heading).toContainText("CONFIDENCE.");
+    await expect(heading).toContainText("СТИЛЬ.");
+    await expect(heading).toContainText("ЯКІСТЬ.");
+    await expect(heading).toContainText("ВПЕВНЕНІСТЬ.");
   });
 
   test("primary CTA navigates to the catalog", async ({ page }) => {
-    await page.getByRole("link", { name: "Shop the Catalog" }).click();
+    // Root-caused a non-deterministic failure here (and on the secondary CTA
+    // test below): in isolated repeat runs it alternated which test failed —
+    // sometimes this one, sometimes the other, sometimes neither — on BOTH
+    // Mobile Safari and Mobile Chrome. That alternating pattern rules out a
+    // fixed CSS overlay/z-index bug (which would fail the same element every
+    // time); it's the signature of a hydration-timing race instead. The CTA
+    // links are static <a> tags already present in the SSR HTML — visible,
+    // and passing Playwright's actionability checks, well before React has
+    // hydrated and next/link's client-side router is ready. A click that
+    // lands in that window can have its native navigation prevented without
+    // the router completing the replacement navigation, silently dropping
+    // it (no error is thrown — the click "succeeds", the URL just never
+    // changes). Same class of bug as webkit-pre-hydration-e2e-testing (that
+    // one was fill()-specific to WebKit; this one is click-based and not
+    // engine-specific, since it reproduced on Chrome too).
+    //
+    // Fix: wait for a signal that's provably POST-hydration, not just
+    // post-paint. CookieConsent (mounted globally) renders `null` until its
+    // own `useEffect` fires — which cannot happen before hydration commits —
+    // then shows this banner when consent is still "pending" (the default
+    // for every fresh Playwright browser context). Waiting for it first,
+    // before interacting with anything else on the page, is a reliable
+    // "hydration has definitely happened" gate without touching product code.
+    await page.getByRole("button", { name: "Decline" }).waitFor();
+    await page.getByRole("link", { name: "ПЕРЕЙТИ В КАТАЛОГ" }).click();
     await expect(page).toHaveURL(/\/products$/);
   });
 
   test("secondary CTA navigates to new arrivals", async ({ page }) => {
-    await page.getByRole("link", { name: "New Arrivals" }).first().click();
-    await expect(page).toHaveURL(/sort=newest/);
+    // Same hydration-race root cause as the primary CTA test above — see its
+    // comment for the full diagnosis. Same fix: wait for the post-hydration-
+    // only cookie-consent banner before clicking.
+    await page.getByRole("button", { name: "Decline" }).waitFor();
+    await page.getByRole("link", { name: "ПЕРЕГЛЯНУТИ НОВИНКИ" }).first().click();
+    await expect(page).toHaveURL(/sortBy=createdAt&sortOrder=desc/);
   });
 
   test("shows the why-choose-us block", async ({ page }) => {
-    await expect(page.getByRole("heading", { name: /why choose us/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /чому обирають нас/i })).toBeVisible();
   });
 
   test("shows social links", async ({ page }) => {
-    await expect(page.getByRole("link", { name: /Instagram/ }).first()).toBeVisible();
+    // Social links live in the footer only since TASK-057's homepage
+    // restructure removed the dedicated tiles section — scope the locator so
+    // this doesn't accidentally match a future header/nav Instagram link.
+    await expect(
+      page
+        .locator("footer")
+        .getByRole("link", { name: /Instagram/i })
+        .first()
+    ).toBeVisible();
   });
 
   test("announcement bar dismisses and stays dismissed when configured", async ({ page }) => {

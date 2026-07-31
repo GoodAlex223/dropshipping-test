@@ -169,11 +169,11 @@ function SubscribersContent() {
   const getStatusBadge = (status: Subscriber["status"]) => {
     switch (status) {
       case "ACTIVE":
-        return (
-          <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-            Active
-          </Badge>
-        );
+        // Token-driven default badge (bg-primary/text-primary-foreground), matching
+        // the isActive="default" convention on the products list — not a status-color
+        // map like PAYMENT_STATUS_COLORS, so not exempt; and no green (TASK-037 owns
+        // status green).
+        return <Badge>Active</Badge>;
       case "PENDING":
         return <Badge variant="secondary">Pending</Badge>;
       case "UNSUBSCRIBED":

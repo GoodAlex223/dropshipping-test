@@ -1,14 +1,9 @@
 import type { Metadata } from "next";
 import { getHomeMetadata } from "@/lib/seo";
-import {
-  getBestsellers,
-  getFeaturedProducts,
-  type BestsellerResult,
-  type ProductCardData,
-} from "@/lib/product-queries";
+import { getNewArrivals, type ProductCardData } from "@/lib/product-queries";
 import { getTestimonials, type Testimonial } from "@/lib/review-queries";
-import { Hero, ProductRail, WhyChooseUs, Testimonials } from "@/components/home";
-import { FadeIn, SocialLinks } from "@/components/common";
+import { BenefitStrip } from "@/components/common";
+import { Hero, ProductRail, Testimonials, WhyChooseUs } from "@/components/home";
 import { home } from "@/content/home";
 
 export const metadata: Metadata = getHomeMetadata();
@@ -46,58 +41,25 @@ async function safeSection<T>(query: Promise<T>, fallback: T, label: string): Pr
 }
 
 export default async function HomePage() {
-  const emptyBestsellers: BestsellerResult = { products: [], source: "backfilled" };
-  const [featured, bestsellers, testimonials] = await Promise.all([
-    safeSection<ProductCardData[]>(getFeaturedProducts(8), [], "featured"),
-    safeSection<BestsellerResult>(getBestsellers(8), emptyBestsellers, "bestsellers"),
+  const [newArrivals, testimonials] = await Promise.all([
+    safeSection<ProductCardData[]>(getNewArrivals(4), [], "new-arrivals"),
     safeSection<Testimonial[]>(getTestimonials(6), [], "testimonials"),
   ]);
-
-  // getBestsellers() reports source: "backfilled" when zero items in the
-  // rail came from real sales — a brand-new store's day-one state, not an
-  // edge case. Labelling untested new stock "Bestsellers" would fabricate
-  // social proof, the same category of problem SocialLinks (no invented
-  // follower counts) and WhyChooseUs (gated, unverified claims) deliberately
-  // avoid elsewhere on this page. "mixed" (real bestsellers topped up with
-  // recent products) is normal, non-deceptive padding and keeps the
-  // Bestsellers heading — do not extend this swap to "mixed", and do not
-  // simplify this back into a constant.
-  const bestsellersRail =
-    bestsellers.source === "backfilled" ? home.rails.newArrivals : home.rails.bestsellers;
 
   return (
     <div className="flex flex-col">
       <Hero />
-
-      <ProductRail
-        title={home.rails.featured.title}
-        products={featured}
-        viewAllHref={home.rails.featured.viewAllHref}
-        viewAllLabel={home.rails.featured.viewAllLabel}
-      />
-
-      <ProductRail
-        title={bestsellersRail.title}
-        products={bestsellers.products}
-        viewAllHref={bestsellersRail.viewAllHref}
-        viewAllLabel={bestsellersRail.viewAllLabel}
-      />
-
-      <WhyChooseUs />
-
-      <Testimonials testimonials={testimonials} />
-
-      <section data-surface="dark" className="bg-background text-foreground">
-        <div className="container py-16 text-center">
-          <FadeIn>
-            <h2 className="font-heading text-2xl font-bold tracking-tight sm:text-3xl">
-              {home.social.title}
-            </h2>
-            <p className="text-muted-foreground mt-4 text-sm">{home.social.subtitle}</p>
-            <SocialLinks variant="tiles" className="mt-8" />
-          </FadeIn>
-        </div>
+      <section aria-label="Переваги" className="border-border border-b">
+        <BenefitStrip items={home.benefits} />
       </section>
+      <ProductRail
+        title={home.rails.newArrivals.title}
+        products={newArrivals}
+        viewAllHref={home.rails.newArrivals.viewAllHref}
+        viewAllLabel={home.rails.newArrivals.viewAllLabel}
+      />
+      <WhyChooseUs />
+      <Testimonials testimonials={testimonials} />
     </div>
   );
 }

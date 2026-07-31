@@ -26,6 +26,7 @@ function row(id: string, name = `Product ${id}`) {
     isFeatured: false,
     category: { name: "Hoodies", slug: "hoodies" },
     images: [{ url: "https://example.com/a.jpg", alt: null }],
+    variants: [],
   };
 }
 
@@ -64,6 +65,32 @@ describe("getFeaturedProducts", () => {
     );
     expect(result[0].price).toBe("100.00");
     expect(result[0].comparePrice).toBeNull();
+  });
+
+  it("selects variant name/value so <ProductCard> can render the sizes row", async () => {
+    findMany.mockResolvedValue([
+      {
+        ...row("a"),
+        variants: [
+          { name: "Size", value: "M" },
+          { name: "Color", value: "Чорний" },
+        ],
+      },
+    ]);
+
+    const result = await getFeaturedProducts(4);
+
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        select: expect.objectContaining({
+          variants: { select: { name: true, value: true } },
+        }),
+      })
+    );
+    expect(result[0].variants).toEqual([
+      { name: "Size", value: "M" },
+      { name: "Color", value: "Чорний" },
+    ]);
   });
 });
 

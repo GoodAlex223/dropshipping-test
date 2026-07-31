@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Heart, Package, Leaf } from "lucide-react";
+import { formatPrice } from "@/lib/format";
 import type { ProductGridProps, ShowcaseProduct } from "../types";
 
 function OrganicProductCard({ product }: { product: ShowcaseProduct }) {
@@ -61,11 +62,11 @@ function OrganicProductCard({ product }: { product: ShowcaseProduct }) {
           {/* Price */}
           <div className="mt-3 flex items-baseline gap-2">
             <span className="text-foreground text-xl font-medium">
-              ${parseFloat(product.price).toFixed(2)}
+              {formatPrice(product.price)}
             </span>
             {hasDiscount && (
               <span className="text-muted-foreground text-sm line-through">
-                ${parseFloat(product.comparePrice!).toFixed(2)}
+                {formatPrice(product.comparePrice!)}
               </span>
             )}
           </div>

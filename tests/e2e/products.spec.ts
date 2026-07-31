@@ -93,7 +93,7 @@ test.describe("Product Browsing", () => {
     await expect(page).toHaveURL(/\/products\/[^/]+$/);
 
     // Price should be visible (use first match since there may be multiple prices)
-    await expect(page.getByText(/\$\d+/).first()).toBeVisible();
+    await expect(page.getByText(/\d[\s ]?грн/).first()).toBeVisible();
   });
 
   test("product detail shows add to cart button", async ({ page }) => {

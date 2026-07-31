@@ -63,6 +63,10 @@ export function SocialLinks({ className, variant = "inline" }: SocialLinksProps)
               href={social.href}
               target="_blank"
               rel="noopener noreferrer"
+              // Icons-only in the footer (inline variant): the visible label
+              // gives way to a native hover tooltip there. The tiles variant
+              // keeps its own visible label, so no tooltip is needed on top.
+              title={isTiles ? undefined : social.label}
               className={cn(
                 "transition-colors",
                 isTiles
@@ -71,7 +75,14 @@ export function SocialLinks({ className, variant = "inline" }: SocialLinksProps)
               )}
             >
               <Icon className={isTiles ? "h-6 w-6" : "h-5 w-5"} aria-hidden="true" />
-              <span>{social.label}</span>
+              {/*
+                Inline variant (footer): label text is `sr-only`, not removed
+                — it stays in the accessibility tree (and thus in the link's
+                accessible name, `getByRole("link", { name: ... })`-queryable)
+                while being visually hidden behind the icon-only treatment.
+                The tiles variant keeps the label fully visible.
+              */}
+              <span className={isTiles ? undefined : "sr-only"}>{social.label}</span>
               {social.followers !== null && (
                 <span className="text-muted-foreground text-xs">
                   {formatFollowers(social.followers)}

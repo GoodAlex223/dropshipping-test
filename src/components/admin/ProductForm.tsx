@@ -283,7 +283,7 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
                   <Label htmlFor="price">Price *</Label>
                   <div className="relative">
                     <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">
-                      $
+                      грн
                     </span>
                     <Input
                       id="price"
@@ -305,7 +305,7 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
                   <Label htmlFor="comparePrice">Compare Price</Label>
                   <div className="relative">
                     <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">
-                      $
+                      грн
                     </span>
                     <Input
                       id="comparePrice"
@@ -331,7 +331,7 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
                   <Label htmlFor="costPrice">Cost Price</Label>
                   <div className="relative">
                     <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">
-                      $
+                      грн
                     </span>
                     <Input
                       id="costPrice"

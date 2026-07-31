@@ -6,6 +6,8 @@
 `docs/reference/client-brief.md` and `docs/reference/mirox-concept-screenshot.jpg`); Figma/design
 files to arrive later.
 
+> **Update 2026-07-27:** A-track design source of truth is now docs/design/design_handoff_mirox/ + the [design-adoption spec](2026-07-27-mirox-design-adoption-design.md); TASK-036/037/039 details revised there. TASK-057 added.
+
 ---
 
 ## 1. Summary

@@ -11,8 +11,46 @@ import { subscribers } from "./seed-data/subscribers";
 const prisma = new PrismaClient();
 const SALT_ROUNDS = 12;
 
+function assertLocalDatabase() {
+  const raw = process.env.DATABASE_URL ?? "";
+  let host = "";
+  try {
+    host = new URL(raw).hostname;
+  } catch {
+    throw new Error("DATABASE_URL is missing or unparsable — refusing to seed.");
+  }
+  const local = new Set(["localhost", "127.0.0.1", "postgres", "db"]);
+  if (!local.has(host) && process.env.SEED_ALLOW_REMOTE !== "1") {
+    throw new Error(
+      `Refusing to seed non-local database host "${host}". ` +
+        `This seed DELETES the catalog and all orders/reviews. ` +
+        `Set SEED_ALLOW_REMOTE=1 only for a deliberate, user-approved production re-seed.`
+    );
+  }
+}
+
 async function main() {
+  assertLocalDatabase();
   console.log("Starting database seed...\n");
+
+  // 0. CATALOG + TRANSACTIONAL RESET
+  // Users, subscribers, settings, and the supplier record survive (upserted
+  // below); everything catalog-shaped is rebuilt from seed-data so stale rows
+  // can't linger next to the new catalog. Order matches FK dependencies:
+  // reviews/supplier orders/order items before orders; cart items before
+  // variants/images before products; subcategories before parent categories.
+  console.log("Resetting catalog and transactional data...");
+  await prisma.review.deleteMany();
+  await prisma.supplierOrder.deleteMany();
+  await prisma.orderItem.deleteMany();
+  await prisma.order.deleteMany();
+  await prisma.cartItem.deleteMany();
+  await prisma.productVariant.deleteMany();
+  await prisma.productImage.deleteMany();
+  await prisma.product.deleteMany();
+  await prisma.category.deleteMany({ where: { parentId: { not: null } } });
+  await prisma.category.deleteMany();
+  console.log("  catalog reset complete\n");
 
   // 1. USERS
   console.log("Creating users...");
@@ -131,6 +169,7 @@ async function main() {
       barcode: p.barcode,
       mpn: p.mpn,
       isActive: true,
+      createdAt: p.createdAt,
     };
 
     const product = await prisma.product.upsert({
@@ -161,9 +200,9 @@ async function main() {
       throw new Error(`User "${o.customerEmail}" not found for order "${o.orderNumber}"`);
 
     const subtotal = o.items.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0);
-    const shippingCost = subtotal >= 50 ? 0 : 5.99;
-    const tax = Math.round(subtotal * 0.08 * 100) / 100;
-    const total = Math.round((subtotal + shippingCost + tax) * 100) / 100;
+    const shippingCost = 80; // Нова Пошта відділення flat placeholder (real rates: TASK-049)
+    const tax = 0; // no VAT itemization in the demo
+    const total = subtotal + shippingCost + tax;
 
     const orderItems = o.items.map((i) => {
       const productId = productMap.get(i.productSku);
@@ -277,7 +316,7 @@ async function main() {
   // 8. SETTINGS
   console.log("Creating settings...");
   const settingsData = [
-    { key: "store_name", value: "DropShip Store", type: "string" },
+    { key: "store_name", value: "Mirox Shop", type: "string" },
     { key: "store_currency", value: "USD", type: "string" },
     { key: "shipping_flat_rate", value: "5.99", type: "number" },
     { key: "free_shipping_threshold", value: "50", type: "number" },

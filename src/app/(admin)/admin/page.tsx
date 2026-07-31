@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, ShoppingCart, Users, DollarSign, Mail } from "lucide-react";
 import { prisma } from "@/lib/db";
+import { formatPrice } from "@/lib/format";
 
 export default async function AdminDashboardPage() {
   const subscriberCount = await prisma.subscriber.count({
@@ -20,7 +21,7 @@ export default async function AdminDashboardPage() {
             <DollarSign className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$0.00</div>
+            <div className="text-2xl font-bold">{formatPrice(0)}</div>
             <p className="text-muted-foreground text-xs">+0% from last month</p>
           </CardContent>
         </Card>

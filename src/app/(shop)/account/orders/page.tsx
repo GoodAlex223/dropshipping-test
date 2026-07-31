@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getOrderStatusStyle, getOrderStatusLabel } from "@/lib/order-status";
+import { formatPrice } from "@/lib/format";
 
 interface OrderItem {
   id: string;
@@ -173,7 +174,7 @@ function OrdersPageContent() {
                       </div>
                       <div>
                         <p className="text-muted-foreground text-sm">Total</p>
-                        <p className="font-medium">${parseFloat(order.total).toFixed(2)}</p>
+                        <p className="font-medium">{formatPrice(order.total)}</p>
                       </div>
                       <div>
                         <p className="text-muted-foreground text-sm">Order #</p>

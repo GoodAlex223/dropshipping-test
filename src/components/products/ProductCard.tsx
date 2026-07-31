@@ -1,9 +1,14 @@
 import Link from "next/link";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { IMAGE_SIZES } from "@/lib/image-utils";
+import { formatPrice } from "@/lib/format";
 import { ProductImage } from "./ProductImage";
+
+interface ProductVariantOption {
+  name: string;
+  value: string;
+}
 
 interface ProductCardProps {
   product: {
@@ -17,8 +22,26 @@ interface ProductCardProps {
     isFeatured?: boolean;
     category?: { name: string; slug: string };
     images: { url: string; alt?: string | null }[];
+    // Optional: category pages, search API results, and other ProductCard
+    // callers besides src/lib/product-queries.ts may not supply variants at
+    // all — the size row below just doesn't render in that case.
+    variants?: ProductVariantOption[];
   };
   showCategory?: boolean;
+}
+
+/** Canonical display order; any other Size value (e.g. "One size") is appended after, in first-seen order. */
+const SIZE_ORDER = ["S", "M", "L", "XL", "XXL"] as const;
+
+/** Dedupes Size-variant values and orders them S · M · L · XL · XXL; returns null when there are none. */
+function getSizeLabel(variants: ProductVariantOption[] | undefined): string | null {
+  const sizeValues = variants?.filter((v) => v.name === "Size").map((v) => v.value) ?? [];
+  if (sizeValues.length === 0) return null;
+
+  const unique = Array.from(new Set(sizeValues));
+  const ranked = SIZE_ORDER.filter((s) => unique.includes(s));
+  const extras = unique.filter((v) => !(SIZE_ORDER as readonly string[]).includes(v));
+  return [...ranked, ...extras].join(" · ");
 }
 
 export function ProductCard({ product, showCategory = true }: ProductCardProps) {
@@ -34,21 +57,23 @@ export function ProductCard({ product, showCategory = true }: ProductCardProps) 
       ? Math.round(((comparePrice - price) / comparePrice) * 100)
       : null;
 
-  const formatPrice = (value: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(value);
-  };
-
   const isOutOfStock = product.stock <= 0;
+  const sizeLabel = getSizeLabel(product.variants);
 
   return (
     <Card
       className="group hover-lift overflow-hidden shadow-[var(--shadow-soft)]"
       data-testid="product-card"
     >
-      <Link href={`/products/${product.slug}`}>
+      {/* Whole card is one link, per the design handoff (its product card is
+          a single <a>) — no separate footer CTA, no nested category link
+          (nesting an <a> inside this one would be invalid HTML). aria-label
+          pins the link's accessible name to just the product name; without
+          it, the computed name would be the concatenation of every nested
+          text node (category, description, both prices, size row) — a much
+          noisier announcement than a screen reader needs for "go to this
+          product's page". */}
+      <Link href={`/products/${product.slug}`} className="block" aria-label={product.name}>
         <div className="bg-muted relative aspect-square overflow-hidden">
           <ProductImage
             src={product.images[0]?.url}
@@ -60,8 +85,8 @@ export function ProductCard({ product, showCategory = true }: ProductCardProps) 
           <div className="absolute top-2 left-2 flex flex-col gap-1">
             {discount && (
               <Badge
-                variant="default"
-                className="rounded-none px-2 py-0.5 text-[0.65rem] font-semibold tracking-wider uppercase"
+                variant="secondary"
+                className="border-border-strong text-foreground rounded-full px-2.5 py-1 text-[10.5px] font-extrabold"
               >
                 -{discount}%
               </Badge>
@@ -73,50 +98,34 @@ export function ProductCard({ product, showCategory = true }: ProductCardProps) 
             )}
           </div>
         </div>
-      </Link>
 
-      <CardContent className="p-4">
-        {showCategory && product.category && (
-          <Link
-            href={`/categories/${product.category.slug}`}
-            className="text-muted-foreground hover:text-primary text-xs"
-          >
-            {product.category.name}
-          </Link>
-        )}
+        <CardContent className="p-4">
+          {showCategory && product.category && (
+            <p className="text-muted-foreground text-xs">{product.category.name}</p>
+          )}
 
-        <Link href={`/products/${product.slug}`}>
-          <h3 className="hover:text-primary mt-1 line-clamp-2 leading-tight font-medium">
+          <h3 className="group-hover:text-primary mt-1 line-clamp-2 leading-tight font-medium">
             {product.name}
           </h3>
-        </Link>
 
-        {product.shortDesc && (
-          <p className="text-muted-foreground mt-1 line-clamp-2 text-sm">{product.shortDesc}</p>
-        )}
-
-        <div className="mt-2 flex items-center gap-2">
-          <span className="text-lg font-bold">{formatPrice(price)}</span>
-          {comparePrice && comparePrice > price && (
-            <span className="text-muted-foreground text-sm line-through">
-              {formatPrice(comparePrice)}
-            </span>
+          {product.shortDesc && (
+            <p className="text-muted-foreground mt-1 line-clamp-2 text-sm">{product.shortDesc}</p>
           )}
-        </div>
-      </CardContent>
 
-      <CardFooter className="p-4 pt-0">
-        <Button
-          asChild
-          variant={isOutOfStock ? "secondary" : "default"}
-          className="w-full"
-          size="sm"
-        >
-          <Link href={`/products/${product.slug}`}>
-            {isOutOfStock ? "View Details" : "View Product"}
-          </Link>
-        </Button>
-      </CardFooter>
+          <div className="mt-2 flex items-center gap-2">
+            <span className="text-lg font-bold">{formatPrice(price)}</span>
+            {comparePrice && comparePrice > price && (
+              <span className="text-muted-foreground text-sm line-through">
+                {formatPrice(comparePrice)}
+              </span>
+            )}
+          </div>
+
+          {sizeLabel && (
+            <p className="text-muted-foreground mt-2 text-[11.5px] font-semibold">{sizeLabel}</p>
+          )}
+        </CardContent>
+      </Link>
     </Card>
   );
 }

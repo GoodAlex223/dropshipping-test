@@ -34,6 +34,7 @@ import {
 import { useCartStore } from "@/stores/cart.store";
 import { checkoutSchema, type CheckoutInput } from "@/lib/validations";
 import { getStripe } from "@/lib/stripe-client";
+import { formatPrice } from "@/lib/format";
 import { PaymentForm } from "@/components/checkout/PaymentForm";
 import { trackBeginCheckout, trackAddShippingInfo, trackAddPaymentInfo } from "@/lib/analytics";
 
@@ -525,7 +526,7 @@ export default function CheckoutPage() {
                                       </p>
                                     </div>
                                   </div>
-                                  <span className="font-medium">${method.price.toFixed(2)}</span>
+                                  <span className="font-medium">{formatPrice(method.price)}</span>
                                 </Label>
                               ))}
                             </RadioGroup>
@@ -606,12 +607,17 @@ export default function CheckoutPage() {
                       options={{
                         clientSecret,
                         appearance: {
-                          theme: "flat",
+                          theme: "night",
                           variables: {
-                            colorPrimary: "#000000",
-                            colorBackground: "#ffffff",
-                            colorText: "#1a1a1a",
-                            colorDanger: "#b91c1c",
+                            // Stripe Elements renders in an iframe and can't read our
+                            // CSS custom properties, so these are literal hex values
+                            // matching the Mirox dark :root tokens (globals.css):
+                            // --primary, --input (form field fill, distinct from the
+                            // --card panel it sits on), --foreground, --destructive.
+                            colorPrimary: "#ffffff",
+                            colorBackground: "#1a1a1a",
+                            colorText: "#ffffff",
+                            colorDanger: "#f87171",
                             borderRadius: "4px",
                             fontFamily: "system-ui, sans-serif",
                           },
@@ -664,9 +670,7 @@ export default function CheckoutPage() {
                       <p className="line-clamp-2 text-sm font-medium">{item.name}</p>
                       <p className="text-muted-foreground text-sm">Qty: {item.quantity}</p>
                     </div>
-                    <p className="text-sm font-medium">
-                      ${(item.price * item.quantity).toFixed(2)}
-                    </p>
+                    <p className="text-sm font-medium">{formatPrice(item.price * item.quantity)}</p>
                   </div>
                 ))}
               </div>
@@ -676,17 +680,17 @@ export default function CheckoutPage() {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Shipping</span>
                   <span>
-                    {selectedShipping ? `$${shippingCost.toFixed(2)}` : "Calculated at next step"}
+                    {selectedShipping ? formatPrice(shippingCost) : "Calculated at next step"}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Tax</span>
-                  <span>$0.00</span>
+                  <span>{formatPrice(0)}</span>
                 </div>
               </div>
 
@@ -694,7 +698,7 @@ export default function CheckoutPage() {
 
               <div className="flex justify-between font-semibold">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>{formatPrice(total)}</span>
               </div>
 
               {orderNumber && (

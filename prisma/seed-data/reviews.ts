@@ -4,95 +4,85 @@ const now = new Date();
 const daysAgo = (days: number) => new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
 export const reviews = [
-  // Reviews for order ORD-2026-0001 (John Smith - headphones, USB cables)
+  // Reviews for order ORD-2026-0001 (Олександр Петренко - hoodie, olimpiyka)
   {
     customerEmail: "customer@example.com",
-    productSku: "ELEC-001",
+    productSku: "MRX-001",
     orderNumber: "ORD-2026-0001",
     rating: 5,
-    comment:
-      "Absolutely love these headphones! The noise cancellation is incredible - I can't hear anything around me when I'm working. Battery life is exactly as advertised. Highly recommend!",
-    adminReply:
-      "Thank you so much for your glowing review, John! We're thrilled the noise cancellation is working perfectly for you. Enjoy your music!",
-    adminRepliedAt: daysAgo(40),
-    createdAt: daysAgo(42),
+    comment: "Відмінна якість! Худі сидить ідеально, тканина щільна, дуже задоволений покупкою.",
+    adminReply: "Дякуємо за відгук! Раді, що худі підійшло — носіть із задоволенням!",
+    adminRepliedAt: daysAgo(1),
+    createdAt: daysAgo(2),
   },
   {
     customerEmail: "customer@example.com",
-    productSku: "ELEC-003",
+    productSku: "MRX-003",
     orderNumber: "ORD-2026-0001",
     rating: 4,
     comment:
-      "Good quality cables that charge fast. The braided design feels durable. Only wish the 6ft one was a bit longer, but overall great value for a 2-pack.",
-    createdAt: daysAgo(43),
+      "Олімпійка приємна на дотик, начос теплий. Розмір відповідає таблиці, але рукави трохи довші, ніж очікував.",
+    createdAt: daysAgo(6),
   },
 
-  // Reviews for order ORD-2026-0002 (Sarah Wilson - dress, bag)
+  // Reviews for order ORD-2026-0002 (Дмитро Коваленко - t-shirt, white hoodie)
   {
     customerEmail: "sarah.wilson@example.com",
-    productSku: "CLOTH-003",
+    productSku: "MRX-002",
+    orderNumber: "ORD-2026-0002",
+    rating: 5,
+    comment: "Швидка доставка, все як на фото. Рекомендую!",
+    createdAt: daysAgo(4),
+  },
+  {
+    customerEmail: "sarah.wilson@example.com",
+    productSku: "MRX-004",
     orderNumber: "ORD-2026-0002",
     rating: 5,
     comment:
-      "This dress is even prettier in person! The fabric is so soft and flows beautifully. I wore it to a garden party and got so many compliments. Fits true to size.",
-    adminReply:
-      "We're so happy you love the dress, Sarah! Thank you for sharing - you must have looked gorgeous at the party! 🌸",
-    adminRepliedAt: daysAgo(33),
-    createdAt: daysAgo(35),
-  },
-  {
-    customerEmail: "sarah.wilson@example.com",
-    productSku: "CLOTH-005",
-    orderNumber: "ORD-2026-0002",
-    rating: 4,
-    comment:
-      "Beautiful bag with nice leather quality. The strap is comfortable and adjustable. Took off one star because it's slightly smaller than I expected, but it still fits my essentials.",
-    createdAt: daysAgo(34),
+      "Біле худі виглядає ще краще наживо. Тканина щільна, не просвічує, шви акуратні. Обов'язково візьму ще один колір.",
+    createdAt: daysAgo(8),
   },
 
-  // Reviews for order ORD-2026-0003 (Mike Johnson - dumbbells, yoga mat)
+  // Reviews for order ORD-2026-0003 (Марія Шевченко - oversize hoodie, longsleeve)
   {
     customerEmail: "mike.johnson@example.com",
-    productSku: "SPORT-001",
+    productSku: "MRX-005",
     orderNumber: "ORD-2026-0003",
     rating: 5,
     comment:
-      "Game changer for my home gym! The dial system is smooth and easy to adjust between exercises. Build quality is solid and they look great. Worth every penny.",
-    adminReply:
-      "Awesome to hear the dumbbells are elevating your home workouts, Mike! Thanks for the detailed review. Keep crushing those gains! 💪",
-    adminRepliedAt: daysAgo(25),
-    createdAt: daysAgo(27),
+      "Оверсайз худі — саме те, що шукала! Сидить вільно, але не мішкувато, дуже приємний матеріал. Ношу постійно.",
+    adminReply: "Дякуємо, Маріє! Раді, що оверсайз-крій припав до смаку. Гарного носіння!",
+    adminRepliedAt: daysAgo(9),
+    createdAt: daysAgo(10),
   },
   {
     customerEmail: "mike.johnson@example.com",
-    productSku: "SPORT-002",
+    productSku: "MRX-007",
     orderNumber: "ORD-2026-0003",
     rating: 3,
     comment:
-      "The mat is decent quality and the thickness is nice for floor exercises. However, it has a slight rubbery smell that took about a week to go away. The carrying strap is useful.",
-    createdAt: daysAgo(26),
+      "Лонгслів непоганий, але тканина тонша, ніж я очікувала за цю ціну. Розмір підійшов, колір відповідає фото.",
+    createdAt: daysAgo(11),
   },
 
-  // Reviews for order ORD-2026-0004 (Emily Chen - armchair, plant pots)
+  // Reviews for order ORD-2026-0004 (Ірина Бондаренко - olimpiyka, white hoodie)
   {
     customerEmail: "emily.chen@example.com",
-    productSku: "HOME-001",
+    productSku: "MRX-003",
     orderNumber: "ORD-2026-0004",
     rating: 4,
     comment:
-      "Really comfortable chair with a mid-century look I was going for. Assembly took about 30 minutes. The sage green color is beautiful. Only complaint is the instructions could be clearer.",
-    adminReply:
-      "Thank you for your feedback, Emily! We're glad you love the chair. We've noted your suggestion about the instructions for improvement.",
-    adminRepliedAt: daysAgo(20),
-    createdAt: daysAgo(22),
+      "Гарна олімпійка на весну-осінь, зручні кишені. Блискавка трохи туга, та загалом задоволена покупкою.",
+    createdAt: daysAgo(13),
   },
   {
     customerEmail: "emily.chen@example.com",
-    productSku: "HOME-003",
+    productSku: "MRX-004",
     orderNumber: "ORD-2026-0004",
-    rating: 5,
+    rating: 4,
     comment:
-      "These pots are exactly what I needed for my plant collection! The matte finish looks so elegant, and I love that they have drainage holes. Already ordered another set!",
-    createdAt: daysAgo(21),
+      "Худі якісне, тканина не просвічує навіть у білому кольорі. Розмір М трохи більший, ніж очікувала, але це навіть плюс для оверсайз-стилю.",
+    createdAt: daysAgo(14),
   },
 ];

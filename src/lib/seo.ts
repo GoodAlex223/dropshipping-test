@@ -311,7 +311,7 @@ export function getProductJsonLd(product: {
     offers: {
       "@type": "Offer",
       price: product.price,
-      priceCurrency: "USD",
+      priceCurrency: "UAH",
       availability,
       url: `${siteConfig.url}/products/${product.slug}`,
       seller: {

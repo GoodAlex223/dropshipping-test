@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
+// TASK-039: externalize — hardcoded Ukrainian strings below stay inline
+// until the i18n library lands; this component has no English consumer.
 export function NewsletterSignup() {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -26,14 +28,14 @@ export function NewsletterSignup() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Subscription failed");
+        throw new Error(data.error || "Не вдалося підписатися");
       }
 
       setIsSuccess(true);
       setEmail("");
-      toast.success("Check your email to confirm your subscription");
+      toast.success("Перевірте пошту, щоб підтвердити підписку");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to subscribe");
+      toast.error(error instanceof Error ? error.message : "Не вдалося підписатися");
     } finally {
       setIsLoading(false);
     }
@@ -43,7 +45,7 @@ export function NewsletterSignup() {
     return (
       <div className="border-border bg-muted flex items-start gap-2 rounded-md border p-3">
         <CheckCircle2 className="text-foreground h-5 w-5 flex-shrink-0" />
-        <p className="text-foreground text-sm">Check your email to confirm your subscription!</p>
+        <p className="text-foreground text-sm">Перевірте пошту, щоб підтвердити підписку!</p>
       </div>
     );
   }
@@ -52,7 +54,7 @@ export function NewsletterSignup() {
     <form onSubmit={handleSubmit} className="space-y-2">
       <Input
         type="email"
-        placeholder="Enter your email"
+        placeholder="Ваш email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         disabled={isLoading}
@@ -61,10 +63,10 @@ export function NewsletterSignup() {
       />
       <Button type="submit" disabled={isLoading} className="w-full" size="sm">
         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        {isLoading ? "Subscribing..." : "Subscribe"}
+        {isLoading ? "Підписуємось..." : "Підписатися"}
       </Button>
       <p className="text-muted-foreground text-xs">
-        We respect your privacy. Unsubscribe at any time.
+        Ми поважаємо вашу приватність. Відписатися можна будь-коли.
       </p>
     </form>
   );

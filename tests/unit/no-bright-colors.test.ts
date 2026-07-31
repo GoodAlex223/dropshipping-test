@@ -2,31 +2,39 @@ import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
-// Surfaces TASK-034 and TASK-035 cleaned; these must never carry bright color
-// utilities.
+// Surfaces TASK-034, TASK-035, and TASK-057 (Task 11) cleaned; these must never
+// carry bright color utilities.
 //
-// Within src/app/(shop), only catalog / product / cart (page.tsx et al.) are
-// deliberately NOT in this list — they're rebuilt by TASK-036 / 037 / 043 and
-// may legitimately still contain bright colors until those land. The home page
-// WAS in that deferred set; TASK-035 rebuilt it, so `(shop)/page.tsx`,
-// `src/components/home` and `src/content` joined the scan as part of that task.
-// Every other customer-facing route group IS scanned, specifically because none
-// of them has a rebuild task of its own to inherit the obligation:
-// `(shop)/account` (TASK-034 neutralized its one offender,
-// account/orders/[id]/page.tsx), `(shop)/checkout` (TASK-034 neutralized its one
-// offender, checkout/confirmation/page.tsx), the whole `(auth)` group
-// (login/register — verified clean, no changes needed), and the shared
-// root-level files every route tree passes through — `(shop)/layout.tsx`, the
-// root `error.tsx`, and the root `layout.tsx` (all three verified clean). Do not
-// mistake any of these for oversights, and do not add the remaining deferred
-// (shop) page routes above without a corresponding cleanup task landing first.
+// The storefront carve-out from TASK-034/035 is now CLOSED: cart, products, and
+// categories were the last deferred (shop) routes (originally left out because
+// TASK-036/037/043 were expected to rebuild them), and TASK-057 Task 11 swept
+// their bright utilities and added them below instead of waiting on those
+// rebuild tasks. Every customer-facing route group under src/app/(shop) and
+// src/app/(auth) is now scanned — none of it is deferred anymore. The home page
+// joined in TASK-035 (`(shop)/page.tsx`, `src/components/home`, `src/content`);
+// `(shop)/account` and `(shop)/checkout` joined in TASK-034 (each had one
+// offender, neutralized); the whole `(auth)` group (login/register) was already
+// verified clean; and the shared root-level files every route tree passes
+// through — `(shop)/layout.tsx`, the root `error.tsx`, and the root
+// `layout.tsx` — were already verified clean too.
+//
+// Coverage predating all three of the above tasks (added 2026-07-18, before
+// TASK-034 existed) that this narrative doesn't otherwise mention:
+// `src/app/newsletter`, `src/app/not-found.tsx`, and `src/lib/order-status.ts`
+// are also in SCAN_PATHS below and verified clean — listed here so the
+// account above isn't read as the complete map of what's scanned.
 //
 // Also deliberately NOT in this list, for unrelated reasons:
 // - src/app/(admin) — admin is inheriting design tokens but is not being restyled
-//   by TASK-034. Note its OrderStatus chips ARE already monochrome: both admin
-//   orders pages were converted to the shared getOrderStatusStyle() in this task.
-//   What remains bright is PAYMENT_STATUS_COLORS (PaymentStatus, admin-only) and
-//   the supplier-order status map — both deliberate, both backlogged.
+//   by TASK-034/057 (BACKLOG'd, no rebuild task owns it yet), so it's still not in
+//   SCAN_PATHS. Note its OrderStatus chips ARE already monochrome: both admin
+//   orders pages were converted to the shared getOrderStatusStyle() in TASK-034.
+//   TASK-057 Task 11's admin pass spot-fixed two hardcoded-light-background
+//   offenders it found while clicking through (newsletter's "Active" badge,
+//   suppliers/[id]'s stat-icon circles) without adding admin to SCAN_PATHS — a
+//   point fix, not a sweep. What remains bright is PAYMENT_STATUS_COLORS
+//   (PaymentStatus, admin-only) and the supplier-order status map — both
+//   deliberate, both backlogged.
 // - src/components/ui/ — shadcn primitives. Token-driven and managed by the shadcn
 //   CLI, not hand-edited.
 // - src/app/showcase and the .bold/.luxury/.organic theme blocks — the showcase
@@ -45,6 +53,9 @@ const SCAN_PATHS = [
   "src/app/(shop)/page.tsx",
   "src/app/(shop)/account",
   "src/app/(shop)/checkout",
+  "src/app/(shop)/cart",
+  "src/app/(shop)/products",
+  "src/app/(shop)/categories",
   "src/app/(shop)/layout.tsx",
   "src/app/(auth)",
   "src/app/error.tsx",
@@ -109,11 +120,11 @@ describe("token-layer color policy (globals.css Mirox tokens are achromatic)", (
   const css = readFileSync(GLOBALS_CSS_PATH, "utf8");
 
   // Non-color custom properties that legitimately live inside the same :root
-  // (and [data-surface="dark"]) block as the color tokens: radius, font-family
-  // refs, motion timing, and box-shadow values. They aren't colors at all, so
-  // they're exempt rather than expected to pass a color check. --shadow-soft is
-  // a multi-layer box-shadow (achromatic rgb(0 0 0 / a) drops), re-skinned under
-  // dark — not a color token, so it is exempt like the timing tokens.
+  // block as the color tokens: radius, font-family refs, motion timing, and
+  // box-shadow values. They aren't colors at all, so they're exempt rather
+  // than expected to pass a color check. --shadow-soft is a multi-layer
+  // box-shadow (achromatic rgb(0 0 0 / a) drops) — not a color token, so it
+  // is exempt like the timing tokens.
   const NON_COLOR_PROPS = new Set([
     "--radius",
     "--font-heading",
@@ -156,9 +167,11 @@ describe("token-layer color policy (globals.css Mirox tokens are achromatic)", (
     "--sidebar-ring",
   ]);
 
-  // The one sanctioned hue: destructive red. Must still resolve to a valid
-  // hex color, just not required to be achromatic.
-  const SANCTIONED_HUE_PROPS = new Set(["--destructive", "--destructive-foreground"]);
+  // The sanctioned hues: destructive red, and amber for star ratings (used by
+  // StarRating site-wide, reviews pages included — intended, per design).
+  // Must still resolve to a valid hex color, just not required to be
+  // achromatic.
+  const SANCTIONED_HUE_PROPS = new Set(["--destructive", "--destructive-foreground", "--rating"]);
 
   function extractBlock(selectorPattern: RegExp): string {
     const match = selectorPattern.exec(css);
@@ -179,16 +192,14 @@ describe("token-layer color policy (globals.css Mirox tokens are achromatic)", (
       });
   }
 
-  // Neither block has nested rules inside it (flat custom-property
+  // The block has no nested rules inside it (flat custom-property
   // declarations only), so matching up to the first `}` safely captures the
-  // whole block. `[data-surface="dark"]` is reused later in the file inside
-  // `@layer base` purely for a background-color/color rule — but since these
-  // patterns are non-global, `.exec()` returns only the FIRST match, which is
-  // the token-definition block, not that later reuse.
+  // whole block. `data-surface` no longer exists in this file (TASK-057
+  // folded the section-inversion tokens into `:root` and deleted the
+  // override block), so `:root` is the only block left to parse.
   const rootDeclarations = parseDeclarations(extractBlock(/:root\s*{([^}]*)}/));
-  const darkDeclarations = parseDeclarations(extractBlock(/\[data-surface="dark"\]\s*{([^}]*)}/));
 
-  const colorDeclarations = [...rootDeclarations, ...darkDeclarations].filter(
+  const colorDeclarations = rootDeclarations.filter(
     ({ prop }) => !NON_COLOR_PROPS.has(prop) && !ADMIN_ONLY_PROPS.has(prop)
   );
 

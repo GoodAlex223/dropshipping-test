@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useCartStore } from "@/stores/cart.store";
+import { formatPrice } from "@/lib/format";
 import { trackViewCart } from "@/lib/analytics";
 
 export function CartDrawer() {
@@ -98,7 +99,7 @@ export function CartDrawer() {
                         <div>
                           <h4 className="line-clamp-2 text-sm font-medium">{item.name}</h4>
                           <p className="text-muted-foreground mt-0.5 text-sm">
-                            ${item.price.toFixed(2)}
+                            {formatPrice(item.price)}
                           </p>
                         </div>
                         <Button
@@ -138,7 +139,7 @@ export function CartDrawer() {
                           </Button>
                         </div>
                         <p className="text-sm font-medium">
-                          ${(item.price * item.quantity).toFixed(2)}
+                          {formatPrice(item.price * item.quantity)}
                         </p>
                       </div>
                     </div>
@@ -152,7 +153,7 @@ export function CartDrawer() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Shipping</span>
@@ -161,7 +162,7 @@ export function CartDrawer() {
                 <Separator />
                 <div className="flex items-center justify-between font-medium">
                   <span>Total</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>{formatPrice(subtotal)}</span>
                 </div>
               </div>
               <div className="flex flex-col gap-2">

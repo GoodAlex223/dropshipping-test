@@ -8,33 +8,14 @@
 export const BRAND_NAME = "Mirox Shop";
 
 /** Long form — hero subtitle, footer. */
-export const BRAND_TAGLINE = "Modern clothing for those who value quality and minimalism.";
+export const BRAND_TAGLINE = "Сучасний одяг для тих, хто цінує якість і мінімалізм.";
 
-/**
- * Hero subtitle. Written out rather than composed from BRAND_NAME +
- * BRAND_TAGLINE because the hero continues the sentence after an em dash
- * (lowercase "modern", per design §5.2) while the footer renders the tagline
- * as its own sentence (capital "Modern"). A runtime capitalize() would be
- * locale-fragile for the Ukrainian and Russian locales TASK-039 adds, to save
- * one character of duplication. These two strings are the same sentence —
- * keep them in sync.
- */
+// BRAND_HERO_SUBTITLE is the same sentence as BRAND_TAGLINE, just prefixed
+// with the brand name for the hero's context — keep both in sync.
 export const BRAND_HERO_SUBTITLE =
-  "Mirox Shop — modern clothing for those who value quality and minimalism.";
+  "Mirox Shop — сучасний одяг для тих, хто цінує якість і мінімалізм.";
 
-/**
- * Short form for <title>. The long tagline pushes the homepage title past 70
- * characters, which search results truncate.
- */
-export const BRAND_META_SUFFIX = "Modern Clothing";
+export const BRAND_META_SUFFIX = "Сучасний одяг";
 
-/**
- * Meta/OG/Twitter description. Opens with the client brief's own hero line
- * (list #1, "Главная страница — Первый экран": "Mirox Shop — современная
- * одежда для тех, кто ценит качество и минимализм.") and extends it with the
- * shipping/quality-check differentiators from the same brief's "Почему
- * выбирают нас" benefit list — see docs/reference/client-brief.md. Kept under
- * 155 characters so Google/social previews don't truncate it mid-sentence.
- */
 export const BRAND_DESCRIPTION =
-  "Mirox Shop — modern clothing for those who value quality and minimalism. Every item checked before shipping, with fast delivery across Ukraine.";
+  "Mirox Shop — сучасний одяг для тих, хто цінує якість і мінімалізм. Перевіряємо кожну річ перед відправкою, швидка доставка по всій Україні.";
