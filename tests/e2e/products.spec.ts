@@ -12,7 +12,7 @@ test.describe("Product Browsing", () => {
     await expect(products).toBeVisible();
   });
 
-  test("can filter products by search", async ({ page, isMobile }) => {
+  test("can filter products by search", async ({ page }) => {
     await page.goto("/products");
 
     // Wait for the product grid before interacting with the form. Cards are
@@ -24,46 +24,39 @@ test.describe("Product Browsing", () => {
     // pre-hydration fill() silently no-ops. See BACKLOG.md TASK-038a entry.
     await page.waitForSelector("[data-testid='product-card']");
 
-    // Find search input and search button
+    // Search moved to the Header dialog in TASK-036 (the catalog filter bar
+    // has no search input, per the Mirox mock).
+    await page.getByRole("button", { name: "Пошук" }).first().click();
     const searchInput = page.getByPlaceholder(/search/i);
-
-    if (await searchInput.isVisible()) {
-      await searchInput.fill("test");
-
-      if (isMobile) {
-        // On mobile, submit the form via keyboard since button may have touch issues
-        await searchInput.press("Enter");
-        // Wait for URL to update with timeout
-        await page.waitForURL(/search=test/, { timeout: 15000 });
-      } else {
-        // On desktop, click the search button
-        const searchButton = page.getByRole("button", { name: "Search", exact: true });
-        await Promise.all([
-          page.waitForURL(/search=test/, { timeout: 10000 }),
-          searchButton.click(),
-        ]);
-      }
-
-      // URL should have updated with search param
-      await expect(page).toHaveURL(/search=test/);
-    }
+    await searchInput.fill("test");
+    await searchInput.press("Enter");
+    await page.waitForURL(/search=test/, { timeout: 15000 });
+    await expect(page).toHaveURL(/search=test/);
   });
 
   test("can sort products", async ({ page }) => {
     await page.goto("/products");
+    await page.waitForSelector("[data-testid='product-card']");
 
-    // Find sort dropdown
-    const sortTrigger = page.getByRole("combobox").first();
+    await Promise.all([
+      page.waitForURL(/sort=price-asc/, { timeout: 15000 }),
+      page.getByRole("button", { name: "Ціна ↑" }).click(),
+    ]);
 
-    if (await sortTrigger.isVisible()) {
-      await sortTrigger.click();
+    await page.waitForSelector("[data-testid='product-card']");
+    await expect(page).toHaveURL(/sort=price-asc/);
+  });
 
-      // Select a sort option
-      const priceOption = page.getByRole("option", { name: /price/i }).first();
-      if (await priceOption.isVisible()) {
-        await priceOption.click();
-      }
-    }
+  test("size filter chip updates URL and grid", async ({ page }) => {
+    await page.goto("/products");
+    await page.waitForSelector("[data-testid='product-card']");
+
+    await Promise.all([
+      page.waitForURL(/size=M/, { timeout: 15000 }),
+      page.getByRole("button", { name: "M", exact: true }).first().click(),
+    ]);
+
+    await page.waitForSelector("[data-testid='product-card']");
   });
 
   test("can view product details", async ({ page }) => {
