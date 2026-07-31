@@ -519,6 +519,7 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 **Origin**: PR #24's external review rounds and the post-merge deploy verification. All 🟤 Auto-Generated (reviewer-surfaced or Claude-surfaced during verification).
 
 - 🟤 **Narrow the ESLint ignore and drop the inert `--ext` flag in one pass** — `38ce2c0` unblocked CI by adding directory-wide `docs/**` to `globalIgnores`; the reviewer accepted it but noted the pairing worth doing whenever it's tidied: `docs/**` means a _real_ `.ts` file landing under `docs/` later would silently go unlinted. One-line follow-up: narrow to `docs/design/design_handoff_mirox/**` (the actual vendor exports) and remove the lint script's `--ext .ts,.tsx`, which is inert under ESLint v9 flat config and now only misleads readers about what gets linted. (Low value, Low effort)
+- 🟤 **Cache Playwright browsers in the CI E2E job** — PR #25's E2E job hung ~28 minutes inside "Install Playwright browsers" (a 1–3 min step; the tests never started) and needed a manual cancel + `gh run rerun --failed` to unstick. The download runs from scratch on every E2E job. An `actions/cache` step keyed on the Playwright version (`~/.cache/ms-playwright`) plus `npx playwright install --with-deps chromium webkit` on miss removes the flaky CDN download from the critical path and shaves minutes off every run. (Med value, Low effort) `[relates-to: TASK-040]`
 
 ---
 
