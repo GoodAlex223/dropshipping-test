@@ -163,6 +163,26 @@ describe("ProductCard — TASK-036 upgrades", () => {
     expect(screen.getAllByRole("link")).toHaveLength(1);
   });
 
+  it("keeps quick-action buttons pointer-events-none until hover/focus-within makes the overlay visible", () => {
+    // Regression test (Task 10 E2E finding): an unconditional
+    // pointer-events-auto on these buttons let the invisible (opacity-0)
+    // overlay sit on top of the card's <a> and intercept clicks meant for
+    // the product link — reproduced via Playwright as "subtree intercepts
+    // pointer events" on the "can view product details" E2E test. jsdom
+    // doesn't do real hit-testing, so this asserts the class contract
+    // directly: pointer-events must start "none" and only flip to "auto"
+    // via the group-hover/group-focus-within variants that also drive the
+    // overlay's opacity, never as a bare unconditional utility.
+    render(<ProductCard product={base} onQuickView={vi.fn()} />);
+    for (const name of ["Швидкий перегляд", "В кошик"]) {
+      const classes = screen.getByRole("button", { name }).className.split(/\s+/);
+      expect(classes).not.toContain("pointer-events-auto");
+      expect(classes).toContain("pointer-events-none");
+      expect(classes).toContain("group-hover:pointer-events-auto");
+      expect(classes).toContain("group-focus-within:pointer-events-auto");
+    }
+  });
+
   it("hides «В кошик» (but keeps quick view) when out of stock", () => {
     render(<ProductCard product={{ ...base, stock: 0 }} onQuickView={vi.fn()} />);
     expect(screen.getByRole("button", { name: "Швидкий перегляд" })).toBeInTheDocument();

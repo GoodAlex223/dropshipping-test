@@ -192,7 +192,16 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
               e.stopPropagation();
               onQuickView({ focusSizes: false });
             }}
-            className="border-border-strong pointer-events-auto rounded-[10px] border bg-black/80 px-3 py-2 text-[12px] font-bold backdrop-blur-sm hover:border-white"
+            // pointer-events-none by default, matching the invisible
+            // opacity-0 state the containing overlay starts in — only the
+            // hover/focus-within state that makes the overlay visible
+            // (group-hover/group-focus-within:opacity-100 above) re-enables
+            // pointer events. An unconditional pointer-events-auto here
+            // would let this invisible button sit on top of the card's
+            // <a> and intercept clicks meant for it even when nothing is
+            // hovered/focused (reproduced via Playwright: "subtree
+            // intercepts pointer events").
+            className="border-border-strong pointer-events-none rounded-[10px] border bg-black/80 px-3 py-2 text-[12px] font-bold backdrop-blur-sm group-focus-within:pointer-events-auto group-hover:pointer-events-auto hover:border-white"
           >
             Швидкий перегляд
           </button>
@@ -203,7 +212,7 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
                 e.stopPropagation();
                 onQuickView({ focusSizes: true });
               }}
-              className="pointer-events-auto rounded-[10px] bg-white px-3 py-2 text-[12px] font-extrabold text-black hover:bg-[#e5e5e5]"
+              className="pointer-events-none rounded-[10px] bg-white px-3 py-2 text-[12px] font-extrabold text-black group-focus-within:pointer-events-auto group-hover:pointer-events-auto hover:bg-[#e5e5e5]"
             >
               В кошик
             </button>
