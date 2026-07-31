@@ -34,14 +34,19 @@ describe("Header", () => {
     expect(screen.getByRole("link", { name: "Каталог" })).toHaveAttribute("href", "/products");
     expect(screen.getByRole("link", { name: "Новинки" })).toHaveAttribute(
       "href",
-      "/products?sortBy=createdAt&sortOrder=desc"
+      "/products?sort=new"
     );
     expect(screen.getByRole("link", { name: "Бестселери" })).toHaveAttribute(
       "href",
-      "/products?featured=true"
+      "/products?sort=popular"
     );
     for (const dead of ["Про нас", "Доставка", "Контакти"]) {
       expect(screen.queryByRole("link", { name: dead })).not.toBeInTheDocument();
     }
+  });
+
+  it("labels the search trigger for a11y and E2E", () => {
+    render(<Header />);
+    expect(screen.getByRole("button", { name: "Пошук" })).toBeInTheDocument();
   });
 });
