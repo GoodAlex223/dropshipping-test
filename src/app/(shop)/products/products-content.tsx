@@ -2,24 +2,12 @@
 
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, Package, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { ProductCard } from "@/components/products";
+import Link from "next/link";
+import { Package } from "lucide-react";
+import { ProductCard, QuickViewDialog } from "@/components/products";
 import { trackViewItemList, trackSelectItem, type GA4Item } from "@/lib/analytics";
-import { formatPrice } from "@/lib/format";
+import { cn } from "@/lib/utils";
+import { FilterBar, type CatalogFilters, type CatalogSort } from "./filter-bar";
 
 interface Product {
   id: string;
@@ -30,14 +18,10 @@ interface Product {
   comparePrice: string | null;
   stock: number;
   isFeatured: boolean;
+  createdAt: string;
   category: { id: string; name: string; slug: string };
   images: { url: string; alt: string | null }[];
-}
-
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
+  variants: { id: string; name: string; value: string; stock: number; price: string | null }[];
 }
 
 interface PaginatedResponse {
@@ -52,12 +36,38 @@ interface PaginatedResponse {
   };
 }
 
+/**
+ * All page numbers when there are 7 or fewer; otherwise the first and last
+ * page plus a window of `current ± 2`, with an "ellipsis" marker filling any
+ * gap so the sequence never looks like it skipped pages silently.
+ */
+function getPageNumbers(current: number, total: number): (number | "ellipsis")[] {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+
+  const pages = new Set<number>([1, total]);
+  for (let p = current - 2; p <= current + 2; p++) {
+    if (p >= 1 && p <= total) pages.add(p);
+  }
+
+  const sorted = Array.from(pages).sort((a, b) => a - b);
+  const result: (number | "ellipsis")[] = [];
+  let prev = 0;
+  for (const p of sorted) {
+    if (prev && p - prev > 1) result.push("ellipsis");
+    result.push(p);
+    prev = p;
+  }
+  return result;
+}
+
 function ProductsContentInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [brands, setBrands] = useState<string[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 12,
@@ -67,15 +77,9 @@ function ProductsContentInner() {
     hasPrev: false,
   });
   const [isLoading, setIsLoading] = useState(true);
-  const [filtersOpen, setFiltersOpen] = useState(false);
-
-  // Filter state
-  const [search, setSearch] = useState(searchParams?.get("search") || "");
-  const [category, setCategory] = useState(searchParams?.get("category") || "");
-  const [sortBy, setSortBy] = useState(searchParams?.get("sortBy") || "createdAt");
-  const [sortOrder, setSortOrder] = useState(searchParams?.get("sortOrder") || "desc");
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
-  const [maxPriceLimit] = useState(2000);
+  const [quickView, setQuickView] = useState<{ product: Product; focusSizes: boolean } | null>(
+    null
+  );
 
   const fetchProducts = useCallback(async () => {
     setIsLoading(true);
@@ -83,18 +87,26 @@ function ProductsContentInner() {
       const params = new URLSearchParams();
       params.set("page", searchParams?.get("page") || "1");
       params.set("limit", "12");
-      const searchVal = searchParams?.get("search");
-      const categoryVal = searchParams?.get("category");
-      const featuredVal = searchParams?.get("featured");
-      const minPriceVal = searchParams?.get("minPrice");
-      const maxPriceVal = searchParams?.get("maxPrice");
-      if (searchVal) params.set("search", searchVal);
-      if (categoryVal) params.set("category", categoryVal);
-      if (featuredVal) params.set("featured", featuredVal);
-      if (minPriceVal) params.set("minPrice", minPriceVal);
-      if (maxPriceVal) params.set("maxPrice", maxPriceVal);
-      params.set("sortBy", searchParams?.get("sortBy") || "createdAt");
-      params.set("sortOrder", searchParams?.get("sortOrder") || "desc");
+
+      // Legacy sortBy/sortOrder are forwarded only when present in the URL
+      // (old links keep working); `sort` is the current param and the API
+      // defaults it to "new" on its own, so we don't always set it here.
+      const forward = (key: string) => {
+        const value = searchParams?.get(key);
+        if (value) params.set(key, value);
+      };
+      forward("search");
+      forward("category");
+      forward("featured");
+      forward("minPrice");
+      forward("maxPrice");
+      forward("size");
+      forward("color");
+      forward("brand");
+      forward("inStock");
+      forward("sort");
+      forward("sortBy");
+      forward("sortOrder");
 
       const response = await fetch(`/api/products?${params}`);
       if (!response.ok) throw new Error("Failed to fetch products");
@@ -109,32 +121,23 @@ function ProductsContentInner() {
     }
   }, [searchParams]);
 
-  const fetchCategories = useCallback(async () => {
-    try {
-      const response = await fetch("/api/categories?parentOnly=true");
-      if (!response.ok) throw new Error("Failed to fetch categories");
-      const data = await response.json();
-      setCategories(data);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  }, []);
-
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
 
   useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
-
-  useEffect(() => {
-    // Sync state with URL params
-    setSearch(searchParams?.get("search") || "");
-    setCategory(searchParams?.get("category") || "");
-    setSortBy(searchParams?.get("sortBy") || "createdAt");
-    setSortOrder(searchParams?.get("sortOrder") || "desc");
-  }, [searchParams]);
+    async function fetchBrands() {
+      try {
+        const response = await fetch("/api/products/brands");
+        if (!response.ok) throw new Error("Failed to fetch brands");
+        const data = await response.json();
+        setBrands(data);
+      } catch {
+        setBrands([]);
+      }
+    }
+    fetchBrands();
+  }, []);
 
   // GA4: Track product list view (once per product set)
   const listTracked = useRef(false);
@@ -174,12 +177,6 @@ function ProductsContentInner() {
     });
 
     router.push(`/products?${params}`);
-    setFiltersOpen(false);
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    updateFilters({ search: search || null });
   };
 
   const handlePageChange = (newPage: number) => {
@@ -190,235 +187,76 @@ function ProductsContentInner() {
 
   const clearFilters = () => {
     router.push("/products");
-    setSearch("");
-    setCategory("");
-    setPriceRange([0, maxPriceLimit]);
   };
 
-  const activeFiltersCount = [
-    searchParams?.get("search"),
-    searchParams?.get("category"),
-    searchParams?.get("minPrice"),
-    searchParams?.get("maxPrice"),
-    searchParams?.get("featured"),
-  ].filter(Boolean).length;
+  const rawSort = searchParams?.get("sort");
+  const sort: CatalogSort =
+    rawSort === "popular" || rawSort === "price-asc" || rawSort === "price-desc" ? rawSort : "new";
+
+  const filters: CatalogFilters = {
+    size: searchParams?.get("size") || null,
+    color: searchParams?.get("color") || null,
+    brand: searchParams?.get("brand") || null,
+    inStock: searchParams?.get("inStock") === "true",
+    minPrice: searchParams?.get("minPrice") ? Number(searchParams.get("minPrice")) : null,
+    maxPrice: searchParams?.get("maxPrice") ? Number(searchParams.get("maxPrice")) : null,
+    search: searchParams?.get("search") || null,
+    category: searchParams?.get("category") || null,
+    sort,
+  };
 
   return (
-    <div className="container py-8">
+    <div className="container py-10">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Products</h1>
-        <p className="text-muted-foreground mt-2">
-          Browse our collection of {pagination.total} products
-        </p>
+      <div className="mb-2.5 text-[12.5px] text-[#737373]">
+        <Link href="/" className="hover:text-white">
+          Головна
+        </Link>{" "}
+        / <span className="text-[#a3a3a3]">Каталог</span>
       </div>
+      <h1 className="mb-7 text-[40px] font-extrabold tracking-[-0.02em]">Каталог</h1>
 
-      {/* Toolbar */}
-      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        {/* Search */}
-        <form onSubmit={handleSearch} className="flex flex-1 gap-2 md:max-w-md">
-          <div className="relative flex-1">
-            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-            <Input
-              placeholder="Search products..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-          <Button type="submit" variant="secondary">
-            Search
-          </Button>
-        </form>
-
-        {/* Sort and Filter */}
-        <div className="flex items-center gap-2">
-          {/* Mobile Filter Button */}
-          <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
-            <SheetTrigger asChild>
-              <Button variant="outline" className="md:hidden">
-                <SlidersHorizontal className="mr-2 h-4 w-4" />
-                Filters
-                {activeFiltersCount > 0 && (
-                  <Badge variant="secondary" className="ml-2">
-                    {activeFiltersCount}
-                  </Badge>
-                )}
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-[300px]">
-              <SheetHeader>
-                <SheetTitle>Filters</SheetTitle>
-              </SheetHeader>
-              <div className="mt-6 space-y-6">
-                {/* Category Filter */}
-                <div className="space-y-2">
-                  <Label>Category</Label>
-                  <Select
-                    value={category || "all"}
-                    onValueChange={(value) => {
-                      const newValue = value === "all" ? "" : value;
-                      setCategory(newValue);
-                      updateFilters({ category: newValue || null });
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="All Categories" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
-                      {categories.map((cat) => (
-                        <SelectItem key={cat.id} value={cat.slug}>
-                          {cat.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Price Range */}
-                <div className="space-y-4">
-                  <Label>Price Range</Label>
-                  <Slider
-                    value={priceRange}
-                    onValueChange={(value) => setPriceRange(value as [number, number])}
-                    max={maxPriceLimit}
-                    step={10}
-                    className="mt-2"
-                  />
-                  <div className="flex items-center justify-between text-sm">
-                    <span>{formatPrice(priceRange[0])}</span>
-                    <span>{formatPrice(priceRange[1])}</span>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full"
-                    onClick={() =>
-                      updateFilters({
-                        minPrice: priceRange[0] > 0 ? priceRange[0].toString() : null,
-                        maxPrice: priceRange[1] < maxPriceLimit ? priceRange[1].toString() : null,
-                      })
-                    }
-                  >
-                    Apply Price Filter
-                  </Button>
-                </div>
-
-                <Separator />
-
-                <Button variant="outline" className="w-full" onClick={clearFilters}>
-                  Clear All Filters
-                </Button>
-              </div>
-            </SheetContent>
-          </Sheet>
-
-          {/* Desktop Category Filter */}
-          <Select
-            value={category || "all"}
-            onValueChange={(value) => updateFilters({ category: value === "all" ? null : value })}
-          >
-            <SelectTrigger className="hidden w-[180px] md:flex">
-              <SelectValue placeholder="All Categories" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              {categories.map((cat) => (
-                <SelectItem key={cat.id} value={cat.slug}>
-                  {cat.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {/* Sort */}
-          <Select
-            value={`${sortBy}-${sortOrder}`}
-            onValueChange={(value) => {
-              const [newSortBy, newSortOrder] = value.split("-");
-              updateFilters({ sortBy: newSortBy, sortOrder: newSortOrder });
-            }}
-          >
-            <SelectTrigger className="w-[160px]">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="createdAt-desc">Newest</SelectItem>
-              <SelectItem value="createdAt-asc">Oldest</SelectItem>
-              <SelectItem value="price-asc">Price: Low to High</SelectItem>
-              <SelectItem value="price-desc">Price: High to Low</SelectItem>
-              <SelectItem value="name-asc">Name: A to Z</SelectItem>
-              <SelectItem value="name-desc">Name: Z to A</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      {/* Active Filters */}
-      {activeFiltersCount > 0 && (
-        <div className="mb-6 flex flex-wrap items-center gap-2">
-          <span className="text-muted-foreground text-sm">Active filters:</span>
-          {searchParams?.get("search") && (
-            <Badge variant="secondary" className="gap-1">
-              Search: {searchParams?.get("search")}
-              <button onClick={() => updateFilters({ search: null })}>
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
-          )}
-          {searchParams?.get("category") && (
-            <Badge variant="secondary" className="gap-1">
-              Category: {searchParams?.get("category")}
-              <button onClick={() => updateFilters({ category: null })}>
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
-          )}
-          {(searchParams?.get("minPrice") || searchParams?.get("maxPrice")) && (
-            <Badge variant="secondary" className="gap-1">
-              {/* "∞" has no currency unit of its own — formatPrice() only wraps the
-                  numeric bound, never a hand-rolled digit string. */}
-              Price: {formatPrice(searchParams?.get("minPrice") || 0)} -{" "}
-              {searchParams?.get("maxPrice") ? formatPrice(searchParams.get("maxPrice")!) : "∞"}
-              <button onClick={() => updateFilters({ minPrice: null, maxPrice: null })}>
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
-          )}
-          <Button variant="ghost" size="sm" onClick={clearFilters}>
-            Clear all
-          </Button>
-        </div>
-      )}
+      <FilterBar
+        filters={filters}
+        brands={brands}
+        onChange={updateFilters}
+        onClearAll={clearFilters}
+      />
 
       {/* Products Grid */}
       {isLoading ? (
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-[repeat(auto-fill,minmax(240px,1fr))] md:gap-5">
           {Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="overflow-hidden rounded-lg border">
-              <div className="bg-muted aspect-square animate-pulse" />
+            <div
+              key={i}
+              className="overflow-hidden rounded-2xl border border-[#1a1a1a] bg-[#0d0d0d]"
+            >
+              <div className="aspect-square animate-pulse bg-[#1a1a1a]" />
               <div className="space-y-2 p-4">
-                <div className="bg-muted h-4 w-3/4 animate-pulse rounded" />
-                <div className="bg-muted h-3 w-1/2 animate-pulse rounded" />
-                <div className="bg-muted h-5 w-1/3 animate-pulse rounded" />
+                <div className="h-4 w-3/4 animate-pulse rounded bg-[#1a1a1a]" />
+                <div className="h-3 w-1/2 animate-pulse rounded bg-[#1a1a1a]" />
+                <div className="h-5 w-1/3 animate-pulse rounded bg-[#1a1a1a]" />
               </div>
             </div>
           ))}
         </div>
       ) : products.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16">
-          <Package className="text-muted-foreground h-16 w-16" />
-          <h2 className="mt-4 text-xl font-semibold">No products found</h2>
-          <p className="text-muted-foreground mt-2">
-            Try adjusting your search or filter criteria.
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <Package className="h-12 w-12 text-[#525252]" />
+          <h2 className="mt-4 text-lg font-bold">Нічого не знайдено</h2>
+          <p className="mt-2 text-sm text-[#a3a3a3]">
+            Спробуйте змінити фільтри або пошуковий запит.
           </p>
-          <Button variant="outline" className="mt-4" onClick={clearFilters}>
-            Clear Filters
-          </Button>
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="mt-6 rounded-[10px] border border-[#333] px-5 py-2.5 text-[13px] font-bold"
+          >
+            Скинути фільтри
+          </button>
         </div>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-[repeat(auto-fill,minmax(240px,1fr))] md:gap-5">
           {products.map((product, index) => (
             <div
               key={product.id}
@@ -439,7 +277,10 @@ function ProductsContentInner() {
                 )
               }
             >
-              <ProductCard product={product} />
+              <ProductCard
+                product={product}
+                onQuickView={(opts) => setQuickView({ product, focusSizes: opts.focusSizes })}
+              />
             </div>
           ))}
         </div>
@@ -447,53 +288,82 @@ function ProductsContentInner() {
 
       {/* Pagination */}
       {pagination.totalPages > 1 && (
-        <div className="mt-8 flex items-center justify-center gap-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePageChange(pagination.page - 1)}
-            disabled={!pagination.hasPrev}
-          >
-            <ChevronLeft className="mr-1 h-4 w-4" />
-            Previous
-          </Button>
-          <span className="text-muted-foreground text-sm">
-            Page {pagination.page} of {pagination.totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePageChange(pagination.page + 1)}
-            disabled={!pagination.hasNext}
-          >
-            Next
-            <ChevronRight className="ml-1 h-4 w-4" />
-          </Button>
+        <div className="mt-10 flex items-center justify-center gap-2 text-[13.5px] font-bold text-[#a3a3a3]">
+          {pagination.hasPrev && (
+            <button
+              type="button"
+              aria-label="Попередня сторінка"
+              onClick={() => handlePageChange(pagination.page - 1)}
+              className="flex h-9 w-9 items-center justify-center rounded-[9px] border border-[#262626]"
+            >
+              ←
+            </button>
+          )}
+          {getPageNumbers(pagination.page, pagination.totalPages).map((p, i) =>
+            p === "ellipsis" ? (
+              <span
+                key={`ellipsis-${i}`}
+                className="flex h-9 w-9 items-center justify-center"
+                aria-hidden="true"
+              >
+                …
+              </span>
+            ) : (
+              <button
+                key={p}
+                type="button"
+                aria-current={p === pagination.page ? "page" : undefined}
+                onClick={() => handlePageChange(p)}
+                className={cn(
+                  "flex h-9 w-9 items-center justify-center rounded-[9px] border",
+                  p === pagination.page
+                    ? "border-[#333] bg-white text-black"
+                    : "border-[#262626] text-[#a3a3a3]"
+                )}
+              >
+                {p}
+              </button>
+            )
+          )}
+          {pagination.hasNext && (
+            <button
+              type="button"
+              aria-label="Наступна сторінка"
+              onClick={() => handlePageChange(pagination.page + 1)}
+              className="flex h-9 w-9 items-center justify-center rounded-[9px] border border-[#262626]"
+            >
+              →
+            </button>
+          )}
         </div>
       )}
+
+      <QuickViewDialog
+        product={quickView?.product ?? null}
+        focusSizes={quickView?.focusSizes ?? false}
+        onOpenChange={(open) => !open && setQuickView(null)}
+      />
     </div>
   );
 }
 
 function ProductsLoadingSkeleton() {
   return (
-    <div className="container py-8">
-      <div className="mb-8">
-        <div className="bg-muted h-9 w-32 animate-pulse rounded" />
-        <div className="bg-muted mt-2 h-5 w-48 animate-pulse rounded" />
+    <div className="container py-10">
+      <div className="mb-2.5 h-3 w-24 animate-pulse rounded bg-[#1a1a1a]" />
+      <div className="mb-7 h-10 w-56 animate-pulse rounded bg-[#1a1a1a]" />
+      <div className="mb-8 flex gap-2.5">
+        <div className="h-10 w-24 animate-pulse rounded-[10px] bg-[#1a1a1a]" />
+        <div className="h-10 w-24 animate-pulse rounded-[10px] bg-[#1a1a1a]" />
+        <div className="h-10 w-40 animate-pulse rounded-[10px] bg-[#1a1a1a]" />
       </div>
-      <div className="mb-6 flex gap-4">
-        <div className="bg-muted h-10 max-w-md flex-1 animate-pulse rounded" />
-        <div className="bg-muted h-10 w-[180px] animate-pulse rounded" />
-        <div className="bg-muted h-10 w-[160px] animate-pulse rounded" />
-      </div>
-      <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-[repeat(auto-fill,minmax(240px,1fr))] md:gap-5">
         {Array.from({ length: 12 }).map((_, i) => (
-          <div key={i} className="overflow-hidden rounded-lg border">
-            <div className="bg-muted aspect-square animate-pulse" />
+          <div key={i} className="overflow-hidden rounded-2xl border border-[#1a1a1a] bg-[#0d0d0d]">
+            <div className="aspect-square animate-pulse bg-[#1a1a1a]" />
             <div className="space-y-2 p-4">
-              <div className="bg-muted h-4 w-3/4 animate-pulse rounded" />
-              <div className="bg-muted h-5 w-1/3 animate-pulse rounded" />
+              <div className="h-4 w-3/4 animate-pulse rounded bg-[#1a1a1a]" />
+              <div className="h-5 w-1/3 animate-pulse rounded bg-[#1a1a1a]" />
             </div>
           </div>
         ))}
