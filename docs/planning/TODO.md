@@ -8,7 +8,7 @@ Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-
 
 ## 📋 Planned (v1.3 — "Mirox Rebrand Demo")
 
-_TASK-057 (Mirox design adoption) completed 2026-07-31 — PR [#24](https://github.com/GoodAlex223/dropshipping-test/pull/24) merged `f9ceb97`; see [DONE.md](DONE.md). The user-approved **prod re-seed** (`SEED_ALLOW_REMOTE=1`) remains a separate explicitly-gated step — prod still serves the electronics catalog until it runs._
+_TASK-057 (Mirox design adoption) completed 2026-07-31 — PR [#24](https://github.com/GoodAlex223/dropshipping-test/pull/24) merged `f9ceb97`; see [DONE.md](DONE.md). The user-approved **prod re-seed** ran the same day (`SEED_ALLOW_REMOTE=1` against the Neon direct endpoint): prod now serves the Mirox clothing catalog (8 products, UAH), verified live via API/PDP/homepage._
 
 #### [TASK-036] Catalog redesign + filters
 

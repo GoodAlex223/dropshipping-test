@@ -42,12 +42,12 @@
 
 ## 🚧 Blockers & Risks
 
-| Blocker                          | Impact                                                                      | Mitigation                                                                           | Owner  |
-| -------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ------ |
-| ~~TASK-057 not yet merged~~      | Resolved 2026-07-31 — PR #24 merged `f9ceb97`; TASK-036/037 unblocked       | —                                                                                    | Claude |
-| Prod re-seed not yet run         | Prod DB still serves the electronics catalog under the Mirox storefront     | User-approved `SEED_ALLOW_REMOTE=1` re-seed, gated on explicit approval              | User   |
-| Client content inventory pending | Real photography, logo vector, real socials/claims, size charts, legal copy | TASK-056 consolidates the ask; TASK-057 shipped generated placeholders as an interim | User   |
-| Client payments prerequisites    | TASK-048 gateway pick blocked                                               | 9-item checklist (decision doc §5.3) — chase before v1.4                             | User   |
+| Blocker                          | Impact                                                                         | Mitigation                                                                           | Owner  |
+| -------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ | ------ |
+| ~~TASK-057 not yet merged~~      | Resolved 2026-07-31 — PR #24 merged `f9ceb97`; TASK-036/037 unblocked          | —                                                                                    | Claude |
+| ~~Prod re-seed not yet run~~     | Resolved 2026-07-31 — user-approved re-seed ran; prod serves the Mirox catalog | Verified live: 8 MRX products via API, PDP 200, homepage UAH/Ukrainian content       | User   |
+| Client content inventory pending | Real photography, logo vector, real socials/claims, size charts, legal copy    | TASK-056 consolidates the ask; TASK-057 shipped generated placeholders as an interim | User   |
+| Client payments prerequisites    | TASK-048 gateway pick blocked                                                  | 9-item checklist (decision doc §5.3) — chase before v1.4                             | User   |
 
 ---
 
@@ -88,7 +88,7 @@
 **Preparation Needed**:
 
 - [x] Push `feat/task-057-design-adoption`, open the PR (#24), run `/code-review` (sub-threshold findings listed in chat and addressed)
-- [ ] User-approved prod re-seed (`SEED_ALLOW_REMOTE=1` against the prod `DIRECT_URL`) — only after the Vercel deploy is verified serving the merged branch
+- [x] User-approved prod re-seed (`SEED_ALLOW_REMOTE=1` against the prod `DIRECT_URL`) — ran 2026-07-31 after the deploy was verified serving the merged branch; prod catalog is now Mirox (verified via API/PDP/homepage)
 - [ ] Client content inventory (TASK-056): real photography, logo vector, real follower counts/claim figures, announcement copy, free-shipping threshold, size charts, legal copy — hero/products/logo now have generated placeholders as an interim
 - [ ] **Client answers to the 9-item prerequisites checklist** ([decision doc §5.3](../superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md)) — legal form, tax group, turnover, VAT, current bank, installments, РРО/ПРРО (accountant), NovaPay account, site prerequisites. Until these land, TASK-048 has a decision tree but no single gateway.
 - [ ] **Open the Cloudflare-blocked `developers.novaposhta.ua` from an unblocked network** to settle whether the classic API has a status webhook — gates TASK-049's polling design (decision doc §6.6)
