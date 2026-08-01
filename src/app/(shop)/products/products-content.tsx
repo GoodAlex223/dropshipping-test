@@ -37,6 +37,20 @@ interface PaginatedResponse {
 }
 
 /**
+ * Parses a minPrice/maxPrice query param into a finite number, or null.
+ * `Number("")` is 0 and `Number("abc")` is NaN — a malformed/garbage URL
+ * (hand-edited, or a stale bookmark) must not feed NaN into the price
+ * slider's `[minPrice ?? 0, maxPrice ?? PRICE_MAX]` range (final-review
+ * Fix 3): `Number.isFinite` rejects NaN and ±Infinity alike, falling back to
+ * null (== "no filter") for anything that isn't a real number.
+ */
+function parseNumericParam(value: string | null): number | null {
+  if (!value) return null;
+  const num = Number(value);
+  return Number.isFinite(num) ? num : null;
+}
+
+/**
  * All page numbers when there are 7 or fewer; otherwise the first and last
  * page plus a window of `current ± 2`, with an "ellipsis" marker filling any
  * gap so the sequence never looks like it skipped pages silently.
@@ -198,8 +212,8 @@ function ProductsContentInner() {
     color: searchParams?.get("color") || null,
     brand: searchParams?.get("brand") || null,
     inStock: searchParams?.get("inStock") === "true",
-    minPrice: searchParams?.get("minPrice") ? Number(searchParams.get("minPrice")) : null,
-    maxPrice: searchParams?.get("maxPrice") ? Number(searchParams.get("maxPrice")) : null,
+    minPrice: parseNumericParam(searchParams?.get("minPrice") ?? null),
+    maxPrice: parseNumericParam(searchParams?.get("maxPrice") ?? null),
     search: searchParams?.get("search") || null,
     category: searchParams?.get("category") || null,
     sort,

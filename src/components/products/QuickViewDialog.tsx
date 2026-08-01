@@ -47,24 +47,43 @@ export function QuickViewDialog({ product, focusSizes, onOpenChange }: QuickView
   const addItem = useCartStore((state) => state.addItem);
   const openCart = useCartStore((state) => state.openCart);
 
-  // Reset the size selection (and carousel position) whenever a different
-  // product opens. Adjusting state during render (rather than in a
+  // Reset the size selection (and carousel position/pause state) whenever a
+  // different product opens. Adjusting state during render (rather than in a
   // useEffect) avoids the extra commit-then-recommit cascade React flags for
   // effect-based resets.
+  //
+  // isCarouselPaused reset (final-review Fix 2): without this, closing the
+  // dialog while the pointer sits over an arrow (which sets isCarouselPaused
+  // via onMouseEnter) leaves it `true` forever — the mouseleave that would
+  // normally clear it never fires because the button unmounts with the
+  // dialog first. The next product to open would then never auto-advance.
   const [lastProductId, setLastProductId] = useState<string | null>(product?.id ?? null);
   if ((product?.id ?? null) !== lastProductId) {
     setLastProductId(product?.id ?? null);
     setSelectedSizeId(null);
     setActiveImageIndex(0);
+    setIsCarouselPaused(false);
   }
 
   const images = product?.images ?? [];
   const hasMultipleImages = images.length > 1;
 
   // Auto-advance while the dialog is open (a product is set) for a genuine
-  // multi-image product; hovering either arrow pauses it.
+  // multi-image product; hovering either arrow pauses it. Also bails under
+  // prefers-reduced-motion (final-review Fix 5), checked lazily right here
+  // rather than stored in state — read once per effect run is enough since
+  // manual arrow clicks keep working regardless. Fails open (autoplay runs)
+  // when matchMedia isn't available at all (SSR / this repo's jsdom test
+  // environment), matching ProductCard's same gate.
   useEffect(() => {
     if (!product || !hasMultipleImages || isCarouselPaused) return;
+    if (
+      typeof window !== "undefined" &&
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
     const id = setInterval(() => {
       setActiveImageIndex((i) => (i + 1) % images.length);
     }, CAROUSEL_INTERVAL_MS);

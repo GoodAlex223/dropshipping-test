@@ -117,11 +117,9 @@ export async function getSalesRanking(windowDays = 90, take?: number): Promise<s
  * Real bestsellers: units sold per product over a trailing window, counting
  * only orders that stuck. Backfills from new arrivals when order history is
  * too thin to fill the rail — the normal state of a new store.
- *
- * This is the shared definition of "popular"; TASK-036 imports it for the
- * catalog sort rather than defining a second one.
  */
-// TASK-036's "popular" sort now imports getSalesRanking() for the same definition.
+// TASK-036's "popular" sort imports getSalesRanking() above for the same
+// definition — this function (getBestsellers) has no catalog consumer.
 export async function getBestsellers(limit = 8, windowDays = 90): Promise<BestsellerResult> {
   const rankedIds = await getSalesRanking(windowDays, limit);
 

@@ -14,6 +14,24 @@ import { ProductImage } from "./ProductImage";
 /** Card-hover carousel autoplay tick, milliseconds (R2). */
 const CAROUSEL_INTERVAL_MS = 1500;
 
+/**
+ * Hover-capability + reduced-motion gates for the card's autoplay interval
+ * (final-review Fix 1 / Fix 5). Both fail OPEN (behave as before) when
+ * `matchMedia` isn't available at all — that's SSR and this repo's jsdom
+ * test environment (which has no `matchMedia` stub), not a real browser; a
+ * real touch-only browser does implement `matchMedia` and correctly reports
+ * `(hover: hover)` as non-matching, so the gate still does its job there.
+ */
+function isHoverCapable(): boolean {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return true;
+  return window.matchMedia("(hover: hover)").matches;
+}
+
+function prefersReducedMotion(): boolean {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 interface ProductVariantOption {
   name: string;
   value: string;
@@ -92,14 +110,20 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
   // Card-hover mini-carousel (R2): auto-advances through product.images
   // while the pointer rests anywhere on the Card (isHovering is set by the
   // Card root's onMouseEnter/onMouseLeave below, not the image div — see
-  // the comment there for why that boundary matters). Arrows/hover are
-  // CSS-gated to md+ (`hidden ... md:flex` below, same idiom as the
-  // quick-action overlay), so touch/mobile never shows arrows; this effect
-  // additionally never starts unless a real `mouseenter` set isHovering,
-  // which touch interactions don't reliably produce (the whole card
-  // navigates away on tap before the interval would ever fire).
+  // the comment there for why that boundary matters). Arrows/hover overlay
+  // are CSS-gated to hover-capable md+ devices (`hidden ...
+  // [@media(hover:hover)]:md:flex` below — final-review Fix 1; a ≥768px
+  // touch tablet gets invisible-but-tappable overlays via WebKit's emulated
+  // :hover rather than a real one), so touch/mobile never shows arrows; this
+  // effect additionally never starts unless a real `mouseenter` set
+  // isHovering, which touch interactions don't reliably produce (the whole
+  // card navigates away on tap before the interval would ever fire) — and,
+  // belt-and-suspenders, explicitly bails on non-hover-capable devices and
+  // on prefers-reduced-motion (final-review Fix 1 / Fix 5), so a touch tap
+  // that does manage to synthesize a mouseenter still can't start it.
   useEffect(() => {
     if (!hasMultipleImages || !isHovering || isArrowPaused) return;
+    if (!isHoverCapable() || prefersReducedMotion()) return;
     const id = setInterval(() => {
       setActiveImageIndex((i) => (i + 1) % images.length);
     }, CAROUSEL_INTERVAL_MS);
@@ -250,14 +274,19 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
 
       {/* Carousel arrows (R2) — Card sibling of the Link for the same reason
           as the quick-action overlay below (buttons can't nest in an <a>).
-          `hidden ... md:flex` keeps them out of the layout entirely below
-          md (touch gets image[0] static, no arrows, per spec), and the
-          opacity/pointer-events pair only lets them intercept clicks once
-          group-hover/group-focus-within actually reveals them — identical
-          gating to the quick-action buttons, so an invisible arrow can never
-          steal a click meant for the card link underneath. */}
+          Gated on hover-capable devices, not just viewport width: plain
+          `md:flex` would also fire on a ≥768px device with no real pointer
+          (a touch tablet); `hidden ... [@media(hover:hover)]:md:flex`
+          (final-review Fix 1) keeps them out of the layout below md AND on
+          any md+ device that can't hover, while a ≥768px touch tablet in
+          WebKit's emulated-:hover mode still gets an invisible-but-tappable
+          overlay per spec. The opacity/pointer-events pair only lets them
+          intercept clicks once group-hover/group-focus-within actually
+          reveals them — identical gating to the quick-action buttons, so an
+          invisible arrow can never steal a click meant for the card link
+          underneath. */}
       {hasMultipleImages && (
-        <div className="pointer-events-none absolute inset-x-0 top-0 hidden aspect-square items-center justify-between px-2 opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100 md:flex">
+        <div className="pointer-events-none absolute inset-x-0 top-0 hidden aspect-square items-center justify-between px-2 opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100 [@media(hover:hover)]:md:flex">
           <button
             type="button"
             aria-label="Попереднє фото"
@@ -293,8 +322,12 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
         </div>
       )}
 
+      {/* Quick-action overlay — same hover-capability gating as the carousel
+          arrows above (final-review Fix 1): `[@media(hover:hover)]:md:flex`
+          instead of plain `md:flex` so a ≥768px touch tablet doesn't get a
+          permanently-visible overlay it can never actually hover off of. */}
       {onQuickView && (
-        <div className="pointer-events-none absolute inset-x-0 top-0 hidden aspect-square items-end justify-center gap-2 p-3 opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100 md:flex">
+        <div className="pointer-events-none absolute inset-x-0 top-0 hidden aspect-square items-end justify-center gap-2 p-3 opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100 [@media(hover:hover)]:md:flex">
           <button
             type="button"
             onClick={(e) => {

@@ -362,11 +362,16 @@ function FiltersSheet({
               minPrice={filters.minPrice}
               maxPrice={filters.maxPrice}
               onApply={(min, max) => {
+                // No setOpen(false) here (final-review Fix 6) — every other
+                // sheet filter (size/color/availability/sort) leaves the
+                // sheet open so a mobile user can apply several filters in
+                // one session; price/brand used to be the odd ones out,
+                // closing on every selection. Desktop's PricePopover keeps
+                // closing on apply (a popover, not a multi-filter sheet).
                 onChange({
                   minPrice: min !== null ? String(min) : null,
                   maxPrice: max !== null ? String(max) : null,
                 });
-                setOpen(false);
               }}
             />
           </div>
@@ -382,10 +387,7 @@ function FiltersSheet({
                     key={b}
                     type="button"
                     aria-pressed={isActive}
-                    onClick={() => {
-                      onChange({ brand: isActive ? null : b });
-                      setOpen(false);
-                    }}
+                    onClick={() => onChange({ brand: isActive ? null : b })}
                     className={cn(
                       "rounded-[8px] border px-3 py-2 text-left text-[13px] font-semibold transition-colors",
                       isActive

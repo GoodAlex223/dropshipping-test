@@ -1,6 +1,29 @@
 import { render, screen, fireEvent, act } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { ProductCard } from "@/components/products/ProductCard";
+
+/**
+ * jsdom (this repo's test environment) has no `matchMedia` at all — see
+ * tests/unit/fade-in.test.tsx for the same pattern. `hoverCapable`/
+ * `reducedMotion` are resolved per query string so a single mock can stand
+ * in for both `(hover: hover)` and `(prefers-reduced-motion: reduce)`
+ * without one setting leaking into the other's result.
+ */
+function mockMatchMedia({
+  hoverCapable = true,
+  reducedMotion = false,
+}: { hoverCapable?: boolean; reducedMotion?: boolean } = {}) {
+  window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+    matches: query.includes("hover") ? hoverCapable : reducedMotion,
+    media: query,
+    onchange: null,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  }));
+}
 
 const base = {
   id: "p1",
@@ -412,5 +435,101 @@ describe("ProductCard — R3 quick-buy cart icon", () => {
     const button = screen.getByRole("button", { name: "В кошик" });
     expect(button).not.toHaveTextContent("В кошик");
     expect(button.querySelector("svg")).toBeInTheDocument();
+  });
+});
+
+describe("ProductCard — final-review Fix 1: hover-capability gating (not just viewport width)", () => {
+  const multi = {
+    ...base,
+    images: [
+      { url: "https://example.com/a.jpg", alt: "front" },
+      { url: "https://example.com/b.jpg", alt: "back" },
+    ],
+  };
+
+  it("gates the quick-action overlay on [@media(hover:hover)]:md:flex, not bare md:flex", () => {
+    render(<ProductCard product={base} onQuickView={vi.fn()} />);
+    const overlay = screen.getByRole("button", { name: "Швидкий перегляд" }).closest("div")!;
+    const classes = overlay.className.split(/\s+/);
+    expect(classes).toContain("hidden");
+    expect(classes).toContain("[@media(hover:hover)]:md:flex");
+    expect(classes).not.toContain("md:flex");
+  });
+
+  it("gates the carousel-arrow overlay on [@media(hover:hover)]:md:flex, not bare md:flex", () => {
+    render(<ProductCard product={multi} />);
+    const overlay = screen.getByRole("button", { name: "Наступне фото" }).closest("div")!;
+    const classes = overlay.className.split(/\s+/);
+    expect(classes).toContain("hidden");
+    expect(classes).toContain("[@media(hover:hover)]:md:flex");
+    expect(classes).not.toContain("md:flex");
+  });
+});
+
+describe("ProductCard — final-review Fix 1 / Fix 5: autoplay gating", () => {
+  afterEach(() => {
+    // Undo the per-test window.matchMedia stub so later tests in this file
+    // (and other files sharing the jsdom window) see the real jsdom default
+    // (undefined) again, not a stale mock's captured matches value —
+    // vi.clearAllMocks() (tests/setup.tsx) only clears call history, not the
+    // assigned implementation.
+    // @ts-expect-error -- deleting a non-optional global for test cleanup
+    delete window.matchMedia;
+  });
+
+  const multi = {
+    ...base,
+    images: [
+      { url: "https://example.com/a.jpg", alt: "front" },
+      { url: "https://example.com/b.jpg", alt: "back" },
+    ],
+  };
+
+  it("does not auto-advance on a non-hover-capable device even after mouseenter", () => {
+    mockMatchMedia({ hoverCapable: false });
+    vi.useFakeTimers();
+    try {
+      render(<ProductCard product={multi} />);
+      const frontWrapper = screen.getByAltText("front").parentElement!;
+      fireEvent.mouseEnter(screen.getByTestId("product-card"));
+      act(() => {
+        vi.advanceTimersByTime(5000);
+      });
+      expect(frontWrapper.className).toContain("opacity-100"); // never advanced
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("does not auto-advance under prefers-reduced-motion even on a hover-capable device", () => {
+    mockMatchMedia({ hoverCapable: true, reducedMotion: true });
+    vi.useFakeTimers();
+    try {
+      render(<ProductCard product={multi} />);
+      const frontWrapper = screen.getByAltText("front").parentElement!;
+      fireEvent.mouseEnter(screen.getByTestId("product-card"));
+      act(() => {
+        vi.advanceTimersByTime(5000);
+      });
+      expect(frontWrapper.className).toContain("opacity-100"); // never advanced
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("still auto-advances on a hover-capable device with no motion preference", () => {
+    mockMatchMedia({ hoverCapable: true, reducedMotion: false });
+    vi.useFakeTimers();
+    try {
+      render(<ProductCard product={multi} />);
+      const backWrapper = screen.getByAltText("back").parentElement!;
+      fireEvent.mouseEnter(screen.getByTestId("product-card"));
+      act(() => {
+        vi.advanceTimersByTime(1500);
+      });
+      expect(backWrapper.className).toContain("opacity-100");
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

@@ -147,3 +147,72 @@ describe("QuickViewDialog — R2 image carousel", () => {
     expect(backWrapper.className).toContain("opacity-100");
   });
 });
+
+describe("QuickViewDialog — final-review Fix 2: isCarouselPaused reset", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("resumes autoplay for the next product after closing while an arrow was hovered", () => {
+    // Regression for: closing the dialog while the pointer sits over an
+    // arrow (which sets isCarouselPaused via onMouseEnter) never fires that
+    // arrow's onMouseLeave — it unmounts with the dialog — so pre-fix,
+    // isCarouselPaused stayed `true` forever and the next product opened
+    // with a permanently-dead carousel.
+    vi.useFakeTimers();
+    const { rerender } = render(
+      <QuickViewDialog product={multiImageProduct} focusSizes={false} onOpenChange={vi.fn()} />
+    );
+    fireEvent.mouseEnter(screen.getByRole("button", { name: "Наступне фото" }));
+
+    // Close without a mouseleave (parent sets product to null).
+    rerender(<QuickViewDialog product={null} focusSizes={false} onOpenChange={vi.fn()} />);
+
+    // Reopen — same product id, mirroring the real "click quick-view on the
+    // same card again" path, but the reset fires on any id change (including
+    // the close step's transition to null), so this exercises the fix either way.
+    rerender(
+      <QuickViewDialog product={multiImageProduct} focusSizes={false} onOpenChange={vi.fn()} />
+    );
+
+    const backWrapper = screen.getByAltText("back").parentElement!;
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
+    expect(backWrapper.className).toContain("opacity-100");
+  });
+});
+
+describe("QuickViewDialog — final-review Fix 5: reduced motion", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+    // @ts-expect-error -- deleting a non-optional global for test cleanup
+    delete window.matchMedia;
+  });
+
+  it("does not auto-advance under prefers-reduced-motion", () => {
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: query.includes("prefers-reduced-motion"),
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }));
+    vi.useFakeTimers();
+    render(
+      <QuickViewDialog product={multiImageProduct} focusSizes={false} onOpenChange={vi.fn()} />
+    );
+    const backWrapper = screen.getByAltText("back").parentElement!;
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+    expect(backWrapper.className).toContain("opacity-0"); // never advanced
+
+    // Manual arrow click still works under reduced motion (only autoplay is gated).
+    fireEvent.click(screen.getByRole("button", { name: "Наступне фото" }));
+    expect(backWrapper.className).toContain("opacity-100");
+  });
+});

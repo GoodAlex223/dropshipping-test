@@ -32,7 +32,7 @@ describe("home content", () => {
 
   it("uses the homepage-section CTA labels, not the mockup-prompt ones", () => {
     expect(home.hero.primaryCta.href).toBe("/products");
-    expect(home.hero.secondaryCta.href).toBe("/products?sortBy=createdAt&sortOrder=desc");
+    expect(home.hero.secondaryCta.href).toBe("/products?sort=new");
   });
 
   it("configures the hero image at the handoff's path", () => {
