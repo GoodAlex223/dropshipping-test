@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { ProductCard } from "@/components/products/ProductCard";
 
@@ -322,6 +322,87 @@ describe("ProductCard — R2 image carousel", () => {
       expect(classes).toContain("group-hover:pointer-events-auto");
       expect(classes).toContain("group-focus-within:pointer-events-auto");
     }
+  });
+});
+
+describe("ProductCard — fix round 1: hover boundary is the Card root", () => {
+  // Fix-round-1 finding: hover tracking used to live on the image div, but
+  // the arrows/quick-action buttons are absolutely-positioned DOM SIBLINGS
+  // of the Link (stacked visually over the image, structurally not inside
+  // it) — so moving the cursor onto an overlay button fired mouseleave on
+  // the image div in a real browser and reset the carousel before a click
+  // could land. jsdom has no paint/hit-testing model, so it can't reproduce
+  // *that* specific browser behavior (a real-browser Playwright check
+  // covers it — see the revision-1 report). What these tests DO verify,
+  // using real React event-tree semantics that jsdom faithfully implements
+  // (containment, not paint order): the mouseenter/mouseleave handlers are
+  // bound to the Card root, not the image div, and moving onto a
+  // descendant overlay button never fires the Card's mouseleave.
+  const multi = {
+    ...base,
+    images: [
+      { url: "https://example.com/a.jpg", alt: "front" },
+      { url: "https://example.com/b.jpg", alt: "back" },
+    ],
+  };
+
+  it("starts autoplay when the Card root itself is entered (not just the image area)", () => {
+    vi.useFakeTimers();
+    try {
+      render(<ProductCard product={multi} />);
+      const frontWrapper = screen.getByAltText("front").parentElement!;
+      const backWrapper = screen.getByAltText("back").parentElement!;
+
+      // Firing mouseEnter directly on the Card root only reaches a handler
+      // that's actually bound there (or an ancestor) — a handler left on
+      // the image div (a descendant) would never see this event, so this
+      // fails against the pre-fix code.
+      fireEvent.mouseEnter(screen.getByTestId("product-card"));
+      act(() => {
+        vi.advanceTimersByTime(1500);
+      });
+
+      expect(frontWrapper.className).toContain("opacity-0");
+      expect(backWrapper.className).toContain("opacity-100");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("does not reset to image[0] when the cursor moves onto a descendant overlay arrow", () => {
+    vi.useFakeTimers();
+    try {
+      render(<ProductCard product={multi} />);
+      const frontWrapper = screen.getByAltText("front").parentElement!;
+      const backWrapper = screen.getByAltText("back").parentElement!;
+
+      fireEvent.mouseEnter(screen.getByTestId("product-card"));
+      act(() => {
+        vi.advanceTimersByTime(1500);
+      });
+      expect(backWrapper.className).toContain("opacity-100"); // advanced past image[0]
+
+      // The arrow button is a Card descendant (sibling of the Link, not of
+      // the image div) — entering it must never look like leaving the Card.
+      fireEvent.mouseEnter(screen.getByRole("button", { name: "Наступне фото" }));
+
+      expect(frontWrapper.className).toContain("opacity-0");
+      expect(backWrapper.className).toContain("opacity-100"); // still on image[1], not reset
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("resets to image[0] only when the cursor actually leaves the Card", () => {
+    render(<ProductCard product={multi} />);
+    const frontWrapper = screen.getByAltText("front").parentElement!;
+
+    fireEvent.click(screen.getByRole("button", { name: "Наступне фото" })); // move off image[0]
+    expect(frontWrapper.className).toContain("opacity-0");
+
+    fireEvent.mouseLeave(screen.getByTestId("product-card"));
+
+    expect(frontWrapper.className).toContain("opacity-100"); // back to image[0]
   });
 });
 

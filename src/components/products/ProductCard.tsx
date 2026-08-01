@@ -90,12 +90,14 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
   const [isArrowPaused, setIsArrowPaused] = useState(false);
 
   // Card-hover mini-carousel (R2): auto-advances through product.images
-  // while the pointer rests over the card. Arrows/hover are CSS-gated to
-  // md+ (`hidden ... md:flex` below, same idiom as the quick-action
-  // overlay), so touch/mobile never shows arrows; this effect additionally
-  // never starts unless a real `mouseenter` set isHovering, which touch
-  // interactions don't reliably produce (the whole card navigates away on
-  // tap before the interval would ever fire).
+  // while the pointer rests anywhere on the Card (isHovering is set by the
+  // Card root's onMouseEnter/onMouseLeave below, not the image div — see
+  // the comment there for why that boundary matters). Arrows/hover are
+  // CSS-gated to md+ (`hidden ... md:flex` below, same idiom as the
+  // quick-action overlay), so touch/mobile never shows arrows; this effect
+  // additionally never starts unless a real `mouseenter` set isHovering,
+  // which touch interactions don't reliably produce (the whole card
+  // navigates away on tap before the interval would ever fire).
   useEffect(() => {
     if (!hasMultipleImages || !isHovering || isArrowPaused) return;
     const id = setInterval(() => {
@@ -125,6 +127,24 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
     <Card
       className="group hover-lift relative flex h-full flex-col overflow-hidden shadow-[var(--shadow-soft)]"
       data-testid="product-card"
+      // Hover tracking lives on the Card root, not the image div (fix
+      // round 1): the carousel arrows and quick-action buttons are
+      // absolutely-positioned DOM SIBLINGS of the Link, stacked visually
+      // over the image but structurally children of this Card. If hover
+      // tracking were on the image div alone, moving the cursor from the
+      // image onto an overlay button would fire mouseleave on the image div
+      // (the button becomes the new hit-test target) and reset the
+      // carousel back to image[0] / stop autoplay before the user could
+      // ever click an arrow. Anchoring both the mouseenter/mouseleave
+      // tracking AND the group-hover CSS that reveals the overlays (see
+      // `group` above) to this same Card boundary means moving onto any
+      // overlay button — or the text area below the image — never counts
+      // as leaving; only actually leaving the Card's rectangle does.
+      onMouseEnter={() => hasMultipleImages && setIsHovering(true)}
+      onMouseLeave={() => {
+        setIsHovering(false);
+        setActiveImageIndex(0);
+      }}
     >
       {/* Whole card is one link, per the design handoff (its product card is
           a single <a>) — no separate footer CTA, no nested category link
@@ -144,14 +164,7 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
         className="flex flex-1 flex-col"
         aria-label={product.name}
       >
-        <div
-          className="bg-muted relative aspect-square overflow-hidden"
-          onMouseEnter={() => hasMultipleImages && setIsHovering(true)}
-          onMouseLeave={() => {
-            setIsHovering(false);
-            setActiveImageIndex(0);
-          }}
-        >
+        <div className="bg-muted relative aspect-square overflow-hidden">
           {images.length > 0 ? (
             images.map((image, index) => (
               <div
