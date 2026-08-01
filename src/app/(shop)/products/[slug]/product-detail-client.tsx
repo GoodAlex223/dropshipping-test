@@ -157,6 +157,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
 
   const handleBuyNow = () => {
     if (outOfStock || isAddingToCart) return;
+    setIsAddingToCart(true);
     addLine();
     router.push("/checkout");
   };
@@ -239,8 +240,8 @@ export function ProductDetailClient({ product }: { product: Product }) {
                   <span
                     aria-label={`Колір: ${product.colorValue} (обраний)`}
                     className={cn(
-                      "h-9 w-9 rounded-full border-2 border-white",
-                      COLOR_SWATCH_CLASSES[product.colorValue] ?? "bg-muted"
+                      COLOR_SWATCH_CLASSES[product.colorValue] ?? "bg-muted",
+                      "h-9 w-9 rounded-full border-2 border-white"
                     )}
                   />
                 )}

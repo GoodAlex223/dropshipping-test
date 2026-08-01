@@ -102,10 +102,29 @@ describe("ProductDetailClient (TASK-037)", () => {
     expect(useCartStore.getState().items).toHaveLength(1);
   });
 
+  it("«КУПИТИ ЗАРАЗ» double-tap adds only one line — busy flag guards against a second addLine", async () => {
+    render(<ProductDetailClient product={makeProduct()} />);
+    const buyButton = screen.getByRole("button", { name: "КУПИТИ ЗАРАЗ" });
+    fireEvent.click(buyButton);
+    fireEvent.click(buyButton);
+    await vi.waitFor(() => expect(push).toHaveBeenCalled());
+    const items = useCartStore.getState().items;
+    expect(items).toHaveLength(1);
+    expect(items[0].quantity).toBe(1);
+    expect(buyButton).toBeDisabled();
+  });
+
   it("sibling colorway renders as a link to its PDP", () => {
     render(<ProductDetailClient product={makeProduct()} />);
     const link = screen.getByRole("link", { name: /Білий — Худі Mirox White/ });
     expect(link).toHaveAttribute("href", "/products/hudi-mirox-white");
+  });
+
+  it("active colorway swatch keeps the white active border after tailwind-merge (bg class must also survive)", () => {
+    render(<ProductDetailClient product={makeProduct()} />);
+    const swatch = screen.getByLabelText("Колір: Чорний (обраний)");
+    expect(swatch.className).toContain("border-white");
+    expect(swatch.className).toContain("bg-black");
   });
 
   it("low stock (≤5) shows «Залишилось N шт», in-stock shows «В наявності»", () => {
