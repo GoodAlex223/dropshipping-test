@@ -47,7 +47,7 @@ test.describe("Homepage", () => {
     // only cookie-consent banner before clicking.
     await page.getByRole("button", { name: "Decline" }).waitFor();
     await page.getByRole("link", { name: "ПЕРЕГЛЯНУТИ НОВИНКИ" }).first().click();
-    await expect(page).toHaveURL(/sortBy=createdAt&sortOrder=desc/);
+    await expect(page).toHaveURL(/sort=new/);
   });
 
   test("shows the why-choose-us block", async ({ page }) => {

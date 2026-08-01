@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";
+import { getSalesRanking } from "@/lib/product-queries";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,24 @@ function getPagination(searchParams: URLSearchParams): PaginationParams {
   return { page, limit, skip };
 }
 
+const LIST_SELECT = {
+  id: true,
+  name: true,
+  slug: true,
+  shortDesc: true,
+  price: true,
+  comparePrice: true,
+  stock: true,
+  isFeatured: true,
+  createdAt: true,
+  category: { select: { id: true, name: true, slug: true } },
+  images: {
+    select: { id: true, url: true, alt: true },
+    orderBy: { position: "asc" as const },
+  },
+  variants: { select: { id: true, name: true, value: true, stock: true, price: true } },
+};
+
 // GET /api/products - Public product listing
 export async function GET(request: NextRequest) {
   try {
@@ -29,8 +48,6 @@ export async function GET(request: NextRequest) {
     const minPrice = searchParams.get("minPrice");
     const maxPrice = searchParams.get("maxPrice");
     const featured = searchParams.get("featured");
-    const sortBy = searchParams.get("sortBy") || "createdAt";
-    const sortOrder = searchParams.get("sortOrder") || "desc";
 
     // Build where clause - only active products
     const where: Prisma.ProductWhereInput = {
@@ -61,40 +78,89 @@ export async function GET(request: NextRequest) {
       where.isFeatured = true;
     }
 
-    // Build order by
-    const orderBy: Prisma.ProductOrderByWithRelationInput = {};
-    const validSortFields = ["name", "price", "createdAt"];
-    if (validSortFields.includes(sortBy)) {
-      orderBy[sortBy as keyof Prisma.ProductOrderByWithRelationInput] =
-        sortOrder === "asc" ? "asc" : "desc";
+    // Filter by variants (size, color)
+    const size = searchParams.get("size");
+    const color = searchParams.get("color");
+    const brand = searchParams.get("brand");
+    const inStock = searchParams.get("inStock");
+
+    const variantConditions: Prisma.ProductWhereInput[] = [];
+    if (size) {
+      variantConditions.push({ variants: { some: { name: "Size", value: size } } });
+    }
+    if (color) {
+      variantConditions.push({ variants: { some: { name: "Color", value: color } } });
+    }
+    if (variantConditions.length > 0) {
+      where.AND = variantConditions;
+    }
+    if (brand) {
+      where.brand = brand;
+    }
+    if (inStock === "true") {
+      where.stock = { gt: 0 };
     }
 
-    // Execute queries
-    const [products, total] = await Promise.all([
-      prisma.product.findMany({
-        where,
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          shortDesc: true,
-          price: true,
-          comparePrice: true,
-          stock: true,
-          isFeatured: true,
-          category: { select: { id: true, name: true, slug: true } },
-          images: {
-            select: { id: true, url: true, alt: true },
-            orderBy: { position: "asc" },
-            take: 1,
-          },
-        },
-        orderBy,
-        skip,
-        take: limit,
-      }),
-      prisma.product.count({ where }),
-    ]);
+    // Sort
+    const VALID_SORTS = ["new", "popular", "price-asc", "price-desc"] as const;
+    const sortParam = searchParams.get("sort");
+    const sort = (VALID_SORTS as readonly string[]).includes(sortParam ?? "")
+      ? (sortParam as (typeof VALID_SORTS)[number])
+      : sortParam !== null
+        ? "new" // explicit but invalid → default
+        : null; // absent → legacy path
+
+    let products;
+    let total: number;
+
+    if (sort === "popular") {
+      const [rankedIds, matching, matchTotal] = await Promise.all([
+        getSalesRanking(90),
+        prisma.product.findMany({ where, select: { id: true, createdAt: true } }),
+        prisma.product.count({ where }),
+      ]);
+      const rank = new Map(rankedIds.map((id, index) => [id, index]));
+      const pageIds = matching
+        .sort((a, b) => {
+          const ra = rank.get(a.id);
+          const rb = rank.get(b.id);
+          if (ra !== undefined && rb !== undefined) return ra - rb;
+          if (ra !== undefined) return -1;
+          if (rb !== undefined) return 1;
+          return b.createdAt.getTime() - a.createdAt.getTime();
+        })
+        .slice(skip, skip + limit)
+        .map((p) => p.id);
+      const rows = await prisma.product.findMany({
+        where: { id: { in: pageIds } },
+        select: LIST_SELECT,
+      });
+      // `in` does not preserve order — re-impose the page order.
+      const byId = new Map(rows.map((r) => [r.id, r]));
+      products = pageIds.map((id) => byId.get(id)).filter((p) => p !== undefined);
+      total = matchTotal;
+    } else {
+      const orderBy: Prisma.ProductOrderByWithRelationInput = {};
+      if (sort === "price-asc") orderBy.price = "asc";
+      else if (sort === "price-desc") orderBy.price = "desc";
+      else if (sort === "new") orderBy.createdAt = "desc";
+      else {
+        // Legacy path (sort absent): sortBy/sortOrder exactly as before.
+        const sortBy = searchParams.get("sortBy") || "createdAt";
+        const sortOrder = searchParams.get("sortOrder") || "desc";
+        const validSortFields = ["name", "price", "createdAt"];
+        if (validSortFields.includes(sortBy)) {
+          orderBy[sortBy as keyof Prisma.ProductOrderByWithRelationInput] =
+            sortOrder === "asc" ? "asc" : "desc";
+        }
+      }
+      const [rows, rowTotal] = await Promise.all([
+        prisma.product.findMany({ where, select: LIST_SELECT, orderBy, skip, take: limit }),
+        prisma.product.count({ where }),
+      ]);
+      products = rows;
+      total = rowTotal;
+    }
 
     const totalPages = Math.ceil(total / limit);
 

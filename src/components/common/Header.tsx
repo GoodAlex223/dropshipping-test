@@ -40,8 +40,8 @@ interface Category {
 
 const navigation = [
   { name: "Каталог", href: "/products" },
-  { name: "Новинки", href: "/products?sortBy=createdAt&sortOrder=desc" },
-  { name: "Бестселери", href: "/products?featured=true" },
+  { name: "Новинки", href: "/products?sort=new" },
+  { name: "Бестселери", href: "/products?sort=popular" },
 ];
 
 export function Header() {
@@ -320,7 +320,12 @@ export function Header() {
         {/* Actions */}
         <div className="flex items-center gap-2">
           {/* Search Button */}
-          <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setSearchOpen(true)}
+            aria-label="Пошук"
+          >
             <Search className="h-5 w-5" />
             <span className="sr-only">Search (Ctrl+K)</span>
           </Button>

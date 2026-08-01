@@ -14,6 +14,7 @@ export interface ProductCardData {
   comparePrice: string | null;
   stock: number;
   isFeatured: boolean;
+  createdAt: Date | string;
   category: { name: string; slug: string };
   images: { url: string; alt: string | null }[];
   /** Every variant row (Size and Color alike) — <ProductCard> filters to Size itself. */
@@ -37,6 +38,7 @@ const PRODUCT_CARD_SELECT = {
   comparePrice: true,
   stock: true,
   isFeatured: true,
+  createdAt: true,
   category: { select: { name: true, slug: true } },
   images: {
     select: { url: true, alt: true },
@@ -91,15 +93,11 @@ export interface BestsellerResult {
 }
 
 /**
- * Real bestsellers: units sold per product over a trailing window, counting
- * only orders that stuck. Backfills from new arrivals when order history is
- * too thin to fill the rail — the normal state of a new store.
- *
- * This is the shared definition of "popular"; TASK-036 imports it for the
- * catalog sort rather than defining a second one.
+ * Product IDs ranked by units sold (desc) over a trailing window, counting
+ * only orders that stuck. Shared by getBestsellers() and the catalog's
+ * `sort=popular` (/api/products) so "popular" has exactly one definition.
  */
-// No homepage consumer since TASK-057; TASK-036's "popular" sort is the intended next consumer.
-export async function getBestsellers(limit = 8, windowDays = 90): Promise<BestsellerResult> {
+export async function getSalesRanking(windowDays = 90, take?: number): Promise<string[]> {
   const since = new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000);
 
   const grouped = await prisma.orderItem.groupBy({
@@ -109,10 +107,21 @@ export async function getBestsellers(limit = 8, windowDays = 90): Promise<Bestse
     },
     _sum: { quantity: true },
     orderBy: { _sum: { quantity: "desc" } },
-    take: limit,
+    ...(take !== undefined ? { take } : {}),
   });
 
-  const rankedIds = grouped.map((group) => group.productId);
+  return grouped.map((group) => group.productId);
+}
+
+/**
+ * Real bestsellers: units sold per product over a trailing window, counting
+ * only orders that stuck. Backfills from new arrivals when order history is
+ * too thin to fill the rail — the normal state of a new store.
+ */
+// TASK-036's "popular" sort imports getSalesRanking() above for the same
+// definition — this function (getBestsellers) has no catalog consumer.
+export async function getBestsellers(limit = 8, windowDays = 90): Promise<BestsellerResult> {
+  const rankedIds = await getSalesRanking(windowDays, limit);
 
   const ranked = rankedIds.length
     ? await prisma.product.findMany({

@@ -34,8 +34,9 @@ components/
 │   ├── ResourceHints.tsx  # Resource hints (preconnect/dns-prefetch for third-party domains)
 │   └── index.ts
 ├── products/
-│   ├── ProductCard.tsx    # Product card (server): monochrome discount badge, price, CTA, soft-shadow + hover-lift; delegates the image to ProductImage
+│   ├── ProductCard.tsx    # Product card ("use client" since TASK-036 revision-1 — the hover image carousel needs interval/state; still rendered from server-tree callers like ProductRail since it only ever receives serializable props there, no onQuickView): equal-height flex layout, monochrome discount badge, price, cart-icon quick-buy CTA, soft-shadow + hover-lift; delegates each image layer to ProductImage
 │   ├── ProductImage.tsx   # "use client" product image: blur placeholder + responsive sizes; renders the branded Mirox "M" fallback on missing/broken src (onError)
+│   ├── QuickViewDialog.tsx  # "use client" quick-view/quick-buy dialog (TASK-036): image carousel (autoplay, reduced-motion gated), size-required add-to-cart → cart store + drawer + GA4 add_to_cart, «Детальніше» PDP link
 │   ├── SocialShareButtons.tsx  # Social media sharing buttons (Facebook, Twitter, Pinterest, WhatsApp, Telegram, copy link, native share)
 │   └── index.ts
 ├── reviews/               # Review components

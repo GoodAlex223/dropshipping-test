@@ -12,7 +12,7 @@ test.describe("Product Browsing", () => {
     await expect(products).toBeVisible();
   });
 
-  test("can filter products by search", async ({ page, isMobile }) => {
+  test("can filter products by search", async ({ page }) => {
     await page.goto("/products");
 
     // Wait for the product grid before interacting with the form. Cards are
@@ -24,46 +24,65 @@ test.describe("Product Browsing", () => {
     // pre-hydration fill() silently no-ops. See BACKLOG.md TASK-038a entry.
     await page.waitForSelector("[data-testid='product-card']");
 
-    // Find search input and search button
+    // Search moved to the Header dialog in TASK-036 (the catalog filter bar
+    // has no search input, per the Mirox mock).
+    await page.getByRole("button", { name: "Пошук" }).first().click();
     const searchInput = page.getByPlaceholder(/search/i);
-
-    if (await searchInput.isVisible()) {
-      await searchInput.fill("test");
-
-      if (isMobile) {
-        // On mobile, submit the form via keyboard since button may have touch issues
-        await searchInput.press("Enter");
-        // Wait for URL to update with timeout
-        await page.waitForURL(/search=test/, { timeout: 15000 });
-      } else {
-        // On desktop, click the search button
-        const searchButton = page.getByRole("button", { name: "Search", exact: true });
-        await Promise.all([
-          page.waitForURL(/search=test/, { timeout: 10000 }),
-          searchButton.click(),
-        ]);
-      }
-
-      // URL should have updated with search param
-      await expect(page).toHaveURL(/search=test/);
-    }
+    await searchInput.fill("test");
+    await searchInput.press("Enter");
+    await page.waitForURL(/search=test/, { timeout: 15000 });
+    await expect(page).toHaveURL(/search=test/);
   });
 
-  test("can sort products", async ({ page }) => {
+  test("can sort products", async ({ page, isMobile }) => {
     await page.goto("/products");
+    await page.waitForSelector("[data-testid='product-card']");
 
-    // Find sort dropdown
-    const sortTrigger = page.getByRole("combobox").first();
-
-    if (await sortTrigger.isVisible()) {
-      await sortTrigger.click();
-
-      // Select a sort option
-      const priceOption = page.getByRole("option", { name: /price/i }).first();
-      if (await priceOption.isVisible()) {
-        await priceOption.click();
-      }
+    // R5: below md the inline "Сортування" row is CSS-hidden — sort now
+    // lives only inside the «Фільтри» sheet's own Сортування section.
+    // Scope the click to the sheet (role="dialog") since the hidden inline
+    // row's buttons are still present in the DOM (just not visible) and
+    // share the same accessible names.
+    if (isMobile) {
+      await page.getByRole("button", { name: "Фільтри" }).click();
+      const sheet = page.getByRole("dialog");
+      await Promise.all([
+        page.waitForURL(/sort=price-asc/, { timeout: 15000 }),
+        sheet.getByRole("button", { name: "Ціна ↑" }).click(),
+      ]);
+    } else {
+      await Promise.all([
+        page.waitForURL(/sort=price-asc/, { timeout: 15000 }),
+        page.getByRole("button", { name: "Ціна ↑" }).click(),
+      ]);
     }
+
+    await page.waitForSelector("[data-testid='product-card']");
+    await expect(page).toHaveURL(/sort=price-asc/);
+  });
+
+  test("size filter chip updates URL and grid", async ({ page, isMobile }) => {
+    await page.goto("/products");
+    await page.waitForSelector("[data-testid='product-card']");
+
+    // R5: below md the inline size chip row is CSS-hidden — same "M" name
+    // exists twice in the DOM (hidden inline row + sheet row), so the mobile
+    // branch opens the sheet first and scopes the click to it.
+    if (isMobile) {
+      await page.getByRole("button", { name: "Фільтри" }).click();
+      const sheet = page.getByRole("dialog");
+      await Promise.all([
+        page.waitForURL(/size=M/, { timeout: 15000 }),
+        sheet.getByRole("button", { name: "M", exact: true }).click(),
+      ]);
+    } else {
+      await Promise.all([
+        page.waitForURL(/size=M/, { timeout: 15000 }),
+        page.getByRole("button", { name: "M", exact: true }).first().click(),
+      ]);
+    }
+
+    await page.waitForSelector("[data-testid='product-card']");
   });
 
   test("can view product details", async ({ page }) => {
@@ -72,9 +91,20 @@ test.describe("Product Browsing", () => {
     // Wait for products to load
     await page.waitForSelector("[data-testid='product-card']");
 
-    // Click on first product link
-    const productLink = page.locator("[data-testid='product-card'] a").first();
-    await productLink.click();
+    // Click the product name inside the first card's link, not a blind
+    // center-of-card click: the whole card is one <a>, but ProductCard's
+    // desktop hover overlay (quick-view/quick-buy buttons) absolutely
+    // covers the image area and legitimately becomes pointer-events-auto
+    // once the mouse actually hovers there — same as a real user's cursor
+    // would trigger it. Playwright's default click point is the bounding
+    // box's geometric center, which for this card layout lands inside the
+    // image, right where those buttons sit, so it would hover-reveal and
+    // then click the button instead of navigating. The heading text sits
+    // in CardContent, below the image, outside the overlay's aspect-square
+    // footprint (see ProductCard.tsx) — clicking there is unambiguously
+    // "click the product link," bubbling up to the enclosing <a>.
+    const productCard = page.locator("[data-testid='product-card']").first();
+    await productCard.getByRole("heading").click();
 
     // Should be on product detail page
     await expect(page).toHaveURL(/\/products\/[^/]+$/);
@@ -86,8 +116,9 @@ test.describe("Product Browsing", () => {
   test("product detail shows price", async ({ page }) => {
     await page.goto("/products");
 
-    // Navigate to first product
-    await page.locator("[data-testid='product-card'] a").first().click();
+    // Navigate to first product — see the comment on "can view product
+    // details" above for why this clicks the heading rather than the card.
+    await page.locator("[data-testid='product-card']").first().getByRole("heading").click();
 
     // Wait for product page to load
     await expect(page).toHaveURL(/\/products\/[^/]+$/);
@@ -101,7 +132,7 @@ test.describe("Product Browsing", () => {
 
     // Wait for products and navigate to first product
     await page.waitForSelector("[data-testid='product-card']");
-    await page.locator("[data-testid='product-card'] a").first().click();
+    await page.locator("[data-testid='product-card']").first().getByRole("heading").click();
 
     // Wait for product page to load
     await expect(page).toHaveURL(/\/products\/[^/]+$/);

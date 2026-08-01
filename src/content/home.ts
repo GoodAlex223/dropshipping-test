@@ -24,7 +24,11 @@ export const home = {
     primaryCta: { label: "ПЕРЕЙТИ В КАТАЛОГ", href: "/products" },
     secondaryCta: {
       label: "ПЕРЕГЛЯНУТИ НОВИНКИ",
-      href: "/products?sortBy=createdAt&sortOrder=desc",
+      // `sort=new` (final-review Fix 4) — the current catalog sort param,
+      // matching Header.tsx's "Новинки" nav link (retargeted in 36e1737);
+      // the legacy sortBy/sortOrder pair still works (products-content.tsx
+      // forwards it if present) but this CTA should point at the current one.
+      href: "/products?sort=new",
     },
     // Generated placeholder from the design handoff; client photography
     // replaces the file (same path) via TASK-056 — content stays untouched.

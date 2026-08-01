@@ -8,7 +8,12 @@ vi.mock("@/lib/db", () => ({
 }));
 
 import { prisma } from "@/lib/db";
-import { getBestsellers, getFeaturedProducts, getNewArrivals } from "@/lib/product-queries";
+import {
+  getBestsellers,
+  getFeaturedProducts,
+  getNewArrivals,
+  getSalesRanking,
+} from "@/lib/product-queries";
 
 const findMany = prisma.product.findMany as unknown as ReturnType<typeof vi.fn>;
 const groupBy = prisma.orderItem.groupBy as unknown as ReturnType<typeof vi.fn>;
@@ -204,5 +209,29 @@ describe("getBestsellers", () => {
     // the exact case that used to be mislabeled "mixed" (Finding 1).
     expect(result.source).toBe("orders");
     expect(findMany.mock.calls[0][0].where).toEqual(expect.objectContaining({ isActive: true }));
+  });
+});
+
+describe("getSalesRanking", () => {
+  it("returns product ids in sales order without a take when none is given", async () => {
+    groupBy.mockResolvedValue([
+      { productId: "b", _sum: { quantity: 9 } },
+      { productId: "a", _sum: { quantity: 4 } },
+    ]);
+
+    const before = Date.now();
+    const ids = await getSalesRanking(90);
+
+    expect(ids).toEqual(["b", "a"]);
+    const arg = groupBy.mock.calls[0][0];
+    expect(arg.take).toBeUndefined();
+    expect(arg.where.order.status.in).toEqual(["CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED"]);
+    assertWindowGte(arg.where.order.createdAt.gte, 90, before);
+  });
+
+  it("passes take through when given", async () => {
+    groupBy.mockResolvedValue([]);
+    await getSalesRanking(90, 4);
+    expect(groupBy.mock.calls[0][0].take).toBe(4);
   });
 });
