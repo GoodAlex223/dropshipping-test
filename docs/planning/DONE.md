@@ -2,7 +2,29 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-07-31
+**Last Updated**: 2026-08-01
+
+---
+
+## 2026-08 (August)
+
+### [2026-08-01] TASK-036 - Catalog Redesign + Filters
+
+**Plan**: [docs/archive/plans/2026-07-31_task-036-catalog-redesign-filters.md](../archive/plans/2026-07-31_task-036-catalog-redesign-filters.md)
+**Spec**: [2026-07-31-task-036-catalog-redesign-design.md](../superpowers/specs/2026-07-31-task-036-catalog-redesign-design.md) (incl. §8a visual-gate revision round)
+**PR**: [#26](https://github.com/GoodAlex223/dropshipping-test/pull/26) — merged `919906b` (2026-08-01)
+
+**Summary**: `/products` rebuilt to the `Mirox Catalog.dc.html` handoff. `/api/products` gained five combinable filters (`size`/`color`/`brand`/`inStock` + existing) and `sort=new|popular|price-asc|price-desc` (`popular` = shared `getSalesRanking()` sales definition; legacy `sortBy`/`sortOrder` fully preserved), plus `/api/products/brands`. ProductCard: single-badge slot (`-N%` > НОВИНКА (30-day `isNewProduct()`) > out-of-stock), colour swatches, image carousel (hover autoplay + arrows, hover-capability + reduced-motion gated), quick-view/quick-buy overlay (cart icon). New `QuickViewDialog` (size-required add-to-cart → cart store + drawer + GA4). Catalog page: URL-driven FilterBar (popovers desktop, sheet-only on mobile incl. sort), 36px square pagination, Ukrainian copy, GA4 wiring preserved. Header «Новинки»/«Бестселери» retargeted to the new sort params. The E2E hydration gate stayed untouched by design (Approach A — client-fetch rendering path preserved).
+
+**Key changes**:
+
+- 26 commits; unit tests 451 → **517** (+~66: products-api, product-badges, filter-bar, quick-view-dialog, carousel/card behavior), full local verification green
+- Visual-fidelity gate: signed off 2026-08-01 after one user revision round (equal card heights, full-media carousel, cart-icon quick-buy, hover states on all controls, mobile sheet-only filters+sort, struck-price wrap, PDP mobile overflow `min-w-0` fix)
+- Fixes shipped en route: quick-action click bubbling into `select_item`; invisible-overlay click interception (pointer-events gated to visibility); carousel hover-boundary reset (real-browser verified); CI-only stale `Каталог` heading assertion (masked locally by a dev-server race that fails on `main` too)
+- Review arc: per-task SDD reviews + final whole-branch review (1 Important: touch-tablet hover gating → `[@media(hover:hover)]` fix) + user-posted PR review (3 doc-drift findings, all fixed; ruling accepted all responses; docs-lint automation BACKLOG'd as the 6th recurrence of the Last-Updated pair)
+- Prod verified live post-merge via the real URL: catalog page, `sort=popular`, `/api/products/brands`
+
+**Learnings**: carousel hover state must live on the element containing sibling overlays (mouseleave fires when crossing onto an overlay button); RTL cannot catch pointer-events/hit-testing bugs — real-browser verification required; a locally-failing test can mask a second, real defect behind its first failure (CI's prod build reached the stale assertion local runs never did).
 
 ---
 

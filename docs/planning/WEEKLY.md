@@ -1,7 +1,7 @@
 # Weekly Plan
 
 **Week of**: 2026-07-27 to 2026-08-02
-**Last Updated**: 2026-07-31
+**Last Updated**: 2026-08-01
 
 ---
 
@@ -11,7 +11,7 @@
 
 **Secondary Goals**:
 
-- Start TASK-036 catalog redesign once TASK-057 merges (re-scoped to `Mirox Catalog.dc.html`)
+- Start TASK-036 catalog redesign once TASK-057 merges (re-scoped to `Mirox Catalog.dc.html`) — **done: shipped and merged (PR #26, 2026-08-01)**
 - Carry TASK-039 i18n foundation forward — still a payments prerequisite (monobank requires a UA-language site)
 
 ---
@@ -26,10 +26,10 @@
 
 ### Should Complete (Important)
 
-| Task                  | Reference        | Status     | Notes                                                                                      |
-| --------------------- | ---------------- | ---------- | ------------------------------------------------------------------------------------------ |
-| Catalog redesign      | TODO.md TASK-036 | 📋 Planned | Re-scoped to `Mirox Catalog.dc.html` (TASK-057); hydration gate + client-brief extras stay |
-| Product page redesign | TODO.md TASK-037 | 📋 Planned | Re-scoped to `Mirox Product.dc.html` (TASK-057); gains `SizePicker` + `BoughtTogether`     |
+| Task                  | Reference        | Status     | Notes                                                                                                                                                                                                                                                                                                                                                                                    |
+| --------------------- | ---------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Catalog redesign      | TODO.md TASK-036 | ✅ PR #26  | Merged `919906b` 2026-08-01. Five filters + 4 sorts (incl. «Популярні» via `getSalesRanking()`), carousel/quick-view/quick-buy cards, mobile sheet-only filters, hydration gate preserved unchanged. Visual gate signed off after 1 revision round; user PR review: 3 doc-drift findings fixed, ruling accepted all responses. Prod verified live (catalog, `sort=popular`, brands API). |
+| Product page redesign | TODO.md TASK-037 | 📋 Planned | Re-scoped to `Mirox Product.dc.html` (TASK-057); gains `SizePicker` + `BoughtTogether`                                                                                                                                                                                                                                                                                                   |
 
 ### Nice to Have (If Time Permits)
 
@@ -73,11 +73,17 @@
 - **Completed**: implemented all revisions from Tuesday's verdict across 3 rounds (`6f1877e`, `7c06be8`, `ea39abd`, `92bfe0e`) — round 1 addressed all 9 items A–I and, along the way, found+fixed a `next/og` static-prerender bug (a build-time self-fetch of a local asset by absolute URL silently fails during `next build`'s prerender; switched to an embedded base64 `data:` URI); round 2 fixed an E2E cart-spec locator; a v2 gate re-presentation (noting a Chromium `fullPage`-capture artifact that drops the hero's composited image layer — worked around with a tall-viewport, non-fullPage capture instead); round 3 fixed WhyChooseUs checklist vertical centering. **USER SIGN-OFF GRANTED (v3)** — Task 12 complete. Task 13 (docs housekeeping): TASK-057 added to TODO.md; TASK-036/037/039 re-scoped and TASK-055/056 annotated per the design-adoption spec §4; WEEKLY.md rolled to this week; new BACKLOG intake group filed; docs/README.md indexed; the 2026-07-14 program spec noted; CLAUDE.md propagation check applied.
 - **Blockers**: none. PR #24 opened with `/code-review` posted (review findings fixed in-branch); the user-approved prod re-seed happens only after the Vercel deploy is verified serving the merged branch.
 
-#### Thursday (2026-07-31) — today
+#### Thursday (2026-07-31)
 
 - [x] PR #24 review rounds → merge → post-merge completion workflow
 - **Completed**: review round 1 fixed all 4 findings (`8166e47` — token-derived `color-mix` vignette, PR-status doc sync, truthful `--radius` comment); review round 2 surfaced **CI red on every push of the branch** (ESLint linting the Figma-exported vendor JS — `--ext` is inert under flat config) → fixed by ignoring `docs/**` (`38ce2c0`), producing the branch's **first fully-green CI run** with Build + E2E executing for the first time; reviewer's final ruling 7 fixed + 1 accepted, `CLEAN`/`MERGEABLE`. **PR #24 merged** (`f9ceb97`, `--merge`), branches deleted, `main` pulled. Post-merge deploy verified: prod serving the rebrand (~2 min), root OG card 200; **PDP `og:image` 500 in prod** (`ENOENT` on `og-logo-ghost.png` — `public/` not traced into the serverless bundle; anticipated risk) → `outputFileTracingIncludes` fix on follow-up PR #25 (merged `acb0c30` same day; prod PDP og:image verified 200 — Cyrillic, product photo, ghost mark all render). **Prod re-seed executed** (user-approved, `SEED_ALLOW_REMOTE=1`, read-only preflight first) — prod catalog is now Mirox, verified live. Completion workflow: DONE.md entry, plan archived, TODO/WEEKLY/BACKLOG/docs-README synced, memory captured.
 - **Blockers**: prod re-seed still gated on explicit user approval (prod shows electronics under the Mirox storefront until then)
+
+#### Friday–Saturday (2026-07-31 → 2026-08-01) — today
+
+- [x] TASK-036 full cycle: brainstorm → spec → plan → subagent-driven execution (11 tasks) → visual gate (1 revision round) → final review → PR #26 → merge → completion workflow
+- **Completed**: catalog rebuilt to `Mirox Catalog.dc.html` — five combinable URL-driven filters + `/api/products/brands`, 4 sorts incl. «Популярні» (`getSalesRanking()` extracted from `getBestsellers()`), ProductCard badges/swatches/carousel/quick-actions, `QuickViewDialog`, square pagination, Header nav retarget; E2E hydration gate untouched by design. Visual-gate revision round (user remarks 1–7 + PDP mobile overflow fix). Fix rounds caught: `select_item` bubbling, invisible-overlay click interception, carousel hover-boundary reset (real-browser verified pre/post), touch-tablet hover gating (`[@media(hover:hover)]`), reduced-motion autoplay gating. **CI surfaced a stale `Каталог` heading assertion masked locally** by the dev-server race that fails on `main` too — fixed with the masking documented. User PR review: 3 doc-drift findings (all fixed, ruling accepted; 6th recurrence of the Last-Updated pair → docs-lint BACKLOG'd with scoping decision). **PR #26 merged `919906b`**, branches deleted, prod verified live (catalog page, `sort=popular`, brands API). Completion workflow: DONE.md, plan archived, TODO/WEEKLY/docs-README synced, memory captured.
+- **Blockers**: none
 
 ---
 

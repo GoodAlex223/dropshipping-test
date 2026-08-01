@@ -1,6 +1,6 @@
 # TODO
 
-**Last Updated**: 2026-07-31
+**Last Updated**: 2026-08-01
 
 Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-shop-program-design.md) · Current week: [WEEKLY.md](WEEKLY.md)
 
@@ -10,22 +10,7 @@ Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-
 
 _TASK-057 (Mirox design adoption) completed 2026-07-31 — PR [#24](https://github.com/GoodAlex223/dropshipping-test/pull/24) merged `f9ceb97`; see [DONE.md](DONE.md). The user-approved **prod re-seed** ran the same day (`SEED_ALLOW_REMOTE=1` against the Neon direct endpoint): prod now serves the Mirox clothing catalog (8 products, UAH), verified live via API/PDP/homepage._
 
-#### [TASK-036] Catalog redesign + filters
-
-**Priority**: 🟠 High
-**Status**: 📋 Planned
-**Effort**: L
-**Dependencies**: [TASK-034]
-
-**Description** (re-scoped by TASK-057, 2026-07-27 — spec §4): Re-scope to [`Mirox Catalog.dc.html`](../design/design_handoff_mirox/Mirox%20Catalog.dc.html): filter bar (Фільтри, Ціна, Бренд, Розмір chips S–XXL, Колір, Наявність), white-active sort buttons, grid `auto-fill minmax(240px,1fr)`, 36px square pagination, card badges (НОВИНКА white / -15% dark-bordered), sizes row «S · M · L · XL». Design shows 3 sort orders (Новинки / Ціна ↑ / Ціна ↓) vs the TODO's 4 incl. "popular" — reconcile in the task plan. Client-brief extras (second image on hover, quick-view, quick-buy, colour swatches) and the **hydration-gate AC stay**. _(Variants and `brand` field already exist in the Prisma schema.)_
-
-**Acceptance Criteria**:
-
-- [ ] All five filters functional and combinable
-- [ ] Sort orders functional — design ([`Mirox Catalog.dc.html`](../design/design_handoff_mirox/Mirox%20Catalog.dc.html)) shows 3 (Новинки / Ціна ↑ / Ціна ↓) vs. this TODO's previous 4 incl. "popular"; reconcile the exact set in this task's own plan (`getBestsellers()` in `src/lib/product-queries.ts` is the ready-made "popular" definition if kept)
-- [ ] Filter state reflected in the URL (shareable)
-- [ ] ProductCard: second image on hover, quick-view, quick-buy, circular color swatches — client list #2 items 18/19 — plus card badges (НОВИНКА white / -15% dark-bordered) and a sizes row («S · M · L · XL») per [`Mirox Catalog.dc.html`](../design/design_handoff_mirox/Mirox%20Catalog.dc.html)
-- [ ] Hydration invariant preserved or replaced: the E2E hydration gate in `tests/e2e/products.spec.ts` (`waitForSelector("[data-testid='product-card']")`) relies on product cards being client-rendered by a post-hydration `useEffect` fetch. If this rewrite moves product rendering to server components or streaming SSR, that gate stops being a valid hydration signal — replace it with an equivalent readiness signal, or the WebKit `fill()`-before-hydration race diagnosed in TASK-038a returns undetected.
+_TASK-036 (Catalog redesign + filters) completed 2026-08-01 — PR [#26](https://github.com/GoodAlex223/dropshipping-test/pull/26) merged `919906b`; see [DONE.md](DONE.md). All ACs met (4-sort set incl. «Популярні» chosen in-plan; hydration gate preserved unchanged; visual gate signed off after one revision round)._
 
 #### [TASK-037] Product page redesign
 

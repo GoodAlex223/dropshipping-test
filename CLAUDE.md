@@ -110,7 +110,7 @@ src/
 │   ├── checkout/           # Payment form components
 │   ├── common/             # Header, Footer, AnnouncementBar, BenefitStrip, SocialLinks, FadeIn, Logo, NewsletterSignup, CookieConsent, ResourceHints
 │   ├── home/               # Homepage sections: Hero, ProductRail, WhyChooseUs, Testimonials
-│   ├── products/           # ProductCard, SocialShareButtons
+│   ├── products/           # ProductCard (carousel, badges, quick actions), ProductImage, QuickViewDialog, SocialShareButtons
 │   ├── reviews/            # Review components (ReviewSection, ReviewForm, ReviewList, ReviewItem, ReviewStats, StarRating)
 │   ├── shop/               # CartDrawer
 │   ├── showcase/           # Multi-theme showcase components (bold/, luxury/, organic/)

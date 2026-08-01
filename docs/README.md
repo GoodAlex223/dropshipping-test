@@ -33,9 +33,9 @@ Central index for all project documentation.
 | Document                                         | Purpose              | Last Updated |
 | ------------------------------------------------ | -------------------- | ------------ |
 | [planning/README.md](planning/README.md)         | Planning overview    | 2026-01-05   |
-| [planning/WEEKLY.md](planning/WEEKLY.md)         | Current week's plan  | 2026-07-31   |
-| [planning/TODO.md](planning/TODO.md)             | Active tasks         | 2026-07-31   |
-| [planning/DONE.md](planning/DONE.md)             | Completed tasks      | 2026-07-31   |
+| [planning/WEEKLY.md](planning/WEEKLY.md)         | Current week's plan  | 2026-08-01   |
+| [planning/TODO.md](planning/TODO.md)             | Active tasks         | 2026-08-01   |
+| [planning/DONE.md](planning/DONE.md)             | Completed tasks      | 2026-08-01   |
 | [planning/BACKLOG.md](planning/BACKLOG.md)       | Unprioritized ideas  | 2026-08-01   |
 | [planning/ROADMAP.md](planning/ROADMAP.md)       | Long-term vision     | 2026-07-14   |
 | [planning/GOALS.md](planning/GOALS.md)           | Objectives & metrics | 2026-01-26   |
@@ -84,6 +84,7 @@ Central index for all project documentation.
 | [2026-07-19_task-035-homepage-rebrand.md](archive/plans/2026-07-19_task-035-homepage-rebrand.md)                 | TASK-035 Homepage Rebrand           | COMPLETE | 2026-07-21 |
 | [2026-07-24_homepage-polish-art-direction.md](archive/plans/2026-07-24_homepage-polish-art-direction.md)         | Homepage Polish & Art Direction     | COMPLETE | 2026-07-27 |
 | [2026-07-27_task-057-design-adoption.md](archive/plans/2026-07-27_task-057-design-adoption.md)                   | TASK-057 Mirox Design Adoption      | COMPLETE | 2026-07-31 |
+| [2026-07-31_task-036-catalog-redesign-filters.md](archive/plans/2026-07-31_task-036-catalog-redesign-filters.md) | TASK-036 Catalog Redesign + Filters | COMPLETE | 2026-08-01 |
 
 See [archive/README.md](archive/README.md) for more historical plans.
 
