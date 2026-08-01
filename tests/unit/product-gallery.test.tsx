@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { ProductGallery } from "@/components/products/ProductGallery";
 
@@ -7,6 +7,19 @@ const images = [
   { url: "/images/products/b.png", alt: null },
   { url: "/images/products/c.png", alt: null },
 ];
+
+// Stub global.ResizeObserver for jsdom
+beforeEach(() => {
+  if (typeof global.ResizeObserver === "undefined") {
+    class MockResizeObserver {
+      observe = vi.fn();
+      unobserve = vi.fn();
+      disconnect = vi.fn();
+    }
+    (global as typeof globalThis & { ResizeObserver: typeof MockResizeObserver }).ResizeObserver =
+      MockResizeObserver;
+  }
+});
 
 describe("ProductGallery", () => {
   it("renders a thumb per image and marks the first active", () => {
@@ -33,5 +46,23 @@ describe("ProductGallery", () => {
     render(<ProductGallery images={[]} productName="Худі Mirox Basic" />);
     expect(screen.queryAllByRole("button")).toHaveLength(0);
     expect(screen.getAllByTestId("product-image-fallback").length).toBeGreaterThan(0);
+  });
+
+  it("desktop thumb click syncs the hidden mobile track scroll position", () => {
+    render(<ProductGallery images={images} productName="Худі Mirox Basic" />);
+    const track = screen.getByLabelText(/Фотографії/);
+
+    // Stub clientWidth and scrollTo
+    Object.defineProperty(track, "clientWidth", { value: 390, writable: true });
+    track.scrollTo = vi.fn();
+
+    const thumbs = screen.getAllByRole("button", { name: /Фото \d із \d/ });
+    fireEvent.click(thumbs[2]);
+
+    // Assert scrollTo was called with index 2 (the third image)
+    expect(track.scrollTo).toHaveBeenCalledWith({
+      left: 2 * 390,
+      behavior: "auto",
+    });
   });
 });

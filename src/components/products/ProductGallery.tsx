@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IMAGE_SIZES } from "@/lib/image-utils";
 import { cn } from "@/lib/utils";
 import { ProductImage } from "./ProductImage";
@@ -17,10 +17,47 @@ interface ProductGalleryProps {
  * bar). One shared activeIndex: thumb clicks drive the desktop main image,
  * scroll position drives the dots. Real swipe behavior is only verifiable in
  * a browser (visual gate) — jsdom asserts state/aria wiring.
+ *
+ * Sync mechanism: desktop thumb clicks update activeIndex; an effect then
+ * syncs the (hidden) mobile track's scrollLeft to match. A ResizeObserver
+ * handles the rotation/breakpoint transition (track gains width), ensuring
+ * the dots and visible slide stay aligned when crossing lg boundary.
  */
 export function ProductGallery({ images, productName }: ProductGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const trackRef = useRef<HTMLDivElement>(null);
+
+  // Sync the (hidden) mobile track's scroll position with activeIndex when it becomes
+  // visible, and when activeIndex changes (via thumb clicks). Also add a ResizeObserver
+  // to handle rotation/breakpoint transitions.
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    // Instant scroll sync whenever activeIndex changes and track is laid out
+    const syncScroll = () => {
+      if (!track || track.clientWidth === 0) return;
+      const expectedScrollLeft = activeIndex * track.clientWidth;
+      if (Math.round(track.scrollLeft / track.clientWidth) !== activeIndex) {
+        track.scrollTo({ left: expectedScrollLeft, behavior: "auto" });
+      }
+    };
+
+    syncScroll();
+
+    // ResizeObserver to handle rotation/breakpoint transitions (track gains width)
+    let resizeObserver: ResizeObserver | undefined;
+    if (typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(() => {
+        syncScroll();
+      });
+      resizeObserver.observe(track);
+    }
+
+    return () => {
+      resizeObserver?.disconnect();
+    };
+  }, [activeIndex]);
 
   const hasImages = images.length > 0;
   const active = images[activeIndex] ?? images[0];
