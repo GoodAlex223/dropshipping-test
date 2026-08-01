@@ -72,7 +72,11 @@ test.describe("Navigation", () => {
     // Anchored at the end: distinguishes the bare /products landing from the
     // query-string variants the other two nav items would also satisfy.
     await expect(page).toHaveURL(/\/products$/);
-    await expect(page.getByRole("heading", { name: /products/i })).toBeVisible();
+    // TASK-036 renamed the catalog H1 from "Products" to «Каталог». This
+    // assertion was stale after the rename but masked locally: against `next
+    // dev` the test dies earlier at the URL assertion (pre-existing dev-server
+    // race, fails on main too), so only CI's production build ever reached it.
+    await expect(page.getByRole("heading", { level: 1, name: "Каталог" })).toBeVisible();
   });
 
   test("can navigate to categories page via mobile menu", async ({ page }) => {
