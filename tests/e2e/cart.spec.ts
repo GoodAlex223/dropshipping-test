@@ -13,13 +13,15 @@ test.describe("Shopping Cart", () => {
     // Wait for products to load
     await page.waitForSelector("[data-testid='product-card']");
 
-    // Click on the product card link and wait for navigation. The whole
-    // card is a single <a> (no separate "View Product" button — see
-    // TASK-057 item E), so target it the same resilient way lines 56/78/99
-    // in this file already do.
+    // Click on the product card heading (inside the card's single <a> —
+    // see TASK-057 item E) rather than the card's geometric center: the
+    // TASK-036 redesign added a hover-revealed quick-view/quick-buy overlay
+    // over the card image, and a blind click can land on that button
+    // instead of navigating. The heading sits below the overlay's
+    // aspect-square footprint, same pattern as tests/e2e/products.spec.ts.
     await Promise.all([
       page.waitForURL(/\/products\/[^/]+$/),
-      page.locator("[data-testid='product-card'] a").first().click(),
+      page.locator("[data-testid='product-card']").first().getByRole("heading").click(),
     ]);
 
     // Click add to cart
@@ -56,7 +58,7 @@ test.describe("Shopping Cart", () => {
     // Add item to cart
     await page.goto("/products");
     await page.waitForSelector("[data-testid='product-card']");
-    await page.locator("[data-testid='product-card'] a").first().click();
+    await page.locator("[data-testid='product-card']").first().getByRole("heading").click();
     await expect(page).toHaveURL(/\/products\/[^/]+$/);
     await page.getByRole("button", { name: /add to cart/i }).click();
 
@@ -78,7 +80,7 @@ test.describe("Shopping Cart", () => {
     // Add item to cart first
     await page.goto("/products");
     await page.waitForSelector("[data-testid='product-card']");
-    await page.locator("[data-testid='product-card'] a").first().click();
+    await page.locator("[data-testid='product-card']").first().getByRole("heading").click();
     await expect(page).toHaveURL(/\/products\/[^/]+$/);
     await page.getByRole("button", { name: /add to cart/i }).click();
 
@@ -99,7 +101,7 @@ test.describe("Shopping Cart", () => {
     // Add item to cart first
     await page.goto("/products");
     await page.waitForSelector("[data-testid='product-card']");
-    await page.locator("[data-testid='product-card'] a").first().click();
+    await page.locator("[data-testid='product-card']").first().getByRole("heading").click();
     await expect(page).toHaveURL(/\/products\/[^/]+$/);
     await page.getByRole("button", { name: /add to cart/i }).click();
 
