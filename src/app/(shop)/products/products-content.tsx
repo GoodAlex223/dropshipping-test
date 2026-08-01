@@ -294,7 +294,7 @@ function ProductsContentInner() {
               type="button"
               aria-label="Попередня сторінка"
               onClick={() => handlePageChange(pagination.page - 1)}
-              className="flex h-9 w-9 items-center justify-center rounded-[9px] border border-[#262626]"
+              className="flex h-9 w-9 items-center justify-center rounded-[9px] border border-[#262626] transition-colors hover:border-[#666] hover:text-white"
             >
               ←
             </button>
@@ -315,10 +315,10 @@ function ProductsContentInner() {
                 aria-current={p === pagination.page ? "page" : undefined}
                 onClick={() => handlePageChange(p)}
                 className={cn(
-                  "flex h-9 w-9 items-center justify-center rounded-[9px] border",
+                  "flex h-9 w-9 items-center justify-center rounded-[9px] border transition-colors",
                   p === pagination.page
                     ? "border-[#333] bg-white text-black"
-                    : "border-[#262626] text-[#a3a3a3]"
+                    : "border-[#262626] text-[#a3a3a3] hover:border-[#666] hover:text-white"
                 )}
               >
                 {p}
@@ -330,7 +330,7 @@ function ProductsContentInner() {
               type="button"
               aria-label="Наступна сторінка"
               onClick={() => handlePageChange(pagination.page + 1)}
-              className="flex h-9 w-9 items-center justify-center rounded-[9px] border border-[#262626]"
+              className="flex h-9 w-9 items-center justify-center rounded-[9px] border border-[#262626] transition-colors hover:border-[#666] hover:text-white"
             >
               →
             </button>

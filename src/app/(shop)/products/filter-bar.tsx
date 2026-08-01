@@ -48,13 +48,20 @@ const SORT_OPTIONS: { value: CatalogSort; label: string }[] = [
   { value: "price-desc", label: "Ціна ↓" },
 ];
 
-/** Shared "white when active" pill styling for dropdown-trigger chips. */
+/** Shared "white when active" pill styling for dropdown-trigger chips. Inactive
+ *  chips get the mock's hover language (border #262626/#333 → #666, text
+ *  #a3a3a3 → white); active (white) chips are unchanged by hover (R4). */
 function chipClasses(isActive: boolean) {
   return cn(
     "shrink-0 rounded-[10px] border px-4 py-2.5 text-[13px] font-semibold transition-colors",
-    isActive ? "border-white bg-white text-black" : "border-[#262626] text-[#a3a3a3]"
+    isActive
+      ? "border-white bg-white text-black"
+      : "border-[#262626] text-[#a3a3a3] hover:border-[#666] hover:text-white"
   );
 }
+
+/** Shared inactive-row hover styling for popover/sheet option rows (R4). */
+const INACTIVE_ROW_HOVER = "hover:border-[#666] hover:text-white";
 
 function PriceRange({
   minPrice,
@@ -146,7 +153,7 @@ function BrandPopover({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button type="button" className={chipClasses(brand !== null)}>
+        <button type="button" className={cn("hidden md:inline-flex", chipClasses(brand !== null))}>
           Бренд ▾
         </button>
       </PopoverTrigger>
@@ -167,10 +174,10 @@ function BrandPopover({
                   setOpen(false);
                 }}
                 className={cn(
-                  "rounded-[8px] border px-3 py-2 text-left text-[13px] font-semibold",
+                  "rounded-[8px] border px-3 py-2 text-left text-[13px] font-semibold transition-colors",
                   isActive
                     ? "border-white bg-white text-black"
-                    : "border-transparent text-[#a3a3a3]"
+                    : cn("border-transparent text-[#a3a3a3]", INACTIVE_ROW_HOVER)
                 )}
               >
                 {b}
@@ -194,7 +201,7 @@ function ColorPopover({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button type="button" className={chipClasses(color !== null)}>
+        <button type="button" className={cn("hidden md:inline-flex", chipClasses(color !== null))}>
           Колір ▾
         </button>
       </PopoverTrigger>
@@ -212,8 +219,10 @@ function ColorPopover({
                   setOpen(false);
                 }}
                 className={cn(
-                  "flex items-center gap-2 rounded-[8px] border px-3 py-2 text-left text-[13px] font-semibold",
-                  isActive ? "border-white text-white" : "border-transparent text-[#a3a3a3]"
+                  "flex items-center gap-2 rounded-[8px] border px-3 py-2 text-left text-[13px] font-semibold transition-colors",
+                  isActive
+                    ? "border-white text-white"
+                    : cn("border-transparent text-[#a3a3a3]", INACTIVE_ROW_HOVER)
                 )}
               >
                 <span className={cn("h-4 w-4 rounded-full border", COLOR_SWATCH_CLASSES[c])} />
@@ -238,7 +247,7 @@ function AvailabilityPopover({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button type="button" className={chipClasses(inStock)}>
+        <button type="button" className={cn("hidden md:inline-flex", chipClasses(inStock))}>
           Наявність ▾
         </button>
       </PopoverTrigger>
@@ -252,8 +261,10 @@ function AvailabilityPopover({
               setOpen(false);
             }}
             className={cn(
-              "rounded-[8px] border px-3 py-2 text-left text-[13px] font-semibold",
-              !inStock ? "border-white bg-white text-black" : "border-transparent text-[#a3a3a3]"
+              "rounded-[8px] border px-3 py-2 text-left text-[13px] font-semibold transition-colors",
+              !inStock
+                ? "border-white bg-white text-black"
+                : cn("border-transparent text-[#a3a3a3]", INACTIVE_ROW_HOVER)
             )}
           >
             Всі товари
@@ -266,8 +277,10 @@ function AvailabilityPopover({
               setOpen(false);
             }}
             className={cn(
-              "rounded-[8px] border px-3 py-2 text-left text-[13px] font-semibold",
-              inStock ? "border-white bg-white text-black" : "border-transparent text-[#a3a3a3]"
+              "rounded-[8px] border px-3 py-2 text-left text-[13px] font-semibold transition-colors",
+              inStock
+                ? "border-white bg-white text-black"
+                : cn("border-transparent text-[#a3a3a3]", INACTIVE_ROW_HOVER)
             )}
           >
             В наявності
@@ -286,7 +299,7 @@ function SizeGroup({
   onChange: FilterBarProps["onChange"];
 }) {
   return (
-    <div className="flex shrink-0 items-center gap-1.5 rounded-[10px] border border-[#262626] px-2 py-[5px]">
+    <div className="hidden shrink-0 items-center gap-1.5 rounded-[10px] border border-[#262626] px-2 py-[5px] md:flex">
       <span className="px-1.5 text-[13px] font-semibold text-[#a3a3a3]">Розмір:</span>
       {SIZE_ORDER.map((s) => {
         const isActive = size === s;
@@ -297,8 +310,10 @@ function SizeGroup({
             aria-pressed={isActive}
             onClick={() => onChange({ size: isActive ? null : s })}
             className={cn(
-              "rounded-[7px] border px-3 py-1.5 text-[12.5px] font-bold",
-              isActive ? "border-white bg-white text-black" : "border-[#333] text-[#a3a3a3]"
+              "rounded-[7px] border px-3 py-1.5 text-[12.5px] font-bold transition-colors",
+              isActive
+                ? "border-white bg-white text-black"
+                : cn("border-[#333] text-[#a3a3a3]", INACTIVE_ROW_HOVER)
             )}
           >
             {s}
@@ -327,7 +342,7 @@ function FiltersSheet({
       <SheetTrigger asChild>
         <button
           type="button"
-          className="inline-flex shrink-0 items-center gap-2 rounded-[10px] border border-[#333] px-4 py-2.5 text-[13px] font-bold"
+          className="inline-flex shrink-0 items-center gap-2 rounded-[10px] border border-[#333] px-4 py-2.5 text-[13px] font-bold transition-colors hover:border-[#666]"
         >
           <SlidersHorizontal className="h-[15px] w-[15px]" />
           Фільтри
@@ -372,10 +387,10 @@ function FiltersSheet({
                       setOpen(false);
                     }}
                     className={cn(
-                      "rounded-[8px] border px-3 py-2 text-left text-[13px] font-semibold",
+                      "rounded-[8px] border px-3 py-2 text-left text-[13px] font-semibold transition-colors",
                       isActive
                         ? "border-white bg-white text-black"
-                        : "border-[#262626] text-[#a3a3a3]"
+                        : cn("border-[#262626] text-[#a3a3a3]", INACTIVE_ROW_HOVER)
                     )}
                   >
                     {b}
@@ -397,8 +412,10 @@ function FiltersSheet({
                     aria-pressed={isActive}
                     onClick={() => onChange({ size: isActive ? null : s })}
                     className={cn(
-                      "rounded-[7px] border px-3 py-2 text-[12.5px] font-bold",
-                      isActive ? "border-white bg-white text-black" : "border-[#333] text-[#a3a3a3]"
+                      "rounded-[7px] border px-3 py-2 text-[12.5px] font-bold transition-colors",
+                      isActive
+                        ? "border-white bg-white text-black"
+                        : cn("border-[#333] text-[#a3a3a3]", INACTIVE_ROW_HOVER)
                     )}
                   >
                     {s}
@@ -420,8 +437,10 @@ function FiltersSheet({
                     aria-pressed={isActive}
                     onClick={() => onChange({ color: isActive ? null : c })}
                     className={cn(
-                      "flex items-center gap-2 rounded-[8px] border px-3 py-2 text-[13px] font-semibold",
-                      isActive ? "border-white text-white" : "border-[#262626] text-[#a3a3a3]"
+                      "flex items-center gap-2 rounded-[8px] border px-3 py-2 text-[13px] font-semibold transition-colors",
+                      isActive
+                        ? "border-white text-white"
+                        : cn("border-[#262626] text-[#a3a3a3]", INACTIVE_ROW_HOVER)
                     )}
                   >
                     <span className={cn("h-4 w-4 rounded-full border", COLOR_SWATCH_CLASSES[c])} />
@@ -440,10 +459,10 @@ function FiltersSheet({
                 aria-pressed={!filters.inStock}
                 onClick={() => onChange({ inStock: null })}
                 className={cn(
-                  "rounded-[8px] border px-3 py-2 text-left text-[13px] font-semibold",
+                  "rounded-[8px] border px-3 py-2 text-left text-[13px] font-semibold transition-colors",
                   !filters.inStock
                     ? "border-white bg-white text-black"
-                    : "border-[#262626] text-[#a3a3a3]"
+                    : cn("border-[#262626] text-[#a3a3a3]", INACTIVE_ROW_HOVER)
                 )}
               >
                 Всі товари
@@ -453,14 +472,44 @@ function FiltersSheet({
                 aria-pressed={filters.inStock}
                 onClick={() => onChange({ inStock: "true" })}
                 className={cn(
-                  "rounded-[8px] border px-3 py-2 text-left text-[13px] font-semibold",
+                  "rounded-[8px] border px-3 py-2 text-left text-[13px] font-semibold transition-colors",
                   filters.inStock
                     ? "border-white bg-white text-black"
-                    : "border-[#262626] text-[#a3a3a3]"
+                    : cn("border-[#262626] text-[#a3a3a3]", INACTIVE_ROW_HOVER)
                 )}
               >
                 В наявності
               </button>
+            </div>
+          </div>
+
+          {/* R5: below md this is the ONLY place sort options live — the
+              inline "Сортування" row (bottom of the desktop bar) is hidden
+              below md via `hidden md:flex`. Same 4 options, same URL
+              semantics (onChange({ sort: value })), white-active styling
+              matching every other row in this sheet. */}
+          <div>
+            <p className="mb-2 text-[13px] font-semibold text-[#a3a3a3]">Сортування</p>
+            <div className="flex flex-col gap-1">
+              {SORT_OPTIONS.map((opt) => {
+                const isActive = filters.sort === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    aria-pressed={isActive}
+                    onClick={() => onChange({ sort: opt.value })}
+                    className={cn(
+                      "rounded-[8px] border px-3 py-2 text-left text-[13px] font-semibold transition-colors",
+                      isActive
+                        ? "border-white bg-white text-black"
+                        : cn("border-[#262626] text-[#a3a3a3]", INACTIVE_ROW_HOVER)
+                    )}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -470,7 +519,7 @@ function FiltersSheet({
               onClearAll();
               setOpen(false);
             }}
-            className="rounded-[10px] border border-[#333] px-4 py-2.5 text-[13px] font-bold text-[#a3a3a3] hover:text-white"
+            className="rounded-[10px] border border-[#333] px-4 py-2.5 text-[13px] font-bold text-[#a3a3a3] transition-colors hover:border-[#666] hover:text-white"
           >
             Скинути все
           </button>
@@ -496,7 +545,10 @@ export function FilterBar({ filters, brands, onChange, onClearAll }: FilterBarPr
         <ColorPopover color={filters.color} onChange={onChange} />
         <AvailabilityPopover inStock={filters.inStock} onChange={onChange} />
 
-        <div className="flex shrink-0 items-center gap-1.5 md:ml-auto">
+        {/* R5: sort lives only in the Фільтри sheet below md — this row
+            (and every trigger above it besides FiltersSheet) is hidden
+            below md and only re-appears at md+. */}
+        <div className="hidden shrink-0 items-center gap-1.5 md:ml-auto md:flex">
           <span className="text-[13px] font-semibold whitespace-nowrap text-[#737373]">
             Сортування:
           </span>
@@ -509,8 +561,10 @@ export function FilterBar({ filters, brands, onChange, onClearAll }: FilterBarPr
                 aria-pressed={isActive}
                 onClick={() => onChange({ sort: opt.value })}
                 className={cn(
-                  "shrink-0 rounded-[9px] border px-3.5 py-[9px] text-[12.5px] font-bold",
-                  isActive ? "border-white bg-white text-black" : "border-[#333] text-[#a3a3a3]"
+                  "shrink-0 rounded-[9px] border px-3.5 py-[9px] text-[12.5px] font-bold transition-colors",
+                  isActive
+                    ? "border-white bg-white text-black"
+                    : cn("border-[#333] text-[#a3a3a3]", INACTIVE_ROW_HOVER)
                 )}
               >
                 {opt.label}

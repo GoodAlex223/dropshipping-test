@@ -34,27 +34,53 @@ test.describe("Product Browsing", () => {
     await expect(page).toHaveURL(/search=test/);
   });
 
-  test("can sort products", async ({ page }) => {
+  test("can sort products", async ({ page, isMobile }) => {
     await page.goto("/products");
     await page.waitForSelector("[data-testid='product-card']");
 
-    await Promise.all([
-      page.waitForURL(/sort=price-asc/, { timeout: 15000 }),
-      page.getByRole("button", { name: "Ціна ↑" }).click(),
-    ]);
+    // R5: below md the inline "Сортування" row is CSS-hidden — sort now
+    // lives only inside the «Фільтри» sheet's own Сортування section.
+    // Scope the click to the sheet (role="dialog") since the hidden inline
+    // row's buttons are still present in the DOM (just not visible) and
+    // share the same accessible names.
+    if (isMobile) {
+      await page.getByRole("button", { name: "Фільтри" }).click();
+      const sheet = page.getByRole("dialog");
+      await Promise.all([
+        page.waitForURL(/sort=price-asc/, { timeout: 15000 }),
+        sheet.getByRole("button", { name: "Ціна ↑" }).click(),
+      ]);
+    } else {
+      await Promise.all([
+        page.waitForURL(/sort=price-asc/, { timeout: 15000 }),
+        page.getByRole("button", { name: "Ціна ↑" }).click(),
+      ]);
+    }
 
     await page.waitForSelector("[data-testid='product-card']");
     await expect(page).toHaveURL(/sort=price-asc/);
   });
 
-  test("size filter chip updates URL and grid", async ({ page }) => {
+  test("size filter chip updates URL and grid", async ({ page, isMobile }) => {
     await page.goto("/products");
     await page.waitForSelector("[data-testid='product-card']");
 
-    await Promise.all([
-      page.waitForURL(/size=M/, { timeout: 15000 }),
-      page.getByRole("button", { name: "M", exact: true }).first().click(),
-    ]);
+    // R5: below md the inline size chip row is CSS-hidden — same "M" name
+    // exists twice in the DOM (hidden inline row + sheet row), so the mobile
+    // branch opens the sheet first and scopes the click to it.
+    if (isMobile) {
+      await page.getByRole("button", { name: "Фільтри" }).click();
+      const sheet = page.getByRole("dialog");
+      await Promise.all([
+        page.waitForURL(/size=M/, { timeout: 15000 }),
+        sheet.getByRole("button", { name: "M", exact: true }).click(),
+      ]);
+    } else {
+      await Promise.all([
+        page.waitForURL(/size=M/, { timeout: 15000 }),
+        page.getByRole("button", { name: "M", exact: true }).first().click(),
+      ]);
+    }
 
     await page.waitForSelector("[data-testid='product-card']");
   });
