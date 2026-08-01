@@ -59,10 +59,10 @@ describe("ProductGallery", () => {
     const thumbs = screen.getAllByRole("button", { name: /Фото \d із \d/ });
     fireEvent.click(thumbs[2]);
 
-    // Assert scrollTo was called with index 2 (the third image)
+    // Assert scrollTo was called with index 2 (the third image) using instant behavior
     expect(track.scrollTo).toHaveBeenCalledWith({
       left: 2 * 390,
-      behavior: "auto",
+      behavior: "instant",
     });
   });
 });

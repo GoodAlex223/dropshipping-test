@@ -39,7 +39,8 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
       if (!track || track.clientWidth === 0) return;
       const expectedScrollLeft = activeIndex * track.clientWidth;
       if (Math.round(track.scrollLeft / track.clientWidth) !== activeIndex) {
-        track.scrollTo({ left: expectedScrollLeft, behavior: "auto" });
+        // behavior: "instant" bypasses the track's scroll-smooth CSS; scroll-smooth defers "auto" to CSS
+        track.scrollTo({ left: expectedScrollLeft, behavior: "instant" as ScrollBehavior });
       }
     };
 
