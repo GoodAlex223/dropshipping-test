@@ -1,33 +1,27 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Minus,
-  Plus,
-  ShoppingCart,
-  Package,
-  ArrowLeft,
-  Check,
-  AlertCircle,
-} from "lucide-react";
+import { Check, Package, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { ProductCard, SocialShareButtons } from "@/components/products";
-import { ReviewSection } from "@/components/reviews";
+import {
+  ProductGallery,
+  SizePicker,
+  BoughtTogether,
+  RecentlyViewed,
+  ProductCard,
+  SocialShareButtons,
+} from "@/components/products";
+import { ReviewSection, StarRating } from "@/components/reviews";
 import { useCartStore } from "@/stores/cart.store";
 import { cn } from "@/lib/utils";
-import { formatPrice } from "@/lib/format";
+import { formatPrice, pluralizeUk } from "@/lib/format";
+import { COLOR_SWATCH_CLASSES, rankSizeValues } from "@/lib/product-display";
 import { trackViewItem, trackAddToCart } from "@/lib/analytics";
-import { DEFAULT_BLUR_DATA_URL, IMAGE_SIZES } from "@/lib/image-utils";
 import type { ReviewWithUser, RatingDistribution, StyleSibling, BundleCompanion } from "@/types";
 
-interface ProductImage {
+interface ProductImageData {
   id: string;
   url: string;
   alt: string | null;
@@ -58,11 +52,11 @@ export interface Product {
   isFeatured: boolean;
   styleGroup?: string | null;
   colorValue: string | null;
-  category: { id: string; name: string; slug: string };
-  images: ProductImage[];
-  variants: ProductVariant[];
   styleSiblings: StyleSibling[];
   companions: BundleCompanion[];
+  category: { id: string; name: string; slug: string };
+  images: ProductImageData[];
+  variants: ProductVariant[];
   relatedProducts: {
     id: string;
     name: string;
@@ -81,22 +75,35 @@ export interface Product {
   ratingDistribution: RatingDistribution[];
 }
 
-interface ProductDetailClientProps {
-  product: Product;
-}
+const LOW_STOCK_THRESHOLD = 5;
 
-export function ProductDetailClient({ product }: ProductDetailClientProps) {
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
-    product.variants.length > 0 ? product.variants[0] : null
+export function ProductDetailClient({ product }: { product: Product }) {
+  const router = useRouter();
+  const { addItem } = useCartStore();
+
+  // Sizes: the one real cart dimension (spec §1 constraint 2). Ranked S→XXL;
+  // first in-stock preselected.
+  const sizes = useMemo(() => {
+    const sizeVariants = product.variants.filter((v) => v.name === "Size");
+    const ranked = rankSizeValues(sizeVariants.map((v) => v.value));
+    return ranked
+      .map((value) => sizeVariants.find((v) => v.value === value))
+      .filter((v): v is ProductVariant => Boolean(v));
+  }, [product.variants]);
+
+  const [selectedSizeId, setSelectedSizeId] = useState<string | null>(
+    () => sizes.find((v) => v.stock > 0)?.id ?? null
   );
-  const [quantity, setQuantity] = useState(1);
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const selectedSize = sizes.find((v) => v.id === selectedSizeId) ?? null;
+
   const [addedToCart, setAddedToCart] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
-  const { addItem, openCart } = useCartStore();
+  // E2E hydration signal: interactions (size clicks, add-to-cart) are lost if
+  // they land before hydration — tests wait for [data-hydrated="true"].
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []); // eslint-disable-line react-hooks/set-state-in-effect
 
-  // GA4: Track product view (once per page load)
   const viewTracked = useRef(false);
   useEffect(() => {
     if (viewTracked.current) return;
@@ -110,424 +117,299 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     });
   }, [product]);
 
-  const currentPrice = selectedVariant
-    ? parseFloat(selectedVariant.price)
-    : parseFloat(product.price);
-
-  const currentStock = selectedVariant?.stock ?? product.stock;
-
+  const currentPrice = selectedSize ? parseFloat(selectedSize.price) : parseFloat(product.price);
   const comparePrice = product.comparePrice ? parseFloat(product.comparePrice) : null;
-  const hasDiscount = comparePrice && comparePrice > currentPrice;
-  const discountPercent = hasDiscount
-    ? Math.round(((comparePrice - currentPrice) / comparePrice) * 100)
-    : 0;
+  const hasDiscount = comparePrice !== null && comparePrice > currentPrice;
 
-  const handleQuantityChange = (delta: number) => {
-    const newQuantity = quantity + delta;
-    if (newQuantity >= 1 && newQuantity <= currentStock) {
-      setQuantity(newQuantity);
-    }
-  };
+  const currentStock = sizes.length > 0 ? (selectedSize?.stock ?? 0) : product.stock;
+  const outOfStock = sizes.length > 0 ? sizes.every((v) => v.stock <= 0) : product.stock <= 0;
+  const lowStock = !outOfStock && currentStock > 0 && currentStock <= LOW_STOCK_THRESHOLD;
 
-  const handleAddToCart = async () => {
-    setIsAddingToCart(true);
-
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
+  const addLine = () => {
+    const name = selectedSize ? `${product.name} — ${selectedSize.value}` : product.name;
     addItem({
       productId: product.id,
-      variantId: selectedVariant?.id,
-      name: selectedVariant ? `${product.name} - ${selectedVariant.name}` : product.name,
+      variantId: selectedSize?.id,
+      name,
       price: currentPrice,
       image: product.images[0]?.url,
       maxStock: currentStock,
-      quantity,
     });
-
-    // GA4: Track add to cart
     trackAddToCart({
       item_id: product.id,
-      item_name: selectedVariant ? `${product.name} - ${selectedVariant.name}` : product.name,
+      item_name: name,
       item_category: product.category.name,
-      item_variant: selectedVariant?.name,
+      item_variant: selectedSize?.value,
       price: currentPrice,
-      quantity,
+      quantity: 1,
     });
+  };
 
+  const handleAddToCart = async () => {
+    if (outOfStock || isAddingToCart) return;
+    setIsAddingToCart(true);
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    addLine();
     setIsAddingToCart(false);
     setAddedToCart(true);
-
     setTimeout(() => setAddedToCart(false), 2000);
   };
 
-  const handleBuyNow = async () => {
-    await handleAddToCart();
-    openCart();
+  const handleBuyNow = () => {
+    if (outOfStock || isAddingToCart) return;
+    addLine();
+    router.push("/checkout");
   };
 
-  const nextImage = () => {
-    setSelectedImageIndex((prev) => (prev === product.images.length - 1 ? 0 : prev + 1));
-  };
+  // Current colorway + linked siblings (spec §2 #2): the active swatch is this
+  // product; sibling swatches navigate to their own PDPs. Legacy prod data may
+  // still carry extra Color rows — they render as informational swatches.
+  const legacyExtraColors = Array.from(
+    new Set(
+      product.variants
+        .filter((v) => v.name === "Color" && v.value !== product.colorValue)
+        .map((v) => v.value)
+    )
+  ).filter((value) => !product.styleSiblings.some((s) => s.colorValue === value));
 
-  const prevImage = () => {
-    setSelectedImageIndex((prev) => (prev === 0 ? product.images.length - 1 : prev - 1));
+  const currentAsCompanion: BundleCompanion = {
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    price: product.price,
+    comparePrice: product.comparePrice,
+    stock: product.stock,
+    image: product.images[0] ? { url: product.images[0].url, alt: product.images[0].alt } : null,
+    sizeVariants: sizes.map((v) => ({ id: v.id, value: v.value, stock: v.stock, price: v.price })),
   };
 
   return (
-    <div className="container py-8">
-      {/* Breadcrumb */}
-      <nav className="text-muted-foreground mb-6 flex items-center gap-2 text-sm">
-        <Link href="/" className="hover:text-foreground">
-          Home
-        </Link>
-        <span>/</span>
-        <Link href="/products" className="hover:text-foreground">
-          Products
-        </Link>
-        <span>/</span>
-        <Link href={`/categories/${product.category.slug}`} className="hover:text-foreground">
-          {product.category.name}
-        </Link>
-        <span>/</span>
-        <span className="text-foreground">{product.name}</span>
+    <div className="container py-6 lg:py-8" data-hydrated={hydrated ? "true" : undefined}>
+      {/* Breadcrumb — Головна / Каталог / {name} (catalog markup precedent) */}
+      <nav className="mb-4 text-[12.5px] text-[#737373]">
+        <Link href="/" className="hover:text-white">
+          Головна
+        </Link>{" "}
+        /{" "}
+        <Link href="/products" className="hover:text-white">
+          Каталог
+        </Link>{" "}
+        / <span className="text-[#a3a3a3]">{product.name}</span>
       </nav>
 
-      {/* Main Product Section */}
-      <div className="grid gap-8 lg:grid-cols-2">
-        {/* Image Gallery */}
-        {/* min-w-0 (R8 fix): this is a CSS Grid item (`grid ... lg:grid-cols-2`
-            above); grid items default to `min-width: auto`, i.e. never
-            shrink below their content's intrinsic width. The thumbnail
-            strip below is `overflow-x-auto` but that only clips *inside*
-            this div — it doesn't stop the div itself (and thus the grid
-            track, and the page) from growing to fit every unclipped
-            thumbnail's cumulative width. Confirmed via Playwright at 390px
-            on /products/hudi-mirox-basic (multi-image): before this fix,
-            document.documentElement.scrollWidth was 536 vs a 390 viewport,
-            and the widest offending element was exactly this div (width
-            520px). min-w-0 lets it shrink to the grid track's actual
-            available width, so overflow-x-auto can do its job. */}
-        <div className="min-w-0 space-y-4">
-          {/* Main Image */}
-          <div className="bg-muted relative aspect-square overflow-hidden rounded-lg border">
-            {product.images.length > 0 ? (
-              <>
-                <Image
-                  src={product.images[selectedImageIndex]?.url}
-                  alt={product.images[selectedImageIndex]?.alt || product.name}
-                  fill
-                  className="object-contain"
-                  sizes={IMAGE_SIZES.productDetail}
-                  priority
-                  placeholder="blur"
-                  blurDataURL={DEFAULT_BLUR_DATA_URL}
-                />
-                {product.images.length > 1 && (
-                  <>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="bg-background/80 hover:bg-background absolute top-1/2 left-2 -translate-y-1/2"
-                      onClick={prevImage}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="bg-background/80 hover:bg-background absolute top-1/2 right-2 -translate-y-1/2"
-                      onClick={nextImage}
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </>
-                )}
-              </>
-            ) : (
-              <div className="flex h-full items-center justify-center">
-                <Package className="text-muted-foreground/50 h-24 w-24" />
-              </div>
-            )}
+      {/* Main: gallery | panel */}
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(340px,420px)] lg:items-start">
+        <ProductGallery
+          images={product.images.map((i) => ({ url: i.url, alt: i.alt }))}
+          productName={product.name}
+        />
 
-            {/* Badges */}
-            <div className="absolute top-3 left-3 flex flex-col gap-2">
-              {product.isFeatured && <Badge variant="default">Featured</Badge>}
-              {hasDiscount && <Badge variant="destructive">-{discountPercent}%</Badge>}
-              {currentStock === 0 && <Badge variant="secondary">Out of Stock</Badge>}
-            </div>
-          </div>
-
-          {/* Thumbnail Strip */}
-          {product.images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {product.images.map((image, index) => (
-                <button
-                  key={image.id}
-                  onClick={() => setSelectedImageIndex(index)}
-                  className={cn(
-                    "relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border-2 transition-colors",
-                    selectedImageIndex === index
-                      ? "border-primary"
-                      : "hover:border-muted-foreground/50 border-transparent"
-                  )}
-                >
-                  <Image
-                    src={image.url}
-                    alt={image.alt || `${product.name} thumbnail ${index + 1}`}
-                    fill
-                    className="object-cover"
-                    sizes={IMAGE_SIZES.thumbnail}
-                    placeholder="blur"
-                    blurDataURL={DEFAULT_BLUR_DATA_URL}
-                  />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Product Info */}
-        <div className="space-y-6">
-          {/* Category */}
-          <Link
-            href={`/categories/${product.category.slug}`}
-            className="text-primary text-sm font-medium hover:underline"
-          >
-            {product.category.name}
-          </Link>
-
-          {/* Title */}
-          <h1 className="text-3xl font-bold tracking-tight">{product.name}</h1>
-
-          {/* Price */}
-          <div className="flex items-baseline gap-3">
-            <span className="text-3xl font-bold">{formatPrice(currentPrice)}</span>
+        <div className="flex flex-col">
+          <h1 className="text-[19px] font-extrabold tracking-[-0.02em] lg:text-[30px]">
+            {product.name}
+          </h1>
+          <div className="mt-2.5 flex items-baseline gap-3">
+            <span className="text-lg font-extrabold lg:text-[26px]">
+              {formatPrice(currentPrice)}
+            </span>
             {hasDiscount && (
-              <span className="text-muted-foreground text-xl line-through">
+              <span className="text-muted-foreground text-base line-through">
                 {formatPrice(comparePrice)}
               </span>
             )}
           </div>
 
-          {/* Social Share */}
-          <SocialShareButtons
-            productId={product.id}
-            productName={product.name}
-            productSlug={product.slug}
-            productImage={product.images[0]?.url}
-          />
+          {product.totalReviews > 0 && (
+            <div className="mt-2.5 flex items-center gap-2">
+              <StarRating value={Math.round(product.averageRating)} size="sm" />
+              <a href="#reviews" className="text-[13px] text-[#a3a3a3] hover:text-white">
+                {product.totalReviews}{" "}
+                {pluralizeUk(product.totalReviews, "відгук", "відгуки", "відгуків")}
+              </a>
+            </div>
+          )}
 
-          {/* Short Description */}
-          {product.shortDesc && <p className="text-muted-foreground">{product.shortDesc}</p>}
-
-          <Separator />
-
-          {/* Variants */}
-          {product.variants.length > 0 && (
-            <div className="space-y-3">
-              <div className="text-sm font-medium">Options</div>
-              <div className="flex flex-wrap gap-2">
-                {product.variants.map((variant) => (
-                  <Button
-                    key={variant.id}
-                    variant={selectedVariant?.id === variant.id ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => {
-                      setSelectedVariant(variant);
-                      setQuantity(1);
-                    }}
-                    disabled={variant.stock === 0}
-                    className="min-w-[80px]"
-                  >
-                    {variant.name}
-                    {variant.stock === 0 && " (Out)"}
-                  </Button>
+          {(product.colorValue || product.styleSiblings.length > 0) && (
+            <div className="mt-4.5">
+              <div className="text-[13.5px] font-semibold text-[#a3a3a3]">
+                Колір: <span className="text-foreground">{product.colorValue ?? "—"}</span>
+              </div>
+              <div className="mt-2.5 flex gap-2.5">
+                {product.colorValue && (
+                  <span
+                    aria-label={`Колір: ${product.colorValue} (обраний)`}
+                    className={cn(
+                      "h-9 w-9 rounded-full border-2 border-white",
+                      COLOR_SWATCH_CLASSES[product.colorValue] ?? "bg-muted"
+                    )}
+                  />
+                )}
+                {product.styleSiblings.map((sibling) => (
+                  <Link
+                    key={sibling.slug}
+                    href={`/products/${sibling.slug}`}
+                    aria-label={`Колір: ${sibling.colorValue ?? sibling.name} — ${sibling.name}`}
+                    title={sibling.name}
+                    className={cn(
+                      "h-9 w-9 rounded-full border transition-colors hover:border-white",
+                      (sibling.colorValue && COLOR_SWATCH_CLASSES[sibling.colorValue]) || "bg-muted"
+                    )}
+                  />
+                ))}
+                {legacyExtraColors.map((value) => (
+                  <span
+                    key={value}
+                    aria-label={`Колір: ${value}`}
+                    title={value}
+                    className={cn(
+                      "h-9 w-9 rounded-full border",
+                      COLOR_SWATCH_CLASSES[value] ?? "bg-muted"
+                    )}
+                  />
                 ))}
               </div>
             </div>
           )}
 
-          {/* Quantity */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Quantity</span>
-              {currentStock > 0 && currentStock <= 10 && (
-                <span className="text-muted-foreground text-sm">
-                  Only {currentStock} left in stock
-                </span>
-              )}
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center rounded-md border">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-10 w-10 rounded-r-none"
-                  onClick={() => handleQuantityChange(-1)}
-                  disabled={quantity <= 1 || currentStock === 0}
-                >
-                  <Minus className="h-4 w-4" />
-                </Button>
-                <span className="w-12 text-center font-medium">{quantity}</span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-10 w-10 rounded-l-none"
-                  onClick={() => handleQuantityChange(1)}
-                  disabled={quantity >= currentStock || currentStock === 0}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
+          {sizes.length > 0 && (
+            <div className="mt-4.5">
+              <div className="text-[13.5px] font-semibold text-[#a3a3a3]">Розмір:</div>
+              <div className="mt-2.5 flex flex-wrap gap-2.5">
+                {sizes.map((variant) => {
+                  const isActive = variant.id === selectedSizeId;
+                  const isOut = variant.stock <= 0;
+                  return (
+                    <button
+                      key={variant.id}
+                      type="button"
+                      aria-pressed={isActive}
+                      disabled={isOut}
+                      onClick={() => setSelectedSizeId(variant.id)}
+                      className={cn(
+                        "min-w-[52px] flex-1 rounded-[10px] border px-2 py-3 text-[13.5px] font-bold transition-colors lg:flex-none",
+                        isActive
+                          ? "border-white bg-white text-black"
+                          : "border-border-strong text-foreground hover:border-white",
+                        isOut && "cursor-not-allowed opacity-40"
+                      )}
+                    >
+                      {variant.value}
+                    </button>
+                  );
+                })}
               </div>
-            </div>
-          </div>
-
-          {/* Add to Cart / Buy Now */}
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Button
-              size="lg"
-              className="flex-1"
-              onClick={handleAddToCart}
-              disabled={currentStock === 0 || isAddingToCart}
-            >
-              {isAddingToCart ? (
-                <span className="flex items-center gap-2">
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                  Adding...
-                </span>
-              ) : addedToCart ? (
-                <span className="flex items-center gap-2">
-                  <Check className="h-4 w-4" />
-                  Added to Cart
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  <ShoppingCart className="h-4 w-4" />
-                  Add to Cart
-                </span>
-              )}
-            </Button>
-            <Button
-              size="lg"
-              variant="secondary"
-              className="flex-1"
-              onClick={handleBuyNow}
-              disabled={currentStock === 0 || isAddingToCart}
-            >
-              Buy Now
-            </Button>
-          </div>
-
-          {/* Stock Warning */}
-          {currentStock === 0 && (
-            <div className="bg-destructive/10 text-destructive flex items-center gap-2 rounded-md p-3">
-              <AlertCircle className="h-4 w-4" />
-              <span className="text-sm font-medium">This product is currently out of stock</span>
             </div>
           )}
 
-          {/* SKU */}
-          <div className="text-muted-foreground text-sm">
-            SKU: {selectedVariant?.sku || product.sku}
+          <div className="mt-4.5 flex items-center justify-between text-[13.5px]">
+            {outOfStock ? (
+              <span className="text-muted-foreground font-bold">Немає в наявності</span>
+            ) : lowStock ? (
+              <span className="font-bold">Залишилось {currentStock} шт</span>
+            ) : (
+              <span className="text-available font-bold">● В наявності</span>
+            )}
+            <span className="text-[#a3a3a3]">Доставка Новою Поштою</span>
+          </div>
+
+          <div className="mt-3 flex flex-col gap-2.5">
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              disabled={outOfStock || isAddingToCart}
+              className="rounded-[10px] bg-white p-4 text-sm font-extrabold tracking-[0.06em] text-black transition-colors hover:bg-[#e5e5e5] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {addedToCart ? (
+                <span className="inline-flex items-center gap-2">
+                  <Check className="h-4 w-4" /> ДОДАНО В КОШИК
+                </span>
+              ) : (
+                "ДОДАТИ В КОШИК"
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={handleBuyNow}
+              disabled={outOfStock || isAddingToCart}
+              className="border-border-strong text-foreground rounded-[10px] border p-4 text-sm font-bold tracking-[0.06em] transition-colors hover:border-white disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              КУПИТИ ЗАРАЗ
+            </button>
+          </div>
+
+          {/* «У вибране» and «Відкрити фото замірів» deliberately absent — spec §7 ledger #2/#3. */}
+          <div className="mt-4">
+            <SocialShareButtons
+              productId={product.id}
+              productName={product.name}
+              productSlug={product.slug}
+              productImage={product.images[0]?.url}
+            />
           </div>
         </div>
       </div>
 
-      {/* Full Description */}
+      {/* Size picker + bought together */}
+      <div className="mt-12 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
+        <SizePicker />
+        <BoughtTogether
+          current={currentAsCompanion}
+          companions={product.companions}
+          preferredSizeValue={selectedSize?.value ?? null}
+        />
+      </div>
+
+      {/* Опис — kept for SEO (spec §7 ledger #9) */}
       {product.description && (
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold">Description</h2>
-          <Separator className="my-4" />
-          <div className="prose prose-gray dark:prose-invert max-w-none">
-            <p className="whitespace-pre-wrap">{product.description}</p>
-          </div>
-        </div>
+        <section aria-label="Опис" className="mt-16">
+          <h2 className="mb-5 text-[28px] font-extrabold tracking-[-0.02em]">Опис</h2>
+          <p className="text-foreground/80 max-w-3xl text-[14.5px] leading-relaxed whitespace-pre-wrap">
+            {product.description}
+          </p>
+        </section>
       )}
 
-      {/* Customer Reviews */}
-      <ReviewSection
-        productId={product.id}
-        productSlug={product.slug}
-        initialReviews={product.reviews}
-        averageRating={product.averageRating}
-        totalReviews={product.totalReviews}
-        ratingDistribution={product.ratingDistribution}
-      />
+      <div id="reviews">
+        <ReviewSection
+          productId={product.id}
+          productSlug={product.slug}
+          initialReviews={product.reviews}
+          averageRating={product.averageRating}
+          totalReviews={product.totalReviews}
+          ratingDistribution={product.ratingDistribution}
+        />
+      </div>
 
-      {/* Related Products */}
       {product.relatedProducts.length > 0 && (
-        <div className="mt-16">
-          <h2 className="text-2xl font-bold">Related Products</h2>
-          <div className="mt-6 grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <section aria-label="Схожі товари" className="mt-16">
+          <h2 className="mb-7 text-[28px] font-extrabold tracking-[-0.02em]">Схожі товари</h2>
+          <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
             {product.relatedProducts.map((relatedProduct) => (
               <ProductCard key={relatedProduct.id} product={relatedProduct} />
             ))}
           </div>
-        </div>
+        </section>
       )}
+
+      <RecentlyViewed currentProductId={product.id} />
     </div>
   );
 }
 
 export function ProductNotFound() {
   const router = useRouter();
-
   return (
     <div className="container py-16">
       <div className="flex flex-col items-center justify-center text-center">
         <Package className="text-muted-foreground h-16 w-16" />
-        <h1 className="mt-4 text-2xl font-bold">Product not found</h1>
+        <h1 className="mt-4 text-2xl font-extrabold">Товар не знайдено</h1>
         <p className="text-muted-foreground mt-2">
-          The product you&apos;re looking for doesn&apos;t exist or has been removed.
+          Товару, який ви шукаєте, не існує, або його було видалено.
         </p>
         <Button className="mt-6" onClick={() => router.push("/products")}>
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Products
+          До каталогу
         </Button>
-      </div>
-    </div>
-  );
-}
-
-export function ProductDetailSkeleton() {
-  return (
-    <div className="container py-8">
-      {/* Breadcrumb skeleton */}
-      <div className="mb-6 flex gap-2">
-        {[60, 80, 100, 120].map((width, i) => (
-          <div key={i} className="bg-muted h-4 animate-pulse rounded" style={{ width }} />
-        ))}
-      </div>
-
-      <div className="grid gap-8 lg:grid-cols-2">
-        {/* Image skeleton */}
-        <div className="space-y-4">
-          <div className="bg-muted aspect-square animate-pulse rounded-lg" />
-          <div className="flex gap-2">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-muted h-20 w-20 animate-pulse rounded-md" />
-            ))}
-          </div>
-        </div>
-
-        {/* Info skeleton */}
-        <div className="space-y-6">
-          <div className="bg-muted h-4 w-24 animate-pulse rounded" />
-          <div className="bg-muted h-9 w-3/4 animate-pulse rounded" />
-          <div className="bg-muted h-8 w-32 animate-pulse rounded" />
-          <div className="bg-muted h-16 w-full animate-pulse rounded" />
-          <div className="bg-muted h-px" />
-          <div className="space-y-2">
-            <div className="bg-muted h-4 w-16 animate-pulse rounded" />
-            <div className="flex gap-2">
-              <div className="bg-muted h-10 w-12 animate-pulse rounded" />
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <div className="bg-muted h-12 flex-1 animate-pulse rounded" />
-            <div className="bg-muted h-12 flex-1 animate-pulse rounded" />
-          </div>
-        </div>
       </div>
     </div>
   );

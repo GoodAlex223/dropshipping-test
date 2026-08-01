@@ -331,9 +331,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
   });
 
   const breadcrumbJsonLd = getBreadcrumbJsonLd([
-    { name: "Home", url: siteConfig.url },
-    { name: "Products", url: `${siteConfig.url}/products` },
-    { name: product.category.name, url: `${siteConfig.url}/categories/${product.category.slug}` },
+    { name: "Головна", url: siteConfig.url },
+    { name: "Каталог", url: `${siteConfig.url}/products` },
     { name: product.name, url: `${siteConfig.url}/products/${product.slug}` },
   ]);
 
