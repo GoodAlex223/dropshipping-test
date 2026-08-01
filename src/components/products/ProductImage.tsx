@@ -17,8 +17,9 @@ interface ProductImageProps {
  * Product image with a branded fallback. A missing src, or a src that 404s at
  * runtime (onError), renders the Mirox mark on --muted instead of a blank box —
  * making the data-level broken images (dead seed URLs, tracked in BACKLOG) look
- * deliberate. Client component so it can catch the load error; the parent
- * ProductCard stays a server component.
+ * deliberate. Client component so it can catch the load error (ProductCard is
+ * itself "use client" since the TASK-036 carousel, but this component's own
+ * error state still has to live here, closest to the <Image>).
  */
 export function ProductImage({ src, alt, sizes, className }: ProductImageProps) {
   const [failed, setFailed] = useState(false);

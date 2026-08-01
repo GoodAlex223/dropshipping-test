@@ -2,7 +2,7 @@
 
 Central index for all project documentation.
 
-**Last Updated**: 2026-07-31
+**Last Updated**: 2026-08-01
 
 ---
 
@@ -36,7 +36,7 @@ Central index for all project documentation.
 | [planning/WEEKLY.md](planning/WEEKLY.md)         | Current week's plan  | 2026-07-31   |
 | [planning/TODO.md](planning/TODO.md)             | Active tasks         | 2026-07-31   |
 | [planning/DONE.md](planning/DONE.md)             | Completed tasks      | 2026-07-31   |
-| [planning/BACKLOG.md](planning/BACKLOG.md)       | Unprioritized ideas  | 2026-07-31   |
+| [planning/BACKLOG.md](planning/BACKLOG.md)       | Unprioritized ideas  | 2026-08-01   |
 | [planning/ROADMAP.md](planning/ROADMAP.md)       | Long-term vision     | 2026-07-14   |
 | [planning/GOALS.md](planning/GOALS.md)           | Objectives & metrics | 2026-01-26   |
 | [planning/MILESTONES.md](planning/MILESTONES.md) | Key targets          | 2026-01-26   |
@@ -55,7 +55,7 @@ Central index for all project documentation.
 | [superpowers/specs/2026-07-19-task-035-homepage-design.md](superpowers/specs/2026-07-19-task-035-homepage-design.md)                     | TASK-035 design: homepage sections, content modules, bestseller definition, colour-guard extension                                                                         | 2026-07-19   |
 | [superpowers/specs/2026-07-24-mirox-homepage-polish-design.md](superpowers/specs/2026-07-24-mirox-homepage-polish-design.md)             | Homepage polish & art direction: motion invariants, monochrome badge, dark stats block, social tiles, hero                                                                 | 2026-07-24   |
 | [superpowers/specs/2026-07-27-mirox-design-adoption-design.md](superpowers/specs/2026-07-27-mirox-design-adoption-design.md)             | **TASK-057 design adoption**: dark-theme token flip, homepage realignment, Mirox clothing seed, UAH display, v1.3/v1.4 task-map revision                                   | 2026-07-27   |
-| [superpowers/specs/2026-07-31-task-036-catalog-redesign-design.md](superpowers/specs/2026-07-31-task-036-catalog-redesign-design.md)     | TASK-036 design: catalog filter bar, 4-sort set incl. Популярні, card quick-view/quick-buy, hover second image, hydration-gate preservation                                | 2026-07-31   |
+| [superpowers/specs/2026-07-31-task-036-catalog-redesign-design.md](superpowers/specs/2026-07-31-task-036-catalog-redesign-design.md)     | TASK-036 design: catalog filter bar, 4-sort set incl. Популярні, card quick-view/quick-buy, image carousel, hydration-gate preservation (§8a revision round)               | 2026-08-01   |
 | [design/design_handoff_mirox/README.md](design/design_handoff_mirox/README.md)                                                           | **Design handoff** — 7 HTML screen prototypes (Home/Catalog/Product/Cart/Checkout/Contacts/Mobile) + design spec, reconstructed from the client mockup and client-approved | 2026-07-27   |
 | [reference/client-brief.md](reference/client-brief.md)                                                                                   | **Client brief (verbatim)** — Mirox Shop requirement lists #1 and #2, RU + EN                                                                                              | 2026-07-19   |
 
