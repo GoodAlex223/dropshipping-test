@@ -147,6 +147,29 @@ All customer-visible strings Ukrainian, hardcoded and greppable for TASK-039 ext
 - Generating the 7 missing second-image assets (TASK-056 client-asset item, per decision #3).
 - Any fabricated data: ratings, counters, popularity beyond what orders legitimately contain.
 
+## 8a. Revision round — visual gate (2026-08-01, user feedback)
+
+The first visual-gate review requested these changes; they supersede the matching lines above:
+
+1. **Equal card heights** within a grid row (flex/h-full card, bottom-pinned price group).
+2. **Image carousel replaces the two-image hover swap** (supersedes decision #3's mechanism, not its
+   graceful-fallback principle): the API returns **all** product images; cards with 2+ images
+   auto-advance (~1.5s) on hover with prev/next arrows (arrow hover pauses; touch: static, no
+   arrows); QuickViewDialog gets the same carousel with autoplay while open (~2s). Single-image
+   products keep today's behavior — the asset gap (7/8 single-image) still demos on one card only.
+3. **Quick-buy button shows the header's cart icon** instead of the «В кошик» text label
+   (aria-label stays «В кошик»).
+4. **Hover states on all filter/sort controls** (border #333→#666 / text lighten), incl. popover
+   and sheet rows and pagination squares.
+5. **Mobile shows only the «Фільтри» button**; the sheet gains a «Сортування» section — inline
+   chips and sort row are md+ only (resolves the mobile brief-vs-mock conflict toward the mock).
+6. **Mobile struck-price overflow fixed** (price row wraps).
+7. **PDP mobile horizontal overflow**: diagnose; contained CSS fix ships in this branch, else the
+   diagnosis is handed to TASK-037.
+
+Confirmed unchanged by the user: pagination design (hidden at 8 products is correct behavior;
+12/page via API).
+
 ## 8. Risks
 
 1. **Popular sort + filters + pagination interplay** — mitigated by sharing `getBestsellers()`'s
