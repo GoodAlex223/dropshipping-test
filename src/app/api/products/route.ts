@@ -78,6 +78,19 @@ export async function GET(request: NextRequest) {
       where.isFeatured = true;
     }
 
+    // Explicit id list (recently-viewed): capped, blank-tolerant, still isActive-only.
+    const idsParam = searchParams.get("ids");
+    if (idsParam) {
+      const ids = idsParam
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .slice(0, 12);
+      if (ids.length > 0) {
+        where.id = { in: ids };
+      }
+    }
+
     // Filter by variants (size, color)
     const size = searchParams.get("size");
     const color = searchParams.get("color");

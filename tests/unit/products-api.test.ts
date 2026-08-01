@@ -156,6 +156,36 @@ describe("GET /api/products — sort", () => {
   });
 });
 
+describe("GET /api/products — ids filter (TASK-037 recently-viewed)", () => {
+  it("filters by ids while still enforcing isActive", async () => {
+    await GET(createNextRequest({ url: "/api/products", searchParams: { ids: "a1,b2" } }));
+    expect(whereOf().id).toEqual({ in: ["a1", "b2"] });
+    expect(whereOf().isActive).toBe(true);
+  });
+
+  it("caps ids at 12", async () => {
+    const ids = Array.from({ length: 15 }, (_, i) => `id${i}`).join(",");
+    await GET(createNextRequest({ url: "/api/products", searchParams: { ids } }));
+    expect(whereOf().id.in).toHaveLength(12);
+    expect(whereOf().id.in[0]).toBe("id0");
+  });
+
+  it("ignores empty/whitespace segments", async () => {
+    await GET(createNextRequest({ url: "/api/products", searchParams: { ids: " a ,, b ," } }));
+    expect(whereOf().id).toEqual({ in: ["a", "b"] });
+  });
+
+  it("an ids param with no usable segments leaves where.id unset", async () => {
+    await GET(createNextRequest({ url: "/api/products", searchParams: { ids: " ,, " } }));
+    expect(whereOf().id).toBeUndefined();
+  });
+
+  it("absent ids leaves where.id unset", async () => {
+    await GET(createNextRequest({ url: "/api/products", searchParams: {} }));
+    expect(whereOf().id).toBeUndefined();
+  });
+});
+
 describe("GET /api/products/brands", () => {
   it("returns distinct non-null brands of active products, alphabetical", async () => {
     findMany.mockResolvedValue([{ brand: "Mirox" }]);
