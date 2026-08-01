@@ -4,3 +4,4 @@ export type { QuickViewProduct } from "./QuickViewDialog";
 export { SocialShareButtons } from "./SocialShareButtons";
 export { SizePicker } from "./SizePicker";
 export { BoughtTogether } from "./BoughtTogether";
+export { RecentlyViewed } from "./RecentlyViewed";
