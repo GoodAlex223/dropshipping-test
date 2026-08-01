@@ -1,6 +1,7 @@
 "use client";
 
 import { StarRating } from "./StarRating";
+import { pluralizeUk } from "@/lib/format";
 
 interface RatingDistribution {
   rating: number;
@@ -17,14 +18,14 @@ export function ReviewStats({ averageRating, totalReviews, ratingDistribution }:
   if (totalReviews === 0) return null;
 
   return (
-    <div className="space-y-4">
+    <div className="bg-card border-border space-y-4 rounded-2xl border p-5 sm:p-7">
       {/* Average Rating */}
       <div className="flex items-center gap-3">
         <span className="text-4xl font-bold">{averageRating.toFixed(1)}</span>
         <div>
           <StarRating value={Math.round(averageRating)} size="md" />
           <p className="text-muted-foreground mt-1 text-sm">
-            {totalReviews} review{totalReviews !== 1 ? "s" : ""}
+            {totalReviews} {pluralizeUk(totalReviews, "відгук", "відгуки", "відгуків")}
           </p>
         </div>
       </div>
