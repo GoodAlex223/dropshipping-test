@@ -63,7 +63,70 @@ describe("BoughtTogether", () => {
     );
     // total 1290+590+590=2470; compare 1290+690+590=2570. formatPrice emits
     // NON-BREAKING spaces (uk-UA thousands + before грн) — assert via regex.
-    expect(screen.getByText(/2[\s ]570[\s ]грн/)).toHaveClass("line-through");
-    expect(screen.getByTestId("bundle-total")).toHaveTextContent(/2[\s ]470/);
+    expect(screen.getByText(/2[\s ]570[\s ]грн/)).toHaveClass("line-through");
+    expect(screen.getByTestId("bundle-total")).toHaveTextContent(/2[\s ]470/);
+  });
+
+  it("disables button when current product's preferredSizeValue is out of stock", () => {
+    render(
+      <BoughtTogether
+        current={current}
+        companions={[
+          companion({ id: "a" }),
+          companion({
+            id: "b",
+            sizeVariants: [{ id: "b-s", value: "S", stock: 0, price: null }],
+          }),
+        ]}
+        preferredSizeValue="S"
+      />
+    );
+    const button = screen.getByRole("button", { name: "ДОДАТИ КОМПЛЕКТ У КОШИК" });
+    expect(button).toBeDisabled();
+    fireEvent.click(button);
+    expect(useCartStore.getState().items).toHaveLength(0);
+  });
+
+  it("disables button when a sizeless companion has zero stock", () => {
+    render(
+      <BoughtTogether
+        current={current}
+        companions={[
+          companion({ id: "a", sizeVariants: [], stock: 10 }),
+          companion({ id: "b", sizeVariants: [], stock: 0 }),
+        ]}
+        preferredSizeValue="L"
+      />
+    );
+    const button = screen.getByRole("button", { name: "ДОДАТИ КОМПЛЕКТ У КОШИК" });
+    expect(button).toBeDisabled();
+    fireEvent.click(button);
+    expect(useCartStore.getState().items).toHaveLength(0);
+  });
+
+  it("adds product-level lines for sizeless companions with stock > 0", () => {
+    render(
+      <BoughtTogether
+        current={current}
+        companions={[
+          companion({ id: "a", sizeVariants: [], stock: 5 }),
+          companion({ id: "b", sizeVariants: [], stock: 3 }),
+        ]}
+        preferredSizeValue="L"
+      />
+    );
+    fireEvent.click(screen.getByRole("button", { name: "ДОДАТИ КОМПЛЕКТ У КОШИК" }));
+    const items = useCartStore.getState().items;
+    expect(items).toHaveLength(3);
+    // Current product with size
+    expect(items[0].name).toBe("Худі Mirox Basic — L");
+    expect(items[0].variantId).toBe("cur-l");
+    // Sizeless companions (no variantId)
+    expect(items[1].name).toBe("Product a");
+    expect(items[1].variantId).toBeUndefined();
+    expect(items[1].maxStock).toBe(5);
+    expect(items[2].name).toBe("Product b");
+    expect(items[2].variantId).toBeUndefined();
+    expect(items[2].maxStock).toBe(3);
   });
 });

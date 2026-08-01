@@ -59,9 +59,10 @@ export function BoughtTogether({ current, companions, preferredSizeValue }: Boug
   if (companions.length < 2) return null;
 
   const currentVariant = preferredSizeValue
-    ? (current.sizeVariants.find((v) => v.value === preferredSizeValue) ?? null)
+    ? (current.sizeVariants.find((v) => v.value === preferredSizeValue && v.stock > 0) ?? null)
     : null;
-  const currentResolved = current.sizeVariants.length === 0 || currentVariant !== null;
+  const currentResolved =
+    (current.sizeVariants.length === 0 && current.stock > 0) || currentVariant !== null;
 
   const lines = [
     {
@@ -76,7 +77,9 @@ export function BoughtTogether({ current, companions, preferredSizeValue }: Boug
 
   const allResolved =
     currentResolved &&
-    companions.every((c) => c.sizeVariants.length === 0 || selections[c.id] !== null);
+    companions.every(
+      (c) => (c.sizeVariants.length === 0 && c.stock > 0) || selections[c.id] !== null
+    );
 
   const totals = computeBundleTotals(
     lines.map(({ product, variant }) => ({
