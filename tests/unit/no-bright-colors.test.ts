@@ -171,7 +171,15 @@ describe("token-layer color policy (globals.css Mirox tokens are achromatic)", (
   // StarRating site-wide, reviews pages included — intended, per design).
   // Must still resolve to a valid hex color, just not required to be
   // achromatic.
-  const SANCTIONED_HUE_PROPS = new Set(["--destructive", "--destructive-foreground", "--rating"]);
+  // --available: sanctioned green for the PDP stock line and the reviews'
+  // verified-purchase badge (TASK-037, per Mirox Product.dc.html) — the same
+  // deliberate-exception mechanism as --rating.
+  const SANCTIONED_HUE_PROPS = new Set([
+    "--destructive",
+    "--destructive-foreground",
+    "--rating",
+    "--available",
+  ]);
 
   function extractBlock(selectorPattern: RegExp): string {
     const match = selectorPattern.exec(css);
