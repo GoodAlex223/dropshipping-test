@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/format";
 import { trackViewItem, trackAddToCart } from "@/lib/analytics";
 import { DEFAULT_BLUR_DATA_URL, IMAGE_SIZES } from "@/lib/image-utils";
-import type { ReviewWithUser, RatingDistribution } from "@/types";
+import type { ReviewWithUser, RatingDistribution, StyleSibling, BundleCompanion } from "@/types";
 
 interface ProductImage {
   id: string;
@@ -36,6 +36,7 @@ interface ProductImage {
 interface ProductVariant {
   id: string;
   name: string;
+  value: string;
   sku: string;
   price: string;
   stock: number;
@@ -55,9 +56,13 @@ export interface Product {
   stock: number;
   sku: string;
   isFeatured: boolean;
+  styleGroup?: string | null;
+  colorValue: string | null;
   category: { id: string; name: string; slug: string };
   images: ProductImage[];
   variants: ProductVariant[];
+  styleSiblings: StyleSibling[];
+  companions: BundleCompanion[];
   relatedProducts: {
     id: string;
     name: string;

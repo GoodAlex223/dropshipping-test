@@ -149,3 +149,25 @@ export interface ProductFilters {
   search?: string;
   sortBy?: "price-asc" | "price-desc" | "newest" | "name";
 }
+
+/**
+ * PDP serialized shapes (TASK-037): Decimal prices arrive as strings, per the
+ * "Serialized" convention documented at the top of this file.
+ */
+export interface StyleSibling {
+  slug: string;
+  name: string;
+  colorValue: string | null;
+}
+
+export interface BundleCompanion {
+  id: string;
+  name: string;
+  slug: string;
+  price: string;
+  comparePrice: string | null;
+  /** Product-level stock — the maxStock for sizeless cart lines. */
+  stock: number;
+  image: { url: string; alt: string | null } | null;
+  sizeVariants: { id: string; value: string; stock: number; price: string | null }[];
+}

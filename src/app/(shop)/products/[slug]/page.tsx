@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import { getProductMetadata, getProductJsonLd, getBreadcrumbJsonLd, siteConfig } from "@/lib/seo";
+import { safeSection } from "@/lib/safe-section";
+import { getSalesRanking } from "@/lib/product-queries";
+import type { BundleCompanion, StyleSibling } from "@/types";
 import { ProductDetailClient, ProductNotFound, type Product } from "./product-detail-client";
 
 interface PageProps {
@@ -23,6 +26,7 @@ async function getProduct(slug: string): Promise<Product | null> {
       stock: true,
       sku: true,
       isFeatured: true,
+      styleGroup: true,
       category: {
         select: {
           id: true,
@@ -42,6 +46,7 @@ async function getProduct(slug: string): Promise<Product | null> {
         select: {
           id: true,
           name: true,
+          value: true,
           sku: true,
           price: true,
           stock: true,
@@ -53,66 +58,189 @@ async function getProduct(slug: string): Promise<Product | null> {
 
   if (!product) return null;
 
+  // Colorway siblings (TASK-037): same styleGroup, other products, active.
+  const siblingRows = product.styleGroup
+    ? await safeSection(
+        prisma.product.findMany({
+          where: {
+            styleGroup: product.styleGroup,
+            id: { not: product.id },
+            isActive: true,
+          },
+          select: {
+            slug: true,
+            name: true,
+            variants: { where: { name: "Color" }, select: { value: true }, take: 1 },
+          },
+        }),
+        [],
+        "pdp:style-siblings"
+      )
+    : [];
+
+  const styleSiblings: StyleSibling[] = siblingRows.map((s) => ({
+    slug: s.slug,
+    name: s.name,
+    colorValue: s.variants[0]?.value ?? null,
+  }));
+
+  // Bundle companions (TASK-037): top sellers excluding this product; fill
+  // deterministically from same-category then any active (createdAt desc).
+  const companionSelect = {
+    id: true,
+    name: true,
+    slug: true,
+    price: true,
+    comparePrice: true,
+    stock: true,
+    categoryId: true,
+    images: { select: { url: true, alt: true }, orderBy: { position: "asc" as const }, take: 1 },
+    variants: {
+      where: { name: "Size" },
+      select: { id: true, value: true, stock: true, price: true },
+    },
+  };
+
+  const companions: BundleCompanion[] = await safeSection(
+    (async () => {
+      const rankedIds = (await getSalesRanking(90)).filter((id) => id !== product.id);
+      const picked = new Map<string, Awaited<ReturnType<typeof fetchCompanions>>[number]>();
+
+      async function fetchCompanions(ids: string[]) {
+        if (ids.length === 0) return [];
+        return prisma.product.findMany({
+          where: { id: { in: ids }, isActive: true, stock: { gt: 0 } },
+          select: companionSelect,
+        });
+      }
+
+      const rankedRows = await fetchCompanions(rankedIds.slice(0, 6));
+      const rowById = new Map(rankedRows.map((r) => [r.id, r]));
+      for (const id of rankedIds) {
+        const row = rowById.get(id);
+        if (row && picked.size < 2) picked.set(id, row);
+      }
+
+      if (picked.size < 2) {
+        const fill = await prisma.product.findMany({
+          where: {
+            isActive: true,
+            stock: { gt: 0 },
+            id: { notIn: [product.id, ...picked.keys()] },
+          },
+          select: companionSelect,
+          orderBy: { createdAt: "desc" },
+          take: 4,
+        });
+        // Same-category fill first, then the rest; Array.prototype.sort is
+        // stable, so createdAt desc is preserved within each group.
+        const preferred = fill.sort((a, b) => {
+          const aSame = a.categoryId === product.category.id ? 0 : 1;
+          const bSame = b.categoryId === product.category.id ? 0 : 1;
+          return aSame - bSame;
+        });
+        for (const row of preferred) {
+          if (picked.size >= 2) break;
+          picked.set(row.id, row);
+        }
+      }
+
+      return [...picked.values()].map((c) => ({
+        id: c.id,
+        name: c.name,
+        slug: c.slug,
+        price: c.price.toString(),
+        comparePrice: c.comparePrice?.toString() ?? null,
+        stock: c.stock,
+        image: c.images[0] ?? null,
+        sizeVariants: c.variants.map((v) => ({
+          id: v.id,
+          value: v.value,
+          stock: v.stock,
+          price: v.price?.toString() ?? null,
+        })),
+      }));
+    })(),
+    [],
+    "pdp:companions"
+  );
+
   // Get related products from same category
-  const relatedProducts = await prisma.product.findMany({
-    where: {
-      categoryId: product.category.id,
-      isActive: true,
-      id: { not: product.id },
-    },
-    select: {
-      id: true,
-      name: true,
-      slug: true,
-      shortDesc: true,
-      price: true,
-      comparePrice: true,
-      stock: true,
-      isFeatured: true,
-      category: {
-        select: {
-          name: true,
-          slug: true,
+  const relatedProducts = await safeSection(
+    prisma.product.findMany({
+      where: {
+        categoryId: product.category.id,
+        isActive: true,
+        id: { not: product.id },
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        shortDesc: true,
+        price: true,
+        comparePrice: true,
+        stock: true,
+        isFeatured: true,
+        category: {
+          select: {
+            name: true,
+            slug: true,
+          },
+        },
+        images: {
+          select: {
+            url: true,
+            alt: true,
+          },
+          orderBy: { position: "asc" },
+          take: 1,
         },
       },
-      images: {
-        select: {
-          url: true,
-          alt: true,
-        },
-        orderBy: { position: "asc" },
-        take: 1,
-      },
-    },
-    take: 4,
-  });
+      take: 4,
+    }),
+    [],
+    "pdp:related"
+  );
 
   // Fetch reviews and stats
   const [reviews, reviewStats, reviewDistribution] = await Promise.all([
-    prisma.review.findMany({
-      where: { productId: product.id, isHidden: false },
-      select: {
-        id: true,
-        rating: true,
-        comment: true,
-        adminReply: true,
-        adminRepliedAt: true,
-        createdAt: true,
-        user: { select: { id: true, name: true, image: true } },
-      },
-      orderBy: { createdAt: "desc" },
-      take: 10,
-    }),
-    prisma.review.aggregate({
-      where: { productId: product.id, isHidden: false },
-      _avg: { rating: true },
-      _count: true,
-    }),
-    prisma.review.groupBy({
-      by: ["rating"],
-      where: { productId: product.id, isHidden: false },
-      _count: true,
-    }),
+    safeSection(
+      prisma.review.findMany({
+        where: { productId: product.id, isHidden: false },
+        select: {
+          id: true,
+          rating: true,
+          comment: true,
+          adminReply: true,
+          adminRepliedAt: true,
+          createdAt: true,
+          user: { select: { id: true, name: true, image: true } },
+        },
+        orderBy: { createdAt: "desc" },
+        take: 10,
+      }),
+      [],
+      "pdp:reviews"
+    ),
+    safeSection(
+      prisma.review.aggregate({
+        where: { productId: product.id, isHidden: false },
+        _avg: { rating: true },
+        _count: true,
+      }),
+      { _avg: { rating: null }, _count: 0 },
+      "pdp:review-stats"
+    ),
+    safeSection(
+      prisma.review.groupBy({
+        by: ["rating"],
+        where: { productId: product.id, isHidden: false },
+        _count: true,
+      }),
+      [],
+      "pdp:review-distribution"
+    ),
   ]);
 
   const ratingDistribution = [5, 4, 3, 2, 1].map((r) => ({
@@ -124,8 +252,12 @@ async function getProduct(slug: string): Promise<Product | null> {
     ...product,
     price: product.price.toString(),
     comparePrice: product.comparePrice?.toString() ?? null,
+    colorValue: product.variants.find((v) => v.name === "Color")?.value ?? null,
+    styleSiblings,
+    companions,
     variants: product.variants.map((v) => ({
       ...v,
+      value: v.value,
       price: v.price?.toString() ?? product.price.toString(),
       sku: v.sku ?? product.sku,
       options: {},
