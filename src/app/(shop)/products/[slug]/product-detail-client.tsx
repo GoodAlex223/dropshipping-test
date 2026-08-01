@@ -190,7 +190,19 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
       {/* Main Product Section */}
       <div className="grid gap-8 lg:grid-cols-2">
         {/* Image Gallery */}
-        <div className="space-y-4">
+        {/* min-w-0 (R8 fix): this is a CSS Grid item (`grid ... lg:grid-cols-2`
+            above); grid items default to `min-width: auto`, i.e. never
+            shrink below their content's intrinsic width. The thumbnail
+            strip below is `overflow-x-auto` but that only clips *inside*
+            this div — it doesn't stop the div itself (and thus the grid
+            track, and the page) from growing to fit every unclipped
+            thumbnail's cumulative width. Confirmed via Playwright at 390px
+            on /products/hudi-mirox-basic (multi-image): before this fix,
+            document.documentElement.scrollWidth was 536 vs a 390 viewport,
+            and the widest offending element was exactly this div (width
+            520px). min-w-0 lets it shrink to the grid track's actual
+            available width, so overflow-x-auto can do its job. */}
+        <div className="min-w-0 space-y-4">
           {/* Main Image */}
           <div className="bg-muted relative aspect-square overflow-hidden rounded-lg border">
             {product.images.length > 0 ? (
