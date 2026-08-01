@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Slider } from "@/components/ui/slider";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { SIZE_ORDER } from "@/components/products/ProductCard";
+import { SIZE_ORDER, COLOR_SWATCH_CLASSES } from "@/lib/product-display";
 
 export type CatalogSort = "new" | "popular" | "price-asc" | "price-desc";
 
@@ -36,10 +36,6 @@ const PRICE_STEP = 10;
 
 /** Fixed per the design spec — not sourced from the API (only Size varies by product). */
 const COLORS = ["Чорний", "Білий"] as const;
-const COLOR_SWATCH_CLASSES: Record<string, string> = {
-  Чорний: "bg-black border-[#333]",
-  Білий: "bg-[#f5f5f5] border-[#333]",
-};
 
 const SORT_OPTIONS: { value: CatalogSort; label: string }[] = [
   { value: "new", label: "Новинки" },

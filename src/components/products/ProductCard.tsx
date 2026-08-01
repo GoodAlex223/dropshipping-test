@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { IMAGE_SIZES } from "@/lib/image-utils";
 import { formatPrice } from "@/lib/format";
 import { isNewProduct } from "@/lib/product-badges";
+import { COLOR_SWATCH_CLASSES, rankSizeValues } from "@/lib/product-display";
 import { cn } from "@/lib/utils";
 import { ProductImage } from "./ProductImage";
 
@@ -66,23 +67,16 @@ interface ProductCardProps {
   onQuickView?: (opts: { focusSizes: boolean }) => void;
 }
 
-/** Canonical display order; any other Size value (e.g. "One size") is appended after, in first-seen order. */
-export const SIZE_ORDER = ["S", "M", "L", "XL", "XXL"] as const;
-
-const COLOR_SWATCH_CLASSES: Record<string, string> = {
-  Чорний: "bg-black border-border-strong",
-  Білий: "bg-[#f5f5f5] border-border",
-};
+// Compatibility re-export: SIZE_ORDER now lives in @/lib/product-display
+// (single source, shared with QuickViewDialog/filter-bar/PDP); kept here so
+// existing importers of `SIZE_ORDER` from this module keep working.
+export { SIZE_ORDER } from "@/lib/product-display";
 
 /** Dedupes Size-variant values and orders them S · M · L · XL · XXL; returns null when there are none. */
 function getSizeLabel(variants: ProductVariantOption[] | undefined): string | null {
   const sizeValues = variants?.filter((v) => v.name === "Size").map((v) => v.value) ?? [];
   if (sizeValues.length === 0) return null;
-
-  const unique = Array.from(new Set(sizeValues));
-  const ranked = SIZE_ORDER.filter((s) => unique.includes(s));
-  const extras = unique.filter((v) => !(SIZE_ORDER as readonly string[]).includes(v));
-  return [...ranked, ...extras].join(" · ");
+  return rankSizeValues(sizeValues).join(" · ");
 }
 
 export function ProductCard({ product, showCategory = true, onQuickView }: ProductCardProps) {
