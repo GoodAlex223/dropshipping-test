@@ -35,7 +35,7 @@
 - Consumes: existing `COUNTED_STATUSES`, `prisma.orderItem.groupBy`.
 - Produces: `export async function getSalesRanking(windowDays = 90, take?: number): Promise<string[]>` — product IDs ranked by units sold (desc) over the trailing window, counting only stuck orders. `getBestsellers()` now calls it with `take = limit` (its groupBy call shape is unchanged, so existing tests still pass). Task 4 calls it with no `take` for the full ranking.
 
-- [ ] **Step 1: Write the failing tests** — append to `tests/unit/product-queries.test.ts`:
+- [x] **Step 1: Write the failing tests** — append to `tests/unit/product-queries.test.ts`:
 
 ```ts
 import {
@@ -70,9 +70,9 @@ describe("getSalesRanking", () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify failure** — `npm run test:run -- tests/unit/product-queries.test.ts`. Expected: FAIL — `getSalesRanking` is not exported.
+- [x] **Step 2: Run to verify failure** — `npm run test:run -- tests/unit/product-queries.test.ts`. Expected: FAIL — `getSalesRanking` is not exported.
 
-- [ ] **Step 3: Implement** in `src/lib/product-queries.ts` — add above `getBestsellers()`:
+- [x] **Step 3: Implement** in `src/lib/product-queries.ts` — add above `getBestsellers()`:
 
 ```ts
 /**
@@ -105,9 +105,9 @@ const rankedIds = await getSalesRanking(windowDays, limit);
 
 (delete the now-unused local `since`/`grouped` code; keep everything from `const ranked = ...` down unchanged). Also update the stale comment above `getBestsellers` (`// No homepage consumer since TASK-057...`) to note TASK-036 now consumes `getSalesRanking()`.
 
-- [ ] **Step 4: Run to verify pass** — `npm run test:run -- tests/unit/product-queries.test.ts`. Expected: all pass, including the pre-existing `getBestsellers` tests (its groupBy still receives `take: limit`).
+- [x] **Step 4: Run to verify pass** — `npm run test:run -- tests/unit/product-queries.test.ts`. Expected: all pass, including the pre-existing `getBestsellers` tests (its groupBy still receives `take: limit`).
 
-- [ ] **Step 5: Commit** — `git add src/lib/product-queries.ts tests/unit/product-queries.test.ts && git commit -m "feat(catalog): extract getSalesRanking() shared popularity definition"`
+- [x] **Step 5: Commit** — `git add src/lib/product-queries.ts tests/unit/product-queries.test.ts && git commit -m "feat(catalog): extract getSalesRanking() shared popularity definition"`
 
 ---
 
@@ -122,7 +122,7 @@ const rankedIds = await getSalesRanking(windowDays, limit);
 
 - Produces: `export const NEW_BADGE_WINDOW_DAYS = 30`; `export function isNewProduct(createdAt: string | Date, now: Date = new Date()): boolean` — true iff `createdAt` is strictly within the last 30 days. Task 6 (ProductCard) consumes it.
 
-- [ ] **Step 1: Write the failing test** — create `tests/unit/product-badges.test.ts`:
+- [x] **Step 1: Write the failing test** — create `tests/unit/product-badges.test.ts`:
 
 ```ts
 import { describe, it, expect } from "vitest";
@@ -154,9 +154,9 @@ describe("isNewProduct", () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify failure** — `npm run test:run -- tests/unit/product-badges.test.ts`. Expected: FAIL — module not found.
+- [x] **Step 2: Run to verify failure** — `npm run test:run -- tests/unit/product-badges.test.ts`. Expected: FAIL — module not found.
 
-- [ ] **Step 3: Implement** — create `src/lib/product-badges.ts`:
+- [x] **Step 3: Implement** — create `src/lib/product-badges.ts`:
 
 ```ts
 /** Window inside which a product earns the НОВИНКА badge (spec §5). */
@@ -175,9 +175,9 @@ export function isNewProduct(createdAt: string | Date, now: Date = new Date()): 
 }
 ```
 
-- [ ] **Step 4: Run to verify pass** — `npm run test:run -- tests/unit/product-badges.test.ts`. Expected: PASS.
+- [x] **Step 4: Run to verify pass** — `npm run test:run -- tests/unit/product-badges.test.ts`. Expected: PASS.
 
-- [ ] **Step 5: Commit** — `git add src/lib/product-badges.ts tests/unit/product-badges.test.ts && git commit -m "feat(catalog): add isNewProduct() НОВИНКА badge helper"`
+- [x] **Step 5: Commit** — `git add src/lib/product-badges.ts tests/unit/product-badges.test.ts && git commit -m "feat(catalog): add isNewProduct() НОВИНКА badge helper"`
 
 ---
 
@@ -193,7 +193,7 @@ export function isNewProduct(createdAt: string | Date, now: Date = new Date()): 
 - Consumes: nothing new.
 - Produces: `GET /api/products` accepting `size`, `color`, `brand`, `inStock=true` (combinable with the existing `search`/`category`/`minPrice`/`maxPrice`/`featured`); response items now include `variants: { id, name, value, stock, price }[]`, `createdAt`, and up to **2** images. Tasks 6–8 consume the response shape.
 
-- [ ] **Step 1: Write the failing tests** — create `tests/unit/products-api.test.ts`:
+- [x] **Step 1: Write the failing tests** — create `tests/unit/products-api.test.ts`:
 
 ```ts
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -284,9 +284,9 @@ describe("GET /api/products — filters", () => {
 
 Note: `createNextRequest` comes from `tests/helpers/api-test-utils.ts` — signature `createNextRequest({ url, method?, body?, searchParams? })`; `url` is required and `searchParams` are merged onto it.
 
-- [ ] **Step 2: Run to verify failure** — `npm run test:run -- tests/unit/products-api.test.ts`. Expected: FAIL on the filter assertions (params ignored today). The `vi.mock("@/lib/product-queries")` is inert until Task 4 — harmless here.
+- [x] **Step 2: Run to verify failure** — `npm run test:run -- tests/unit/products-api.test.ts`. Expected: FAIL on the filter assertions (params ignored today). The `vi.mock("@/lib/product-queries")` is inert until Task 4 — harmless here.
 
-- [ ] **Step 3: Implement** in `src/app/api/products/route.ts` — after the existing `featured` block, add:
+- [x] **Step 3: Implement** in `src/app/api/products/route.ts` — after the existing `featured` block, add:
 
 ```ts
 const size = searchParams.get("size");
@@ -319,9 +319,9 @@ createdAt: true,
 variants: { select: { id: true, name: true, value: true, stock: true, price: true } },
 ```
 
-- [ ] **Step 4: Run to verify pass** — `npm run test:run -- tests/unit/products-api.test.ts`. Expected: PASS.
+- [x] **Step 4: Run to verify pass** — `npm run test:run -- tests/unit/products-api.test.ts`. Expected: PASS.
 
-- [ ] **Step 5: Commit** — `git add src/app/api/products/route.ts tests/unit/products-api.test.ts && git commit -m "feat(catalog): size/color/brand/inStock filters + variants in /api/products"`
+- [x] **Step 5: Commit** — `git add src/app/api/products/route.ts tests/unit/products-api.test.ts && git commit -m "feat(catalog): size/color/brand/inStock filters + variants in /api/products"`
 
 ---
 
@@ -337,7 +337,7 @@ variants: { select: { id: true, name: true, value: true, stock: true, price: tru
 - Consumes: `getSalesRanking()` from Task 1.
 - Produces: `sort` = `new` (default) | `popular` | `price-asc` | `price-desc`. When `sort` is **absent**, the legacy `sortBy`/`sortOrder` path runs exactly as today (full back-compat). Invalid `sort` values fall back to `new`.
 
-- [ ] **Step 1: Write the failing tests** — append to `tests/unit/products-api.test.ts`:
+- [x] **Step 1: Write the failing tests** — append to `tests/unit/products-api.test.ts`:
 
 ```ts
 import { getSalesRanking } from "@/lib/product-queries";
@@ -411,9 +411,9 @@ describe("GET /api/products — sort", () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify failure** — `npm run test:run -- tests/unit/products-api.test.ts`. Expected: new tests FAIL (`sort` unknown).
+- [x] **Step 2: Run to verify failure** — `npm run test:run -- tests/unit/products-api.test.ts`. Expected: new tests FAIL (`sort` unknown).
 
-- [ ] **Step 3: Implement** in `src/app/api/products/route.ts`:
+- [x] **Step 3: Implement** in `src/app/api/products/route.ts`:
 
 Add the import: `import { getSalesRanking } from "@/lib/product-queries";` and extract the current `select` object into a module-level `const LIST_SELECT = { ... }` (the object from Task 3, unchanged) so both query paths share it.
 
@@ -483,9 +483,9 @@ if (sort === "popular") {
 
 (The old top-of-function `sortBy`/`sortOrder` reads move into the legacy branch; the response construction below stays as-is, now using `products`/`total`.)
 
-- [ ] **Step 4: Run to verify pass** — `npm run test:run -- tests/unit/products-api.test.ts` then the full suite `npm run test:run`. Expected: PASS everywhere.
+- [x] **Step 4: Run to verify pass** — `npm run test:run -- tests/unit/products-api.test.ts` then the full suite `npm run test:run`. Expected: PASS everywhere.
 
-- [ ] **Step 5: Commit** — `git add src/app/api/products/route.ts tests/unit/products-api.test.ts && git commit -m "feat(catalog): sort param with popular ranking in /api/products"`
+- [x] **Step 5: Commit** — `git add src/app/api/products/route.ts tests/unit/products-api.test.ts && git commit -m "feat(catalog): sort param with popular ranking in /api/products"`
 
 ---
 
@@ -500,7 +500,7 @@ if (sort === "popular") {
 
 - Produces: `GET /api/products/brands` → `string[]` of distinct non-null brands of active products, alphabetical. Task 8's FilterBar consumes it.
 
-- [ ] **Step 1: Write the failing tests** — append to `tests/unit/products-api.test.ts`:
+- [x] **Step 1: Write the failing tests** — append to `tests/unit/products-api.test.ts`:
 
 ```ts
 import { GET as GET_BRANDS } from "@/app/api/products/brands/route";
@@ -520,9 +520,9 @@ describe("GET /api/products/brands", () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify failure** — module not found. Expected: FAIL.
+- [x] **Step 2: Run to verify failure** — module not found. Expected: FAIL.
 
-- [ ] **Step 3: Implement** — create `src/app/api/products/brands/route.ts`:
+- [x] **Step 3: Implement** — create `src/app/api/products/brands/route.ts`:
 
 ```ts
 import { NextResponse } from "next/server";
@@ -546,9 +546,9 @@ export async function GET() {
 }
 ```
 
-- [ ] **Step 4: Run to verify pass** — `npm run test:run -- tests/unit/products-api.test.ts`. Expected: PASS.
+- [x] **Step 4: Run to verify pass** — `npm run test:run -- tests/unit/products-api.test.ts`. Expected: PASS.
 
-- [ ] **Step 5: Commit** — `git add src/app/api/products/brands/route.ts tests/unit/products-api.test.ts && git commit -m "feat(catalog): /api/products/brands distinct-brand endpoint"`
+- [x] **Step 5: Commit** — `git add src/app/api/products/brands/route.ts tests/unit/products-api.test.ts && git commit -m "feat(catalog): /api/products/brands distinct-brand endpoint"`
 
 ---
 
@@ -566,7 +566,7 @@ export async function GET() {
 - Consumes: `isNewProduct` (Task 2).
 - Produces: `ProductCardProps.product` gains optional `createdAt?: string | Date` and richer optional `variants?: { name: string; value: string }[]` (unchanged shape); new optional prop `onQuickView?: (opts: { focusSizes: boolean }) => void` — when provided (and product in stock for «В кошик»), a hover overlay renders the two quick-action buttons. `export const SIZE_ORDER` (moved from module-private to exported). `ProductImage` gains `className?: string`. Existing consumers pass no new props and render exactly as before.
 
-- [ ] **Step 1: Write the failing tests** — in `tests/unit/product-card.test.tsx`, update the out-of-stock test's expected text from `"Out of Stock"` to `"Немає в наявності"`, and append:
+- [x] **Step 1: Write the failing tests** — in `tests/unit/product-card.test.tsx`, update the out-of-stock test's expected text from `"Out of Stock"` to `"Немає в наявності"`, and append:
 
 ```ts
 const now = Date.now();
@@ -654,9 +654,9 @@ describe("ProductCard — TASK-036 upgrades", () => {
 
 Add `vi` to the vitest import in that file. Note the existing "renders the whole card as a single link, with no separate View Product/Details button" test — its `queryByRole("button")` expectation stays valid because no `onQuickView` is passed there.
 
-- [ ] **Step 2: Run to verify failure** — `npm run test:run -- tests/unit/product-card.test.tsx`. Expected: FAIL on all new tests + the out-of-stock text change.
+- [x] **Step 2: Run to verify failure** — `npm run test:run -- tests/unit/product-card.test.tsx`. Expected: FAIL on all new tests + the out-of-stock text change.
 
-- [ ] **Step 3: Implement.** In `ProductImage.tsx`: add `className?: string` to props, apply via `cn()` to the `<Image>` (import `cn` from `@/lib/utils`; spread onto the fallback div too so hover layering works with fallbacks). In `ProductCard.tsx`:
+- [x] **Step 3: Implement.** In `ProductImage.tsx`: add `className?: string` to props, apply via `cn()` to the `<Image>` (import `cn` from `@/lib/utils`; spread onto the fallback div too so hover layering works with fallbacks). In `ProductCard.tsx`:
 
 ```tsx
 import { isNewProduct } from "@/lib/product-badges";
@@ -772,9 +772,9 @@ const colorValues = Array.from(
 
 In `product-queries.ts`: add `createdAt: true` to `PRODUCT_CARD_SELECT` and `createdAt: Date | string` to `ProductCardData` — homepage rails then show НОВИНКА consistently. Note: `ProductCardData` crosses a server→client boundary in rails; Next serializes `Date` fine in RSC props, but keep the type union so catalog JSON (string) also fits.
 
-- [ ] **Step 4: Run to verify pass** — `npm run test:run -- tests/unit/product-card.test.tsx tests/unit/product-queries.test.ts`, then full `npm run test:run` (home-page/product-rail/showcase tests must stay green — card is additive).
+- [x] **Step 4: Run to verify pass** — `npm run test:run -- tests/unit/product-card.test.tsx tests/unit/product-queries.test.ts`, then full `npm run test:run` (home-page/product-rail/showcase tests must stay green — card is additive).
 
-- [ ] **Step 5: Commit** — `git add -A src/components/products src/lib/product-queries.ts tests/unit/product-card.test.tsx tests/unit/product-queries.test.ts && git commit -m "feat(catalog): ProductCard badges, swatches, hover image, quick actions"`
+- [x] **Step 5: Commit** — `git add -A src/components/products src/lib/product-queries.ts tests/unit/product-card.test.tsx tests/unit/product-queries.test.ts && git commit -m "feat(catalog): ProductCard badges, swatches, hover image, quick actions"`
 
 ---
 
@@ -812,7 +812,7 @@ export function QuickViewDialog(props: {
 
 Open when `product !== null`. Task 8 consumes it.
 
-- [ ] **Step 1: Write the failing tests** — create `tests/unit/quick-view-dialog.test.tsx`:
+- [x] **Step 1: Write the failing tests** — create `tests/unit/quick-view-dialog.test.tsx`:
 
 ```tsx
 import { render, screen, fireEvent } from "@testing-library/react";
@@ -916,9 +916,9 @@ describe("QuickViewDialog", () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify failure** — `npm run test:run -- tests/unit/quick-view-dialog.test.tsx`. Expected: FAIL — module not found.
+- [x] **Step 2: Run to verify failure** — `npm run test:run -- tests/unit/quick-view-dialog.test.tsx`. Expected: FAIL — module not found.
 
-- [ ] **Step 3: Implement** `src/components/products/QuickViewDialog.tsx` (`"use client"`). Key structure:
+- [x] **Step 3: Implement** `src/components/products/QuickViewDialog.tsx` (`"use client"`). Key structure:
 
 ```tsx
 "use client";
@@ -971,9 +971,9 @@ onOpenChange(false);
 - `DialogTitle` = product name (Radix a11y requirement).
 - Export from `src/components/products/index.ts`.
 
-- [ ] **Step 4: Run to verify pass** — `npm run test:run -- tests/unit/quick-view-dialog.test.tsx`. Expected: PASS.
+- [x] **Step 4: Run to verify pass** — `npm run test:run -- tests/unit/quick-view-dialog.test.tsx`. Expected: PASS.
 
-- [ ] **Step 5: Commit** — `git add src/components/products tests/unit/quick-view-dialog.test.tsx && git commit -m "feat(catalog): QuickViewDialog for quick-view/quick-buy"`
+- [x] **Step 5: Commit** — `git add src/components/products tests/unit/quick-view-dialog.test.tsx && git commit -m "feat(catalog): QuickViewDialog for quick-view/quick-buy"`
 
 ---
 
@@ -1012,7 +1012,7 @@ export function FilterBar(props: {
 }): JSX.Element;
 ```
 
-- [ ] **Step 1: Write the failing tests** — create `tests/unit/filter-bar.test.tsx` (no router needed — FilterBar is controlled via props):
+- [x] **Step 1: Write the failing tests** — create `tests/unit/filter-bar.test.tsx` (no router needed — FilterBar is controlled via props):
 
 ```tsx
 import { render, screen, fireEvent } from "@testing-library/react";
@@ -1102,9 +1102,9 @@ describe("FilterBar", () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify failure** — `npm run test:run -- tests/unit/filter-bar.test.tsx`. Expected: FAIL — module not found.
+- [x] **Step 2: Run to verify failure** — `npm run test:run -- tests/unit/filter-bar.test.tsx`. Expected: FAIL — module not found.
 
-- [ ] **Step 3: Implement `filter-bar.tsx`** (`"use client"`). Layout per the mock (`Mirox Catalog.dc.html` lines 49–69):
+- [x] **Step 3: Implement `filter-bar.tsx`** (`"use client"`). Layout per the mock (`Mirox Catalog.dc.html` lines 49–69):
 
 - Wrapping flex row, `gap-2.5`, `flex-wrap`, `mb-8`; on mobile (`max-md`) the chip row becomes `overflow-x-auto flex-nowrap` (per `Mirox Mobile.dc.html`).
 - **«Фільтри»** button (SlidersHorizontal icon + label, `border border-[#333] rounded-[10px] px-4 py-2.5 text-[13px] font-bold`) opens a shadcn `Sheet` (side="left") containing: price `Slider` (0–2000, step 10) + «Застосувати» button emitting `{ minPrice, maxPrice }` (null when at the bounds), brand radio list (from `brands` prop), size chips, colour options (Чорний/Білій — fixed per spec), availability toggle, and «Скинути все» calling `onClearAll`.
@@ -1133,11 +1133,11 @@ describe("FilterBar", () => {
 - Delete: search form, category `Select`s, sort `Select`, old active-filter badges (replaced by FilterBar chips), old Sheet contents (replaced by FilterBar's Sheet).
 - All copy Ukrainian: «Каталог», counts line optional per mock (omit — mock shows none).
 
-- [ ] **Step 4: Run to verify pass** — `npm run test:run -- tests/unit/filter-bar.test.tsx`, then full `npm run test:run`, then `npm run typecheck`.
+- [x] **Step 4: Run to verify pass** — `npm run test:run -- tests/unit/filter-bar.test.tsx`, then full `npm run test:run`, then `npm run typecheck`.
 
-- [ ] **Step 5: Manual smoke** — `npm run dev`, open `http://localhost:3000/products`: filters combine and reflect in the URL, sort buttons white-activate, quick view adds to cart and opens the drawer, pagination squares render. (Full visual gate is Task 11.)
+- [x] **Step 5: Manual smoke** — `npm run dev`, open `http://localhost:3000/products`: filters combine and reflect in the URL, sort buttons white-activate, quick view adds to cart and opens the drawer, pagination squares render. (Full visual gate is Task 11.)
 
-- [ ] **Step 6: Commit** — `git add "src/app/(shop)/products" tests/unit/filter-bar.test.tsx && git commit -m "feat(catalog): Mirox filter bar, grid, square pagination, quick view wiring"`
+- [x] **Step 6: Commit** — `git add "src/app/(shop)/products" tests/unit/filter-bar.test.tsx && git commit -m "feat(catalog): Mirox filter bar, grid, square pagination, quick view wiring"`
 
 ---
 
@@ -1152,7 +1152,7 @@ describe("FilterBar", () => {
 
 - Produces: nav «Новинки» → `/products?sort=new`, «Бестселери» → `/products?sort=popular`; the header search icon button gains `aria-label="Пошук"` (consumed by Task 10's E2E retarget).
 
-- [ ] **Step 1: Update the failing tests** — in `tests/unit/header.test.tsx` change the two href assertions (currently lines ~35–41): «Новинки» → `"/products?sort=new"`, «Бестселери» → `"/products?sort=popular"`. Add:
+- [x] **Step 1: Update the failing tests** — in `tests/unit/header.test.tsx` change the two href assertions (currently lines ~35–41): «Новинки» → `"/products?sort=new"`, «Бестселери» → `"/products?sort=popular"`. Add:
 
 ```ts
 it("labels the search trigger for a11y and E2E", () => {
@@ -1161,13 +1161,13 @@ it("labels the search trigger for a11y and E2E", () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify failure** — `npm run test:run -- tests/unit/header.test.tsx`. Expected: FAIL on all three.
+- [x] **Step 2: Run to verify failure** — `npm run test:run -- tests/unit/header.test.tsx`. Expected: FAIL on all three.
 
-- [ ] **Step 3: Implement** — in `Header.tsx`: update the two `navigation` entries (line ~42–44); add `aria-label="Пошук"` to the search icon `<Button>` (the one calling `setSearchOpen(true)`; there may be desktop + mobile instances — label every search trigger; `getByRole` in the test should then use `getAllByRole(...)` if more than one renders).
+- [x] **Step 3: Implement** — in `Header.tsx`: update the two `navigation` entries (line ~42–44); add `aria-label="Пошук"` to the search icon `<Button>` (the one calling `setSearchOpen(true)`; there may be desktop + mobile instances — label every search trigger; `getByRole` in the test should then use `getAllByRole(...)` if more than one renders).
 
-- [ ] **Step 4: Run to verify pass** — `npm run test:run -- tests/unit/header.test.tsx`. Expected: PASS.
+- [x] **Step 4: Run to verify pass** — `npm run test:run -- tests/unit/header.test.tsx`. Expected: PASS.
 
-- [ ] **Step 5: Commit** — `git add src/components/common/Header.tsx tests/unit/header.test.tsx && git commit -m "feat(catalog): retarget Новинки/Бестселери nav to sort params"`
+- [x] **Step 5: Commit** — `git add src/components/common/Header.tsx tests/unit/header.test.tsx && git commit -m "feat(catalog): retarget Новинки/Бестселери nav to sort params"`
 
 ---
 
@@ -1181,7 +1181,7 @@ it("labels the search trigger for a11y and E2E", () => {
 
 - Consumes: sort buttons + size chips (Task 8), header search label (Task 9). The hydration-gate comment and `waitForSelector("[data-testid='product-card']")` lines are **not modified**.
 
-- [ ] **Step 1: Update the sort test** — replace the combobox-based `"can sort products"` with:
+- [x] **Step 1: Update the sort test** — replace the combobox-based `"can sort products"` with:
 
 ```ts
 test("can sort products", async ({ page }) => {
@@ -1198,7 +1198,7 @@ test("can sort products", async ({ page }) => {
 });
 ```
 
-- [ ] **Step 2: Retarget the search test to the Header** — replace the body of `"can filter products by search"` (keep the hydration-gate comment + waitForSelector):
+- [x] **Step 2: Retarget the search test to the Header** — replace the body of `"can filter products by search"` (keep the hydration-gate comment + waitForSelector):
 
 ```ts
 // Search moved to the Header dialog in TASK-036 (the catalog filter bar
@@ -1213,7 +1213,7 @@ await expect(page).toHaveURL(/search=test/);
 
 (This drops the `isMobile` branch — Enter submits on both. Keep the `isMobile` fixture out of the signature if unused.)
 
-- [ ] **Step 3: Add the size-filter smoke test**:
+- [x] **Step 3: Add the size-filter smoke test**:
 
 ```ts
 test("size filter chip updates URL and grid", async ({ page }) => {
@@ -1231,9 +1231,9 @@ test("size filter chip updates URL and grid", async ({ page }) => {
 
 Note for mobile projects: the size chips live in the scrollable chip row — if the chip is off-screen, Playwright auto-scrolls; if the mobile layout puts sizes only inside the «Фільтри» sheet, open the sheet first with `page.getByRole("button", { name: "Фільтри" }).click()` guarded by `isMobile`. Match the implementation from Task 8.
 
-- [ ] **Step 4: Run E2E locally** — infra first: `docker-compose up -d`, DB seeded (`npm run db:seed` — verify `DATABASE_URL` points at local Postgres first, `.env` duplicate-URL footgun), then `npm run test:e2e`. Expected: all products/navigation specs green on all five local projects.
+- [x] **Step 4: Run E2E locally** — infra first: `docker-compose up -d`, DB seeded (`npm run db:seed` — verify `DATABASE_URL` points at local Postgres first, `.env` duplicate-URL footgun), then `npm run test:e2e`. Expected: all products/navigation specs green on all five local projects.
 
-- [ ] **Step 5: Commit** — `git add tests/e2e/products.spec.ts && git commit -m "test(e2e): sort buttons, header search, size-filter smoke for TASK-036"`
+- [x] **Step 5: Commit** — `git add tests/e2e/products.spec.ts && git commit -m "test(e2e): sort buttons, header search, size-filter smoke for TASK-036"`
 
 ---
 
@@ -1243,7 +1243,7 @@ Note for mobile projects: the size chips live in the scrollable chip row — if 
 
 - Modify: `docs/planning/BACKLOG.md`, `docs/planning/plans/2026-07-31_task-036-catalog-redesign-filters.md` (progress log)
 
-- [ ] **Step 1: Full local verification** — run and confirm green, in order:
+- [x] **Step 1: Full local verification** — run and confirm green, in order:
 
 ```bash
 npm run lint
@@ -1254,13 +1254,13 @@ npm run build
 npm run test:e2e
 ```
 
-- [ ] **Step 2: Visual-fidelity gate (standing rule)** — with `npm run dev` running: screenshot `/products` at 1440×900 and 390×844; open `docs/design/design_handoff_mirox/Mirox Catalog.dc.html` and `Mirox Mobile.dc.html` in a browser and screenshot the catalog views; present side-by-sides to the user and get **explicit sign-off**. Declared deviations (spec §8): 4th sort button «Популярні», functional «Фільтри» sheet, card colour swatches, quick-action hover overlay.
+- [x] **Step 2: Visual-fidelity gate (standing rule)** — with `npm run dev` running: screenshot `/products` at 1440×900 and 390×844; open `docs/design/design_handoff_mirox/Mirox Catalog.dc.html` and `Mirox Mobile.dc.html` in a browser and screenshot the catalog views; present side-by-sides to the user and get **explicit sign-off**. Declared deviations (spec §8): 4th sort button «Популярні», functional «Фільтри» sheet, card colour swatches, quick-action hover overlay.
 
-- [ ] **Step 3: BACKLOG entries** (🟤 Auto-Generated, `### [date] From: TASK-036 implementation`):
+- [x] **Step 3: BACKLOG entries** (🟤 Auto-Generated, `### [date] From: TASK-036 implementation`):
   - TASK-056 client-asset item: 7 products lack a second (back-view) image, so hover-swap only demos on Худі Mirox Basic (`[possible-dup-of:` check existing TASK-056 entries first`]`).
   - PDP cart-line naming: `product-detail-client.tsx` uses `${product.name} - ${selectedVariant.name}` — `variant.name` is `"Size"`/`"Color"`, producing lines like «Худі — Size»; QuickViewDialog uses `variant.value`. Align PDP later.
 
-- [ ] **Step 4: Commit docs** — `git add docs/planning && git commit -m "docs(task-036): backlog extracts + plan progress log"`
+- [x] **Step 4: Commit docs** — `git add docs/planning && git commit -m "docs(task-036): backlog extracts + plan progress log"`
 
 - [ ] **Step 5: User approval → completion workflow** — after sign-off: push branch, open PR (CI must be green — check the check-runs, not just reviews), then the CLAUDE.md completion workflow (Extract → Archive → Transition → Commit → Capture learnings) after merge approval.
 
@@ -1273,3 +1273,96 @@ npm run test:e2e
 - Spec §5 badge rule → Task 2 + Task 6; degradation paths → Tasks 6–7 tests; empty state → Task 8; analytics → Tasks 7–8.
 - Spec §6 testing → Tasks 1–10; hydration gate untouched → Task 10 constraint; visual gate → Task 11.
 - Spec §7 out-of-scope respected: no category-page/PDP changes (PDP naming oddity goes to BACKLOG, not fixed here).
+
+---
+
+## Progress Log
+
+**2026-07-31 — Tasks 1–9 (TDD build-out)**: `getSalesRanking()` extraction, `isNewProduct()` badge
+helper, `/api/products` five-filter + richer-select support, `sort` param (incl. `popular` via
+`getSalesRanking`), `/api/products/brands`, `ProductCard` upgrades (badges/swatches/hover
+image/quick actions), `QuickViewDialog`, the catalog page rewrite (`filter-bar.tsx` + grid +
+pagination + Ukrainian copy), and the Header nav retarget (`Новинки`/`Бестселери` → `sort=new`/
+`sort=popular` + `aria-label="Пошук"`) all landed test-first, one commit per task
+(`9119422` → `36e1737`). A same-day fix round after `b1c326e` addressed a click-tracking bubbling
+issue (`d39a01a`). See each task's own report (`task-1-report.md` … `task-9-report.md`) for
+per-task detail.
+
+**2026-07-31 — Task 10 (E2E updates) + fix round 2**: Updated `products.spec.ts`'s sort/search
+tests and added a size-filter smoke test (`b0d9672`). A follow-up review round found and fixed a
+real product bug — `ProductCard`'s quick-action buttons kept `pointer-events-auto` while their
+container was invisible, intercepting clicks meant for the underlying product link — via
+`group-hover`/`group-focus-within`-gated `pointer-events-none→auto` (`07b9ecd`, plus a jsdom
+regression test), and retargeted 3 `products.spec.ts` tests + 2 stale `navigation.spec.ts` href
+assertions (`sortBy=createdAt`/`featured=true` → the new `sort=new`/`sort=popular` hrefs)
+(`bf60b89`). During that round's triage, a dev-server-only navigation race was diagnosed via
+Playwright trace (aborted RSC prefetch racing a webpack HMR push on the _first_ navigation to a
+not-yet-compiled route) and confirmed structurally impossible against a production build/CI. Full
+detail in `task-10-report.md`.
+
+**2026-08-01 — Task 11 (final verification, visual gate, docs)**:
+
+- **Static/unit verification, all green**: `npm run lint` (clean), `npm run typecheck` (clean),
+  `npm run format:check` (one pre-existing warning in the uncommitted, out-of-scope
+  `.claude/settings.local.json` — not a project source/test file), `npm run test:run` (33 test
+  files, 493 tests passed + 1 todo, matching Task 10's baseline).
+- **Build**: `npm run build` succeeded cleanly (with the known, already-documented non-standard
+  `NODE_ENV` warning, harmless — pending the devcontainer rebuild that will remove it). The
+  Prisma/TypeScript build failure task-10-report.md flagged under `products/brands/route.ts` did
+  not reproduce here; a fresh `prisma generate` + `next build` cleared it, consistent with it
+  having been a stale-client artifact rather than a branch-caused regression.
+- **E2E, full suite, one project per foreground command** (`--reporter=line`, `timeout: 590000`,
+  fresh `next dev` per command, DB already seeded — 8 categories / 8 active products verified via
+  Prisma count, no reseed needed): a blind product-card click in `tests/e2e/cart.spec.ts` (4
+  tests) collided with the Task 6 quick-action hover overlay, exactly as anticipated — retargeted
+  all 4 to click the card heading via `.getByRole("heading")`, the same pattern Task 10 already
+  applied to `products.spec.ts` (verified fixed: 6/6 on chromium in isolation). Checked
+  `home.spec.ts`'s suspected stale `sortBy=createdAt` CTA assertion against actual behavior first
+  — it's real: `src/content/home.ts`'s `secondaryCta.href` was never touched by TASK-036 (only
+  `Header.tsx`'s nav array was retargeted in Task 9), so the test still matches the app; left
+  unmodified (home.spec.ts passes 6/6 as-is).
+  | Project | Passed | Failed | Notes |
+  |---|---|---|---|
+  | chromium | 23 | 1 | pre-existing `navigation.spec.ts` "can navigate to products page" only |
+  | firefox | 23 | 1 | same pre-existing failure only |
+  | Mobile Chrome | 23 | 1 | same pre-existing failure only |
+  | webkit | 19 | 5 | pre-existing failure + non-deterministic WebKit-only dev-server race (different failing tests across 2 runs) |
+  | Mobile Safari | 19 | 5 | same WebKit-family race |
+
+  Every failure beyond the single deterministic pre-existing one (`navigation.spec.ts` "can
+  navigate to products page", confirmed reproducing byte-identically on `main` in Task 10's
+  triage) is the dev-server-only compile/HMR navigation race already diagnosed with trace evidence
+  in Task 10's fix round 2 — confirmed non-deterministic here by re-running webkit twice and
+  getting two different failing-test sets, and confirmed WebKit-family-specific (only webkit +
+  Mobile Safari affected, never Chromium/Firefox/Mobile Chrome). Cannot occur against CI's
+  production build (no on-demand compilation, no Fast Refresh). No source or test change applies;
+  documented in BACKLOG.
+
+- **Test-file changes this task**: `tests/e2e/cart.spec.ts` only (4 click-target retargets, no
+  hydration-gate lines touched). No `src/**` changes were needed.
+- **Visual-fidelity gate artifacts produced** (not committed — `.superpowers/` is gitignored):
+  `catalog-desktop.png` (1440×900), `catalog-mobile.png` (390×844) from the live `/products` page,
+  and `mock-desktop.png` / `mock-mobile.png` from the design handoff HTML files, all under
+  `.superpowers/sdd/2026-07-31_task-036-catalog-redesign-filters/visual/`, captured via a
+  throwaway Playwright spec/config reusing the repo's dev-server `webServer` settings. Visual
+  spot-check: live `/products` matches the mock's dark theme, filter bar, badges, swatches, and
+  square pagination at both breakpoints; the mock's own `Mirox Mobile.dc.html` is a 3-frame
+  desktop-style overview page (Home/Catalog/Product side by side, each 390px), not a real
+  responsive single-page render, so its screenshot is 1368px wide — the catalog frame is the
+  middle panel. Presenting these to the user for explicit sign-off is the controller's next step,
+  not completed by this task.
+- **BACKLOG**: added 5 🟤 Auto-Generated entries under `### [2026-07-31] From: TASK-036
+implementation` (all claims verified against source before writing): the 7-of-8-products
+  missing-second-image asset gap (checked for an existing TASK-056 dup — none found, closest
+  neighbor is a different finding), the PDP cart-line naming bug (`variant.name` vs
+  `variant.value`, verified against both `product-detail-client.tsx` and `QuickViewDialog.tsx`),
+  the pre-existing/dev-server-race E2E failures documented above, `sort=popular`'s in-memory
+  full-scan ranking (verified in `route.ts`), and `filter-bar.tsx`'s `FiltersSheet`
+  duplication + `COLOR_SWATCH_CLASSES` token/hex drift against `ProductCard.tsx` (verified both
+  definitions and the ~150-line `FiltersSheet` span).
+- **Deviations from the brief**: none requiring `src/**` changes or a BLOCKED report — the one
+  anticipated fix (cart.spec.ts) and one suspected-but-not-actual fix (home.spec.ts) were both
+  resolved within the E2E-spec-file scope the brief allowed.
+
+Step 5 (push branch, open PR, post-merge completion workflow) is intentionally left for after
+human visual-gate sign-off — outside this task's scope.
