@@ -68,16 +68,14 @@ describe("BoughtTogether", () => {
   });
 
   it("disables button when current product's preferredSizeValue is out of stock", () => {
+    const currentOOS = {
+      ...current,
+      sizeVariants: [{ id: "cur-s", value: "S", stock: 0, price: null }],
+    };
     render(
       <BoughtTogether
-        current={current}
-        companions={[
-          companion({ id: "a" }),
-          companion({
-            id: "b",
-            sizeVariants: [{ id: "b-s", value: "S", stock: 0, price: null }],
-          }),
-        ]}
+        current={currentOOS}
+        companions={[companion({ id: "a" }), companion({ id: "b" })]}
         preferredSizeValue="S"
       />
     );
