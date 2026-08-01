@@ -168,6 +168,7 @@ async function main() {
       brand: p.brand,
       barcode: p.barcode,
       mpn: p.mpn,
+      styleGroup: p.styleGroup ?? null,
       isActive: true,
       createdAt: p.createdAt,
     };

@@ -113,6 +113,7 @@ model Product {
   barcode       String?
   brand         String?
   mpn           String?
+  styleGroup    String?
   stock         Int              @default(0)
   lowStockAlert Int              @default(5)
   weight        Decimal?         @db.Decimal(10, 3)
@@ -138,6 +139,7 @@ model Product {
   @@index([categoryId])
   @@index([supplierId])
   @@index([isActive, isFeatured])
+  @@index([styleGroup])
   @@map("products")
 }
 

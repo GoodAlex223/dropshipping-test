@@ -21,6 +21,10 @@ export interface ProductSeed {
   shortDesc: string;
   price: number;
   comparePrice?: number;
+  /** Colorway-sibling link: products sharing a styleGroup are the same garment
+   *  in different colors; the PDP renders their swatches as links (TASK-037).
+   *  Exactly one Color variant row per product — the product's true colorway. */
+  styleGroup?: string;
   stock: number;
   isFeatured: boolean;
   categorySlug: string;
@@ -45,6 +49,7 @@ export const products: ProductSeed[] = [
       "Базове чорне худі Mirox з щільного футеру (400 г/м²) з начосом. Оверсайз-крій, посилені шви, капюшон з подвійним шаром та металеві люверси. Вишитий логотип на грудях. Не втрачає форму після прання.",
     shortDesc: "Базове худі з щільного футеру з начосом",
     price: 1290,
+    styleGroup: "hudi-mirox",
     stock: 42,
     isFeatured: true,
     categorySlug: "hudi",
@@ -73,7 +78,6 @@ export const products: ProductSeed[] = [
       { name: "Size", value: "L", stock: 12 },
       { name: "Size", value: "XL", stock: 10 },
       { name: "Color", value: "Чорний", stock: 30 },
-      { name: "Color", value: "Білий", stock: 12 },
     ],
   },
   {
@@ -99,7 +103,6 @@ export const products: ProductSeed[] = [
       { name: "Size", value: "L", stock: 28 },
       { name: "Size", value: "XL", stock: 20 },
       { name: "Color", value: "Чорний", stock: 64 },
-      { name: "Color", value: "Білий", stock: 32 },
     ],
   },
   {
@@ -135,6 +138,7 @@ export const products: ProductSeed[] = [
     shortDesc: "Біле худі з щільного футеру, оверсайз-крій",
     price: 1290,
     comparePrice: 1490,
+    styleGroup: "hudi-mirox",
     stock: 38,
     isFeatured: true,
     categorySlug: "hudi",
