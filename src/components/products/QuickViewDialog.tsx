@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useCartStore } from "@/stores/cart.store";
 import { trackAddToCart } from "@/lib/analytics";
@@ -10,6 +11,10 @@ import { IMAGE_SIZES } from "@/lib/image-utils";
 import { cn } from "@/lib/utils";
 import { ProductImage } from "./ProductImage";
 import { SIZE_ORDER } from "./ProductCard";
+
+/** Dialog carousel autoplay tick, milliseconds (R2) — slower than the card's
+ *  since the dialog is a deliberate, focused view rather than a hover peek. */
+const CAROUSEL_INTERVAL_MS = 2000;
 
 export interface QuickViewProduct {
   id: string;
@@ -36,18 +41,39 @@ interface QuickViewDialogProps {
 
 export function QuickViewDialog({ product, focusSizes, onOpenChange }: QuickViewDialogProps) {
   const [selectedSizeId, setSelectedSizeId] = useState<string | null>(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [isCarouselPaused, setIsCarouselPaused] = useState(false);
   const sizeGroupRef = useRef<HTMLDivElement>(null);
   const addItem = useCartStore((state) => state.addItem);
   const openCart = useCartStore((state) => state.openCart);
 
-  // Reset the size selection whenever a different product opens. Adjusting
-  // state during render (rather than in a useEffect) avoids the extra
-  // commit-then-recommit cascade React flags for effect-based resets.
+  // Reset the size selection (and carousel position) whenever a different
+  // product opens. Adjusting state during render (rather than in a
+  // useEffect) avoids the extra commit-then-recommit cascade React flags for
+  // effect-based resets.
   const [lastProductId, setLastProductId] = useState<string | null>(product?.id ?? null);
   if ((product?.id ?? null) !== lastProductId) {
     setLastProductId(product?.id ?? null);
     setSelectedSizeId(null);
+    setActiveImageIndex(0);
   }
+
+  const images = product?.images ?? [];
+  const hasMultipleImages = images.length > 1;
+
+  // Auto-advance while the dialog is open (a product is set) for a genuine
+  // multi-image product; hovering either arrow pauses it.
+  useEffect(() => {
+    if (!product || !hasMultipleImages || isCarouselPaused) return;
+    const id = setInterval(() => {
+      setActiveImageIndex((i) => (i + 1) % images.length);
+    }, CAROUSEL_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, [product, hasMultipleImages, isCarouselPaused, images.length]);
+
+  const stepImage = (delta: number) => {
+    setActiveImageIndex((i) => (i + delta + images.length) % images.length);
+  };
 
   const sizes = useMemo(() => {
     const sizeVariants = product?.variants.filter((v) => v.name === "Size") ?? [];
@@ -114,11 +140,50 @@ export function QuickViewDialog({ product, focusSizes, onOpenChange }: QuickView
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="bg-muted relative aspect-square overflow-hidden rounded-md">
-            <ProductImage
-              src={product.images[0]?.url}
-              alt={product.images[0]?.alt || product.name}
-              sizes={IMAGE_SIZES.productDetail}
-            />
+            {images.length > 0 ? (
+              images.map((image, index) => (
+                <div
+                  key={`${image.url}-${index}`}
+                  className={cn(
+                    "absolute inset-0 transition-opacity duration-300",
+                    index === activeImageIndex ? "opacity-100" : "opacity-0"
+                  )}
+                >
+                  <ProductImage
+                    src={image.url}
+                    alt={image.alt || product.name}
+                    sizes={IMAGE_SIZES.productDetail}
+                  />
+                </div>
+              ))
+            ) : (
+              <ProductImage src={undefined} alt={product.name} sizes={IMAGE_SIZES.productDetail} />
+            )}
+
+            {hasMultipleImages && (
+              <>
+                <button
+                  type="button"
+                  aria-label="Попереднє фото"
+                  onClick={() => stepImage(-1)}
+                  onMouseEnter={() => setIsCarouselPaused(true)}
+                  onMouseLeave={() => setIsCarouselPaused(false)}
+                  className="absolute top-1/2 left-2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-black/70 text-white hover:border-white"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Наступне фото"
+                  onClick={() => stepImage(1)}
+                  onMouseEnter={() => setIsCarouselPaused(true)}
+                  onMouseLeave={() => setIsCarouselPaused(false)}
+                  className="absolute top-1/2 right-2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-black/70 text-white hover:border-white"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </>
+            )}
           </div>
 
           <div className="flex flex-col gap-3">

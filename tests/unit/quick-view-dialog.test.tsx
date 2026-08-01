@@ -1,5 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent, act } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 vi.mock("@/lib/analytics", () => ({ trackAddToCart: vi.fn() }));
 
@@ -95,5 +95,55 @@ describe("QuickViewDialog", () => {
       "href",
       "/products/hudi-mirox-basic"
     );
+  });
+});
+
+const multiImageProduct = {
+  ...product,
+  images: [
+    { url: "https://example.com/a.jpg", alt: "front" },
+    { url: "https://example.com/b.jpg", alt: "back" },
+  ],
+};
+
+describe("QuickViewDialog — R2 image carousel", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("renders no arrows for a single-image product", () => {
+    render(<QuickViewDialog product={product} focusSizes={false} onOpenChange={vi.fn()} />);
+    expect(screen.queryByRole("button", { name: "Попереднє фото" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Наступне фото" })).not.toBeInTheDocument();
+  });
+
+  it("renders always-visible arrows for a multi-image product and steps manually on click", () => {
+    render(
+      <QuickViewDialog product={multiImageProduct} focusSizes={false} onOpenChange={vi.fn()} />
+    );
+    const frontWrapper = screen.getByAltText("front").parentElement!;
+    const backWrapper = screen.getByAltText("back").parentElement!;
+    expect(frontWrapper.className).toContain("opacity-100");
+    expect(backWrapper.className).toContain("opacity-0");
+
+    fireEvent.click(screen.getByRole("button", { name: "Наступне фото" }));
+
+    expect(frontWrapper.className).toContain("opacity-0");
+    expect(backWrapper.className).toContain("opacity-100");
+  });
+
+  it("auto-advances the visible image while open (fake timers)", () => {
+    vi.useFakeTimers();
+    render(
+      <QuickViewDialog product={multiImageProduct} focusSizes={false} onOpenChange={vi.fn()} />
+    );
+    const backWrapper = screen.getByAltText("back").parentElement!;
+    expect(backWrapper.className).toContain("opacity-0");
+
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
+
+    expect(backWrapper.className).toContain("opacity-100");
   });
 });

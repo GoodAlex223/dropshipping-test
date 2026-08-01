@@ -1,4 +1,8 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { IMAGE_SIZES } from "@/lib/image-utils";
@@ -6,6 +10,9 @@ import { formatPrice } from "@/lib/format";
 import { isNewProduct } from "@/lib/product-badges";
 import { cn } from "@/lib/utils";
 import { ProductImage } from "./ProductImage";
+
+/** Card-hover carousel autoplay tick, milliseconds (R2). */
+const CAROUSEL_INTERVAL_MS = 1500;
 
 interface ProductVariantOption {
   name: string;
@@ -75,7 +82,31 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
 
   const isOutOfStock = product.stock <= 0;
   const sizeLabel = getSizeLabel(product.variants);
-  const hasHoverImage = Boolean(product.images[1]?.url);
+  const images = product.images;
+  const hasMultipleImages = images.length > 1;
+
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [isHovering, setIsHovering] = useState(false);
+  const [isArrowPaused, setIsArrowPaused] = useState(false);
+
+  // Card-hover mini-carousel (R2): auto-advances through product.images
+  // while the pointer rests over the card. Arrows/hover are CSS-gated to
+  // md+ (`hidden ... md:flex` below, same idiom as the quick-action
+  // overlay), so touch/mobile never shows arrows; this effect additionally
+  // never starts unless a real `mouseenter` set isHovering, which touch
+  // interactions don't reliably produce (the whole card navigates away on
+  // tap before the interval would ever fire).
+  useEffect(() => {
+    if (!hasMultipleImages || !isHovering || isArrowPaused) return;
+    const id = setInterval(() => {
+      setActiveImageIndex((i) => (i + 1) % images.length);
+    }, CAROUSEL_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, [hasMultipleImages, isHovering, isArrowPaused, images.length]);
+
+  const stepImage = (delta: number) => {
+    setActiveImageIndex((i) => (i + delta + images.length) % images.length);
+  };
 
   const colorValues = Array.from(
     new Set(product.variants?.filter((v) => v.name === "Color").map((v) => v.value) ?? [])
@@ -92,7 +123,7 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
 
   return (
     <Card
-      className="group hover-lift relative overflow-hidden shadow-[var(--shadow-soft)]"
+      className="group hover-lift relative flex h-full flex-col overflow-hidden shadow-[var(--shadow-soft)]"
       data-testid="product-card"
     >
       {/* Whole card is one link, per the design handoff (its product card is
@@ -104,23 +135,41 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
           noisier announcement than a screen reader needs for "go to this
           product's page". The quick-action overlay buttons live outside this
           Link as Card siblings — buttons nested inside an <a> are invalid
-          HTML. */}
-      <Link href={`/products/${product.slug}`} className="block" aria-label={product.name}>
-        <div className="bg-muted relative aspect-square overflow-hidden">
-          <ProductImage
-            src={product.images[0]?.url}
-            alt={product.images[0]?.alt || product.name}
-            sizes={IMAGE_SIZES.productCard}
-            className={cn(hasHoverImage && "transition-opacity duration-300 group-hover:opacity-0")}
-          />
-          {hasHoverImage && (
-            <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-              <ProductImage
-                src={product.images[1]!.url}
-                alt={product.images[1]!.alt || product.name}
-                sizes={IMAGE_SIZES.productCard}
-              />
-            </div>
+          HTML. `flex-1` makes the Link (and thus CardContent below) stretch
+          to the Card's full h-full height so equal-height grid rows (R1)
+          have somewhere to put the extra space; `mt-auto` on the price row
+          below is what actually consumes it. */}
+      <Link
+        href={`/products/${product.slug}`}
+        className="flex flex-1 flex-col"
+        aria-label={product.name}
+      >
+        <div
+          className="bg-muted relative aspect-square overflow-hidden"
+          onMouseEnter={() => hasMultipleImages && setIsHovering(true)}
+          onMouseLeave={() => {
+            setIsHovering(false);
+            setActiveImageIndex(0);
+          }}
+        >
+          {images.length > 0 ? (
+            images.map((image, index) => (
+              <div
+                key={`${image.url}-${index}`}
+                className={cn(
+                  "absolute inset-0 transition-opacity duration-300",
+                  index === activeImageIndex ? "opacity-100" : "opacity-0"
+                )}
+              >
+                <ProductImage
+                  src={image.url}
+                  alt={image.alt || product.name}
+                  sizes={IMAGE_SIZES.productCard}
+                />
+              </div>
+            ))
+          ) : (
+            <ProductImage src={undefined} alt={product.name} sizes={IMAGE_SIZES.productCard} />
           )}
 
           {/* Badge */}
@@ -139,7 +188,7 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
           )}
         </div>
 
-        <CardContent className="p-4">
+        <CardContent className="flex flex-1 flex-col p-4">
           {showCategory && product.category && (
             <p className="text-muted-foreground text-xs">{product.category.name}</p>
           )}
@@ -152,7 +201,12 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
             <p className="text-muted-foreground mt-1 line-clamp-2 text-sm">{product.shortDesc}</p>
           )}
 
-          <div className="mt-2 flex items-center gap-2">
+          {/* mt-auto (not mt-2): pins this price row — and the swatches/size
+              rows after it — to the bottom of the card, per R1's equal-height
+              spec. On the tallest card in a grid row there's no extra space
+              to absorb, so this row sits flush after the description there;
+              shorter cards in the same row get the gap pushed down instead. */}
+          <div className="mt-auto flex flex-wrap items-center gap-2">
             <span className="text-lg font-bold">{formatPrice(price)}</span>
             {comparePrice && comparePrice > price && (
               <span className="text-muted-foreground text-sm line-through">
@@ -181,6 +235,51 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
         </CardContent>
       </Link>
 
+      {/* Carousel arrows (R2) — Card sibling of the Link for the same reason
+          as the quick-action overlay below (buttons can't nest in an <a>).
+          `hidden ... md:flex` keeps them out of the layout entirely below
+          md (touch gets image[0] static, no arrows, per spec), and the
+          opacity/pointer-events pair only lets them intercept clicks once
+          group-hover/group-focus-within actually reveals them — identical
+          gating to the quick-action buttons, so an invisible arrow can never
+          steal a click meant for the card link underneath. */}
+      {hasMultipleImages && (
+        <div className="pointer-events-none absolute inset-x-0 top-0 hidden aspect-square items-center justify-between px-2 opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100 md:flex">
+          <button
+            type="button"
+            aria-label="Попереднє фото"
+            onClick={(e) => {
+              // Same lesson as the quick-action fix: this sits over the
+              // card's <a>, and catalog/rail wrappers add their own click
+              // handler (GA4 select_item) — a manual arrow step must not
+              // navigate the card link or fire that tracking.
+              e.preventDefault();
+              e.stopPropagation();
+              stepImage(-1);
+            }}
+            onMouseEnter={() => setIsArrowPaused(true)}
+            onMouseLeave={() => setIsArrowPaused(false)}
+            className="pointer-events-none flex h-7 w-7 items-center justify-center rounded-full border border-white/40 bg-black/70 text-white backdrop-blur-sm group-focus-within:pointer-events-auto group-hover:pointer-events-auto hover:border-white"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            aria-label="Наступне фото"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              stepImage(1);
+            }}
+            onMouseEnter={() => setIsArrowPaused(true)}
+            onMouseLeave={() => setIsArrowPaused(false)}
+            className="pointer-events-none flex h-7 w-7 items-center justify-center rounded-full border border-white/40 bg-black/70 text-white backdrop-blur-sm group-focus-within:pointer-events-auto group-hover:pointer-events-auto hover:border-white"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
       {onQuickView && (
         <div className="pointer-events-none absolute inset-x-0 top-0 hidden aspect-square items-end justify-center gap-2 p-3 opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100 md:flex">
           <button
@@ -208,13 +307,19 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
           {!isOutOfStock && (
             <button
               type="button"
+              aria-label="В кошик"
               onClick={(e) => {
                 e.stopPropagation();
                 onQuickView({ focusSizes: true });
               }}
-              className="pointer-events-none rounded-[10px] bg-white px-3 py-2 text-[12px] font-extrabold text-black group-focus-within:pointer-events-auto group-hover:pointer-events-auto hover:bg-[#e5e5e5]"
+              // Cart glyph, not the former "В кошик" text label (R3) — the
+              // exact icon Header.tsx uses top-right. aria-label keeps the
+              // accessible name identical to before so existing
+              // getByRole("button", { name: "В кошик" }) queries still find
+              // it.
+              className="pointer-events-none flex items-center justify-center rounded-[10px] bg-white px-3 py-2 text-black group-focus-within:pointer-events-auto group-hover:pointer-events-auto hover:bg-[#e5e5e5]"
             >
-              В кошик
+              <ShoppingCart className="h-4 w-4" />
             </button>
           )}
         </div>

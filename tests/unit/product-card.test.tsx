@@ -210,7 +210,7 @@ describe("ProductCard — TASK-036 upgrades", () => {
     expect(wrapperClick).toHaveBeenCalledTimes(1);
   });
 
-  it("renders a second image element only when images[1] exists", () => {
+  it("stacks one <img> per product image for the carousel (R2)", () => {
     const two = {
       ...base,
       images: [
@@ -220,9 +220,116 @@ describe("ProductCard — TASK-036 upgrades", () => {
     };
     const { unmount } = render(<ProductCard product={two} />);
     expect(screen.getByAltText("back")).toBeInTheDocument();
-    expect(screen.getAllByRole("img")).toHaveLength(2); // front + hover image
+    expect(screen.getAllByRole("img")).toHaveLength(2);
     unmount();
     render(<ProductCard product={base} />);
-    expect(screen.getAllByRole("img")).toHaveLength(1); // no hover layer without images[1]
+    expect(screen.getAllByRole("img")).toHaveLength(1); // single-image product: unchanged
+  });
+});
+
+describe("ProductCard — R1 equal-height class contract", () => {
+  // RTL/jsdom doesn't lay out flexbox, so this can't assert actual pixel
+  // heights — it locks in the class contract the fix depends on: the Card
+  // root stretches to its CSS Grid track's full height (h-full, backed by
+  // flex flex-col), and the Link/CardContent chain propagates that height
+  // down so the price row's mt-auto (see the next describe block) has real
+  // extra space to consume. See the re-screenshot in the revision report
+  // for the actual rendered proof.
+  it("gives the card root h-full + flex flex-col", () => {
+    render(<ProductCard product={base} />);
+    const classes = screen.getByTestId("product-card").className.split(/\s+/);
+    expect(classes).toContain("h-full");
+    expect(classes).toContain("flex");
+    expect(classes).toContain("flex-col");
+  });
+
+  it("pins the price row to the bottom via mt-auto, not mt-2", () => {
+    // Not queried via the price text itself: formatPrice() joins the amount
+    // and "грн" with a non-breaking space, which RTL's default whitespace
+    // normalizer collapses to a regular space before matching — comparing
+    // against the raw formatPrice() string (still containing  ) would
+    // never match. The price row's own class list is the stable target.
+    const { container } = render(<ProductCard product={base} />);
+    const priceRow = container.querySelector(".mt-auto");
+    expect(priceRow).not.toBeNull();
+    expect(priceRow!.className).not.toContain("mt-2");
+  });
+});
+
+describe("ProductCard — R2 image carousel", () => {
+  const multi = {
+    ...base,
+    images: [
+      { url: "https://example.com/a.jpg", alt: "front" },
+      { url: "https://example.com/b.jpg", alt: "back" },
+      { url: "https://example.com/c.jpg", alt: "side" },
+    ],
+  };
+
+  it("renders no carousel arrows for a single-image product", () => {
+    render(<ProductCard product={base} />);
+    expect(screen.queryByRole("button", { name: "Попереднє фото" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Наступне фото" })).not.toBeInTheDocument();
+  });
+
+  it("renders prev/next arrows for a multi-image product", () => {
+    render(<ProductCard product={multi} />);
+    expect(screen.getByRole("button", { name: "Попереднє фото" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Наступне фото" })).toBeInTheDocument();
+  });
+
+  it("advances the visible image on next-arrow click, without navigating or bubbling to a wrapper handler", () => {
+    const wrapperClick = vi.fn();
+    render(
+      <div onClick={wrapperClick}>
+        <ProductCard product={multi} />
+      </div>
+    );
+
+    const frontWrapper = screen.getByAltText("front").parentElement!;
+    const backWrapper = screen.getByAltText("back").parentElement!;
+    expect(frontWrapper.className).toContain("opacity-100");
+    expect(backWrapper.className).toContain("opacity-0");
+
+    fireEvent.click(screen.getByRole("button", { name: "Наступне фото" }));
+
+    expect(frontWrapper.className).toContain("opacity-0");
+    expect(backWrapper.className).toContain("opacity-100");
+    expect(wrapperClick).not.toHaveBeenCalled();
+  });
+
+  it("steps backward (wrapping to the last image) on prev-arrow click", () => {
+    render(<ProductCard product={multi} />);
+    const frontWrapper = screen.getByAltText("front").parentElement!;
+    const sideWrapper = screen.getByAltText("side").parentElement!;
+    expect(frontWrapper.className).toContain("opacity-100");
+
+    fireEvent.click(screen.getByRole("button", { name: "Попереднє фото" }));
+
+    expect(frontWrapper.className).toContain("opacity-0");
+    expect(sideWrapper.className).toContain("opacity-100");
+  });
+
+  it("keeps arrow buttons pointer-events-none until hover/focus-within reveals the overlay", () => {
+    // Same regression contract as the quick-action buttons (Task 10 E2E
+    // finding): an unconditional pointer-events-auto would let an invisible
+    // arrow intercept clicks meant for the card link beneath it.
+    render(<ProductCard product={multi} />);
+    for (const name of ["Попереднє фото", "Наступне фото"]) {
+      const classes = screen.getByRole("button", { name }).className.split(/\s+/);
+      expect(classes).not.toContain("pointer-events-auto");
+      expect(classes).toContain("pointer-events-none");
+      expect(classes).toContain("group-hover:pointer-events-auto");
+      expect(classes).toContain("group-focus-within:pointer-events-auto");
+    }
+  });
+});
+
+describe("ProductCard — R3 quick-buy cart icon", () => {
+  it("renders a cart icon (not the former text label) with an accessible name of «В кошик»", () => {
+    render(<ProductCard product={base} onQuickView={vi.fn()} />);
+    const button = screen.getByRole("button", { name: "В кошик" });
+    expect(button).not.toHaveTextContent("В кошик");
+    expect(button.querySelector("svg")).toBeInTheDocument();
   });
 });

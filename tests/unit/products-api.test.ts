@@ -75,14 +75,17 @@ describe("GET /api/products — filters", () => {
     );
   });
 
-  it("selects variants (id/name/value/stock/price), createdAt, and two images", async () => {
+  it("selects variants (id/name/value/stock/price), createdAt, and all images ordered by position", async () => {
     await GET(createNextRequest({ url: "/api/products", searchParams: {} }));
     const select = findMany.mock.calls[0][0].select;
     expect(select.variants).toEqual({
       select: { id: true, name: true, value: true, stock: true, price: true },
     });
     expect(select.createdAt).toBe(true);
-    expect(select.images.take).toBe(2);
+    // R2: the card/quick-view carousel needs every image, not just the
+    // first two — no `take` cap, still ordered by position ascending.
+    expect(select.images.take).toBeUndefined();
+    expect(select.images.orderBy).toEqual({ position: "asc" });
   });
 });
 

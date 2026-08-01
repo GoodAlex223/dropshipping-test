@@ -32,7 +32,6 @@ const LIST_SELECT = {
   images: {
     select: { id: true, url: true, alt: true },
     orderBy: { position: "asc" as const },
-    take: 2,
   },
   variants: { select: { id: true, name: true, value: true, stock: true, price: true } },
 };
