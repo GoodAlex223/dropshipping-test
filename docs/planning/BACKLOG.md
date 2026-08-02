@@ -550,6 +550,17 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 
 - 🟤 **`/api/products` passes unvalidated `parseFloat()` output into the Prisma `price` filter** — `src/app/api/products/route.ts:69-74` does `if (minPrice) { where.price = { ..., gte: parseFloat(minPrice) } }` (same shape for `maxPrice`/`lte`). The truthiness guard rejects an empty string but not a non-numeric one, so `?minPrice=abc` yields `parseFloat("abc")` → `NaN`, which reaches a Prisma `Decimal @db.Decimal(10, 2)` comparison. **Verified**: the code path, that the lines are byte-identical to `main` (pre-existing — predates TASK-036, which is why PR #26's review correctly ruled it out of scope), and that root `CLAUDE.md`'s documented "Query param validation pattern" prescribes the opposite (`!isNaN(num) && num >= min && num <= max`, then conditional spread). **Not verified**: the observable runtime behaviour of `NaN` in a Prisma Decimal `gte` — it may throw `PrismaClientValidationError` (500) or be coerced; confirm before choosing between "ignore the param" and "400 Bad Request". PR #26 added the analogous guard on the _client_ side only (`parseNumericParam` in `products-content.tsx`, commit `a7faf75`), so the API is reachable unguarded by any direct caller or crawler. (Low value, Low effort) `[possible-dup-of: "Fix getPagination() NaN propagation" — BACKLOG.md:292, under [2026-02-10] From: TASK-029 → Origin: feat/task-028-test-coverage branch]` — same NaN-propagation class in the same file, but a distinct defect: that one is `parseInt` → `Math.max(1, NaN)` → `NaN` page/limit in `getPagination()`; this one is `parseFloat` → `NaN` in the price `where`. Worth fixing in one pass, but neither entry covers the other.
 
+### [2026-08-01] From: TASK-037 product page redesign (plan extraction)
+
+- 🟤 **Restore «У вибране» on the PDP when wishlist ships** — TASK-037 omitted the reference's
+  «У вибране» affordance under the no-dead-links rule (spec §7 ledger #2); when TASK-041 builds
+  wishlist, add the heart action back to the buy panel's share row per `Mirox Product.dc.html`.
+  (Low effort) `[relates-to: TASK-041]`
+- 🟤 **Admin product form has no `styleGroup` field** — colorway linking (TASK-037) is seed-only;
+  `ProductForm.tsx` can't set/edit `Product.styleGroup`, so admins can't link colorways without
+  DB access. Add the field to the admin form + validation schema. (Med value, Low effort)
+  `[relates-to: TASK-037]`
+
 ---
 
 ## Technical Debt

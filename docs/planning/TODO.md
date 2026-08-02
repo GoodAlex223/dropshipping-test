@@ -1,6 +1,6 @@
 # TODO
 
-**Last Updated**: 2026-08-01
+**Last Updated**: 2026-08-02
 
 Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-shop-program-design.md) · Current week: [WEEKLY.md](WEEKLY.md)
 
@@ -28,7 +28,7 @@ _TASK-036 (Catalog redesign + filters) completed 2026-08-01 — PR [#26](https:/
 - [ ] Related + recently-viewed sections implemented
 - [ ] `SizePicker.tsx` implements the placeholder height/weight formula (XXL h≥190\|w≥95; XL h≥184\|w≥85; L h≥176\|w≥72; M h≥168\|w≥60; else S) pending client size charts (TASK-045 upgrades it later)
 - [ ] `BoughtTogether.tsx` shows 3 items with a struck-through sum collapsing to a bundle price
-- [ ] «Купити в 1 клік» resolved — either built here or explicitly deferred to TASK-043's quick-order (decide in this task's plan)
+- [ ] «Купити в 1 клік» resolved — either built here or explicitly deferred to TASK-043's quick-order (decide in this task's plan) — **RESOLVED 2026-08-01 (spec §2 #1): explicitly deferred to TASK-043; interim second CTA is «КУПИТИ ЗАРАЗ» (add → /checkout)**
 
 #### [TASK-039] i18n foundation
 
@@ -108,5 +108,5 @@ _None._
 - [ ] Announcement banner copy, once a real promotion exists (`site.announcement`, currently `null`)
 - [ ] Free-shipping threshold/currency — still genuinely unconfirmed, no threshold exists anywhere in the order path (see TASK-035's Finding 1). The **return window is now resolved**: «14 днів» is USER-APPROVED (2026-07-28, recorded on TASK-055 above) for use once the `/contact`/policy page ships
 - [ ] Contact details (phone/email/address) for the `/contact` page (feeds TASK-055)
-- [ ] Size charts (feeds TASK-037/TASK-045 — `SizePicker.tsx`'s height/weight formula is an interim placeholder until these arrive)
+- [ ] Size charts (feeds TASK-037/TASK-045 — `SizePicker.tsx`'s height/weight formula is an interim placeholder until these arrive; **the PDP's «Відкрити фото замірів» button was omitted by TASK-037 (spec §7 ledger #3) and gets restored when measurement photos arrive with these charts**)
 - [ ] Legal-page content or lawyer engagement (feeds TASK-055)
