@@ -12,6 +12,7 @@ function companion(over: Partial<BundleCompanion> & { id: string }): BundleCompa
     comparePrice: null,
     stock: 10,
     image: null,
+    category: null,
     sizeVariants: [
       { id: `${over.id}-s`, value: "S", stock: 5, price: null },
       { id: `${over.id}-l`, value: "L", stock: 5, price: null },

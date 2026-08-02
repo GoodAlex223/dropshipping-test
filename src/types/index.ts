@@ -169,5 +169,7 @@ export interface BundleCompanion {
   /** Product-level stock — the maxStock for sizeless cart lines. */
   stock: number;
   image: { url: string; alt: string | null } | null;
+  /** GA4 item_category for the bundle's trackAddToCart calls. */
+  category: { name: string } | null;
   sizeVariants: { id: string; value: string; stock: number; price: string | null }[];
 }

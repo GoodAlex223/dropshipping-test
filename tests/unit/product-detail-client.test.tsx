@@ -127,6 +127,46 @@ describe("ProductDetailClient (TASK-037)", () => {
     expect(swatch.className).toContain("bg-black");
   });
 
+  it("legacy Color variant with no matching sibling renders as a non-link swatch", () => {
+    const product = makeProduct({
+      colorValue: "Чорний",
+      styleSiblings: [],
+      variants: [
+        {
+          id: "v-s",
+          name: "Size",
+          value: "S",
+          sku: "MRX-001-S",
+          price: "1290",
+          stock: 3,
+          options: {},
+        },
+        {
+          id: "v-col",
+          name: "Color",
+          value: "Чорний",
+          sku: "MRX-001-C",
+          price: "1290",
+          stock: 30,
+          options: {},
+        },
+        {
+          id: "v-col-2",
+          name: "Color",
+          value: "Білий",
+          sku: "MRX-001-C2",
+          price: "1290",
+          stock: 10,
+          options: {},
+        },
+      ],
+    });
+    render(<ProductDetailClient product={product} />);
+    const swatch = screen.getByLabelText("Колір: Білий");
+    expect(swatch.tagName).not.toBe("A");
+    expect(swatch.closest("a")).toBeNull();
+  });
+
   it("low stock (≤5) shows «Залишилось N шт», in-stock shows «В наявності»", () => {
     render(<ProductDetailClient product={makeProduct()} />);
     // Selected size S has stock 3.

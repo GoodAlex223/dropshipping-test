@@ -7,7 +7,6 @@ import { trackAddToCart } from "@/lib/analytics";
 import { formatPrice } from "@/lib/format";
 import { computeBundleTotals } from "@/lib/bundle-utils";
 import { rankSizeValues } from "@/lib/product-display";
-import { IMAGE_SIZES } from "@/lib/image-utils";
 import { cn } from "@/lib/utils";
 import { ProductImage } from "./ProductImage";
 import type { BundleCompanion } from "@/types";
@@ -33,6 +32,14 @@ function pickVariantId(product: BundleCompanion, preferred: string | null): stri
 
 function deriveSelections(companions: BundleCompanion[], preferred: string | null): SelectionMap {
   return Object.fromEntries(companions.map((c) => [c.id, pickVariantId(c, preferred)]));
+}
+
+/** Chips render in canonical S·M·L·XL·XXL order, not raw query order. */
+function orderedSizeVariants(product: BundleCompanion) {
+  const orderedValues = rankSizeValues(product.sizeVariants.map((v) => v.value));
+  return orderedValues
+    .map((value) => product.sizeVariants.find((v) => v.value === value))
+    .filter((v): v is BundleCompanion["sizeVariants"][number] => v !== undefined);
 }
 
 /**
@@ -104,6 +111,7 @@ export function BoughtTogether({ current, companions, preferredSizeValue }: Boug
       trackAddToCart({
         item_id: product.id,
         item_name: name,
+        item_category: product.category?.name,
         item_variant: variant?.value,
         price,
         quantity: 1,
@@ -126,7 +134,7 @@ export function BoughtTogether({ current, companions, preferredSizeValue }: Boug
                 <ProductImage
                   src={product.image?.url}
                   alt={product.image?.alt || product.name}
-                  sizes={IMAGE_SIZES.thumbnail}
+                  sizes="150px"
                 />
               </div>
               <div className="truncate text-[13px] font-bold">{product.name}</div>
@@ -145,7 +153,7 @@ export function BoughtTogether({ current, companions, preferredSizeValue }: Boug
                       role="group"
                       aria-label={`Розмір: ${product.name}`}
                     >
-                      {product.sizeVariants.map((v) => {
+                      {orderedSizeVariants(product).map((v) => {
                         const active = selections[product.id] === v.id;
                         const out = v.stock <= 0;
                         return (

@@ -181,6 +181,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
     comparePrice: product.comparePrice,
     stock: product.stock,
     image: product.images[0] ? { url: product.images[0].url, alt: product.images[0].alt } : null,
+    category: { name: product.category.name },
     sizeVariants: sizes.map((v) => ({ id: v.id, value: v.value, stock: v.stock, price: v.price })),
   };
 

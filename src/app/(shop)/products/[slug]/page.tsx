@@ -51,7 +51,9 @@ async function getProduct(slug: string): Promise<Product | null> {
           price: true,
           stock: true,
         },
-        orderBy: { createdAt: "asc" },
+        // id tiebreaker: seeded rows can share a createdAt timestamp, which
+        // otherwise leaves "the first Color row" (→ colorValue) nondeterministic.
+        orderBy: [{ createdAt: "asc" }, { id: "asc" }],
       },
     },
   });
@@ -94,6 +96,7 @@ async function getProduct(slug: string): Promise<Product | null> {
     comparePrice: true,
     stock: true,
     categoryId: true,
+    category: { select: { name: true } },
     images: { select: { url: true, alt: true }, orderBy: { position: "asc" as const }, take: 1 },
     variants: {
       where: { name: "Size" },
@@ -153,6 +156,7 @@ async function getProduct(slug: string): Promise<Product | null> {
         comparePrice: c.comparePrice?.toString() ?? null,
         stock: c.stock,
         image: c.images[0] ?? null,
+        category: c.category ?? null,
         sizeVariants: c.variants.map((v) => ({
           id: v.id,
           value: v.value,
@@ -278,9 +282,31 @@ async function getProduct(slug: string): Promise<Product | null> {
   };
 }
 
+/**
+ * Slim query for generateMetadata (perf, final-review wave): the full
+ * getProduct() above also runs sibling/companion/ranking/related/review
+ * queries that metadata generation never touches.
+ */
+async function getProductForMetadata(slug: string) {
+  return prisma.product.findUnique({
+    where: { slug, isActive: true },
+    select: {
+      name: true,
+      slug: true,
+      description: true,
+      shortDesc: true,
+      metaTitle: true,
+      metaDesc: true,
+      price: true,
+      comparePrice: true,
+      category: { select: { name: true, slug: true } },
+    },
+  });
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = await getProduct(slug);
+  const product = await getProductForMetadata(slug);
 
   if (!product) {
     return {
@@ -295,8 +321,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     shortDesc: product.shortDesc,
     metaTitle: product.metaTitle,
     metaDesc: product.metaDesc,
-    price: product.price,
-    comparePrice: product.comparePrice,
+    price: product.price.toString(),
+    comparePrice: product.comparePrice?.toString() ?? null,
     category: product.category,
   });
 }
