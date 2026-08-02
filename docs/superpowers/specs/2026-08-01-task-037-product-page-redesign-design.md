@@ -241,6 +241,11 @@ later). Breadcrumb: Головна / Каталог / {name}.
 8. Related + recently-viewed sections exist (AC requirement) though absent from the reference
    page; styled in the catalog's card-grid language.
 9. «Опис» section kept for SEO though absent from the reference.
+10. _(added 2026-08-02, final whole-branch review)_ The low-stock line «Залишилось {N} шт» renders
+    white bold, not amber — §4's amber suggestion collided with the token charter (`--rating` is
+    star-ratings-only, per the colour-guard policy), and the reference never renders a low-stock
+    state at all, so the gate's side-by-sides can't arbitrate it. White-bold is the deliberate
+    choice; re-open only if the visual gate objects.
 
 ## 8. Out of scope
 
