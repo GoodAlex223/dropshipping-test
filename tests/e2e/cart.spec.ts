@@ -29,12 +29,14 @@ test.describe("Shopping Cart", () => {
     await page.getByRole("button", { name: /^додати в кошик$/i }).click();
 
     // Cart should indicate item was added: the button flips to its transient
-    // «додано» (added) state, and/or the header cart badge count updates —
-    // both driven by the same cart-store write (product-detail-client.tsx).
-    // No toast and no [data-cart-count] exist in this UI, and the header
-    // cart button's accessible name is count-then-label ("1 Cart"), so a
-    // "cart...1" ordered regex can never match — see Header.tsx.
-    await expect(page.getByRole("button", { name: /додано в кошик|cart/i }).first()).toBeVisible({
+    // «додано» (added) state for 2s (product-detail-client.tsx). This must be
+    // the ONLY signal asserted here: the header cart button's sr-only "Cart"
+    // label renders unconditionally (not gated on item count — see
+    // Header.tsx), so a locator that also accepts "cart" would match that
+    // persistent button even if this click were a no-op, making the
+    // assertion pass regardless of whether the add actually worked. No toast
+    // and no [data-cart-count] exist in this UI to fall back on instead.
+    await expect(page.getByRole("button", { name: /додано в кошик/i })).toBeVisible({
       timeout: 5000,
     });
   });
