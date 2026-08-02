@@ -136,9 +136,34 @@ test.describe("Product Browsing", () => {
 
     // Wait for product page to load
     await expect(page).toHaveURL(/\/products\/[^/]+$/);
+    await page.waitForSelector('[data-hydrated="true"]');
 
     // Add to cart button should be visible
-    const addToCartButton = page.getByRole("button", { name: /add to cart/i });
+    const addToCartButton = page.getByRole("button", { name: /^додати в кошик$/i });
     await expect(addToCartButton).toBeVisible();
+  });
+
+  test("PDP adds a sized cart line (variant value, not dimension name)", async ({ page }) => {
+    await page.goto("/products/hudi-mirox-basic");
+    await page.waitForSelector('[data-hydrated="true"]');
+
+    // First in-stock size (S) is preselected — add straight away.
+    await page.getByRole("button", { name: /^додати в кошик$/i }).click();
+    await expect(page.getByRole("button", { name: /додано в кошик/i })).toBeVisible();
+
+    // The drawer line must carry the VALUE («— S»), never «— Size».
+    await page
+      .getByRole("button", { name: /кошик|cart/i })
+      .first()
+      .click();
+    await expect(page.getByText(/Худі Mirox Basic — S/).first()).toBeVisible();
+    await expect(page.getByText(/— Size/)).toHaveCount(0);
+  });
+
+  test("PDP colorway swatch navigates to the sibling product", async ({ page }) => {
+    await page.goto("/products/hudi-mirox-basic");
+    await page.waitForSelector('[data-hydrated="true"]');
+    await page.getByRole("link", { name: /Білий — Худі Mirox White/ }).click();
+    await expect(page).toHaveURL(/\/products\/hudi-mirox-white$/);
   });
 });
