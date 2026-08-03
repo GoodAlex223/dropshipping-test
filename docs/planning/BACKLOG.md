@@ -571,6 +571,27 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
   infrastructure, wire a real bundle discount into the PDP total. Decided at the TASK-037 visual
   gate 2026-08-03 (user chose honest-sum-now). (Med value) `[relates-to: TASK-046, TASK-047]`
 
+### [2026-08-03] From: TASK-037 completion (plan extraction)
+
+- 🟤 **Site-wide React hydration console errors (#418/#423/#425) in prod builds** — identical
+  signature on untouched pages (homepage included), so pre-existing, not TASK-037's. Prime suspect:
+  a server/client divergence in rendered text — e.g. `formatPrice()`'s `Intl.NumberFormat("uk-UA")`
+  NBSP output differing between the Node and browser ICU builds (TASK-057-era). Diagnose with a
+  React dev build (full hydration diff), fix the source, and assert a clean console in an E2E
+  check so the class can't return. (Med value, Med effort) `[relates-to: TASK-057]`
+- 🟤 **Add `.gitattributes` to pin line endings** — `prisma/schema.prisma` is CRLF while the rest
+  of the repo is LF; TASK-037's migration task had to preserve CRLF by hand and any contributor's
+  editor/autocrlf can silently rewrite the file into a noisy whole-file diff. Pin `* text=lf` with
+  an explicit exception (or normalize schema.prisma to LF once, in its own commit). (Low effort)
+- 🟤 **Sweep `text-[#737373]` literals to the registered `text-faint` token + fold QuickViewDialog's
+  inline size-ranking into `product-display.ts`** — the token exists but TASK-036/037 files carry
+  hex literals (PDP breadcrumb/dates among them); QuickViewDialog still ranks sizes with its own
+  inline comparator instead of `rankSizeValues()`. One mechanical sweep retires both drifts.
+  (Low effort) `[relates-to: TASK-034]`
+- 🟤 **Legacy colorway swatches are bare `<span>`s with no accessible description** — the
+  informational (non-link) extra-Color swatches on the PDP render colour only visually; add
+  `role="img"` + `aria-label` with the colour name. (Low effort) `[relates-to: TASK-037]`
+
 ---
 
 ## Technical Debt

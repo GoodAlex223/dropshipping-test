@@ -1,6 +1,6 @@
 # TODO
 
-**Last Updated**: 2026-08-02
+**Last Updated**: 2026-08-03
 
 Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-shop-program-design.md) · Current week: [WEEKLY.md](WEEKLY.md)
 
@@ -12,23 +12,7 @@ _TASK-057 (Mirox design adoption) completed 2026-07-31 — PR [#24](https://gith
 
 _TASK-036 (Catalog redesign + filters) completed 2026-08-01 — PR [#26](https://github.com/GoodAlex223/dropshipping-test/pull/26) merged `919906b`; see [DONE.md](DONE.md). All ACs met (4-sort set incl. «Популярні» chosen in-plan; hydration gate preserved unchanged; visual gate signed off after one revision round)._
 
-#### [TASK-037] Product page redesign
-
-**Priority**: 🟠 High
-**Status**: 📋 Planned
-**Effort**: L
-**Dependencies**: [TASK-034]
-
-**Description** (re-scoped by TASK-057, 2026-07-27 — spec §4): Re-scope to [`Mirox Product.dc.html`](../design/design_handoff_mirox/Mirox%20Product.dc.html): 96px thumbnail rail, `clamp(420px,100vh−190px,620px)` photo, colour swatches (active white 2px border), size buttons 52px, «Відкрити фото замірів», stock line + «Доставка Новою Поштою», ДОДАТИ В КОШИК → «✓ ДОДАНО В КОШИК» state. New components: **`SizePicker.tsx`** (formula: XXL h≥190\|w≥95; XL h≥184\|w≥85; L h≥176\|w≥72; M h≥168\|w≥60; else S — placeholder until client size charts arrive; TASK-045 later upgrades it) and **`BoughtTogether.tsx`** (3 items, struck-through sum → bundle price). «Купити в 1 клік» overlaps TASK-043 quick-order — decide there or in TASK-037's plan.
-
-**Acceptance Criteria**:
-
-- [ ] Gallery, size/color selection, size table implemented per [`Mirox Product.dc.html`](../design/design_handoff_mirox/Mirox%20Product.dc.html)
-- [ ] Stock counter shows real inventory below a threshold
-- [ ] Related + recently-viewed sections implemented
-- [ ] `SizePicker.tsx` implements the placeholder height/weight formula (XXL h≥190\|w≥95; XL h≥184\|w≥85; L h≥176\|w≥72; M h≥168\|w≥60; else S) pending client size charts (TASK-045 upgrades it later)
-- [ ] `BoughtTogether.tsx` shows 3 items with a struck-through sum collapsing to a bundle price
-- [ ] «Купити в 1 клік» resolved — either built here or explicitly deferred to TASK-043's quick-order (decide in this task's plan) — **RESOLVED 2026-08-01 (spec §2 #1): explicitly deferred to TASK-043; interim second CTA is «КУПИТИ ЗАРАЗ» (add → /checkout)**
+_TASK-037 (Product page redesign) completed 2026-08-03 — PR [#27](https://github.com/GoodAlex223/dropshipping-test/pull/27) merged `cec8408`; see [DONE.md](DONE.md). All ACs met with two spec-ratified deviations: AC-5's fake struck-through bundle price shipped as an **honest sum** (checkout recomputes prices server-side; real bundle discount → TASK-046/047, BACKLOG'd), and «Відкрити фото замірів» omitted until measurement photos arrive (restore note on the size-charts item below). Visual gate signed off after one revision round; 3 PR review rounds all resolved._
 
 #### [TASK-039] i18n foundation
 

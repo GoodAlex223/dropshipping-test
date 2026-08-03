@@ -2,11 +2,32 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-08-01
+**Last Updated**: 2026-08-03
 
 ---
 
 ## 2026-08 (August)
+
+### [2026-08-03] TASK-037 - Product Page Redesign
+
+**Plan**: [docs/archive/plans/2026-08-01_task-037-product-page-redesign.md](../archive/plans/2026-08-01_task-037-product-page-redesign.md)
+**Spec**: [2026-08-01-task-037-product-page-redesign-design.md](../superpowers/specs/2026-08-01-task-037-product-page-redesign-design.md) (§7 = 10-item approved-deviations ledger)
+**PR**: [#27](https://github.com/GoodAlex223/dropshipping-test/pull/27) — merged `cec8408` (2026-08-03)
+**SDD ledger**: `.superpowers/sdd/2026-08-01_task-037-product-page-redesign/progress.md` (removed post-completion; PR carries the review arc)
+
+**Summary**: `/products/[slug]` rebuilt to `Mirox Product.dc.html`. New `ProductGallery` (desktop 96px thumb rail + clamped photo; mobile snap-swipe track with dots), buy panel with colorway swatches (`Product.styleGroup` column + migration links sibling products — active swatch is this product, sibling swatches navigate to their own PDPs; legacy extra Color rows render informational), ranked size chips (first in-stock preselected), stock line, «ДОДАТИ В КОШИК» → «✓ ДОДАНО В КОШИК», «КУПИТИ ЗАРАЗ» (add → /checkout; «КУПИТИ В 1 КЛІК» deferred to TASK-043 per spec §2 #1). New `SizePicker` (placeholder height/weight formula; hidden for one-size products), `BoughtTogether` (current + top-2 sellers via `getSalesRanking(90)`, per-companion size chips following the buy panel's selection, honest totals — strike only from genuine comparePrices since checkout recomputes server-side; mobile swipe carousel), `RecentlyViewed` (localStorage, cap 8). Reviews restyled dark/Ukrainian. Cart lines carry `${name} — ${variant.value}` (BACKLOG naming fix). Breadcrumb JSON-LD; slim metadata query; fail-soft sibling/companion queries.
+
+**Key changes**:
+
+- 27 commits; unit tests 517 → **598** (+1 todo); Prisma migration `20260801173142_add_product_style_group`; seed: one-true-colorway cleanup, `styleGroup` linking, kepka «Один розмір», futbolka «Білий»
+- Executed subagent-driven (14 tasks, fresh implementer + independent reviewer each; 5 task-level fix rounds), final whole-branch review ("Ready to merge: Yes", fix wave re-reviewed clean), visual gate signed off after one revision round
+- Gate revision root-cause: grids with only `lg:` column definitions let the implicit mobile track size to content min-content (436/467px > 343px container) → `grid-cols-1`; plus BT mobile carousel (user-selected), badge wrap, SizePicker gating
+- PR review arc (3 rounds, user-posted): score-100 stale `selectedSizeId` across sibling soft-nav → `key={product.id}` remount + E2E colorway assertions; gallery dot smooth-scroll snap → smooth-target ref + width-guarded ResizeObserver (revert-checked test); docs-freshness drift fixed twice (recurrence #7 — automation entry marked OVERDUE with the reviewer's ~20-row fixture measurement)
+- Prod: migration auto-applied via `vercel-build`; prod **data** unchanged pending the separately-gated re-seed (PDPs render legacy colorway state via the hardened legacy path by design)
+
+**Learnings**: implicit grid tracks (no mobile column definition) size to min-content and silently overflow the container — always declare `grid-cols-1`; a keyless client component under a dynamic route template survives soft nav between params (stale per-product state); `behavior: "instant"` bypasses CSS `scroll-behavior: smooth` while `"auto"` defers to it; ResizeObserver delivers an initial callback on every `observe()` — width-guard sync logic; verify the element type (`Link` vs `<a>`) before asserting soft-nav premises; tailwind-merge resolves border-color conflicts by argument order; stale `.next` cache and container `NODE_ENV=development` both corrupt local prod-build verification (cold `NODE_ENV=production` rebuild is the reliable pattern).
+
+---
 
 ### [2026-08-01] TASK-036 - Catalog Redesign + Filters
 
