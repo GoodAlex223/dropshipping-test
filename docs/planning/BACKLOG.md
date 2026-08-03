@@ -561,6 +561,15 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
   DB access. Add the field to the admin form + validation schema. (Med value, Low effort)
   `[relates-to: TASK-037]`
 
+### [2026-08-03] From: TASK-037 visual gate (user feedback)
+
+- 🔵 **Real «Купують разом» bundle discount** — the PDP bundle shows an honest sum (strikethrough
+  only from genuine comparePrices) because checkout recomputes prices server-side; a PDP-only
+  discount would display a price checkout won't honor. When TASK-046 (promo codes: schema, admin
+  CRUD, checkout application) / TASK-047 (promotions incl. bundles) build server-side discount
+  infrastructure, wire a real bundle discount into the PDP total. Decided at the TASK-037 visual
+  gate 2026-08-03 (user chose honest-sum-now). (Med value) `[relates-to: TASK-046, TASK-047]`
+
 ---
 
 ## Technical Debt

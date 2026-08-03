@@ -123,13 +123,15 @@ export function BoughtTogether({ current, companions, preferredSizeValue }: Boug
   return (
     <div className="bg-card border-border rounded-[20px] border p-6 sm:p-8">
       <h2 className="mb-6 text-[22px] font-extrabold">Купують разом</h2>
-      <div className="mb-6 flex items-start gap-3">
+      {/* <sm: horizontal snap carousel (152px cards, next card peeks to signal
+          swipe — gate revision 2026-08-03); sm+: the original 3-up flex row. */}
+      <div className="mb-6 flex snap-x snap-mandatory items-start gap-3 overflow-x-auto pb-2 [scrollbar-width:none] sm:snap-none sm:overflow-x-visible sm:pb-0 [&::-webkit-scrollbar]:hidden">
         {lines.map(({ product, variant }, index) => (
           <div key={product.id} className="contents">
             {index > 0 && (
               <Plus className="text-muted-foreground mt-16 h-5 w-5 shrink-0" aria-hidden />
             )}
-            <div className="flex min-w-0 flex-1 flex-col gap-2.5">
+            <div className="flex w-[152px] shrink-0 snap-start flex-col gap-2.5 sm:w-auto sm:min-w-0 sm:flex-1">
               <div className="border-border relative h-[150px] overflow-hidden rounded-[14px] border">
                 <ProductImage
                   src={product.image?.url}

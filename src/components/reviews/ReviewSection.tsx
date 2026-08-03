@@ -81,7 +81,7 @@ export function ReviewSection({
     <div className="mt-16">
       <h2 className="mb-7 text-[28px] font-extrabold tracking-[-0.02em]">Відгуки покупців</h2>
 
-      <div className="grid gap-8 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Left: Stats + Form */}
         <div className="space-y-6">
           <ReviewStats

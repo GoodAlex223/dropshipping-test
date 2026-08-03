@@ -4,7 +4,7 @@
  * QuickViewDialog, and the PDP all render.
  */
 
-/** Canonical display order; any other Size value (e.g. "One size") is appended after, in first-seen order. */
+/** Canonical display order; any other Size value (e.g. «Один розмір») is appended after, in first-seen order. */
 export const SIZE_ORDER = ["S", "M", "L", "XL", "XXL"] as const;
 
 export const COLOR_SWATCH_CLASSES: Record<string, string> = {

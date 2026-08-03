@@ -24,9 +24,11 @@ export function ReviewItem({ review }: { review: ReviewWithUser }) {
           {initial}
         </span>
         <div className="min-w-0">
-          <div className="truncate text-[14.5px] font-bold">
-            {displayName}{" "}
-            <span className="text-available ml-1.5 text-[11px] font-bold whitespace-nowrap">
+          {/* flex-wrap lets the badge drop to its own line on narrow screens
+              instead of being ellipsis-clipped with the name (390px gate fix) */}
+          <div className="flex flex-wrap items-baseline gap-x-1.5 text-[14.5px] font-bold">
+            <span className="max-w-full truncate">{displayName}</span>
+            <span className="text-available text-[11px] font-bold whitespace-nowrap">
               ✓ Підтверджена покупка
             </span>
           </div>

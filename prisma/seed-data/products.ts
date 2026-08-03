@@ -102,7 +102,8 @@ export const products: ProductSeed[] = [
       { name: "Size", value: "M", stock: 28 },
       { name: "Size", value: "L", stock: 28 },
       { name: "Size", value: "XL", stock: 20 },
-      { name: "Color", value: "Чорний", stock: 64 },
+      // p-tshirt.png depicts the white tee — colour must match the photo (gate fix 2026-08-03)
+      { name: "Color", value: "Білий", stock: 64 },
     ],
   },
   {
@@ -253,7 +254,7 @@ export const products: ProductSeed[] = [
     createdAt: daysAgo(45),
     images: [{ url: "/images/products/p-cap.png", alt: "Кепка Mirox — вид спереду", position: 0 }],
     variants: [
-      { name: "Size", value: "One size", stock: 60 },
+      { name: "Size", value: "Один розмір", stock: 60 },
       { name: "Color", value: "Чорний", stock: 60 },
     ],
   },

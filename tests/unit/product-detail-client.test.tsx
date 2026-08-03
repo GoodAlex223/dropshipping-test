@@ -190,4 +190,31 @@ describe("ProductDetailClient (TASK-037)", () => {
     const link = screen.getByRole("link", { name: "12 відгуків" });
     expect(link).toHaveAttribute("href", "#reviews");
   });
+
+  it("SizePicker renders for S–XXL products but not for one-size ones (gate revision 2026-08-03)", () => {
+    const { unmount } = render(<ProductDetailClient product={makeProduct()} />);
+    expect(screen.getByText("Підбір розміру")).toBeInTheDocument();
+    unmount();
+
+    const oneSize = makeProduct({
+      variants: [
+        {
+          id: "v-os",
+          name: "Size",
+          value: "Один розмір",
+          sku: "MRX-008-OS",
+          price: "450",
+          stock: 60,
+          options: {},
+        },
+      ],
+    });
+    render(<ProductDetailClient product={oneSize} />);
+    expect(screen.queryByText("Підбір розміру")).not.toBeInTheDocument();
+    // The one-size chip still renders (and preselects) in the buy panel.
+    expect(screen.getByRole("button", { name: "Один розмір" })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
+  });
 });

@@ -17,7 +17,7 @@ import { ReviewSection, StarRating } from "@/components/reviews";
 import { useCartStore } from "@/stores/cart.store";
 import { cn } from "@/lib/utils";
 import { formatPrice, pluralizeUk } from "@/lib/format";
-import { COLOR_SWATCH_CLASSES, rankSizeValues } from "@/lib/product-display";
+import { COLOR_SWATCH_CLASSES, SIZE_ORDER, rankSizeValues } from "@/lib/product-display";
 import { trackViewItem, trackAddToCart } from "@/lib/analytics";
 import type { ReviewWithUser, RatingDistribution, StyleSibling, BundleCompanion } from "@/types";
 
@@ -90,6 +90,10 @@ export function ProductDetailClient({ product }: { product: Product }) {
       .map((value) => sizeVariants.find((v) => v.value === value))
       .filter((v): v is ProductVariant => Boolean(v));
   }, [product.variants]);
+
+  // «Підбір розміру» only makes sense for products carrying real S–XXL sizes;
+  // one-size products (e.g. caps) have a Size variant outside SIZE_ORDER.
+  const showSizePicker = sizes.some((v) => (SIZE_ORDER as readonly string[]).includes(v.value));
 
   const [selectedSizeId, setSelectedSizeId] = useState<string | null>(
     () => sizes.find((v) => v.stock > 0)?.id ?? null
@@ -200,7 +204,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
       </nav>
 
       {/* Main: gallery | panel */}
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(340px,420px)] lg:items-start">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(340px,420px)] lg:items-start">
         <ProductGallery
           images={product.images.map((i) => ({ url: i.url, alt: i.alt }))}
           productName={product.name}
@@ -351,9 +355,16 @@ export function ProductDetailClient({ product }: { product: Product }) {
         </div>
       </div>
 
-      {/* Size picker + bought together */}
-      <div className="mt-12 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
-        <SizePicker />
+      {/* Size picker + bought together; SizePicker renders only for products with
+          real S–XXL sizing — a height/weight recommendation is meaningless for
+          one-size items like caps (gate revision, 2026-08-03). */}
+      <div
+        className={cn(
+          "mt-12 grid grid-cols-1 gap-5",
+          showSizePicker && "lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]"
+        )}
+      >
+        {showSizePicker && <SizePicker />}
         <BoughtTogether
           current={currentAsCompanion}
           companions={product.companions}
