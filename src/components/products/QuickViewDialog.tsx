@@ -10,7 +10,7 @@ import { formatPrice } from "@/lib/format";
 import { IMAGE_SIZES } from "@/lib/image-utils";
 import { cn } from "@/lib/utils";
 import { ProductImage } from "./ProductImage";
-import { SIZE_ORDER } from "./ProductCard";
+import { SIZE_ORDER, COLOR_SWATCH_CLASSES } from "@/lib/product-display";
 
 /** Dialog carousel autoplay tick, milliseconds (R2) — slower than the card's
  *  since the dialog is a deliberate, focused view rather than a hover peek. */
@@ -27,11 +27,6 @@ export interface QuickViewProduct {
   images: { url: string; alt: string | null }[];
   variants: { id: string; name: string; value: string; stock: number; price: string | null }[];
 }
-
-const COLOR_SWATCH_CLASSES: Record<string, string> = {
-  Чорний: "bg-black border-border-strong",
-  Білий: "bg-[#f5f5f5] border-border",
-};
 
 interface QuickViewDialogProps {
   product: QuickViewProduct | null;

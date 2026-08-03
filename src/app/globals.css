@@ -43,6 +43,7 @@
   --color-border-strong: var(--border-strong);
   --color-faint: var(--text-faint);
   --color-rating: var(--rating);
+  --color-available: var(--available);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -90,6 +91,8 @@
   --destructive-foreground: #000000;
   /* Sanctioned amber hue, alongside --destructive — star ratings only. */
   --rating: #fbbf24;
+  /* Sanctioned green hue — stock-availability line and verified-purchase badge only. */
+  --available: #4ade80;
   --border: #1a1a1a;
   --input: #1a1a1a;
   --ring: #ffffff;

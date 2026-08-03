@@ -23,17 +23,22 @@ test.describe("Shopping Cart", () => {
       page.waitForURL(/\/products\/[^/]+$/),
       page.locator("[data-testid='product-card']").first().getByRole("heading").click(),
     ]);
+    await page.waitForSelector('[data-hydrated="true"]');
 
     // Click add to cart
-    await page.getByRole("button", { name: /add to cart/i }).click();
+    await page.getByRole("button", { name: /^додати в кошик$/i }).click();
 
-    // Cart should indicate item was added (toast or cart count update)
-    await expect(
-      page
-        .getByText(/added/i)
-        .or(page.locator("[data-cart-count]"))
-        .or(page.getByRole("button", { name: /cart.*1/i }))
-    ).toBeVisible({ timeout: 5000 });
+    // Cart should indicate item was added: the button flips to its transient
+    // «додано» (added) state for 2s (product-detail-client.tsx). This must be
+    // the ONLY signal asserted here: the header cart button's sr-only "Cart"
+    // label renders unconditionally (not gated on item count — see
+    // Header.tsx), so a locator that also accepts "cart" would match that
+    // persistent button even if this click were a no-op, making the
+    // assertion pass regardless of whether the add actually worked. No toast
+    // and no [data-cart-count] exist in this UI to fall back on instead.
+    await expect(page.getByRole("button", { name: /додано в кошик/i })).toBeVisible({
+      timeout: 5000,
+    });
   });
 
   test("cart page shows empty state when no items", async ({ page }) => {
@@ -60,7 +65,8 @@ test.describe("Shopping Cart", () => {
     await page.waitForSelector("[data-testid='product-card']");
     await page.locator("[data-testid='product-card']").first().getByRole("heading").click();
     await expect(page).toHaveURL(/\/products\/[^/]+$/);
-    await page.getByRole("button", { name: /add to cart/i }).click();
+    await page.waitForSelector('[data-hydrated="true"]');
+    await page.getByRole("button", { name: /^додати в кошик$/i }).click();
 
     // Wait for item to be added
     await page.waitForTimeout(1000);
@@ -82,7 +88,8 @@ test.describe("Shopping Cart", () => {
     await page.waitForSelector("[data-testid='product-card']");
     await page.locator("[data-testid='product-card']").first().getByRole("heading").click();
     await expect(page).toHaveURL(/\/products\/[^/]+$/);
-    await page.getByRole("button", { name: /add to cart/i }).click();
+    await page.waitForSelector('[data-hydrated="true"]');
+    await page.getByRole("button", { name: /^додати в кошик$/i }).click();
 
     // Go to cart page
     await page.goto("/cart");
@@ -103,7 +110,8 @@ test.describe("Shopping Cart", () => {
     await page.waitForSelector("[data-testid='product-card']");
     await page.locator("[data-testid='product-card']").first().getByRole("heading").click();
     await expect(page).toHaveURL(/\/products\/[^/]+$/);
-    await page.getByRole("button", { name: /add to cart/i }).click();
+    await page.waitForSelector('[data-hydrated="true"]');
+    await page.getByRole("button", { name: /^додати в кошик$/i }).click();
 
     // Go to cart page
     await page.goto("/cart");

@@ -72,18 +72,18 @@ export function ReviewList({ productSlug, initialReviews, totalReviews }: Review
       {/* Filter */}
       {totalReviews > 0 && (
         <div className="mb-4 flex items-center gap-2">
-          <span className="text-sm font-medium">Filter:</span>
+          <span className="text-sm font-medium">Фільтр:</span>
           <Select value={ratingFilter} onValueChange={handleFilterChange}>
             <SelectTrigger className="w-[140px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All ratings</SelectItem>
-              <SelectItem value="5">5 stars</SelectItem>
-              <SelectItem value="4">4 stars</SelectItem>
-              <SelectItem value="3">3 stars</SelectItem>
-              <SelectItem value="2">2 stars</SelectItem>
-              <SelectItem value="1">1 star</SelectItem>
+              <SelectItem value="all">Всі оцінки</SelectItem>
+              <SelectItem value="5">5 зірок</SelectItem>
+              <SelectItem value="4">4 зірки</SelectItem>
+              <SelectItem value="3">3 зірки</SelectItem>
+              <SelectItem value="2">2 зірки</SelectItem>
+              <SelectItem value="1">1 зірка</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -92,10 +92,10 @@ export function ReviewList({ productSlug, initialReviews, totalReviews }: Review
       {/* Reviews */}
       {reviews.length === 0 ? (
         <p className="text-muted-foreground py-8 text-center text-sm">
-          {ratingFilter !== "all" ? "No reviews match this filter." : "No reviews yet."}
+          {ratingFilter !== "all" ? "Немає відгуків із такою оцінкою." : "Відгуків поки немає."}
         </p>
       ) : (
-        <div>
+        <div className="space-y-4">
           {reviews.map((review) => (
             <ReviewItem key={review.id} review={review} />
           ))}
@@ -107,7 +107,7 @@ export function ReviewList({ productSlug, initialReviews, totalReviews }: Review
         <div className="mt-4 flex justify-center">
           <Button variant="outline" onClick={handleLoadMore} disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isLoading ? "Loading..." : "Load More Reviews"}
+            {isLoading ? "Завантаження…" : "Показати ще"}
           </Button>
         </div>
       )}

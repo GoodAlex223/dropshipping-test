@@ -34,9 +34,13 @@ components/
 │   ├── ResourceHints.tsx  # Resource hints (preconnect/dns-prefetch for third-party domains)
 │   └── index.ts
 ├── products/
+│   ├── BoughtTogether.tsx  # "use client" «Купують разом» bundle (TASK-037): current + 2 top-selling companions, per-companion size chips (real variantId per line), honest totals (strike only from genuine comparePrices), mobile swipe carousel
 │   ├── ProductCard.tsx    # Product card ("use client" since TASK-036 revision-1 — the hover image carousel needs interval/state; still rendered from server-tree callers like ProductRail since it only ever receives serializable props there, no onQuickView): equal-height flex layout, monochrome discount badge, price, cart-icon quick-buy CTA, soft-shadow + hover-lift; delegates each image layer to ProductImage
+│   ├── ProductGallery.tsx  # "use client" PDP gallery (TASK-037): desktop 96px thumb rail + clamped main photo; mobile snap-swipe track with dots pager; shared activeIndex synced across breakpoints (width-guarded ResizeObserver)
 │   ├── ProductImage.tsx   # "use client" product image: blur placeholder + responsive sizes; renders the branded Mirox "M" fallback on missing/broken src (onError)
 │   ├── QuickViewDialog.tsx  # "use client" quick-view/quick-buy dialog (TASK-036): image carousel (autoplay, reduced-motion gated), size-required add-to-cart → cart store + drawer + GA4 add_to_cart, «Детальніше» PDP link
+│   ├── RecentlyViewed.tsx  # "use client" «Ви нещодавно переглянули» rail (TASK-037): localStorage-backed (mirox:recently-viewed, cap 8), excludes the current product
+│   ├── SizePicker.tsx     # "use client" «Підбір розміру» card (TASK-037): height/weight → recommended size (placeholder formula until TASK-045 size charts); hidden for one-size products
 │   ├── SocialShareButtons.tsx  # Social media sharing buttons (Facebook, Twitter, Pinterest, WhatsApp, Telegram, copy link, native share)
 │   └── index.ts
 ├── reviews/               # Review components

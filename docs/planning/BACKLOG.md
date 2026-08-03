@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-08-01
+**Last Updated**: 2026-08-03
 
 ---
 
@@ -445,6 +445,7 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 **Origin**: PR #19 code-review rounds (separate intake event from Task 12's verification pass). 🟤 Auto-Generated.
 
 - 🟤 **Automate the `docs/README.md` index-freshness check — this defect class has now recurred three consecutive times** — PR #16 (`04a2593`), PR #17 (`3207425`) and PR #19 (`8a98850`) each shipped with the sole review findings being stale index rows, despite `docs/README.md` stating the indexing rule in its own body. Three manual catches in a row is the signal to automate. Shape it like `tests/unit/no-bright-colors.test.ts` (a plain unit test, no new tooling). **Critical design note — a naive implementation is worse than nothing:** a first pass during PR #19 flagged 17 rows, and 16 were false positives. The check MUST understand two shapes before it can be trusted: (1) only tables whose column header is literally `Last Updated` hold dates — the `archive/plans/` tables carry a separate **Status** column (`COMPLETE`/`ACTIVE`) that is not a date at all; (2) specs under `superpowers/specs/` carry `**Date**:`, not `**Last Updated**:`, so "no stamp found" must mean _skip_, never _fail_. Compare a row's date only against a file that actually declares `**Last Updated**:`. Retiring this class is worth more than a fourth manual catch. (Med value, Low effort) `[relates-to: docs-hygiene entries from PR #16/#17]`
+  **Update (2026-08-03, PR #27 — recurrence #7, now OVERDUE):** the class recurred in PR #23, #26 and twice in #27 — where the round that fixed the BACKLOG header re-created the drift in the index row (the "fix moved the drift" failure mode a check would have caught). PR #27's final review measured the naive full audit firing on ~20 rows, all of them the known false-positive classes above — confirming the guards are the load-bearing part of the design and providing that row set as a ready-made test fixture. Promote this entry instead of making an 8th manual catch.
 
 ### [2026-07-18] From: TASK-034 post-merge deploy verification
 
@@ -549,6 +550,26 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
   Complementary option raised in the same review: lower/reword the code-review skill's severity rubric so doc-drift findings (which top out ~75 vs the 80 gate) clear on their own — this covers the drift a linter structurally cannot see, e.g. PR #26 finding 1's stale in-code JSDoc. See the `code-review-threshold-understates-doc-findings` memory. (Med value, Low effort) `[possible-dup-of: "Automated doc freshness check" in the [2026-02-10] From: TASK-030 group]` — related but not identical: that item compares a doc's `Last Updated` header against **git file timestamps** (finds stale docs); this one compares the header against the **`docs/README.md` index row** (finds two-places-disagree drift). Same likely host script, different checks — build together, but neither subsumes the other. The same group's "Link checker in CI" is a third candidate for that script.
 
 - 🟤 **`/api/products` passes unvalidated `parseFloat()` output into the Prisma `price` filter** — `src/app/api/products/route.ts:69-74` does `if (minPrice) { where.price = { ..., gte: parseFloat(minPrice) } }` (same shape for `maxPrice`/`lte`). The truthiness guard rejects an empty string but not a non-numeric one, so `?minPrice=abc` yields `parseFloat("abc")` → `NaN`, which reaches a Prisma `Decimal @db.Decimal(10, 2)` comparison. **Verified**: the code path, that the lines are byte-identical to `main` (pre-existing — predates TASK-036, which is why PR #26's review correctly ruled it out of scope), and that root `CLAUDE.md`'s documented "Query param validation pattern" prescribes the opposite (`!isNaN(num) && num >= min && num <= max`, then conditional spread). **Not verified**: the observable runtime behaviour of `NaN` in a Prisma Decimal `gte` — it may throw `PrismaClientValidationError` (500) or be coerced; confirm before choosing between "ignore the param" and "400 Bad Request". PR #26 added the analogous guard on the _client_ side only (`parseNumericParam` in `products-content.tsx`, commit `a7faf75`), so the API is reachable unguarded by any direct caller or crawler. (Low value, Low effort) `[possible-dup-of: "Fix getPagination() NaN propagation" — BACKLOG.md:292, under [2026-02-10] From: TASK-029 → Origin: feat/task-028-test-coverage branch]` — same NaN-propagation class in the same file, but a distinct defect: that one is `parseInt` → `Math.max(1, NaN)` → `NaN` page/limit in `getPagination()`; this one is `parseFloat` → `NaN` in the price `where`. Worth fixing in one pass, but neither entry covers the other.
+
+### [2026-08-01] From: TASK-037 product page redesign (plan extraction)
+
+- 🟤 **Restore «У вибране» on the PDP when wishlist ships** — TASK-037 omitted the reference's
+  «У вибране» affordance under the no-dead-links rule (spec §7 ledger #2); when TASK-041 builds
+  wishlist, add the heart action back to the buy panel's share row per `Mirox Product.dc.html`.
+  (Low effort) `[relates-to: TASK-041]`
+- 🟤 **Admin product form has no `styleGroup` field** — colorway linking (TASK-037) is seed-only;
+  `ProductForm.tsx` can't set/edit `Product.styleGroup`, so admins can't link colorways without
+  DB access. Add the field to the admin form + validation schema. (Med value, Low effort)
+  `[relates-to: TASK-037]`
+
+### [2026-08-03] From: TASK-037 visual gate (user feedback)
+
+- 🔵 **Real «Купують разом» bundle discount** — the PDP bundle shows an honest sum (strikethrough
+  only from genuine comparePrices) because checkout recomputes prices server-side; a PDP-only
+  discount would display a price checkout won't honor. When TASK-046 (promo codes: schema, admin
+  CRUD, checkout application) / TASK-047 (promotions incl. bundles) build server-side discount
+  infrastructure, wire a real bundle discount into the PDP total. Decided at the TASK-037 visual
+  gate 2026-08-03 (user chose honest-sum-now). (Med value) `[relates-to: TASK-046, TASK-047]`
 
 ---
 

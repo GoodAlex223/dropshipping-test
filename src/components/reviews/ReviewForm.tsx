@@ -29,7 +29,7 @@ export function ReviewForm({ productId, orderId, onReviewCreated }: ReviewFormPr
     e.preventDefault();
 
     if (rating === 0) {
-      toast.error("Please select a rating");
+      toast.error("Оберіть оцінку");
       return;
     }
 
@@ -48,40 +48,43 @@ export function ReviewForm({ productId, orderId, onReviewCreated }: ReviewFormPr
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Failed to submit review");
+        throw new Error(data.error || "Не вдалося надіслати відгук");
       }
 
       const review = await response.json();
-      toast.success("Review submitted successfully!");
+      toast.success("Відгук надіслано!");
       onReviewCreated(review);
       setRating(0);
       setComment("");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to submit review");
+      toast.error(err instanceof Error ? err.message : "Не вдалося надіслати відгук");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border p-4">
-      <h3 className="font-semibold">Write a Review</h3>
+    <form
+      onSubmit={handleSubmit}
+      className="bg-card border-border space-y-4 rounded-2xl border p-5"
+    >
+      <h3 className="font-extrabold">Написати відгук</h3>
 
       <div className="space-y-2">
-        <Label>Rating *</Label>
+        <Label>Оцінка *</Label>
         <StarRating value={rating} onChange={setRating} size="lg" />
       </div>
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label htmlFor="review-comment">Comment (optional)</Label>
+          <Label htmlFor="review-comment">Коментар (необов’язково)</Label>
           <span className="text-muted-foreground text-xs">{comment.length}/2000</span>
         </div>
         <Textarea
           id="review-comment"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          placeholder="Share your experience with this product..."
+          placeholder="Поділіться враженнями про товар…"
           rows={4}
           maxLength={2000}
           disabled={isSubmitting}
@@ -90,7 +93,7 @@ export function ReviewForm({ productId, orderId, onReviewCreated }: ReviewFormPr
 
       <Button type="submit" disabled={rating === 0 || isSubmitting}>
         {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        {isSubmitting ? "Submitting..." : "Submit Review"}
+        {isSubmitting ? "Надсилаємо…" : "Надіслати відгук"}
       </Button>
     </form>
   );

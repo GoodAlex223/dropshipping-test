@@ -2,50 +2,39 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ProductDetailLoading() {
   return (
-    <div className="container py-8">
-      {/* Breadcrumb */}
-      <div className="mb-6 flex gap-2">
-        {[60, 80, 100, 120].map((width, i) => (
-          <Skeleton key={i} className="h-4" style={{ width }} />
-        ))}
-      </div>
-
-      <div className="grid gap-8 lg:grid-cols-2">
-        {/* Image */}
-        <div className="space-y-4">
-          <Skeleton className="aspect-square rounded-lg" />
-          <div className="flex gap-2">
-            {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-20 w-20 rounded-md" />
+    <div className="container py-6 lg:py-8">
+      <Skeleton className="mb-4 h-4 w-64" />
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(340px,420px)]">
+        <div className="hidden gap-6 lg:grid lg:grid-cols-[96px_minmax(0,1fr)]">
+          <div className="flex flex-col gap-3">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Skeleton key={i} className="h-24 w-24 rounded-xl" />
             ))}
           </div>
+          <Skeleton className="h-[clamp(420px,calc(100vh-190px),620px)] rounded-[20px]" />
         </div>
-
-        {/* Info */}
-        <div className="space-y-6">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-9 w-3/4" />
-          <Skeleton className="h-8 w-32" />
-          <Skeleton className="h-16 w-full" />
-          <Skeleton className="h-px w-full" />
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-16" />
-            <div className="flex gap-2">
-              <Skeleton className="h-10 w-28" />
-            </div>
+        <Skeleton className="h-[400px] rounded-[20px] lg:hidden" />
+        <div className="flex flex-col gap-4">
+          <Skeleton className="h-8 w-3/4" />
+          <Skeleton className="h-7 w-32" />
+          <Skeleton className="h-4 w-40" />
+          <div className="flex gap-2.5">
+            {[1, 2].map((i) => (
+              <Skeleton key={i} className="h-9 w-9 rounded-full" />
+            ))}
           </div>
-          <div className="flex gap-3">
-            <Skeleton className="h-12 flex-1" />
-            <Skeleton className="h-12 flex-1" />
+          <div className="flex gap-2.5">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-11 w-[52px] rounded-[10px]" />
+            ))}
           </div>
+          <Skeleton className="h-12 w-full rounded-[10px]" />
+          <Skeleton className="h-12 w-full rounded-[10px]" />
         </div>
       </div>
-
-      {/* Description */}
-      <div className="mt-12 space-y-4">
-        <Skeleton className="h-8 w-40" />
-        <Skeleton className="h-px w-full" />
-        <Skeleton className="h-24 w-full" />
+      <div className="mt-12 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
+        <Skeleton className="h-64 rounded-[20px]" />
+        <Skeleton className="h-64 rounded-[20px]" />
       </div>
     </div>
   );

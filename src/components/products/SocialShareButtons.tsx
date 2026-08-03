@@ -71,9 +71,9 @@ export function SocialShareButtons({
 
     try {
       await navigator.clipboard.writeText(url);
-      toast.success("Link copied to clipboard!");
+      toast.success("Посилання скопійовано!");
     } catch {
-      toast.error("Failed to copy link");
+      toast.error("Не вдалося скопіювати посилання");
     }
   };
 
@@ -96,7 +96,7 @@ export function SocialShareButtons({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <span className="text-muted-foreground text-sm font-medium">Share:</span>
+      <span className="text-muted-foreground text-sm font-medium">Поділитися:</span>
 
       {SHARE_PLATFORMS.map(({ platform, icon: Icon, label }) => (
         <Button
@@ -105,7 +105,7 @@ export function SocialShareButtons({
           size="icon"
           className="h-8 w-8"
           onClick={() => handlePlatformShare(platform)}
-          aria-label={`Share on ${label}`}
+          aria-label={`Поділитися: ${label}`}
         >
           <Icon className="h-3.5 w-3.5" />
         </Button>
@@ -116,7 +116,7 @@ export function SocialShareButtons({
         size="icon"
         className="h-8 w-8"
         onClick={handleCopyLink}
-        aria-label="Copy link"
+        aria-label="Скопіювати посилання"
       >
         <Link2 className="h-3.5 w-3.5" />
       </Button>
@@ -127,7 +127,7 @@ export function SocialShareButtons({
         size="icon"
         className="h-8 w-8 sm:hidden"
         onClick={handleNativeShare}
-        aria-label="Share"
+        aria-label="Поділитися"
       >
         <Share2 className="h-3.5 w-3.5" />
       </Button>
