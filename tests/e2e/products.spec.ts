@@ -165,5 +165,30 @@ test.describe("Product Browsing", () => {
     await page.waitForSelector('[data-hydrated="true"]');
     await page.getByRole("link", { name: /Білий — Худі Mirox White/ }).click();
     await expect(page).toHaveURL(/\/products\/hudi-mirox-white$/);
+
+    // PR #27 review: soft nav reuses the route template, so without a remount
+    // key the sibling PDP kept the previous product's selectedSizeId — no size
+    // preselected, and add-to-cart produced a variantId-less, maxStock-0 line.
+    // The remount must preselect the sibling's own first in-stock size…
+    // (wait for the sibling's h1 first: until the new tree renders, the OLD
+    // instance's data-hydrated node is still attached and would satisfy the
+    // selector while the new instance is pre-hydration — WebKit drops clicks
+    // landing in that window)
+    await expect(page.locator("h1")).toHaveText("Худі Mirox White");
+    await page.waitForSelector('[data-hydrated="true"]');
+    // .first(): the buy panel's size chip; BoughtTogether companions render
+    // their own "S" chips further down.
+    await expect(page.getByRole("button", { name: "S", exact: true }).first()).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
+    // …and add-to-cart must carry the sibling's real sized line.
+    await page.getByRole("button", { name: /^додати в кошик$/i }).click();
+    await expect(page.getByRole("button", { name: /додано в кошик/i })).toBeVisible();
+    await page
+      .getByRole("button", { name: /кошик|cart/i })
+      .first()
+      .click();
+    await expect(page.getByText(/Худі Mirox White — S/).first()).toBeVisible();
   });
 });

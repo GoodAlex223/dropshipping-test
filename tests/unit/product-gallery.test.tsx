@@ -65,4 +65,20 @@ describe("ProductGallery", () => {
       behavior: "instant",
     });
   });
+
+  it("mobile dot click smooth-scrolls without an instant snap from the sync effect (PR #27)", () => {
+    render(<ProductGallery images={images} productName="Худі Mirox Basic" />);
+    const track = screen.getByLabelText(/Фотографії/);
+    Object.defineProperty(track, "clientWidth", { value: 390, writable: true });
+    track.scrollTo = vi.fn();
+
+    const dots = screen.getAllByRole("button", { name: /Перейти до фото \d/ });
+    fireEvent.click(dots[2]);
+
+    expect(track.scrollTo).toHaveBeenCalledWith({ left: 2 * 390, behavior: "smooth" });
+    // The [activeIndex] effect must consume the smooth-target flag, not re-scroll instantly.
+    expect(track.scrollTo).not.toHaveBeenCalledWith(
+      expect.objectContaining({ behavior: "instant" })
+    );
+  });
 });

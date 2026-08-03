@@ -26,6 +26,12 @@ interface ProductGalleryProps {
 export function ProductGallery({ images, productName }: ProductGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const trackRef = useRef<HTMLDivElement>(null);
+  // Set by scrollToSlide: this activeIndex change rides its own smooth scroll,
+  // so the sync effect must not instant-snap over it (PR #27 review).
+  const smoothTargetRef = useRef<number | null>(null);
+  // RO delivers an initial callback on every observe(); only a real width
+  // change (mount, rotation, breakpoint) may trigger a sync from that path.
+  const lastTrackWidthRef = useRef(0);
 
   // Sync the (hidden) mobile track's scroll position with activeIndex when it becomes
   // visible, and when activeIndex changes (via thumb clicks). Also add a ResizeObserver
@@ -44,13 +50,22 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
       }
     };
 
-    syncScroll();
+    if (smoothTargetRef.current === activeIndex) {
+      // Dot click: the smooth scroll it started is still in flight — consume
+      // the flag and let it animate instead of snapping.
+      smoothTargetRef.current = null;
+    } else {
+      syncScroll();
+    }
 
     // ResizeObserver to handle rotation/breakpoint transitions (track gains width)
     let resizeObserver: ResizeObserver | undefined;
     if (typeof ResizeObserver !== "undefined") {
       resizeObserver = new ResizeObserver(() => {
-        syncScroll();
+        if (track.clientWidth !== lastTrackWidthRef.current) {
+          lastTrackWidthRef.current = track.clientWidth;
+          syncScroll();
+        }
       });
       resizeObserver.observe(track);
     }
@@ -71,6 +86,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
   };
 
   const scrollToSlide = (index: number) => {
+    smoothTargetRef.current = index;
     setActiveIndex(index);
     trackRef.current?.scrollTo({
       left: index * (trackRef.current?.clientWidth ?? 0),

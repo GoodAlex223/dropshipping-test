@@ -376,7 +376,11 @@ export default async function ProductDetailPage({ params }: PageProps) {
           __html: JSON.stringify(breadcrumbJsonLd),
         }}
       />
-      <ProductDetailClient product={product} />
+      {/* key: sibling-colorway navigation soft-navigates within this same route
+          template, so without a key the client instance (and its selectedSizeId
+          state) is reused across products — stale variant ids made the CTA add
+          variantId: undefined / maxStock: 0 lines (PR #27 review). */}
+      <ProductDetailClient key={product.id} product={product} />
     </>
   );
 }
