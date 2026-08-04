@@ -130,18 +130,19 @@ export function ProductDetailClient({ product }: { product: Product }) {
   const lowStock = !outOfStock && currentStock > 0 && currentStock <= LOW_STOCK_THRESHOLD;
 
   const addLine = () => {
-    const name = selectedSize ? `${product.name} — ${selectedSize.value}` : product.name;
     addItem({
       productId: product.id,
       variantId: selectedSize?.id,
-      name,
+      name: product.name,
       price: currentPrice,
       image: product.images[0]?.url,
       maxStock: currentStock,
+      color: product.colorValue ?? undefined,
+      size: selectedSize?.value,
     });
     trackAddToCart({
       item_id: product.id,
-      item_name: name,
+      item_name: product.name,
       item_category: product.category.name,
       item_variant: selectedSize?.value,
       price: currentPrice,
@@ -186,6 +187,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
     stock: product.stock,
     image: product.images[0] ? { url: product.images[0].url, alt: product.images[0].alt } : null,
     category: { name: product.category.name },
+    colorValue: product.colorValue ?? null,
     sizeVariants: sizes.map((v) => ({ id: v.id, value: v.value, stock: v.stock, price: v.price })),
   };
 

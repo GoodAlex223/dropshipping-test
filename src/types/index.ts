@@ -171,5 +171,7 @@ export interface BundleCompanion {
   image: { url: string; alt: string | null } | null;
   /** GA4 item_category for the bundle's trackAddToCart calls. */
   category: { name: string } | null;
+  /** This product's own colorway value (first Color variant), for cart lines. */
+  colorValue: string | null;
   sizeVariants: { id: string; value: string; stock: number; price: string | null }[];
 }

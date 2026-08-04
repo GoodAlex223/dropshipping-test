@@ -125,19 +125,21 @@ export function QuickViewDialog({ product, focusSizes, onOpenChange }: QuickView
 
   const handleAddToCart = () => {
     const price = selectedSize?.price ? parseFloat(selectedSize.price) : parseFloat(product.price);
-    const name = selectedSize ? `${product.name} — ${selectedSize.value}` : product.name;
+    const color = product.variants.find((v) => v.name === "Color")?.value;
 
     addItem({
       productId: product.id,
       variantId: selectedSize?.id,
-      name,
+      name: product.name,
       price,
       image: product.images[0]?.url,
       maxStock: selectedSize ? selectedSize.stock : product.stock,
+      color,
+      size: selectedSize?.value,
     });
     trackAddToCart({
       item_id: product.id,
-      item_name: name,
+      item_name: product.name,
       item_category: product.category?.name,
       item_variant: selectedSize?.value,
       price,

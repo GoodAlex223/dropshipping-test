@@ -99,8 +99,8 @@ async function getProduct(slug: string): Promise<Product | null> {
     category: { select: { name: true } },
     images: { select: { url: true, alt: true }, orderBy: { position: "asc" as const }, take: 1 },
     variants: {
-      where: { name: "Size" },
-      select: { id: true, value: true, stock: true, price: true },
+      where: { name: { in: ["Size", "Color"] } },
+      select: { id: true, name: true, value: true, stock: true, price: true },
     },
   };
 
@@ -157,12 +157,15 @@ async function getProduct(slug: string): Promise<Product | null> {
         stock: c.stock,
         image: c.images[0] ?? null,
         category: c.category ?? null,
-        sizeVariants: c.variants.map((v) => ({
-          id: v.id,
-          value: v.value,
-          stock: v.stock,
-          price: v.price?.toString() ?? null,
-        })),
+        sizeVariants: c.variants
+          .filter((v) => v.name === "Size")
+          .map((v) => ({
+            id: v.id,
+            value: v.value,
+            stock: v.stock,
+            price: v.price?.toString() ?? null,
+          })),
+        colorValue: c.variants.find((v) => v.name === "Color")?.value ?? null,
       }));
     })(),
     [],

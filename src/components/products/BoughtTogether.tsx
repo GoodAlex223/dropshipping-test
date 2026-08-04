@@ -99,18 +99,19 @@ export function BoughtTogether({ current, companions, preferredSizeValue }: Boug
     if (!allResolved) return;
     for (const { product, variant } of lines) {
       const price = parseFloat(variant?.price ?? product.price);
-      const name = variant ? `${product.name} — ${variant.value}` : product.name;
       addItem({
         productId: product.id,
         variantId: variant?.id,
-        name,
+        name: product.name,
         price,
         image: product.image?.url,
         maxStock: variant ? variant.stock : product.stock,
+        color: product.colorValue ?? undefined,
+        size: variant?.value,
       });
       trackAddToCart({
         item_id: product.id,
-        item_name: name,
+        item_name: product.name,
         item_category: product.category?.name,
         item_variant: variant?.value,
         price,
