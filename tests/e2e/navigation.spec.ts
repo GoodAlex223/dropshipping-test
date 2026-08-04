@@ -102,7 +102,7 @@ test.describe("Navigation", () => {
     await page.goto("/");
 
     // Cart button/icon should be visible
-    const cartButton = page.locator("[aria-label*='cart' i], button:has-text('cart')").first();
+    const cartButton = page.getByRole("button", { name: /кошик|cart/i }).first();
     await expect(cartButton).toBeVisible();
   });
 

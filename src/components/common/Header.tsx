@@ -482,7 +482,7 @@ export function Header() {
                 {totalItems > 99 ? "99+" : totalItems}
               </span>
             )}
-            <span className="sr-only">Cart</span>
+            <span className="sr-only">Кошик</span>
           </Button>
         </div>
       </div>

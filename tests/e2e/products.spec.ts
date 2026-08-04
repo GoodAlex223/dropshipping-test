@@ -151,12 +151,13 @@ test.describe("Product Browsing", () => {
     await page.getByRole("button", { name: /^додати в кошик$/i }).click();
     await expect(page.getByRole("button", { name: /додано в кошик/i })).toBeVisible();
 
-    // The drawer line must carry the VALUE («— S»), never «— Size».
+    // The drawer line must carry the VALUE («Розмір: S»), never «— Size».
     await page
       .getByRole("button", { name: /кошик|cart/i })
       .first()
       .click();
-    await expect(page.getByText(/Худі Mirox Basic — S/).first()).toBeVisible();
+    await expect(page.getByText("Худі Mirox Basic", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText(/Розмір: S/).first()).toBeVisible();
     await expect(page.getByText(/— Size/)).toHaveCount(0);
   });
 
@@ -189,6 +190,7 @@ test.describe("Product Browsing", () => {
       .getByRole("button", { name: /кошик|cart/i })
       .first()
       .click();
-    await expect(page.getByText(/Худі Mirox White — S/).first()).toBeVisible();
+    await expect(page.getByText("Худі Mirox White", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText(/Розмір: S/).first()).toBeVisible();
   });
 });
