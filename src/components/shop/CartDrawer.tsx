@@ -80,7 +80,7 @@ export function CartDrawer() {
           </div>
         ) : (
           <>
-            <ScrollArea className="-mx-6 flex-1 px-6">
+            <ScrollArea className="flex-1 px-6">
               <div className="space-y-4 py-4">
                 {items.map((item) => {
                   const variantLine = [
@@ -106,9 +106,9 @@ export function CartDrawer() {
                           </div>
                         )}
                       </div>
-                      <div className="flex flex-1 flex-col">
-                        <div className="flex items-start justify-between">
-                          <div>
+                      <div className="flex min-w-0 flex-1 flex-col">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
                             <h4 className="line-clamp-2 text-sm font-bold">{item.name}</h4>
                             {variantLine && (
                               <p className="text-muted-foreground mt-0.5 text-xs font-semibold">
@@ -166,23 +166,25 @@ export function CartDrawer() {
               </div>
             </ScrollArea>
 
-            <div className="space-y-4 pt-4">
+            <div className="space-y-4 px-6 pt-4 pb-6">
               <Separator />
               <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">
+                <div className="flex items-center justify-between gap-3 text-sm">
+                  <span className="text-muted-foreground shrink-0">
                     {cart.summary.itemsLabel} ({totalItems})
                   </span>
                   <span className="font-bold">{formatPrice(subtotal)}</span>
                 </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">{cart.summary.shippingLabel}</span>
-                  <span className="text-muted-foreground text-[13px]">
+                <div className="flex items-start justify-between gap-3 text-sm">
+                  <span className="text-muted-foreground shrink-0">
+                    {cart.summary.shippingLabel}
+                  </span>
+                  <span className="text-muted-foreground min-w-0 text-right text-[13px]">
                     {cart.summary.shippingValue}
                   </span>
                 </div>
                 <Separator />
-                <div className="flex items-center justify-between font-bold">
+                <div className="flex items-center justify-between gap-3 font-bold">
                   <span>{cart.summary.totalLabel}</span>
                   <span>{formatPrice(subtotal)}</span>
                 </div>
