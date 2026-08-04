@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-08-03
+**Last Updated**: 2026-08-04
 
 ---
 
@@ -591,6 +591,19 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 - 🟤 **Legacy colorway swatches are bare `<span>`s with no accessible description** — the
   informational (non-link) extra-Color swatches on the PDP render colour only visually; add
   `role="img"` + `aria-label` with the colour name. (Low effort) `[relates-to: TASK-037]`
+
+### [2026-08-04] From: Weekly planning steer (user-raised)
+
+- 🔵 **Finish the rebrand — stale design/language/data sweep** — user directive at the 2026-08-04
+  weekly brainstorm: several surfaces still carry pre-Mirox design and English copy — cart page
+  ("Shopping Cart"/"Proceed to Checkout"), CartDrawer, checkout (3-step shell with English
+  "Standard/Express/Overnight Shipping" USD options), auth login/register, account pages
+  ("My Account"/"Order History" + the 500ing order detail), newsletter confirm/unsubscribe,
+  root error/404 pages, and transactional emails ("Order Confirmation", "Store" branding).
+  Data side: prod re-seed still user-gated (prod PDPs on the legacy colorway path) and the USD
+  shipping constants. **Promoted same day** into [WEEKLY.md](WEEKLY.md) (week of 2026-08-03)
+  groups G1/G2/G4/G5 + gated 🟡 P1; admin surfaces deliberately excluded (customer-facing
+  first — admin visual pass remains the separate 🟤 entry above). (High value, M effort)
 
 ---
 

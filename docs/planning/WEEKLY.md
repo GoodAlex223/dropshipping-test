@@ -1,119 +1,163 @@
 # Weekly Plan
 
-**Week of**: 2026-07-27 to 2026-08-02
-**Last Updated**: 2026-08-03
+**Week**: Monday August 3 – Friday August 7, 2026
+**Created**: 2026-08-04
+**Sources**: [MILESTONES.md](MILESTONES.md) · [ROADMAP.md](ROADMAP.md) · [GOALS.md](GOALS.md) · [BACKLOG.md](BACKLOG.md) · [TODO.md](TODO.md) · prior WEEKLY (2026-07-27 week, archived below) · REVIEW-QUEUE.md (does not exist yet — created this week by G6)
+**Cleanup Week?**: No — due by cadence (3 feature weeks since resumption, 🟤 pool ≫ 20 SP pending), but deferred by explicit user steer to finish the rebrand; targeted for next week (Aug 10–14) with the OVERDUE docs-freshness linter as first pick.
+**Context**: Mirox program v1.3. User-directed theme (2026-08-04 brainstorm): **finish the redesign + Ukrainian translation of the storefront** — cart, checkout, auth, account, newsletter and error surfaces still carry pre-rebrand design and English copy (transactional emails as the stretch 🏆); the data side rides along as a user-gated prod re-seed plus the USD shipping constants decision inside the checkout group.
 
 ---
 
-## 🎯 Weekly Focus
+## Parallel Work
 
-**Primary Goal**: Ship TASK-057 — Mirox design adoption (dark-theme token flip, homepage/header/footer realignment, Mirox clothing seed, UAH display) and its v1.3/v1.4 task-map revision.
-
-**Secondary Goals**:
-
-- Start TASK-036 catalog redesign once TASK-057 merges (re-scoped to `Mirox Catalog.dc.html`) — **done: shipped and merged (PR #26, 2026-08-01)**
-- Carry TASK-039 i18n foundation forward — still a payments prerequisite (monobank requires a UA-language site)
+- 🟡 **P1 — Prod data re-seed (1 SP, user-approval-gated)**: carry-forward from TASK-037 — prod still lacks `styleGroup` colorway links, «Один розмір» on the kepka, and futbolka «Білий», so prod PDPs render the hardened legacy path. Runs the guarded `SEED_ALLOW_REMOTE=1` procedure (same as 2026-07-31, read-only preflight first) **only on explicit user approval**.
+- **Client chases (zero-code, carry-forward)**: 9-item payments prerequisites checklist ([decision doc §5.3](../superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md)); `developers.novaposhta.ua` webhook question from an unblocked network (gates TASK-049); TASK-056 content asks (photography, logo vector, socials/claims, size charts, legal copy) — G1's audit sharpens this list; formal TASK-056 checklist assembly is a next-week candidate.
 
 ---
 
-## 📋 Planned Tasks
+## Task Groups
 
-### Must Complete (Critical)
+### G1. Cart and Drawer Restyle [batch]
 
-| Task                  | Reference        | Status    | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| --------------------- | ---------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Mirox design adoption | TODO.md TASK-057 | ✅ PR #24 | Merged `f9ceb97` 2026-07-31 after 2 review rounds (round 2 unblocked CI: `docs/**` ESLint ignore — Build/E2E ran for the first time on the branch, all green). Visual gate signed off v3. Prod serving the rebrand; PDP `og:image` ENOENT → follow-up [PR #25](https://github.com/GoodAlex223/dropshipping-test/pull/25), merged `acb0c30` same day — prod og:image verified 200 `image/png`. Also revises TASK-036/037/039/055/056. |
+🔵 User · storefront/cart · **5 SP** · Tue
 
-### Should Complete (Important)
+> Opens with the definitive staleness audit, then converts the cart surfaces — design handoff exists (`Mirox Cart.dc.html`). Visual/copy only: one-click buy, upsell modal and the promo-code field stay in TASK-043 (v1.4).
 
-| Task                  | Reference        | Status    | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| --------------------- | ---------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Catalog redesign      | TODO.md TASK-036 | ✅ PR #26 | Merged `919906b` 2026-08-01. Five filters + 4 sorts (incl. «Популярні» via `getSalesRanking()`), carousel/quick-view/quick-buy cards, mobile sheet-only filters, hydration gate preserved unchanged. Visual gate signed off after 1 revision round; user PR review: 3 doc-drift findings fixed, ruling accepted all responses. Prod verified live (catalog, `sort=popular`, brands API).                                                                                                                                                                                                        |
-| Product page redesign | TODO.md TASK-037 | ✅ PR #27 | Merged `cec8408` 2026-08-03. PDP rebuilt to `Mirox Product.dc.html`: gallery (thumb rail / mobile swipe+dots), `styleGroup` colorway siblings, ranked size chips, `SizePicker` (hidden for one-size), honest-sum `BoughtTogether` (mobile carousel), `RecentlyViewed`, reviews restyle, cart-line naming fix. Visual gate signed off after 1 revision round (390px overflow root-cause `grid-cols-1`); 3 user PR review rounds: score-100 stale-state fix (`key={product.id}` remount), dots smooth-scroll, docs-freshness drift ×2 (recurrence #7 → automation entry OVERDUE). Unit 517 → 598. |
+- [ ] Route-by-route staleness audit — screenshot + EN-string sweep of every customer route; produces the definitive scope list for G2/G4 and feeds content gaps to TASK-056 (1) — BACKLOG [2026-08-04] weekly-planning steer
+- [ ] Cart page → `Mirox Cart.dc.html`: quantity steppers, sticky order summary, dashed-border empty state; Ukrainian copy via the content-config layer — [src/app/(shop)/cart/page.tsx](<../../src/app/(shop)/cart/page.tsx>) ("Shopping Cart" / "Continue Shopping" / "Proceed to Checkout" today) (3) — BACKLOG [2026-08-04] weekly-planning steer [HIGH]
+- [ ] CartDrawer restyle + Ukrainian strings; update E2E cart specs — [src/components/shop/CartDrawer.tsx](../../src/components/shop/CartDrawer.tsx) (1) — BACKLOG [2026-08-04] weekly-planning steer
 
-### Nice to Have (If Time Permits)
+### G2. Checkout Restyle [batch]
 
-| Task            | Reference        | Status     | Notes                                                                                            |
-| --------------- | ---------------- | ---------- | ------------------------------------------------------------------------------------------------ |
-| i18n foundation | TODO.md TASK-039 | 📋 Planned | Scope shifted: externalize now-hardcoded UA strings; `formatPrice()` already landed via TASK-057 |
-| CI extensions   | TODO.md TASK-040 | 📋 Planned | Lighthouse budget, preview deploys, post-deploy smoke test                                       |
+🔵 User · storefront/checkout · **5 SP** · Wed
 
----
+> Visual + language only per `Mirox Checkout.dc.html`'s shell — the Stripe rails, step logic and order creation stay untouched (payment/delivery integration is TASK-048/049). Risk: Stripe Elements' dark theme is unverifiable locally (no keys — known BACKLOG note); the visual gate covers the rest.
 
-## 🚧 Blockers & Risks
+- [ ] 3-step checkout restyle + Ukrainian copy (information/shipping/payment steps, PaymentForm labels) — [src/app/(shop)/checkout/page.tsx](<../../src/app/(shop)/checkout/page.tsx>) (3) — BACKLOG [2026-08-04] weekly-planning steer [HIGH]
+- [ ] Shipping methods: replace English "Standard/Express/Overnight" (5.99/12.99/24.99 USD) with Nova-Poshta-style Ukrainian labels; in-task decision on interim numeric amounts (NP published rates 80/120/70 as numerics under the documented Stripe-USD-mismatch convention) — checkout page local list + `SHIPPING_METHODS` in [src/lib/stripe.ts](../../src/lib/stripe.ts) (1) — BACKLOG [2026-07-29] TASK-057 group (checkout pointer)
+- [ ] Order confirmation page Ukrainian + Mirox alignment — `src/app/(shop)/checkout/confirmation/` (1) — BACKLOG [2026-08-04] weekly-planning steer
 
-| Blocker                          | Impact                                                                         | Mitigation                                                                           | Owner  |
-| -------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ | ------ |
-| ~~TASK-057 not yet merged~~      | Resolved 2026-07-31 — PR #24 merged `f9ceb97`; TASK-036/037 unblocked          | —                                                                                    | Claude |
-| ~~Prod re-seed not yet run~~     | Resolved 2026-07-31 — user-approved re-seed ran; prod serves the Mirox catalog | Verified live: 8 MRX products via API, PDP 200, homepage UAH/Ukrainian content       | User   |
-| Client content inventory pending | Real photography, logo vector, real socials/claims, size charts, legal copy    | TASK-056 consolidates the ask; TASK-057 shipped generated placeholders as an interim | User   |
-| Client payments prerequisites    | TASK-048 gateway pick blocked                                                  | 9-item checklist (decision doc §5.3) — chase before v1.4                             | User   |
+### G3. Params Fix [solo]
 
----
+🟤 Auto · Next.js routing · **2 SP** · Wed
 
-## 📊 Progress Tracking
+> The only 🟤 group this week (≤1-group cap). Solo-2-SP exception: kept separate from G4 so every group stays single-source; it is one mechanical pattern across 4 files. `/account/orders/[id]` is also squarely inside this week's theme — a 500 page is the ultimate stale surface.
 
-### Daily Log
+- [ ] Fix `use(params)` on Next 14.2.35 (plain object, not a Promise) in all 4 broken client routes — `/admin/orders/[id]`, `/admin/products/[id]`, `/admin/suppliers/[id]`, `/account/orders/[id]` — each currently 500s; add a regression check (2) — BACKLOG [2026-07-18] TASK-034 Task 12 [HIGH]
 
-#### Monday (2026-07-27)
+### G4. Peripheral Surfaces Sweep [batch]
 
-- [x] TASK-057 brainstorm → spec → plan → Tasks 1–8 (subagent-driven — fresh implementer + independent reviewer per task)
-- **Completed**: design handoff (`docs/design/design_handoff_mirox/`) adopted as canonical, app image assets staged; shared `formatPrice()` (`src/lib/format.ts`, uk-UA formatting per decision doc §7.4) replacing 5 duplicated USD formatters; `:root` flipped to the Mirox dark palette with `[data-surface="dark"]` inversion machinery deleted; Ukrainian content config (`src/content/{brand,home,site}.ts`) and homepage restructured to the handoff's section order; hero photo variant with CSS vignette + bordered benefit strip; header/footer realigned (client logo PNG, Ukrainian nav, footer benefits/socials/copyright); WhyChooseUs 2-column with stat cards + testimonial cards with avatars + amber `--rating` token.
-- **Blockers**: none
+🔵 User · storefront/auth+account+system pages · **5 SP** · Thu
 
-#### Tuesday (2026-07-28)
+> Tokens are already global, so this is mostly copy conversion + component alignment to the Mirox look; G1's audit fixes the exact file list.
 
-- [x] TASK-057 Tasks 9–11 (Mirox seed, Cyrillic OG images, dark-coherence sweep) + Task 12 first pass (full verification + visual gate)
-- **Completed**: Mirox clothing seed (8 products, UAH prices, `brand: "Mirox"`, guarded destructive reset via `SEED_ALLOW_REMOTE`) replacing the electronics catalog; Cyrillic-capable OG fonts + PDP OG card restyled to the Mirox palette (incidentally fixed a pre-existing prod bug — the PDP OG route crashed on relative product-image URLs, Satori needs absolute); deferred bright utilities cleared on cart/products, colour guard extended to cart/products/categories, admin functional-contrast pass (found and fixed a dead `dark:` badge and two stat-icon circles). Task 12's full verification pass found and fixed 2 MAJOR bugs: a local-only `NODE_ENV=development` leak (devcontainer + `.env.example`) corrupting every responsive Tailwind utility in `next build`'s compiled CSS (Vercel unaffected — the platform sets its own `NODE_ENV=production` first), and `tests/e2e/navigation.spec.ts` never updated for the Ukrainian header rework (rewritten for the new nav, 25/25 passing). Visual-fidelity gate captured (desktop + mobile, OG cards) and presented for sign-off; **user returned revision requests same day** (logo size, eyebrow removal, hero containment, 2-line headline, card buttons removed + sizes row + badge pill + rail reorder, socials icons-only, subscribe UA copy, OG ghost-logo watermark on both cards); info-page nav/footer links confirmed staying hidden until TASK-055 ships; return window «14 днів» **user-approved** for future TASK-055 use.
-- **Blockers**: none — revisions queued for the next session
+- [ ] Auth: login/register forms → Ukrainian + Mirox alignment — `src/app/(auth)/login/`, `src/app/(auth)/register/` (2) — BACKLOG [2026-08-04] weekly-planning steer
+- [ ] Account: layout ("My Account"), overview, orders list/detail ("Order History") → Ukrainian + restyle — `src/app/(shop)/account/**` (2) — BACKLOG [2026-08-04] weekly-planning steer
+- [ ] Newsletter confirm/unsubscribe pages + root error/404 pages → Ukrainian — `src/app/newsletter/**`, [src/app/error.tsx](../../src/app/error.tsx) ("Something went wrong"), [src/app/not-found.tsx](../../src/app/not-found.tsx) ("Page not found") (1) — BACKLOG [2026-08-04] weekly-planning steer
 
-#### Wednesday (2026-07-29)
+### G5. Transactional Emails [solo] 🏆
 
-- [x] TASK-057 gate revision waves (3 rounds) → Task 12 sign-off → Task 13 docs housekeeping
-- **Completed**: implemented all revisions from Tuesday's verdict across 3 rounds (`6f1877e`, `7c06be8`, `ea39abd`, `92bfe0e`) — round 1 addressed all 9 items A–I and, along the way, found+fixed a `next/og` static-prerender bug (a build-time self-fetch of a local asset by absolute URL silently fails during `next build`'s prerender; switched to an embedded base64 `data:` URI); round 2 fixed an E2E cart-spec locator; a v2 gate re-presentation (noting a Chromium `fullPage`-capture artifact that drops the hero's composited image layer — worked around with a tall-viewport, non-fullPage capture instead); round 3 fixed WhyChooseUs checklist vertical centering. **USER SIGN-OFF GRANTED (v3)** — Task 12 complete. Task 13 (docs housekeeping): TASK-057 added to TODO.md; TASK-036/037/039 re-scoped and TASK-055/056 annotated per the design-adoption spec §4; WEEKLY.md rolled to this week; new BACKLOG intake group filed; docs/README.md indexed; the 2026-07-14 program spec noted; CLAUDE.md propagation check applied.
-- **Blockers**: none. PR #24 opened with `/code-review` posted (review findings fixed in-branch); the user-approved prod re-seed happens only after the Vercel deploy is verified serving the merged branch.
+🔵 User · email templates · **3 SP** · Fri (stretch)
 
-#### Thursday (2026-07-31)
+> The Weekly Challenge — see the 🏆 section below.
 
-- [x] PR #24 review rounds → merge → post-merge completion workflow
-- **Completed**: review round 1 fixed all 4 findings (`8166e47` — token-derived `color-mix` vignette, PR-status doc sync, truthful `--radius` comment); review round 2 surfaced **CI red on every push of the branch** (ESLint linting the Figma-exported vendor JS — `--ext` is inert under flat config) → fixed by ignoring `docs/**` (`38ce2c0`), producing the branch's **first fully-green CI run** with Build + E2E executing for the first time; reviewer's final ruling 7 fixed + 1 accepted, `CLEAN`/`MERGEABLE`. **PR #24 merged** (`f9ceb97`, `--merge`), branches deleted, `main` pulled. Post-merge deploy verified: prod serving the rebrand (~2 min), root OG card 200; **PDP `og:image` 500 in prod** (`ENOENT` on `og-logo-ghost.png` — `public/` not traced into the serverless bundle; anticipated risk) → `outputFileTracingIncludes` fix on follow-up PR #25 (merged `acb0c30` same day; prod PDP og:image verified 200 — Cyrillic, product photo, ghost mark all render). **Prod re-seed executed** (user-approved, `SEED_ALLOW_REMOTE=1`, read-only preflight first) — prod catalog is now Mirox, verified live. Completion workflow: DONE.md entry, plan archived, TODO/WEEKLY/BACKLOG/docs-README synced, memory captured.
-- **Blockers**: prod re-seed still gated on explicit user approval (prod shows electronics under the Mirox storefront until then)
+- [ ] Order-confirmation + newsletter-confirmation emails → Ukrainian, Mirox-consistent styling — [src/lib/email.ts](../../src/lib/email.ts) ("Order Confirmation" / "Thank you for your order" today), `src/lib/email-templates/` (2) — BACKLOG [2026-08-04] weekly-planning steer
+- [ ] Route the brand through `BRAND_NAME` instead of `|| "Store"` fallbacks (email.ts, newsletter template, admin settings label) — closes the code side of the `NEXT_PUBLIC_STORE_NAME` entry (1) — BACKLOG [2026-07-18] post-merge deploy verification
 
-#### Friday–Saturday (2026-07-31 → 2026-08-01)
+### G6. Weekly Reviews [batch]
 
-- [x] TASK-036 full cycle: brainstorm → spec → plan → subagent-driven execution (11 tasks) → visual gate (1 revision round) → final review → PR #26 → merge → completion workflow
-- **Completed**: catalog rebuilt to `Mirox Catalog.dc.html` — five combinable URL-driven filters + `/api/products/brands`, 4 sorts incl. «Популярні» (`getSalesRanking()` extracted from `getBestsellers()`), ProductCard badges/swatches/carousel/quick-actions, `QuickViewDialog`, square pagination, Header nav retarget; E2E hydration gate untouched by design. Visual-gate revision round (user remarks 1–7 + PDP mobile overflow fix). Fix rounds caught: `select_item` bubbling, invisible-overlay click interception, carousel hover-boundary reset (real-browser verified pre/post), touch-tablet hover gating (`[@media(hover:hover)]`), reduced-motion autoplay gating. **CI surfaced a stale `Каталог` heading assertion masked locally** by the dev-server race that fails on `main` too — fixed with the masking documented. User PR review: 3 doc-drift findings (all fixed, ruling accepted; 6th recurrence of the Last-Updated pair → docs-lint BACKLOG'd with scoping decision). **PR #26 merged `919906b`**, branches deleted, prod verified live (catalog page, `sort=popular`, brands API). Completion workflow: DONE.md, plan archived, TODO/WEEKLY/docs-README synced, memory captured.
-- **Blockers**: none
+⚪ Overhead · recurring reviews · **5 SP** · Thu–Fri
 
-#### Saturday–Sunday (2026-08-01 → 2026-08-03)
+> First-ever run of the standing batch — creates `REVIEW-QUEUE.md` (per-category Reviewed log + Next-up + Conventions). Exempt from the quota denominator; scheduled late-week per rule.
 
-- [x] TASK-037 full cycle: brainstorm → spec (6 user decisions incl. `styleGroup` colorway model + honest bundle sums) → plan (14 tasks) → subagent-driven execution → visual gate (1 revision round) → final review + fix wave → PR #27 → 3 review rounds → merge → completion workflow
-- **Completed**: PDP rebuilt to `Mirox Product.dc.html` — `ProductGallery`, colorway swatches (`Product.styleGroup` migration; sibling PDP links; legacy rows hardened), ranked sizes, stock line, «КУПИТИ ЗАРАЗ», `SizePicker`, `BoughtTogether`, `RecentlyViewed`, reviews restyle, cart-line naming fix. Gate revision root-caused all three 390px overflows to lg-only grid definitions (implicit track min-content) and shipped the user-selected BT swipe carousel + «Один розмір» + futbolka «Білий» seed fixes. PR reviews: score-100 stale `selectedSizeId` across sibling soft-nav (→ `key={product.id}` remount, E2E-proven), gallery dot snap (→ smooth-target ref + width-guarded RO, revert-checked), docs-freshness drift twice (recurrence #7 — BACKLOG automation entry now OVERDUE with the reviewer's ~20-row fixture measurement). **PR #27 merged `cec8408`**, branches deleted, `main` pulled.
-- **Blockers**: prod re-seed (colorway links, «Один розмір», futbolka colour in prod **data**) remains gated on explicit user approval; prod PDPs render the hardened legacy path until then
+- [ ] Create REVIEW-QUEUE.md; Plugins: review two independent tops — best not-yet-reviewed from the official Claude plugin store AND best from the wider internet, each logged with `source:` (2)
+- [ ] Claude best-practices: top not-yet-reviewed candidate via web search (1)
+- [ ] Non-Claude AI best-practices: same, for non-Claude models/tools (1)
+- [ ] Cross-project propagation (outbound): scan this week's DONE entries, merged PRs #24–#27, new memory files, config diffs → `propagate | pass | defer` rows; high bar, `propagate` files a TODO § Spawned Tasks row (1)
 
 ---
 
-## 🔮 Next Week Preview
+## Daily Schedule
 
-**Tentative Focus**: Merge TASK-057 to `main`; start TASK-036 catalog + TASK-037 product page on the new tokens/content-config; continue chasing TASK-039/TASK-048 prerequisites.
+### Monday — Spillover close-out (pre-plan, recorded)
 
-**Preparation Needed**:
+- **TASK-037 completion** — PR #27 merged `cec8408` + full completion workflow (DONE/TODO/WEEKLY/BACKLOG/docs-README sync, plan archived, CLAUDE.md propagation). No groups were scheduled; this week's plan was written Tuesday.
 
-- [x] Push `feat/task-057-design-adoption`, open the PR (#24), run `/code-review` (sub-threshold findings listed in chat and addressed)
-- [x] User-approved prod re-seed (`SEED_ALLOW_REMOTE=1` against the prod `DIRECT_URL`) — ran 2026-07-31 after the deploy was verified serving the merged branch; prod catalog is now Mirox (verified via API/PDP/homepage)
-- [ ] Client content inventory (TASK-056): real photography, logo vector, real follower counts/claim figures, announcement copy, free-shipping threshold, size charts, legal copy — hero/products/logo now have generated placeholders as an interim
-- [ ] **Client answers to the 9-item prerequisites checklist** ([decision doc §5.3](../superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md)) — legal form, tax group, turnover, VAT, current bank, installments, РРО/ПРРО (accountant), NovaPay account, site prerequisites. Until these land, TASK-048 has a decision tree but no single gateway.
-- [ ] **Open the Cloudflare-blocked `developers.novaposhta.ua` from an unblocked network** to settle whether the classic API has a status webhook — gates TASK-049's polling design (decision doc §6.6)
+### Tuesday — Cart surfaces + this plan
+
+- **[G1](#g1-cart-and-drawer-restyle-batch)** 🔵 — staleness audit first, then cart page + drawer.
+
+### Wednesday — Checkout + broken routes
+
+- **[G2](#g2-checkout-restyle-batch)** 🔵 — the riskiest restyle, front-loaded.
+- **[G3](#g3-params-fix-solo)** 🟤 — 4-route `use(params)` fix.
+
+### Thursday — Peripheral sweep + reviews start
+
+- **[G4](#g4-peripheral-surfaces-sweep-batch)** 🔵 — auth/account/newsletter/error pages.
+- **[G6](#g6-weekly-reviews-batch)** ⚪ — part 1 (queue creation + plugins slot).
+
+### Friday — Reviews close + stretch
+
+- **[G6](#g6-weekly-reviews-batch)** ⚪ — part 2 (best-practices slots + propagation scan).
+- **[G5](#g5-transactional-emails-solo-)** 🔵 🏆 — stretch: emails, if the core groups are green.
+- Week close-out: statuses → `✅ PR #N`, spillover check, next-week (cleanup) seed list.
 
 ---
 
-## Status Legend
+## Summary Table
 
-| Symbol | Meaning      |
-| ------ | ------------ |
-| 📋     | Planned      |
-| ⏳     | In Progress  |
-| ✅     | Completed    |
-| ⏸️     | On Hold      |
-| ❌     | Canceled     |
-| 🔄     | Carried Over |
+| ID  | Group                               | Domain              | Source      | Tasks  | Total SP | Day         | Status    |
+| --- | ----------------------------------- | ------------------- | ----------- | ------ | -------- | ----------- | --------- |
+| G1  | Cart and Drawer Restyle `[batch]`   | storefront/cart     | 🔵 User     | 3      | 5        | Tue         | ☐ Planned |
+| G2  | Checkout Restyle `[batch]`          | storefront/checkout | 🔵 User     | 3      | 5        | Wed         | ☐ Planned |
+| G3  | Params Fix `[solo]`                 | Next.js routing     | 🟤 Auto     | 1      | 2        | Wed         | ☐ Planned |
+| G4  | Peripheral Surfaces Sweep `[batch]` | auth/account/system | 🔵 User     | 3      | 5        | Thu         | ☐ Planned |
+| G5  | Transactional Emails `[solo]` 🏆    | email templates     | 🔵 User     | 2      | 3        | Fri         | ☐ Planned |
+| G6  | Weekly Reviews `[batch]`            | recurring reviews   | ⚪ Overhead | 4      | 5        | Thu–Fri     | ☐ Planned |
+| P1  | Prod data re-seed (gated)           | ops/data            | 🟡 Ops      | 1      | 1        | On approval | ⏸ Gated   |
+|     | **Total**                           |                     |             | **17** | **26**   |             |           |
+
+_Source legend: 🔵 User · 🟡 Ops · 🟤 Auto · ⚪ Overhead (exempt from the quota denominator). Status on completion: `✅ PR #N` (the number, never a bare ✅)._
+
+---
+
+## Notes
+
+- _Brainstorm sanity-checks: week dates confirmed vs git/DONE (today Tue 2026-08-04; Mon Aug 3 was consumed by TASK-037's spillover close-out — `cec8408`, `3b208f9`); previous week's delivery ran through Mon 2026-08-03, **3 days past its Friday (Jul 31)** → archived below under its TRUE header with a spillover note, not re-dated; velocity ≈ 2–3 large (8-SP-class) tasks/week but with recurring weekend spillovers → this 4-effective-day week planned at 26 SP incl. 5 ⚪ overhead; Cleanup Week due by cadence but **deferred by user decision**, not skipped — scheduled intent for Aug 10–14; source quotas satisfiable and met (below)._
+- **Discussion-phase decisions (2026-08-04)**: user chose the rebrand-completion theme over the recommended Cleanup Week. Not yet ruled by the user (all parked, nothing executed): the 5 (+2 borderline) BACKLOG **reap nominations** (electronics-seed entry, USD-prices entry, `sort=newest` entry, «Бестселери» entry, stale-seed-counts entry; borderline: site-level OG placeholder, seed-demo-reviews); the **MILESTONES/GOALS refresh** (both stale since 2026-01-26, pre-Mirox — parked for cleanup week); adding a **📌 Process Rules section to BACKLOG.md** (parked for cleanup week); the **hydration console errors** investigation (held); **P1 prod re-seed approval** (open — gated in Parallel Work).
+- **OVERDUE item not schedulable this week**: the docs-freshness linter (🟤, recurrence #7) loses the week's single 🟤 slot to G3 under the ≤1-group hard rule. Mitigation until it lands: every PR this week manually verifies `docs/README.md` index rows ↔ doc headers **in both directions plus neighbouring rows** at completion. It is the first pick for next week's cleanup week.
+- **TASK-039 interaction**: this week deliberately adds more hardcoded-Ukrainian copy via the extraction-ready content-config layer (`src/content/`) — the established TASK-057 pattern. TASK-039's externalization scope grows by exactly these surfaces; that is the designed trade, not drift.
+- **TASK-043 interaction**: the cart _restyle_ is pulled forward into G1; TASK-043 (v1.4) retains one-click buy, the post-purchase upsell modal, and the promo-code field.
+- **Scope boundary**: admin surfaces are excluded from this sweep (customer-facing first); the admin visual pass + admin settings "$" labels stay BACKLOG'd. Showcase routes untouched.
+- **Dependencies/risks**: checkout E2E specs and cart specs will need updating with the restyles (known-fragile area — hydration-gate patterns apply); Stripe Elements dark theme remains runtime-unverifiable locally; the shipping-method numeric decision must respect the documented UAH-display / USD-test-charge convention (decision doc §7.4 context).
+
+### Quota Check
+
+- 🔵 User-Flagged SP: 18 / 21 (86%) — must be ≥50% ✅
+- 🟡 Operational SP: 1 / 21 (5%) — must be ≤25% ✅
+- 🟤 Auto-Generated SP: 2 / 21 (10%) — must be ≤25% AND ≤1 group ✅ (one group: G3)
+- Cleanup Week status: **due** (deferred by user steer; intent: next week)
+- Last Cleanup Week: never (Feb 2026 freeze week predates the cadence)
+- Compliance: ✅ all quotas met — deviation-free; the cadence deferral is recorded above with justification
+- _Denominator note_: Y = 26 total − 5 ⚪ (G6 Weekly Reviews) = 21.
+
+---
+
+## Weekly Challenge 🏆
+
+**G5 — Transactional Emails (🔵)**: completes the user's "finish the rebrand" theme end-to-end — the inbox is the last customer-facing surface still branded "Store" in English — and opportunistically closes the standing `NEXT_PUBLIC_STORE_NAME` backlog item on the code side. Stretch because the four core groups (G1–G4, G6) come first in a 4-effective-day week.
+
+---
+
+## Previous Week Summary
+
+**Week of 2026-07-27 – 2026-08-02** (old header schema, Mon–Sun) · **Spillover: delivery ran through 2026-08-03** — TASK-037's merge + completion landed Monday, 3 days past the week's Friday (Jul 31), past the 2-day grace. Archived under its true header; the header was correct when written — delivery is what slipped.
+
+- **TASK-057 Mirox design adoption** — ✅ PR #24 merged `f9ceb97` 2026-07-31 (+ follow-up PR #25 `acb0c30` same day for the PDP og:image tracing ENOENT). Dark `:root` flip, homepage/header/footer realignment, Mirox clothing seed, `formatPrice()` UAH, Cyrillic OG cards. Visual gate signed off v3; **user-approved prod re-seed ran 2026-07-31** — prod serves the Mirox catalog, verified live.
+- **TASK-036 Catalog redesign + filters** — ✅ PR #26 merged `919906b` Sat 2026-08-01 (+1 day). Five URL-driven filters, 4 sorts incl. «Популярні» via `getSalesRanking()`, card carousel/quick-view/quick-buy, mobile sheet-only filters, square pagination. Visual gate: 1 revision round; prod verified live.
+- **TASK-037 Product page redesign** — ✅ PR #27 merged `cec8408` Mon 2026-08-03 (+3 days, the spillover). PDP rebuilt to `Mirox Product.dc.html`: gallery, `styleGroup` colorways, ranked size chips, SizePicker, honest-sum BoughtTogether, RecentlyViewed, reviews restyle, cart-line naming fix. Unit tests 517 → 598. 3 PR review rounds (incl. the docs-freshness recurrence #7 → automation entry marked OVERDUE).
+- **Velocity**: 3 large (8-SP-class) tasks delivered across 8 calendar days — high, but only via weekend + Monday spillover; this informed the current week's 26-SP cap.
+- **Carried forward**: prod data re-seed (user-gated → P1), client content inventory (TASK-056), payments prerequisites checklist (§5.3), NP webhook network check.
+
+_Full detail: [DONE.md](DONE.md) · daily logs in git history of this file (pre-2026-08-04 version)._
