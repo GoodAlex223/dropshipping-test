@@ -5,18 +5,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft, ArrowRight, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Trash2, ShoppingBag, AlertCircle, Lock } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,6 +21,7 @@ import { useCartStore, CartItem } from "@/stores/cart.store";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/format";
 import { trackViewCart } from "@/lib/analytics";
+import { cart } from "@/content/cart";
 
 interface StockInfo {
   productId: string;
@@ -91,8 +81,8 @@ export default function CartPage() {
               isAvailable: data.isAvailable && data.stock >= item.quantity,
             });
           }
-        } catch (error) {
-          console.error("Error validating stock:", error);
+        } catch {
+          // Stock validation is best-effort; leave the item unflagged on error.
         }
       }
 
@@ -110,10 +100,9 @@ export default function CartPage() {
     if (!info) return null;
 
     if (!info.isAvailable) {
-      if (info.currentStock === 0) return { type: "error", message: "Out of stock" };
-      if (info.currentStock < item.quantity) {
-        return { type: "warning", message: `Only ${info.currentStock} available` };
-      }
+      if (info.currentStock === 0) return { type: "error", message: cart.stock.outOfStock };
+      if (info.currentStock < item.quantity)
+        return { type: "warning", message: cart.stock.onlyN(info.currentStock) };
     }
     return null;
   };
@@ -127,6 +116,7 @@ export default function CartPage() {
 
   const subtotal = getTotalPrice();
   const total = subtotal;
+  const totalQuantity = items.reduce((s, i) => s + i.quantity, 0);
 
   if (!mounted) {
     return <CartPageSkeleton />;
@@ -134,18 +124,15 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="container py-16">
-        <div className="mx-auto max-w-md text-center">
-          <ShoppingBag className="text-muted-foreground mx-auto h-16 w-16" />
-          <h1 className="mt-6 text-2xl font-bold">Your cart is empty</h1>
-          <p className="text-muted-foreground mt-2">
-            Looks like you haven&apos;t added any products to your cart yet.
-          </p>
-          <Link href="/products">
-            <Button className="mt-6">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Continue Shopping
-            </Button>
+      <div className="container py-12">
+        <h1 className="text-3xl font-extrabold tracking-tight">{cart.title}</h1>
+        <div className="border-border mt-8 rounded-2xl border border-dashed p-14 text-center">
+          <p className="text-foreground text-base font-bold">{cart.empty.title}</p>
+          <Link
+            href="/products"
+            className="text-foreground mt-2 inline-block text-sm font-bold underline underline-offset-4"
+          >
+            {cart.empty.cta}
           </Link>
         </div>
       </div>
@@ -153,236 +140,132 @@ export default function CartPage() {
   }
 
   return (
-    <div className="container py-8">
-      <h1 className="text-3xl font-bold">Shopping Cart</h1>
-      <p className="text-muted-foreground mt-2">
-        {items.length} {items.length === 1 ? "item" : "items"} in your cart
+    <div className="container py-12">
+      <h1 className="text-3xl font-extrabold tracking-tight">{cart.title}</h1>
+      <p className="text-muted-foreground mt-2 text-sm font-semibold">
+        {cart.itemsCount(items.length)}
       </p>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-3">
-        {/* Cart Items */}
-        <div className="lg:col-span-2">
-          {/* Desktop Table */}
-          <div className="hidden rounded-lg border md:block">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[50%]">Product</TableHead>
-                  <TableHead className="text-center">Quantity</TableHead>
-                  <TableHead className="text-right">Total</TableHead>
-                  <TableHead className="w-[50px]"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {items.map((item) => {
-                  const stockStatus = getItemStockStatus(item);
-                  return (
-                    <TableRow key={getItemKey(item)}>
-                      <TableCell>
-                        <div className="flex items-center gap-4">
-                          {item.image ? (
-                            <Image
-                              src={item.image}
-                              alt={item.name}
-                              width={80}
-                              height={80}
-                              className="h-20 w-20 rounded-md object-cover"
-                            />
-                          ) : (
-                            <div className="bg-muted flex h-20 w-20 items-center justify-center rounded-md">
-                              <ShoppingBag className="text-muted-foreground h-8 w-8" />
-                            </div>
-                          )}
-                          <div>
-                            <h3 className="font-medium">{item.name}</h3>
-                            <p className="text-muted-foreground text-sm">
-                              {formatPrice(item.price)} each
-                            </p>
-                            {stockStatus && (
-                              <p
-                                className={cn(
-                                  "mt-1 flex items-center gap-1 text-sm",
-                                  stockStatus.type === "error"
-                                    ? "text-destructive"
-                                    : "text-muted-foreground"
-                                )}
-                              >
-                                <AlertCircle className="h-3 w-3" />
-                                {stockStatus.message}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center justify-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() =>
-                              updateQuantity(item.productId, item.quantity - 1, item.variantId)
-                            }
-                          >
-                            <Minus className="h-3 w-3" />
-                          </Button>
-                          <Input
-                            type="number"
-                            min="1"
-                            max={item.maxStock}
-                            value={item.quantity}
-                            onChange={(e) => {
-                              const val = parseInt(e.target.value);
-                              if (!isNaN(val) && val > 0) {
-                                updateQuantity(item.productId, val, item.variantId);
-                              }
-                            }}
-                            className="h-8 w-16 text-center"
-                          />
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() =>
-                              updateQuantity(item.productId, item.quantity + 1, item.variantId)
-                            }
-                            disabled={item.quantity >= item.maxStock}
-                          >
-                            <Plus className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right font-medium">
-                        {formatPrice(item.price * item.quantity)}
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-muted-foreground hover:text-destructive h-8 w-8"
-                          onClick={() => removeItem(item.productId, item.variantId)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </div>
-
-          {/* Mobile Cards */}
-          <div className="space-y-4 md:hidden">
+      <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(340px,400px)] lg:items-start">
+        <div>
+          <div className="flex flex-col gap-3.5">
             {items.map((item) => {
               const stockStatus = getItemStockStatus(item);
+              const variantLine = [
+                item.color && `${cart.variant.color} ${item.color}`,
+                item.size && `${cart.variant.size} ${item.size}`,
+              ]
+                .filter(Boolean)
+                .join(" · ");
               return (
-                <div key={getItemKey(item)} className="rounded-lg border p-4">
-                  <div className="flex gap-4">
+                <div
+                  key={getItemKey(item)}
+                  className="bg-card border-border flex flex-wrap items-center gap-4 rounded-2xl border p-4 sm:gap-5 sm:py-4 sm:pr-6 sm:pl-4"
+                >
+                  <div className="h-[110px] w-24 shrink-0 overflow-hidden rounded-xl">
                     {item.image ? (
                       <Image
                         src={item.image}
                         alt={item.name}
                         width={96}
-                        height={96}
-                        className="h-24 w-24 rounded-md object-cover"
+                        height={110}
+                        className="h-full w-full object-cover"
                       />
                     ) : (
-                      <div className="bg-muted flex h-24 w-24 items-center justify-center rounded-md">
+                      <div className="bg-muted flex h-full w-full items-center justify-center">
                         <ShoppingBag className="text-muted-foreground h-8 w-8" />
                       </div>
                     )}
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h3 className="font-medium">{item.name}</h3>
-                          <p className="text-muted-foreground text-sm">{formatPrice(item.price)}</p>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-muted-foreground hover:text-destructive h-8 w-8"
-                          onClick={() => removeItem(item.productId, item.variantId)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                      {stockStatus && (
-                        <p
-                          className={cn(
-                            "mt-1 flex items-center gap-1 text-sm",
-                            stockStatus.type === "error"
-                              ? "text-destructive"
-                              : "text-muted-foreground"
-                          )}
-                        >
-                          <AlertCircle className="h-3 w-3" />
-                          {stockStatus.message}
-                        </p>
-                      )}
-                    </div>
                   </div>
-                  <div className="mt-4 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() =>
-                          updateQuantity(item.productId, item.quantity - 1, item.variantId)
-                        }
+                  <div className="min-w-0 flex-1 basis-40">
+                    <h3 className="text-[15.5px] font-bold">{item.name}</h3>
+                    {variantLine && (
+                      <p className="text-muted-foreground mt-1 text-[12.5px] font-semibold">
+                        {variantLine}
+                      </p>
+                    )}
+                    <p className="mt-1 text-[14.5px] font-extrabold">{formatPrice(item.price)}</p>
+                    {stockStatus && (
+                      <p
+                        className={cn(
+                          "mt-1 flex items-center gap-1 text-sm",
+                          stockStatus.type === "error"
+                            ? "text-destructive"
+                            : "text-muted-foreground"
+                        )}
                       >
-                        <Minus className="h-3 w-3" />
-                      </Button>
-                      <span className="w-8 text-center font-medium">{item.quantity}</span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() =>
-                          updateQuantity(item.productId, item.quantity + 1, item.variantId)
-                        }
-                        disabled={item.quantity >= item.maxStock}
-                      >
-                        <Plus className="h-3 w-3" />
-                      </Button>
-                    </div>
-                    <p className="font-medium">{formatPrice(item.price * item.quantity)}</p>
+                        <AlertCircle className="h-3 w-3" />
+                        {stockStatus.message}
+                      </p>
+                    )}
                   </div>
+                  <div className="border-border-strong flex items-center overflow-hidden rounded-[10px] border">
+                    <button
+                      type="button"
+                      aria-label={cart.quantity.decrease}
+                      className="text-foreground hover:bg-muted h-9 w-9 text-base transition-colors"
+                      onClick={() =>
+                        updateQuantity(item.productId, item.quantity - 1, item.variantId)
+                      }
+                    >
+                      −
+                    </button>
+                    <span className="w-8 text-center text-sm font-bold">{item.quantity}</span>
+                    <button
+                      type="button"
+                      aria-label={cart.quantity.increase}
+                      className="text-foreground hover:bg-muted h-9 w-9 text-base transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+                      onClick={() =>
+                        updateQuantity(item.productId, item.quantity + 1, item.variantId)
+                      }
+                      disabled={item.quantity >= item.maxStock}
+                    >
+                      +
+                    </button>
+                  </div>
+                  <p className="w-[90px] text-right text-[15.5px] font-extrabold">
+                    {formatPrice(item.price * item.quantity)}
+                  </p>
+                  <button
+                    type="button"
+                    aria-label={cart.remove}
+                    className="text-muted-foreground hover:text-foreground p-1.5 transition-colors"
+                    onClick={() => removeItem(item.productId, item.variantId)}
+                  >
+                    <Trash2 className="h-[18px] w-[18px]" />
+                  </button>
                 </div>
               );
             })}
           </div>
-
-          {/* Cart Actions */}
-          <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:justify-between">
-            <Link href="/products">
-              <Button variant="outline">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Continue Shopping
-              </Button>
+          <div className="mt-6 flex items-center justify-between">
+            <Link
+              href="/products"
+              className="text-muted-foreground hover:text-foreground text-sm font-bold transition-colors"
+            >
+              ← {cart.continueShopping}
             </Link>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="outline" className="text-destructive hover:text-destructive">
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Clear Cart
-                </Button>
+                <button
+                  type="button"
+                  className="text-muted-foreground hover:text-destructive text-sm font-bold transition-colors"
+                >
+                  {cart.clear.action}
+                </button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Clear your cart?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This will remove all items from your cart. This action cannot be undone.
-                  </AlertDialogDescription>
+                  <AlertDialogTitle>{cart.clear.dialogTitle}</AlertDialogTitle>
+                  <AlertDialogDescription>{cart.clear.dialogDescription}</AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel>{cart.clear.cancel}</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={clearCart}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   >
-                    Clear Cart
+                    {cart.clear.confirm}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -390,59 +273,47 @@ export default function CartPage() {
           </div>
         </div>
 
-        {/* Order Summary */}
-        <div className="lg:col-span-1">
-          <div className="rounded-lg border p-6">
-            <h2 className="text-lg font-semibold">Order Summary</h2>
-
-            <div className="mt-4 space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Subtotal</span>
-                <span>{formatPrice(subtotal)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Shipping</span>
-                <span>Calculated at checkout</span>
-              </div>
-              <Separator />
-              <div className="flex justify-between font-semibold">
-                <span>Total</span>
-                <span>{formatPrice(total)}</span>
-              </div>
+        <div className="bg-card border-border rounded-[20px] border p-7 lg:sticky lg:top-24">
+          <h2 className="text-xl font-extrabold">{cart.summary.title}</h2>
+          <div className="mt-5 flex flex-col gap-3 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">
+                {cart.summary.itemsLabel} ({totalQuantity})
+              </span>
+              <span className="font-bold">{formatPrice(subtotal)}</span>
             </div>
-
-            {hasStockIssues() && (
-              <div className="bg-destructive/10 text-destructive mt-4 rounded-md p-3 text-sm">
-                <p className="flex items-center gap-2 font-medium">
-                  <AlertCircle className="h-4 w-4" />
-                  Some items have stock issues
-                </p>
-                <p className="text-muted-foreground mt-1">
-                  Please update quantities or remove unavailable items before checkout.
-                </p>
-              </div>
-            )}
-
-            <Button
-              className="mt-6 w-full"
-              size="lg"
-              onClick={() => router.push("/checkout")}
-              disabled={hasStockIssues() || isValidating}
-            >
-              {isValidating ? (
-                "Validating..."
-              ) : (
-                <>
-                  Proceed to Checkout
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </>
-              )}
-            </Button>
-
-            <p className="text-muted-foreground mt-4 text-center text-xs">
-              Taxes calculated at checkout
-            </p>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">{cart.summary.shippingLabel}</span>
+              <span className="text-muted-foreground text-[13px]">
+                {cart.summary.shippingValue}
+              </span>
+            </div>
           </div>
+          <div className="border-border mt-5 flex items-center justify-between border-t pt-4">
+            <span className="text-[15px] font-bold">{cart.summary.totalLabel}</span>
+            <span className="text-xl font-extrabold">{formatPrice(total)}</span>
+          </div>
+          {hasStockIssues() && (
+            <div className="bg-destructive/10 text-destructive mt-4 rounded-md p-3 text-sm">
+              <p className="flex items-center gap-2 font-medium">
+                <AlertCircle className="h-4 w-4" />
+                {cart.summary.stockIssues.title}
+              </p>
+              <p className="text-muted-foreground mt-1">{cart.summary.stockIssues.description}</p>
+            </div>
+          )}
+          <button
+            type="button"
+            className="mt-5 w-full rounded-[10px] bg-white p-4 text-[13.5px] font-extrabold tracking-[0.06em] text-black transition-colors hover:bg-[#e5e5e5] disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={() => router.push("/checkout")}
+            disabled={hasStockIssues() || isValidating}
+          >
+            {isValidating ? cart.summary.validating : cart.summary.checkoutCta}
+          </button>
+          <p className="text-muted-foreground mt-3.5 flex items-center justify-center gap-2 text-xs font-semibold">
+            <Lock className="h-3.5 w-3.5" />
+            {cart.summary.securePayment}
+          </p>
         </div>
       </div>
     </div>
@@ -451,38 +322,17 @@ export default function CartPage() {
 
 function CartPageSkeleton() {
   return (
-    <div className="container py-8">
+    <div className="container py-12">
       <div className="bg-muted h-9 w-48 animate-pulse rounded" />
       <div className="bg-muted mt-2 h-5 w-32 animate-pulse rounded" />
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <div className="rounded-lg border p-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex items-center gap-4 py-4">
-                <div className="bg-muted h-20 w-20 animate-pulse rounded-md" />
-                <div className="flex-1 space-y-2">
-                  <div className="bg-muted h-5 w-48 animate-pulse rounded" />
-                  <div className="bg-muted h-4 w-24 animate-pulse rounded" />
-                </div>
-                <div className="bg-muted h-8 w-24 animate-pulse rounded" />
-                <div className="bg-muted h-5 w-16 animate-pulse rounded" />
-              </div>
-            ))}
-          </div>
+      <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(340px,400px)] lg:items-start">
+        <div className="flex flex-col gap-3.5">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-muted h-[142px] animate-pulse rounded-2xl" />
+          ))}
         </div>
-        <div className="lg:col-span-1">
-          <div className="rounded-lg border p-6">
-            <div className="bg-muted h-6 w-32 animate-pulse rounded" />
-            <div className="mt-4 space-y-3">
-              <div className="bg-muted h-4 w-full animate-pulse rounded" />
-              <div className="bg-muted h-4 w-full animate-pulse rounded" />
-              <div className="bg-muted h-px" />
-              <div className="bg-muted h-5 w-full animate-pulse rounded" />
-            </div>
-            <div className="bg-muted mt-6 h-12 w-full animate-pulse rounded" />
-          </div>
-        </div>
+        <div className="bg-muted h-[320px] animate-pulse rounded-[20px]" />
       </div>
     </div>
   );
