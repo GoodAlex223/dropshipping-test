@@ -598,6 +598,48 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
   groups G1/G2/G4/G5 + gated 🟡 P1; admin surfaces deliberately excluded (customer-facing
   first — admin visual pass remains the separate 🟤 entry above). (High value, M effort)
 
+### [2026-08-04] From: G1 cart & drawer restyle (PR #28)
+
+- 🟤 **`StyleSibling.colorValue` is the last nondeterministic colorway pick** — PR #28's review
+  fixed the `companionSelect` and `/api/products` variant queries with the
+  `[{ createdAt: "asc" }, { id: "asc" }]` tiebreaker (matching the main PDP query), but the
+  sibling-swatch query (`src/app/(shop)/products/[slug]/page.tsx` ~L75:
+  `where: { name: "Color" }, take: 1`, **no `orderBy`**) still lets the database make the
+  arbitrary pick — the strongest form of the bug since `take: 1` leaves no client-side rows to
+  disambiguate. Pre-existing from TASK-037 (`aeb5495`); drives the PDP sibling-swatch label.
+  One-line fix + consider a shared `COLOR_VARIANT_ORDER_BY` constant so a fifth site can't
+  regress. (Low effort) `[relates-to: TASK-037]`
+- 🟤 **Local-dev-only E2E flake list has grown — document the full set in one place** — G1's
+  verification proved (like-for-like `git worktree` control on `main`) that webkit's
+  `cart.spec.ts` trio ("can add product to cart", "cart page shows empty state", "cart persists
+  on page reload") fails against `next dev` via the same on-demand-compile/Fast-Refresh
+  navigation race already catalogued for other specs; chromium's "can view product details"
+  joined the known list this week. CI's prebuilt `next start` is unaffected (PR #28 CI green,
+  chromium + webkit). Consolidate the now-5+ known local-dev-only failures into one reference
+  (test file + trigger + evidence link) so each future branch stops re-diagnosing them.
+  (Low effort) `[possible-dup-of: 2026-08-01 "Pre-existing E2E failures on main" entry]`
+- 🟤 **Local dev-server credentials login silently fails without `AUTH_TRUST_HOST=true`** —
+  G1's staleness audit hit `MissingCSRF` logging in as a seeded customer against `next dev` on
+  port 3001; setting `AUTH_TRUST_HOST=true` for the run fixed it. CLAUDE.md documents the var
+  only for CI E2E; the local prod-mode gap is already BACKLOG'd ([2026-07-16] entry) — this adds
+  the dev-mode-login facet. Doc fix. (Low effort)
+  `[possible-dup-of: 2026-07-16 AUTH_TRUST_HOST entry]`
+- 🟤 **`/categories` + `/categories/[slug]` missed the rebrand sweep** — G1's staleness audit
+  found both pages still carry pre-Mirox chrome and English copy ("Categories", "Browse our
+  products by category", empty-state strings); they're in no current WEEKLY group (G2 =
+  checkout, G4 = auth/account/newsletter/error). Either fold into G4's Thursday sweep if slack
+  allows or schedule next week with the launch-push visuals. (Med value, S effort)
+- 🟤 **`/account/addresses` and `/account/settings` are dead 404 links** — `/account` links to
+  both; neither route exists. Audit-confirmed. Either build stubs in G4's account sweep, drop
+  the links, or fold into TASK-056's content round-trip (addresses need real legal/contact
+  decisions anyway). (Low effort) `[relates-to: TASK-056]`
+- 🔵 **Promo-code field: launch-time acquisition tracking rationale (user, 2026-08-04)** — at
+  the G1 visual gate the user flagged that the promo field (deliberately excluded from G1,
+  handoff slot preserved) "will be useful for us at the start and will allow us to track where
+  our users are coming from" — i.e. TASK-043's promo work is not just a discount mechanism but
+  the launch attribution channel. Weight TASK-043's priority accordingly when v1.4 is planned.
+  (Med value) `[relates-to: TASK-043]`
+
 ---
 
 ## Technical Debt

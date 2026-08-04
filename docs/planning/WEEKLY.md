@@ -23,9 +23,11 @@
 
 > Opens with the definitive staleness audit, then converts the cart surfaces — design handoff exists (`Mirox Cart.dc.html`). Visual/copy only: one-click buy, upsell modal and the promo-code field stay in TASK-043 (v1.4).
 
-- [ ] Route-by-route staleness audit — screenshot + EN-string sweep of every customer route; produces the definitive scope list for G2/G4 and feeds content gaps to TASK-056 (1) — BACKLOG [2026-08-04] weekly-planning steer
-- [ ] Cart page → `Mirox Cart.dc.html`: quantity steppers, sticky order summary, dashed-border empty state; Ukrainian copy via the content-config layer — [src/app/(shop)/cart/page.tsx](<../../src/app/(shop)/cart/page.tsx>) ("Shopping Cart" / "Continue Shopping" / "Proceed to Checkout" today) (3) — BACKLOG [2026-08-04] weekly-planning steer [HIGH]
-- [ ] CartDrawer restyle + Ukrainian strings; update E2E cart specs — [src/components/shop/CartDrawer.tsx](../../src/components/shop/CartDrawer.tsx) (1) — BACKLOG [2026-08-04] weekly-planning steer
+- [x] Route-by-route staleness audit — screenshot + EN-string sweep of every customer route; produces the definitive scope list for G2/G4 and feeds content gaps to TASK-056 (1) — BACKLOG [2026-08-04] weekly-planning steer → [audit doc](audits/2026-08-04-storefront-staleness-audit.md)
+- [x] Cart page → `Mirox Cart.dc.html`: quantity steppers, sticky order summary, dashed-border empty state; Ukrainian copy via the content-config layer — [src/app/(shop)/cart/page.tsx](<../../src/app/(shop)/cart/page.tsx>) ("Shopping Cart" / "Continue Shopping" / "Proceed to Checkout" today) (3) — BACKLOG [2026-08-04] weekly-planning steer [HIGH]
+- [x] CartDrawer restyle + Ukrainian strings; update E2E cart specs — [src/components/shop/CartDrawer.tsx](../../src/components/shop/CartDrawer.tsx) (1) — BACKLOG [2026-08-04] weekly-planning steer
+
+> ✅ Shipped 2026-08-04 — PR [#28](https://github.com/GoodAlex223/dropshipping-test/pull/28) merged `0eccaf7`; prod verified. G2 inherits two audit catches: checkout Order-Summary variant line (audit doc §G2 item 4) and the missing Ukraine country option.
 
 ### G2. Checkout Restyle [batch]
 
@@ -93,7 +95,7 @@
 
 ### Tuesday — Cart surfaces + this plan
 
-- **[G1](#g1-cart-and-drawer-restyle-batch)** 🔵 — staleness audit first, then cart page + drawer.
+- ✅ **[G1](#g1-cart-and-drawer-restyle-batch)** 🔵 — staleness audit first, then cart page + drawer. Shipped same day, PR [#28](https://github.com/GoodAlex223/dropshipping-test/pull/28).
 
 ### Wednesday — Checkout + broken routes
 
@@ -118,7 +120,7 @@
 
 | ID  | Group                                  | Domain              | Source      | Tasks  | Total SP | Day     | Status        |
 | --- | -------------------------------------- | ------------------- | ----------- | ------ | -------- | ------- | ------------- |
-| G1  | Cart and Drawer Restyle `[batch]`      | storefront/cart     | 🔵 User     | 3      | 5        | Tue     | ☐ Planned     |
+| G1  | Cart and Drawer Restyle `[batch]`      | storefront/cart     | 🔵 User     | 3      | 5        | Tue     | ✅ PR #28     |
 | G2  | Checkout Restyle `[batch]`             | storefront/checkout | 🔵 User     | 3      | 5        | Wed     | ☐ Planned     |
 | G3  | Params Fix `[solo]`                    | Next.js routing     | 🟤 Auto     | 1      | 2        | Wed     | ☐ Planned     |
 | G4  | Peripheral Surfaces Sweep `[batch]`    | auth/account/system | 🔵 User     | 3      | 5        | Thu     | ☐ Planned     |

@@ -118,6 +118,7 @@ src/
 │   └── providers.tsx       # Context providers wrapper (auth, toast, cookie consent, web vitals)
 ├── content/                # Typed content-config layer (Ukrainian copy, extraction-ready for TASK-039 i18n)
 │   ├── brand.ts            # Brand name/tagline constants — deliberately import-free (consumed by seo.ts)
+│   ├── cart.ts             # Cart + CartDrawer copy (summary/empty/clear/stock strings, itemsCount plural via pluralizeUk)
 │   ├── home.ts             # Homepage copy (hero, benefits, whyChooseUs, rails, testimonials)
 │   └── site.ts             # Site-wide config (announcement, socials, client claims, footer benefits)
 ├── hooks/                  # Custom React hooks (use-debounce, use-toast)

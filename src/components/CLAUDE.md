@@ -52,7 +52,7 @@ components/
 │   ├── StarRating.tsx     # Star rating input component
 │   └── index.ts
 ├── shop/
-│   ├── CartDrawer.tsx     # Slide-out cart drawer (Sheet) with view_cart tracking
+│   ├── CartDrawer.tsx     # Slide-out cart drawer (Sheet) with view_cart tracking; Mirox dark restyle (G1/PR #28) — strings via content/cart.ts, «Колір: X · Розмір: Y» variant line from CartItem.color/size
 │   └── index.ts
 ├── showcase/              # Multi-theme showcase system
 │   ├── bold/              # Bold theme components (Hero, Features, Categories, ProductGrid, CTA)

@@ -2,11 +2,32 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-08-03
+**Last Updated**: 2026-08-04
 
 ---
 
 ## 2026-08 (August)
+
+### [2026-08-04] G1 - Cart & Drawer Restyle (WEEKLY batch)
+
+**Plan**: [docs/archive/plans/2026-08-04_g1-cart-drawer-restyle.md](../archive/plans/2026-08-04_g1-cart-drawer-restyle.md)
+**Spec**: [2026-08-04-cart-drawer-restyle-design.md](../superpowers/specs/2026-08-04-cart-drawer-restyle-design.md)
+**PR**: [#28](https://github.com/GoodAlex223/dropshipping-test/pull/28) — merged `0eccaf7` (2026-08-04)
+**Audit**: [2026-08-04-storefront-staleness-audit.md](../audits/2026-08-04-storefront-staleness-audit.md) — G2/G4 definitive scope + TASK-056 content gaps
+
+**Summary**: Cart page and CartDrawer converted to the Mirox design language with Ukrainian copy per `Mirox Cart.dc.html`, opened by the definitive storefront staleness audit (15 routes: 3 ✅ / 2 🟠 / 12 🔴; catches incl. checkout's missing Ukraine country option and two dead `/account/*` links). New `src/content/cart.ts` content module (reuses `pluralizeUk`); `CartItem` gained optional `color`/`size` and **cart-line names reverted to plain product names** (supersedes TASK-037's `${name} — ${variant.value}` combined-name convention — the separate fields now carry the variant, rendered as «Колір: X · Розмір: Y» on both surfaces). All three `addItem` callers updated; `BundleCompanion.colorValue` added. Cart page: responsive card rows replace the table/mobile-cards split, joined steppers (qty input removed per handoff), sticky «Разом» summary, dashed empty state, Clear-Cart dialog + stock warnings kept and translated; **no promo field** (TASK-043 — user flagged it as the launch acquisition-tracking channel). Shipping row deliberately neutral («Розраховується при оформленні») until G2 ships NP-style methods. Header cart trigger sr-only → «Кошик».
+
+**Key changes**:
+
+- 12 commits; unit tests 598 → **606**; E2E cart/products/navigation specs → Ukrainian locators, drawer-line assertions scoped to the open sheet (non-vacuity proven by break/restore — Radix Sheet doesn't hide background content from `toBeVisible()`)
+- Executed subagent-driven (7 tasks, per-task reviews); one visual-gate fix round (drawer `-mx-6 px-6` negative-margin trick assumed parent padding `SheetContent` never had → content flush at sheet edge); final whole-branch review + fix wave (E2E sheet-scoping, checkout variant-line seam recorded for G2)
+- PR review (user-posted, 2 rounds): 3 findings fixed in `7d66ec6` — colorValue determinism (`createdAt`+`id` orderBy on `companionSelect` **and** `/api/products`), GA4 mid-funnel `item_variant: item.size` at all 5 cart-sourced event maps, spec indexed in docs/README (docs-freshness recurrence #8). Round-2 re-raise conceded: `StyleSibling.colorValue` is a 4th, still-nondeterministic site (pre-existing, BACKLOG'd)
+- 3 webkit cart E2E failures proven **pre-existing** via like-for-like `git worktree` control on `main` (WebKit × `next dev` cold-compile race); CI prod-build chromium+webkit green
+- Prod verified live post-merge: `/cart` 200 serving the new build (sr-only «Кошик» in SSR HTML)
+
+**Learnings**: negative-margin+padding tricks (`-mx-6 px-6`) silently assume the parent's padding — verify the actual parent before reusing the idiom; page-wide E2E text assertions go vacuous the moment an overlay opens (scope to `getByRole("dialog")`); an exact-shape Prisma-select test assertion catches unintended query changes exactly as designed (products-api caught the orderBy fix); user review scores measure provenance, not risk — a pre-existing source becomes load-bearing the moment new code consumes it.
+
+---
 
 ### [2026-08-03] TASK-037 - Product Page Redesign
 
