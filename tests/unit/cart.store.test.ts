@@ -152,6 +152,33 @@ describe("Cart Store", () => {
       expect(state.items[0].quantity).toBe(3); // 1 + 2
       expect(state.items[1].quantity).toBe(1); // unchanged
     });
+
+    it("carries optional color and size through addItem", () => {
+      useCartStore.getState().addItem({
+        productId: "p1",
+        variantId: "v1",
+        name: "Худі Mirox Basic",
+        price: 1290,
+        maxStock: 5,
+        color: "Чорний",
+        size: "L",
+      });
+      const item = useCartStore.getState().items[0];
+      expect(item.color).toBe("Чорний");
+      expect(item.size).toBe("L");
+    });
+
+    it("accepts legacy items without color/size (old persisted carts)", () => {
+      useCartStore.getState().addItem({
+        productId: "p2",
+        name: "Худі Mirox Basic — L",
+        price: 1290,
+        maxStock: 5,
+      });
+      const item = useCartStore.getState().items[0];
+      expect(item.color).toBeUndefined();
+      expect(item.size).toBeUndefined();
+    });
   });
 
   describe("removeItem", () => {

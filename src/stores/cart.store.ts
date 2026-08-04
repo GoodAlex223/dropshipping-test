@@ -9,6 +9,9 @@ export interface CartItem {
   quantity: number;
   image?: string;
   maxStock: number;
+  /** Display-only variant parts (spec §2) — absent on legacy persisted items. */
+  color?: string;
+  size?: string;
 }
 
 interface CartState {
