@@ -10,8 +10,8 @@
 
 ## Parallel Work
 
-- 🟡 **P1 — Prod data re-seed (1 SP, user-approval-gated)**: carry-forward from TASK-037 — prod still lacks `styleGroup` colorway links, «Один розмір» on the kepka, and futbolka «Білий», so prod PDPs render the hardened legacy path. Runs the guarded `SEED_ALLOW_REMOTE=1` procedure (same as 2026-07-31, read-only preflight first) **only on explicit user approval**.
-- **Client chases (zero-code, carry-forward)**: 9-item payments prerequisites checklist ([decision doc §5.3](../superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md)); `developers.novaposhta.ua` webhook question from an unblocked network (gates TASK-049); TASK-056 content asks (photography, logo vector, socials/claims, size charts, legal copy) — G1's audit sharpens this list; formal TASK-056 checklist assembly is a next-week candidate.
+- 🟡 **P1 — Prod data re-seed (1 SP)**: ✅ **ran 2026-08-04, user-approved** — guarded `SEED_ALLOW_REMOTE=1` against the Neon direct endpoint, read-only preflight first. Verified in DB (both hoodies share `styleGroup: "hudi-mirox"`; kepka «Один розмір»; futbolka «Білий») and live (hudi PDP renders the white-sibling colorway link, kepka PDP shows «Один розмір», homepage 200). Prod PDPs now render the full swatch UI; the legacy fallback path is retired from prod.
+- **Client chases (zero-code, carry-forward)**: 9-item payments prerequisites checklist ([decision doc §5.3](../superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md)); `developers.novaposhta.ua` webhook question from an unblocked network (gates TASK-049); TASK-056 content asks (photography, logo vector, socials/claims, size charts, legal copy) — G1's audit sharpens this list; formal TASK-056 checklist assembly is scheduled Friday as G7.
 
 ---
 
@@ -75,6 +75,14 @@
 - [ ] Non-Claude AI best-practices: same, for non-Claude models/tools (1)
 - [ ] Cross-project propagation (outbound): scan this week's DONE entries, merged PRs #24–#27, new memory files, config diffs → `propagate | pass | defer` rows; high bar, `propagate` files a TODO § Spawned Tasks row (1)
 
+### G7. Client Content Ask (TASK-056) [solo]
+
+🔵 User · client content round-trip · **2 SP** · Fri
+
+> Folded in at user request (2026-08-04, launch push): assemble and send the consolidated client ask now so the round-trip runs while engineering continues. Solo-2-SP exception: no domain-mate among this week's code groups (doc + client-communication task).
+
+- [ ] Assemble the consolidated TASK-056 ask from TODO's checklist + G1-audit findings (real photography incl. the 7 missing back-view shots, logo vector, real socials/claims, size charts + measurement photos, contact details, legal copy, free-shipping threshold, announcement copy) and hand it to the user for forwarding to the client (2) — TODO.md TASK-056 [HIGH]
+
 ---
 
 ## Daily Schedule
@@ -100,6 +108,7 @@
 ### Friday — Reviews close + stretch
 
 - **[G6](#g6-weekly-reviews-batch)** ⚪ — part 2 (best-practices slots + propagation scan).
+- **[G7](#g7-client-content-ask-task-056-solo)** 🔵 — consolidated client ask assembled + handed off.
 - **[G5](#g5-transactional-emails-solo-)** 🔵 🏆 — stretch: emails, if the core groups are green.
 - Week close-out: statuses → `✅ PR #N`, spillover check, next-week (launch-push continuation) seed list.
 
@@ -107,16 +116,17 @@
 
 ## Summary Table
 
-| ID  | Group                               | Domain              | Source      | Tasks  | Total SP | Day         | Status    |
-| --- | ----------------------------------- | ------------------- | ----------- | ------ | -------- | ----------- | --------- |
-| G1  | Cart and Drawer Restyle `[batch]`   | storefront/cart     | 🔵 User     | 3      | 5        | Tue         | ☐ Planned |
-| G2  | Checkout Restyle `[batch]`          | storefront/checkout | 🔵 User     | 3      | 5        | Wed         | ☐ Planned |
-| G3  | Params Fix `[solo]`                 | Next.js routing     | 🟤 Auto     | 1      | 2        | Wed         | ☐ Planned |
-| G4  | Peripheral Surfaces Sweep `[batch]` | auth/account/system | 🔵 User     | 3      | 5        | Thu         | ☐ Planned |
-| G5  | Transactional Emails `[solo]` 🏆    | email templates     | 🔵 User     | 2      | 3        | Fri         | ☐ Planned |
-| G6  | Weekly Reviews `[batch]`            | recurring reviews   | ⚪ Overhead | 4      | 5        | Thu–Fri     | ☐ Planned |
-| P1  | Prod data re-seed (gated)           | ops/data            | 🟡 Ops      | 1      | 1        | On approval | ⏸ Gated   |
-|     | **Total**                           |                     |             | **17** | **26**   |             |           |
+| ID  | Group                                  | Domain              | Source      | Tasks  | Total SP | Day     | Status        |
+| --- | -------------------------------------- | ------------------- | ----------- | ------ | -------- | ------- | ------------- |
+| G1  | Cart and Drawer Restyle `[batch]`      | storefront/cart     | 🔵 User     | 3      | 5        | Tue     | ☐ Planned     |
+| G2  | Checkout Restyle `[batch]`             | storefront/checkout | 🔵 User     | 3      | 5        | Wed     | ☐ Planned     |
+| G3  | Params Fix `[solo]`                    | Next.js routing     | 🟤 Auto     | 1      | 2        | Wed     | ☐ Planned     |
+| G4  | Peripheral Surfaces Sweep `[batch]`    | auth/account/system | 🔵 User     | 3      | 5        | Thu     | ☐ Planned     |
+| G5  | Transactional Emails `[solo]` 🏆       | email templates     | 🔵 User     | 2      | 3        | Fri     | ☐ Planned     |
+| G6  | Weekly Reviews `[batch]`               | recurring reviews   | ⚪ Overhead | 4      | 5        | Thu–Fri | ☐ Planned     |
+| G7  | Client Content Ask (TASK-056) `[solo]` | client content      | 🔵 User     | 1      | 2        | Fri     | ☐ Planned     |
+| P1  | Prod data re-seed                      | ops/data            | 🟡 Ops      | 1      | 1        | Tue     | ✅ 2026-08-04 |
+|     | **Total**                              |                     |             | **18** | **28**   |         |               |
 
 _Source legend: 🔵 User · 🟡 Ops · 🟤 Auto · ⚪ Overhead (exempt from the quota denominator). Status on completion: `✅ PR #N` (the number, never a bare ✅)._
 
@@ -125,7 +135,7 @@ _Source legend: 🔵 User · 🟡 Ops · 🟤 Auto · ⚪ Overhead (exempt from 
 ## Notes
 
 - _Brainstorm sanity-checks: week dates confirmed vs git/DONE (today Tue 2026-08-04; Mon Aug 3 was consumed by TASK-037's spillover close-out — `cec8408`, `3b208f9`); previous week's delivery ran through Mon 2026-08-03, **3 days past its Friday (Jul 31)** → archived below under its TRUE header with a spillover note, not re-dated; velocity ≈ 2–3 large (8-SP-class) tasks/week but with recurring weekend spillovers → this 4-effective-day week planned at 26 SP incl. 5 ⚪ overhead; Cleanup Week due by cadence but **deferred by user decision**, not skipped — and further deferred same day by the launch-push steer (see the Launch-push note below); source quotas satisfiable and met (below)._
-- **Discussion-phase decisions (2026-08-04)**: user chose the rebrand-completion theme over the recommended Cleanup Week. Not yet ruled by the user (all parked, nothing executed): the 5 (+2 borderline) BACKLOG **reap nominations** (electronics-seed entry, USD-prices entry, `sort=newest` entry, «Бестселери» entry, stale-seed-counts entry; borderline: site-level OG placeholder, seed-demo-reviews); the **MILESTONES/GOALS refresh** (both stale since 2026-01-26, pre-Mirox — parked for cleanup week); adding a **📌 Process Rules section to BACKLOG.md** (parked for cleanup week); the **hydration console errors** investigation (held); **P1 prod re-seed approval** (open — gated in Parallel Work).
+- **Discussion-phase decisions (2026-08-04, ruled same day)**: user chose the rebrand-completion theme over the recommended Cleanup Week. **Ruled + executed**: all 7 BACKLOG **reaps** approved and executed (tombstone rows in Rejected Ideas; user note recorded there — the DB catalog is deliberately placeholder data, built for visual integrity and tests, and will be replaced with real products when the site deploys to its real server/domain); **P1 prod re-seed** approved, ran and verified (see Parallel Work); **TASK-056** folded in as G7 (Fri). Still parked: **MILESTONES/GOALS refresh** and **📌 Process Rules section for BACKLOG.md** (cleanup work, post-launch-push); **hydration console errors** investigation (held).
 - **OVERDUE item not schedulable this week**: the docs-freshness linter (🟤, recurrence #7) loses the week's single 🟤 slot to G3 under the ≤1-group hard rule. Mitigation until it lands: every PR this week manually verifies `docs/README.md` index rows ↔ doc headers **in both directions plus neighbouring rows** at completion. With next week now also a launch-push week, its realistic home is next week's single 🟤 slot; the manual check stands until it lands.
 - **Launch push (user steer, 2026-08-04)**: the goal is to launch and show the site to users as fast as possible — next week continues visuals/language. Likely spine: **TASK-039 i18n** (it _is_ the remaining language work and the monobank payments prerequisite), plus whatever G1's staleness audit leaves over, plus TASK-055 pages if client copy arrives. The true launch long-poles are **client-gated**, not engineering: photography/logo/socials/size charts (TASK-056), legal-page copy (TASK-055 — gateway-onboarding prerequisite), and the §5.3 payments checklist (TASK-048). Chase these in parallel starting now; engineering speed cannot substitute for them.
 - **TASK-039 interaction**: this week deliberately adds more hardcoded-Ukrainian copy via the extraction-ready content-config layer (`src/content/`) — the established TASK-057 pattern. TASK-039's externalization scope grows by exactly these surfaces; that is the designed trade, not drift.
@@ -135,13 +145,13 @@ _Source legend: 🔵 User · 🟡 Ops · 🟤 Auto · ⚪ Overhead (exempt from 
 
 ### Quota Check
 
-- 🔵 User-Flagged SP: 18 / 21 (86%) — must be ≥50% ✅
-- 🟡 Operational SP: 1 / 21 (5%) — must be ≤25% ✅
-- 🟤 Auto-Generated SP: 2 / 21 (10%) — must be ≤25% AND ≤1 group ✅ (one group: G3)
+- 🔵 User-Flagged SP: 20 / 23 (87%) — must be ≥50% ✅
+- 🟡 Operational SP: 1 / 23 (4%) — must be ≤25% ✅
+- 🟤 Auto-Generated SP: 2 / 23 (9%) — must be ≤25% AND ≤1 group ✅ (one group: G3)
 - Cleanup Week status: **due** (deferred by user steer; launch push takes precedence — re-evaluate after it)
 - Last Cleanup Week: never (Feb 2026 freeze week predates the cadence)
 - Compliance: ✅ all quotas met — deviation-free; the cadence deferral is recorded above with justification
-- _Denominator note_: Y = 26 total − 5 ⚪ (G6 Weekly Reviews) = 21.
+- _Denominator note_: Y = 28 total − 5 ⚪ (G6 Weekly Reviews) = 23.
 
 ---
 
