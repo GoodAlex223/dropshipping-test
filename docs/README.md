@@ -30,16 +30,17 @@ Central index for all project documentation.
 
 ### Planning & Tasks
 
-| Document                                         | Purpose              | Last Updated |
-| ------------------------------------------------ | -------------------- | ------------ |
-| [planning/README.md](planning/README.md)         | Planning overview    | 2026-01-05   |
-| [planning/WEEKLY.md](planning/WEEKLY.md)         | Current week's plan  | 2026-08-04   |
-| [planning/TODO.md](planning/TODO.md)             | Active tasks         | 2026-08-03   |
-| [planning/DONE.md](planning/DONE.md)             | Completed tasks      | 2026-08-03   |
-| [planning/BACKLOG.md](planning/BACKLOG.md)       | Unprioritized ideas  | 2026-08-04   |
-| [planning/ROADMAP.md](planning/ROADMAP.md)       | Long-term vision     | 2026-07-14   |
-| [planning/GOALS.md](planning/GOALS.md)           | Objectives & metrics | 2026-01-26   |
-| [planning/MILESTONES.md](planning/MILESTONES.md) | Key targets          | 2026-01-26   |
+| Document                                                                                                             | Purpose                                                                       | Last Updated |
+| -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------ |
+| [planning/README.md](planning/README.md)                                                                             | Planning overview                                                             | 2026-01-05   |
+| [planning/WEEKLY.md](planning/WEEKLY.md)                                                                             | Current week's plan                                                           | 2026-08-04   |
+| [planning/TODO.md](planning/TODO.md)                                                                                 | Active tasks                                                                  | 2026-08-03   |
+| [planning/DONE.md](planning/DONE.md)                                                                                 | Completed tasks                                                               | 2026-08-03   |
+| [planning/BACKLOG.md](planning/BACKLOG.md)                                                                           | Unprioritized ideas                                                           | 2026-08-04   |
+| [planning/ROADMAP.md](planning/ROADMAP.md)                                                                           | Long-term vision                                                              | 2026-07-14   |
+| [planning/GOALS.md](planning/GOALS.md)                                                                               | Objectives & metrics                                                          | 2026-01-26   |
+| [planning/MILESTONES.md](planning/MILESTONES.md)                                                                     | Key targets                                                                   | 2026-01-26   |
+| [planning/audits/2026-08-04-storefront-staleness-audit.md](planning/audits/2026-08-04-storefront-staleness-audit.md) | Storefront EN-string/staleness audit — G2/G4 definitive scope + TASK-056 gaps | 2026-08-04   |
 
 ### Architecture & Design
 
