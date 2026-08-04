@@ -45,7 +45,7 @@ test.describe("Shopping Cart", () => {
     await page.goto("/cart");
 
     // Should show empty cart message
-    await expect(page.getByText(/empty/i).or(page.getByText(/no items/i))).toBeVisible();
+    await expect(page.getByText(/порожній/i)).toBeVisible();
   });
 
   test("can navigate to cart page", async ({ page }) => {
@@ -95,7 +95,7 @@ test.describe("Shopping Cart", () => {
     await page.goto("/cart");
 
     // Find quantity controls
-    const increaseButton = page.getByRole("button", { name: /\+|increase/i }).first();
+    const increaseButton = page.getByRole("button", { name: /збільшити/i }).first();
 
     if (await increaseButton.isVisible()) {
       await increaseButton.click();
@@ -117,13 +117,13 @@ test.describe("Shopping Cart", () => {
     await page.goto("/cart");
 
     // Find remove button
-    const removeButton = page.getByRole("button", { name: /remove|delete|×/i }).first();
+    const removeButton = page.getByRole("button", { name: /видалити/i }).first();
 
     if (await removeButton.isVisible()) {
       await removeButton.click();
 
       // Cart should become empty or item count decrease
-      await expect(page.getByText(/empty/i).or(page.getByText(/no items/i))).toBeVisible({
+      await expect(page.getByText(/порожній/i)).toBeVisible({
         timeout: 5000,
       });
     }

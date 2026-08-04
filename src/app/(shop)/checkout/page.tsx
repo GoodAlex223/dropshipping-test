@@ -124,6 +124,7 @@ export default function CheckoutPage() {
         items.map((item) => ({
           item_id: item.productId,
           item_name: item.name,
+          item_variant: item.size,
           price: item.price,
           quantity: item.quantity,
         })),
@@ -161,6 +162,7 @@ export default function CheckoutPage() {
       items.map((item) => ({
         item_id: item.productId,
         item_name: item.name,
+        item_variant: item.size,
         price: item.price,
         quantity: item.quantity,
       })),
@@ -202,6 +204,7 @@ export default function CheckoutPage() {
         items.map((item) => ({
           item_id: item.productId,
           item_name: item.name,
+          item_variant: item.size,
           price: item.price,
           quantity: item.quantity,
         })),

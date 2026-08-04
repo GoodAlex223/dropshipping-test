@@ -46,7 +46,9 @@ describe("QuickViewDialog", () => {
     expect(items[0]).toMatchObject({
       productId: "p1",
       variantId: "v-m",
-      name: "Худі Mirox Basic — M",
+      name: "Худі Mirox Basic",
+      color: "Чорний",
+      size: "M",
       price: 1290,
       maxStock: 8,
       quantity: 1,

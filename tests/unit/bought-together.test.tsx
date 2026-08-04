@@ -13,6 +13,7 @@ function companion(over: Partial<BundleCompanion> & { id: string }): BundleCompa
     stock: 10,
     image: null,
     category: null,
+    colorValue: null,
     sizeVariants: [
       { id: `${over.id}-s`, value: "S", stock: 5, price: null },
       { id: `${over.id}-l`, value: "L", stock: 5, price: null },
@@ -21,7 +22,12 @@ function companion(over: Partial<BundleCompanion> & { id: string }): BundleCompa
   };
 }
 
-const current = companion({ id: "cur", name: "Худі Mirox Basic", price: "1290" });
+const current = companion({
+  id: "cur",
+  name: "Худі Mirox Basic",
+  price: "1290",
+  colorValue: "Чорний",
+});
 
 beforeEach(() => {
   useCartStore.setState({ items: [], isOpen: false });
@@ -51,7 +57,9 @@ describe("BoughtTogether", () => {
     const items = useCartStore.getState().items;
     expect(items).toHaveLength(3);
     expect(items.every((i) => i.variantId?.endsWith("-l"))).toBe(true);
-    expect(items[0].name).toBe("Худі Mirox Basic — L");
+    expect(items[0].name).toBe("Худі Mirox Basic");
+    expect(items[0].size).toBe("L");
+    expect(items[0].color).toBe("Чорний");
   });
 
   it("shows the struck sum only when comparePrices make it genuinely higher", () => {
@@ -118,7 +126,9 @@ describe("BoughtTogether", () => {
     const items = useCartStore.getState().items;
     expect(items).toHaveLength(3);
     // Current product with size
-    expect(items[0].name).toBe("Худі Mirox Basic — L");
+    expect(items[0].name).toBe("Худі Mirox Basic");
+    expect(items[0].size).toBe("L");
+    expect(items[0].color).toBe("Чорний");
     expect(items[0].variantId).toBe("cur-l");
     // Sizeless companions (no variantId)
     expect(items[1].name).toBe("Product a");

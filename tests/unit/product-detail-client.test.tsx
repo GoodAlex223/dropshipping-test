@@ -86,12 +86,14 @@ describe("ProductDetailClient (TASK-037)", () => {
     expect(screen.getByRole("button", { name: "L" })).toBeDisabled();
   });
 
-  it("add to cart uses the variant VALUE in the line name (BACKLOG naming fix)", async () => {
+  it("add to cart keeps the line name plain and carries size/color separately (G1 naming revert)", async () => {
     render(<ProductDetailClient product={makeProduct()} />);
     fireEvent.click(screen.getByRole("button", { name: "ДОДАТИ В КОШИК" }));
     await screen.findByRole("button", { name: /ДОДАНО В КОШИК/ });
     const item = useCartStore.getState().items[0];
-    expect(item.name).toBe("Худі Mirox Basic — S");
+    expect(item.name).toBe("Худі Mirox Basic");
+    expect(item.size).toBe("S");
+    expect(item.color).toBe("Чорний");
     expect(item.variantId).toBe("v-s");
   });
 

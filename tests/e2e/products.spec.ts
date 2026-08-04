@@ -151,12 +151,18 @@ test.describe("Product Browsing", () => {
     await page.getByRole("button", { name: /^додати в кошик$/i }).click();
     await expect(page.getByRole("button", { name: /додано в кошик/i })).toBeVisible();
 
-    // The drawer line must carry the VALUE («— S»), never «— Size».
+    // The drawer line must carry the VALUE («Розмір: S»), never «— Size».
     await page
       .getByRole("button", { name: /кошик|cart/i })
       .first()
       .click();
-    await expect(page.getByText(/Худі Mirox Basic — S/).first()).toBeVisible();
+    // Scoped to the open drawer (Radix Sheet, role="dialog") — the PDP behind
+    // it also renders "Худі Mirox Basic" (breadcrumb/title) and BoughtTogether
+    // renders "Розмір: S" for the current product, so page-wide assertions
+    // here would still pass even if the drawer's own variant line were deleted.
+    const drawer = page.getByRole("dialog");
+    await expect(drawer.getByText("Худі Mirox Basic", { exact: true }).first()).toBeVisible();
+    await expect(drawer.getByText(/Розмір: S/).first()).toBeVisible();
     await expect(page.getByText(/— Size/)).toHaveCount(0);
   });
 
@@ -189,6 +195,9 @@ test.describe("Product Browsing", () => {
       .getByRole("button", { name: /кошик|cart/i })
       .first()
       .click();
-    await expect(page.getByText(/Худі Mirox White — S/).first()).toBeVisible();
+    // Scoped to the open drawer, same rationale as the test above.
+    const drawer = page.getByRole("dialog");
+    await expect(drawer.getByText("Худі Mirox White", { exact: true }).first()).toBeVisible();
+    await expect(drawer.getByText(/Розмір: S/).first()).toBeVisible();
   });
 });
