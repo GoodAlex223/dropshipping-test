@@ -63,6 +63,12 @@ explicit decision on (per WEEKLY 2026-08-03 steer):
 3. Stripe still runs in test-mode USD on the same numeric amount (documented pre-existing
    decision per CLAUDE.md, not new — flagged here only because the shipping-price/currency-label
    mismatch above compounds it).
+4. **Order Summary renders `item.name` bare** (`src/app/(shop)/checkout/page.tsx:670`), with no
+   variant info — a seam exposed by the G1 cart-drawer restyle's plain-name revert (cart lines no
+   longer carry `— Size`/`— Color` in the name itself). After G1 merges, two sizes of the same
+   product show as identical lines in the Order Summary. G2 must render the cart-line variant info
+   (`item.size`/`item.color`) in the checkout Order Summary too, using the same «Колір: X · Розмір:
+   Y» composition already used for the cart-line variant display (see `src/content/cart.ts`).
 
 ## G4 definitive scope
 
