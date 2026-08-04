@@ -101,6 +101,10 @@ async function getProduct(slug: string): Promise<Product | null> {
     variants: {
       where: { name: { in: ["Size", "Color"] } },
       select: { id: true, name: true, value: true, stock: true, price: true },
+      // Same tiebreaker as the main-product query above: seeded rows can share
+      // a createdAt, which otherwise leaves "the first Color row" (→ colorValue)
+      // nondeterministic.
+      orderBy: [{ createdAt: "asc" as const }, { id: "asc" as const }],
     },
   };
 

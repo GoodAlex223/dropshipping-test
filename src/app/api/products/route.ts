@@ -33,7 +33,12 @@ const LIST_SELECT = {
     select: { id: true, url: true, alt: true },
     orderBy: { position: "asc" as const },
   },
-  variants: { select: { id: true, name: true, value: true, stock: true, price: true } },
+  variants: {
+    select: { id: true, name: true, value: true, stock: true, price: true },
+    // Deterministic "first Color row" for consumers deriving a colorway
+    // (QuickViewDialog cart lines) — same tiebreaker as the PDP query.
+    orderBy: [{ createdAt: "asc" as const }, { id: "asc" as const }],
+  },
 };
 
 // GET /api/products - Public product listing

@@ -80,6 +80,9 @@ describe("GET /api/products — filters", () => {
     const select = findMany.mock.calls[0][0].select;
     expect(select.variants).toEqual({
       select: { id: true, name: true, value: true, stock: true, price: true },
+      // Deterministic "first Color row" for colorway-deriving consumers
+      // (PR #28 review finding 1) — createdAt with id tiebreaker.
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
     });
     expect(select.createdAt).toBe(true);
     // R2: the card/quick-view carousel needs every image, not just the

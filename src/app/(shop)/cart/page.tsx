@@ -49,6 +49,7 @@ export default function CartPage() {
         items.map((item) => ({
           item_id: item.productId,
           item_name: item.name,
+          item_variant: item.size,
           price: item.price,
           quantity: item.quantity,
         })),
