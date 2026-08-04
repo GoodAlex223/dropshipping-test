@@ -3,7 +3,7 @@
 **Week**: Monday August 3 – Friday August 7, 2026
 **Created**: 2026-08-04
 **Sources**: [MILESTONES.md](MILESTONES.md) · [ROADMAP.md](ROADMAP.md) · [GOALS.md](GOALS.md) · [BACKLOG.md](BACKLOG.md) · [TODO.md](TODO.md) · prior WEEKLY (2026-07-27 week, archived below) · REVIEW-QUEUE.md (does not exist yet — created this week by G6)
-**Cleanup Week?**: No — due by cadence (3 feature weeks since resumption, 🟤 pool ≫ 20 SP pending), but deferred by explicit user steer to finish the rebrand; targeted for next week (Aug 10–14) with the OVERDUE docs-freshness linter as first pick.
+**Cleanup Week?**: No — due by cadence (3 feature weeks since resumption, 🟤 pool ≫ 20 SP pending), but deferred by explicit user steer: this week finishes the rebrand and **next week (Aug 10–14) continues the visuals/translation launch push** (user, 2026-08-04 — "launch and show to users as fast as possible"). The OVERDUE docs-freshness linter competes for next week's single 🟤 slot; a full Cleanup Week is re-evaluated after the launch push.
 **Context**: Mirox program v1.3. User-directed theme (2026-08-04 brainstorm): **finish the redesign + Ukrainian translation of the storefront** — cart, checkout, auth, account, newsletter and error surfaces still carry pre-rebrand design and English copy (transactional emails as the stretch 🏆); the data side rides along as a user-gated prod re-seed plus the USD shipping constants decision inside the checkout group.
 
 ---
@@ -101,7 +101,7 @@
 
 - **[G6](#g6-weekly-reviews-batch)** ⚪ — part 2 (best-practices slots + propagation scan).
 - **[G5](#g5-transactional-emails-solo-)** 🔵 🏆 — stretch: emails, if the core groups are green.
-- Week close-out: statuses → `✅ PR #N`, spillover check, next-week (cleanup) seed list.
+- Week close-out: statuses → `✅ PR #N`, spillover check, next-week (launch-push continuation) seed list.
 
 ---
 
@@ -124,9 +124,10 @@ _Source legend: 🔵 User · 🟡 Ops · 🟤 Auto · ⚪ Overhead (exempt from 
 
 ## Notes
 
-- _Brainstorm sanity-checks: week dates confirmed vs git/DONE (today Tue 2026-08-04; Mon Aug 3 was consumed by TASK-037's spillover close-out — `cec8408`, `3b208f9`); previous week's delivery ran through Mon 2026-08-03, **3 days past its Friday (Jul 31)** → archived below under its TRUE header with a spillover note, not re-dated; velocity ≈ 2–3 large (8-SP-class) tasks/week but with recurring weekend spillovers → this 4-effective-day week planned at 26 SP incl. 5 ⚪ overhead; Cleanup Week due by cadence but **deferred by user decision**, not skipped — scheduled intent for Aug 10–14; source quotas satisfiable and met (below)._
+- _Brainstorm sanity-checks: week dates confirmed vs git/DONE (today Tue 2026-08-04; Mon Aug 3 was consumed by TASK-037's spillover close-out — `cec8408`, `3b208f9`); previous week's delivery ran through Mon 2026-08-03, **3 days past its Friday (Jul 31)** → archived below under its TRUE header with a spillover note, not re-dated; velocity ≈ 2–3 large (8-SP-class) tasks/week but with recurring weekend spillovers → this 4-effective-day week planned at 26 SP incl. 5 ⚪ overhead; Cleanup Week due by cadence but **deferred by user decision**, not skipped — and further deferred same day by the launch-push steer (see the Launch-push note below); source quotas satisfiable and met (below)._
 - **Discussion-phase decisions (2026-08-04)**: user chose the rebrand-completion theme over the recommended Cleanup Week. Not yet ruled by the user (all parked, nothing executed): the 5 (+2 borderline) BACKLOG **reap nominations** (electronics-seed entry, USD-prices entry, `sort=newest` entry, «Бестселери» entry, stale-seed-counts entry; borderline: site-level OG placeholder, seed-demo-reviews); the **MILESTONES/GOALS refresh** (both stale since 2026-01-26, pre-Mirox — parked for cleanup week); adding a **📌 Process Rules section to BACKLOG.md** (parked for cleanup week); the **hydration console errors** investigation (held); **P1 prod re-seed approval** (open — gated in Parallel Work).
-- **OVERDUE item not schedulable this week**: the docs-freshness linter (🟤, recurrence #7) loses the week's single 🟤 slot to G3 under the ≤1-group hard rule. Mitigation until it lands: every PR this week manually verifies `docs/README.md` index rows ↔ doc headers **in both directions plus neighbouring rows** at completion. It is the first pick for next week's cleanup week.
+- **OVERDUE item not schedulable this week**: the docs-freshness linter (🟤, recurrence #7) loses the week's single 🟤 slot to G3 under the ≤1-group hard rule. Mitigation until it lands: every PR this week manually verifies `docs/README.md` index rows ↔ doc headers **in both directions plus neighbouring rows** at completion. With next week now also a launch-push week, its realistic home is next week's single 🟤 slot; the manual check stands until it lands.
+- **Launch push (user steer, 2026-08-04)**: the goal is to launch and show the site to users as fast as possible — next week continues visuals/language. Likely spine: **TASK-039 i18n** (it _is_ the remaining language work and the monobank payments prerequisite), plus whatever G1's staleness audit leaves over, plus TASK-055 pages if client copy arrives. The true launch long-poles are **client-gated**, not engineering: photography/logo/socials/size charts (TASK-056), legal-page copy (TASK-055 — gateway-onboarding prerequisite), and the §5.3 payments checklist (TASK-048). Chase these in parallel starting now; engineering speed cannot substitute for them.
 - **TASK-039 interaction**: this week deliberately adds more hardcoded-Ukrainian copy via the extraction-ready content-config layer (`src/content/`) — the established TASK-057 pattern. TASK-039's externalization scope grows by exactly these surfaces; that is the designed trade, not drift.
 - **TASK-043 interaction**: the cart _restyle_ is pulled forward into G1; TASK-043 (v1.4) retains one-click buy, the post-purchase upsell modal, and the promo-code field.
 - **Scope boundary**: admin surfaces are excluded from this sweep (customer-facing first); the admin visual pass + admin settings "$" labels stay BACKLOG'd. Showcase routes untouched.
@@ -137,7 +138,7 @@ _Source legend: 🔵 User · 🟡 Ops · 🟤 Auto · ⚪ Overhead (exempt from 
 - 🔵 User-Flagged SP: 18 / 21 (86%) — must be ≥50% ✅
 - 🟡 Operational SP: 1 / 21 (5%) — must be ≤25% ✅
 - 🟤 Auto-Generated SP: 2 / 21 (10%) — must be ≤25% AND ≤1 group ✅ (one group: G3)
-- Cleanup Week status: **due** (deferred by user steer; intent: next week)
+- Cleanup Week status: **due** (deferred by user steer; launch push takes precedence — re-evaluate after it)
 - Last Cleanup Week: never (Feb 2026 freeze week predates the cadence)
 - Compliance: ✅ all quotas met — deviation-free; the cadence deferral is recorded above with justification
 - _Denominator note_: Y = 26 total − 5 ⚪ (G6 Weekly Reviews) = 21.
