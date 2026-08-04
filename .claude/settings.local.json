@@ -4,5 +4,6 @@
     "auto-memory@severity1-marketplace": true,
     "feature-dev@claude-plugins-official": true,
     "code-review@claude-plugins-official": true
-  }
+  },
+  "enabledMcpjsonServers": ["context7", "github", "memory"]
 }
