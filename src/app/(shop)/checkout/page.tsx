@@ -4,18 +4,11 @@ export const dynamic = "force-dynamic";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Elements } from "@stripe/react-stripe-js";
-import { Loader2, ShoppingBag, Truck, CreditCard, ChevronRight, MapPin } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Separator } from "@/components/ui/separator";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Loader2, ShoppingBag, Lock, Instagram, Send, MessageCircle } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -24,51 +17,26 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useCartStore } from "@/stores/cart.store";
 import { checkoutSchema, type CheckoutInput } from "@/lib/validations";
-import { getStripe } from "@/lib/stripe-client";
+import { DELIVERY_METHODS, DEFAULT_DELIVERY_METHOD_ID } from "@/lib/shipping";
 import { formatPrice } from "@/lib/format";
-import { PaymentForm } from "@/components/checkout/PaymentForm";
+import { checkout } from "@/content/checkout";
 import { trackBeginCheckout, trackAddShippingInfo, trackAddPaymentInfo } from "@/lib/analytics";
 
-const SHIPPING_METHODS = [
-  {
-    id: "standard",
-    name: "Standard Shipping",
-    description: "5-7 business days",
-    price: 5.99,
-  },
-  {
-    id: "express",
-    name: "Express Shipping",
-    description: "2-3 business days",
-    price: 12.99,
-  },
-  {
-    id: "overnight",
-    name: "Overnight Shipping",
-    description: "1 business day",
-    price: 24.99,
-  },
-];
-
-const COUNTRIES = [
-  { code: "US", name: "United States" },
-  { code: "CA", name: "Canada" },
-  { code: "GB", name: "United Kingdom" },
-  { code: "AU", name: "Australia" },
-  { code: "DE", name: "Germany" },
-  { code: "FR", name: "France" },
-];
-
 type CheckoutStep = "information" | "shipping" | "payment";
+
+const STEPS: Array<{ id: CheckoutStep; label: string }> = [
+  { id: "information", label: checkout.steps.contacts },
+  { id: "shipping", label: checkout.steps.delivery },
+  { id: "payment", label: checkout.steps.payment },
+];
+
+const inputClass = "border-border-strong bg-background rounded-[10px] border px-3.5 py-3 text-sm";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -77,9 +45,6 @@ export default function CheckoutPage() {
   const [mounted, setMounted] = useState(false);
   const [currentStep, setCurrentStep] = useState<CheckoutStep>("information");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
-  const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const form = useForm<CheckoutInput>({
@@ -94,10 +59,10 @@ export default function CheckoutPage() {
         city: "",
         state: "",
         postalCode: "",
-        country: "US",
+        country: "UA",
         phone: "",
       },
-      shippingMethod: "standard",
+      shippingMethod: DEFAULT_DELIVERY_METHOD_ID,
       customerNotes: "",
     },
   });
@@ -134,103 +99,49 @@ export default function CheckoutPage() {
   }, [items]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const subtotal = getTotalPrice();
-  const selectedShipping = SHIPPING_METHODS.find((m) => m.id === form.watch("shippingMethod"));
+  const selectedShipping = DELIVERY_METHODS.find((m) => m.id === form.watch("shippingMethod"));
   const shippingCost = selectedShipping?.price || 0;
   const total = subtotal + shippingCost;
 
+  const stepIndex = STEPS.findIndex((s) => s.id === currentStep);
+
   const handleContinueToShipping = async () => {
-    const isValid = await form.trigger([
-      "email",
-      "shippingAddress.name",
-      "shippingAddress.line1",
-      "shippingAddress.city",
-      "shippingAddress.postalCode",
-      "shippingAddress.country",
-    ]);
+    const isValid = await form.trigger(["email", "shippingAddress.name", "shippingAddress.phone"]);
     if (isValid) {
       setCurrentStep("shipping");
     }
   };
 
   const handleContinueToPayment = async () => {
-    const isValid = await form.trigger("shippingMethod");
+    const isValid = await form.trigger([
+      "shippingAddress.city",
+      "shippingAddress.line1",
+      "shippingMethod",
+    ]);
     if (!isValid) return;
 
-    // GA4: Track shipping info
-    const shippingMethod = SHIPPING_METHODS.find((m) => m.id === form.getValues("shippingMethod"));
-    trackAddShippingInfo(
-      items.map((item) => ({
-        item_id: item.productId,
-        item_name: item.name,
-        item_variant: item.size,
-        price: item.price,
-        quantity: item.quantity,
-      })),
-      getTotalPrice(),
-      shippingMethod?.name || "Standard Shipping"
-    );
-
-    setIsProcessing(true);
-    setError(null);
-
-    try {
-      const formData = form.getValues();
-      const response = await fetch("/api/checkout/create-payment-intent", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          items: items.map((item) => ({
-            productId: item.productId,
-            variantId: item.variantId,
-            quantity: item.quantity,
-          })),
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to create payment");
-      }
-
-      setClientSecret(data.clientSecret);
-      setPaymentIntentId(data.paymentIntentId);
-      setOrderNumber(data.orderNumber);
-      setCurrentStep("payment");
-
-      // GA4: Track payment info step reached
-      trackAddPaymentInfo(
-        items.map((item) => ({
-          item_id: item.productId,
-          item_name: item.name,
-          item_variant: item.size,
-          price: item.price,
-          quantity: item.quantity,
-        })),
-        getTotalPrice(),
-        "card"
-      );
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setIsProcessing(false);
-    }
+    const gaItems = items.map((item) => ({
+      item_id: item.productId,
+      item_name: item.name,
+      item_variant: item.size,
+      price: item.price,
+      quantity: item.quantity,
+    }));
+    trackAddShippingInfo(gaItems, getTotalPrice(), selectedShipping?.name || "");
+    trackAddPaymentInfo(gaItems, getTotalPrice(), "cod");
+    setCurrentStep("payment");
   };
 
-  const handlePaymentSuccess = async () => {
-    if (!paymentIntentId) return;
-
+  const handleSubmitOrder = async () => {
     setIsProcessing(true);
     setError(null);
 
     try {
       const formData = form.getValues();
-      const response = await fetch("/api/checkout/confirm-order", {
+      const response = await fetch("/api/checkout/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          paymentIntentId,
           ...formData,
           items: items.map((item) => ({
             productId: item.productId,
@@ -243,14 +154,13 @@ export default function CheckoutPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to confirm order");
+        throw new Error(data.error || checkout.payment.errors.orderFailed);
       }
 
       clearCart();
       router.push(`/checkout/confirmation?order=${data.orderNumber}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to confirm order");
-    } finally {
+      setError(err instanceof Error ? err.message : checkout.payment.errors.orderFailed);
       setIsProcessing(false);
     }
   };
@@ -265,290 +175,79 @@ export default function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <div className="container py-12">
+      <div className="container py-16">
         <div className="mx-auto max-w-md text-center">
           <ShoppingBag className="text-muted-foreground mx-auto h-16 w-16" />
-          <h1 className="mt-6 text-2xl font-semibold">Your cart is empty</h1>
-          <p className="text-muted-foreground mt-2">
-            Add some items to your cart before checking out.
-          </p>
-          <Button className="mt-6" onClick={() => router.push("/products")}>
-            Browse Products
-          </Button>
+          <h1 className="mt-6 text-2xl font-extrabold">{checkout.empty.title}</h1>
+          <p className="text-muted-foreground mt-2">{checkout.empty.description}</p>
+          <Link
+            href="/products"
+            className="mt-6 inline-block rounded-[10px] bg-white px-7 py-4 text-[13.5px] font-extrabold tracking-[0.06em] text-black transition-colors hover:bg-[#e5e5e5]"
+          >
+            {checkout.empty.cta}
+          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container py-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold">Checkout</h1>
-        <div className="mt-4 flex items-center gap-2 text-sm">
-          <button
-            className={`flex items-center gap-1 ${
-              currentStep === "information" ? "text-primary font-medium" : "text-muted-foreground"
-            }`}
-            onClick={() => setCurrentStep("information")}
-            disabled={currentStep === "payment" && isProcessing}
-          >
-            <MapPin className="h-4 w-4" />
-            Information
-          </button>
-          <ChevronRight className="text-muted-foreground h-4 w-4" />
-          <button
-            className={`flex items-center gap-1 ${
-              currentStep === "shipping" ? "text-primary font-medium" : "text-muted-foreground"
-            }`}
-            onClick={() => currentStep !== "information" && setCurrentStep("shipping")}
-            disabled={currentStep === "information" || isProcessing}
-          >
-            <Truck className="h-4 w-4" />
-            Shipping
-          </button>
-          <ChevronRight className="text-muted-foreground h-4 w-4" />
-          <span
-            className={`flex items-center gap-1 ${
-              currentStep === "payment" ? "text-primary font-medium" : "text-muted-foreground"
-            }`}
-          >
-            <CreditCard className="h-4 w-4" />
-            Payment
-          </span>
-        </div>
+    <div className="container py-10 lg:py-12">
+      <h1 className="text-3xl font-extrabold tracking-tight lg:text-4xl">{checkout.title}</h1>
+
+      {/* Step nav — numbered circles per handoff */}
+      <div className="mt-6 mb-8 flex items-center gap-2 text-[13px] font-bold">
+        {STEPS.map((step, i) => {
+          const isActive = i === stepIndex;
+          const isDone = i < stepIndex;
+          return (
+            <div key={step.id} className="flex items-center gap-2">
+              {i > 0 && <span className="text-muted-foreground mx-1">→</span>}
+              <button
+                type="button"
+                className={`flex items-center gap-2 ${
+                  isActive ? "text-foreground" : "text-muted-foreground"
+                } disabled:cursor-default`}
+                onClick={() => isDone && setCurrentStep(step.id)}
+                disabled={!isDone || isProcessing}
+              >
+                <span
+                  className={`flex h-6 w-6 items-center justify-center rounded-full border text-[11.5px] ${
+                    isActive
+                      ? "border-white bg-white text-black"
+                      : isDone
+                        ? "border-white bg-transparent"
+                        : "border-border-strong bg-transparent"
+                  }`}
+                >
+                  {i + 1}
+                </span>
+                {step.label}
+              </button>
+            </div>
+          );
+        })}
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(340px,400px)]">
         <div>
           <Form {...form}>
             <form className="space-y-6">
-              {/* Contact Information */}
+              {/* Step 1 — Контакти */}
               {currentStep === "information" && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <MapPin className="h-5 w-5" />
-                      Contact & Shipping Address
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
+                <div className="bg-card border-border rounded-[20px] border p-7 lg:p-8">
+                  <h2 className="text-xl font-extrabold">{checkout.contact.heading}</h2>
+                  <div className="mt-6 grid gap-4 sm:grid-cols-2">
                     <FormField
                       control={form.control}
-                      name="email"
+                      name="shippingAddress.name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Email</FormLabel>
+                          <FormLabel>{checkout.contact.name.label}</FormLabel>
                           <FormControl>
-                            <Input type="email" placeholder="your@email.com" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <FormField
-                        control={form.control}
-                        name="shippingAddress.name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Full Name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="John Doe" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="shippingAddress.company"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Company (optional)</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Company name" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <FormField
-                      control={form.control}
-                      name="shippingAddress.line1"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Address</FormLabel>
-                          <FormControl>
-                            <Input placeholder="123 Main St" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="shippingAddress.line2"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Apartment, suite, etc. (optional)</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Apt 4B" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <div className="grid gap-4 sm:grid-cols-3">
-                      <FormField
-                        control={form.control}
-                        name="shippingAddress.city"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>City</FormLabel>
-                            <FormControl>
-                              <Input placeholder="City" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="shippingAddress.state"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>State / Province</FormLabel>
-                            <FormControl>
-                              <Input placeholder="State" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="shippingAddress.postalCode"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Postal Code</FormLabel>
-                            <FormControl>
-                              <Input placeholder="12345" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <FormField
-                        control={form.control}
-                        name="shippingAddress.country"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Country</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select country" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {COUNTRIES.map((country) => (
-                                  <SelectItem key={country.code} value={country.code}>
-                                    {country.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="shippingAddress.phone"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Phone (optional)</FormLabel>
-                            <FormControl>
-                              <Input type="tel" placeholder="+1 (555) 000-0000" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <Button type="button" className="w-full" onClick={handleContinueToShipping}>
-                      Continue to Shipping
-                      <ChevronRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Shipping Method */}
-              {currentStep === "shipping" && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Truck className="h-5 w-5" />
-                      Shipping Method
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="shippingMethod"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <RadioGroup
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                              className="space-y-3"
-                            >
-                              {SHIPPING_METHODS.map((method) => (
-                                <Label
-                                  key={method.id}
-                                  htmlFor={method.id}
-                                  className="hover:bg-muted/50 [&:has([data-state=checked])]:border-primary flex cursor-pointer items-center justify-between rounded-lg border p-4"
-                                >
-                                  <div className="flex items-center gap-3">
-                                    <RadioGroupItem value={method.id} id={method.id} />
-                                    <div>
-                                      <p className="font-medium">{method.name}</p>
-                                      <p className="text-muted-foreground text-sm">
-                                        {method.description}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <span className="font-medium">{formatPrice(method.price)}</span>
-                                </Label>
-                              ))}
-                            </RadioGroup>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="customerNotes"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Order Notes (optional)</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              placeholder="Special instructions for your order..."
-                              className="resize-none"
+                            <Input
+                              className={inputClass}
+                              placeholder={checkout.contact.name.placeholder}
                               {...field}
                             />
                           </FormControl>
@@ -556,161 +255,336 @@ export default function CheckoutPage() {
                         </FormItem>
                       )}
                     />
-
-                    {error && (
-                      <div className="bg-destructive/10 text-destructive rounded-lg p-4 text-sm">
-                        {error}
-                      </div>
-                    )}
-
-                    <div className="flex gap-4">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => setCurrentStep("information")}
-                        disabled={isProcessing}
-                      >
-                        Back
-                      </Button>
-                      <Button
-                        type="button"
-                        className="flex-1"
-                        onClick={handleContinueToPayment}
-                        disabled={isProcessing}
-                      >
-                        {isProcessing ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Processing...
-                          </>
-                        ) : (
-                          <>
-                            Continue to Payment
-                            <ChevronRight className="ml-2 h-4 w-4" />
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                    <FormField
+                      control={form.control}
+                      name="shippingAddress.phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{checkout.contact.phone.label}</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="tel"
+                              className={inputClass}
+                              placeholder={checkout.contact.phone.placeholder}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem className="sm:col-span-2">
+                          <FormLabel>{checkout.contact.email.label}</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="email"
+                              className={inputClass}
+                              placeholder={checkout.contact.email.placeholder}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    className="mt-6 rounded-[10px] bg-white px-7 py-4 text-[13px] font-extrabold tracking-[0.06em] text-black transition-colors hover:bg-[#e5e5e5]"
+                    onClick={handleContinueToShipping}
+                  >
+                    {checkout.contact.next}
+                  </button>
+                </div>
               )}
 
-              {/* Payment */}
-              {currentStep === "payment" && clientSecret && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <CreditCard className="h-5 w-5" />
-                      Payment
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Elements
-                      stripe={getStripe()}
-                      options={{
-                        clientSecret,
-                        appearance: {
-                          theme: "night",
-                          variables: {
-                            // Stripe Elements renders in an iframe and can't read our
-                            // CSS custom properties, so these are literal hex values
-                            // matching the Mirox dark :root tokens (globals.css):
-                            // --primary, --input (form field fill, distinct from the
-                            // --card panel it sits on), --foreground, --destructive.
-                            colorPrimary: "#ffffff",
-                            colorBackground: "#1a1a1a",
-                            colorText: "#ffffff",
-                            colorDanger: "#f87171",
-                            borderRadius: "4px",
-                            fontFamily: "system-ui, sans-serif",
-                          },
-                        },
-                      }}
+              {/* Step 2 — Доставка */}
+              {currentStep === "shipping" && (
+                <div className="bg-card border-border rounded-[20px] border p-7 lg:p-8">
+                  <h2 className="text-xl font-extrabold">{checkout.delivery.heading}</h2>
+                  <FormField
+                    control={form.control}
+                    name="shippingMethod"
+                    render={({ field }) => (
+                      <FormItem className="mt-6">
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex flex-col gap-3"
+                          >
+                            {DELIVERY_METHODS.map((method) => (
+                              <Label
+                                key={method.id}
+                                htmlFor={method.id}
+                                className={`flex cursor-pointer items-center justify-between gap-4 rounded-[14px] border p-5 transition-colors ${
+                                  field.value === method.id
+                                    ? "border-white"
+                                    : "border-border-strong hover:border-muted-foreground"
+                                }`}
+                              >
+                                <span className="flex items-center gap-3.5">
+                                  <RadioGroupItem value={method.id} id={method.id} />
+                                  <span>
+                                    <span className="block text-[14.5px] font-bold">
+                                      {method.name}
+                                    </span>
+                                    <span className="text-muted-foreground mt-0.5 block text-[12.5px]">
+                                      {method.description}
+                                    </span>
+                                  </span>
+                                </span>
+                                <span className="text-sm font-extrabold whitespace-nowrap">
+                                  {formatPrice(method.price)}
+                                </span>
+                              </Label>
+                            ))}
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="mt-5 grid gap-4">
+                    <FormField
+                      control={form.control}
+                      name="shippingAddress.city"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{checkout.delivery.city.label}</FormLabel>
+                          <FormControl>
+                            <Input
+                              className={inputClass}
+                              placeholder={checkout.delivery.city.placeholder}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="shippingAddress.line1"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{checkout.delivery.address.label}</FormLabel>
+                          <FormControl>
+                            <Input
+                              className={inputClass}
+                              placeholder={checkout.delivery.address.placeholder}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="customerNotes"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{checkout.delivery.notes.label}</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              className={`${inputClass} resize-none`}
+                              placeholder={checkout.delivery.notes.placeholder}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="mt-6 flex gap-3">
+                    <button
+                      type="button"
+                      className="border-border-strong hover:border-muted-foreground rounded-[10px] border px-6 py-4 text-[13px] font-bold transition-colors"
+                      onClick={() => setCurrentStep("information")}
                     >
-                      <PaymentForm
-                        onSuccess={handlePaymentSuccess}
-                        onBack={() => setCurrentStep("shipping")}
-                        isProcessing={isProcessing}
-                        setIsProcessing={setIsProcessing}
-                        error={error}
-                        setError={setError}
-                      />
-                    </Elements>
-                  </CardContent>
-                </Card>
+                      {checkout.delivery.back}
+                    </button>
+                    <button
+                      type="button"
+                      className="rounded-[10px] bg-white px-7 py-4 text-[13px] font-extrabold tracking-[0.06em] text-black transition-colors hover:bg-[#e5e5e5]"
+                      onClick={handleContinueToPayment}
+                    >
+                      {checkout.delivery.next}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3 — Оплата (no payment processing — COD, spec §2) */}
+              {currentStep === "payment" && (
+                <div className="bg-card border-border rounded-[20px] border p-7 lg:p-8">
+                  <h2 className="text-xl font-extrabold">{checkout.payment.heading}</h2>
+
+                  <div className="border-border mt-6 rounded-[14px] border border-white p-5">
+                    <p className="text-[14.5px] font-bold">{checkout.payment.cod.name}</p>
+                    <p className="text-muted-foreground mt-0.5 text-[12.5px]">
+                      {checkout.payment.cod.description}
+                    </p>
+                  </div>
+                  <p className="text-muted-foreground mt-3 text-sm font-semibold">
+                    {checkout.payment.noPrepay}
+                  </p>
+
+                  {/* Content-gated prepay block (spec §2): card details when the
+                      client supplies them, contact-the-manager fallback until then. */}
+                  <div className="bg-muted/40 border-border mt-5 rounded-[14px] border p-5 text-sm">
+                    {checkout.payment.prepay.cardNumber ? (
+                      <>
+                        <p className="font-semibold">{checkout.payment.prepay.cardLabel}</p>
+                        <p className="mt-1 text-base font-extrabold tracking-wider">
+                          {checkout.payment.prepay.cardNumber}
+                        </p>
+                        {checkout.payment.prepay.cardHolder && (
+                          <p className="text-muted-foreground mt-0.5">
+                            {checkout.payment.prepay.cardHolder}
+                          </p>
+                        )}
+                        <p className="text-muted-foreground mt-3">
+                          {checkout.payment.prepay.contactLabel}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-muted-foreground">{checkout.payment.prepay.offer}</p>
+                    )}
+                    <div className="mt-3 flex items-center gap-4">
+                      {checkout.contacts.instagram && (
+                        <a
+                          href={checkout.contacts.instagram}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-foreground hover:text-muted-foreground flex items-center gap-1.5 text-[13px] font-bold transition-colors"
+                        >
+                          <Instagram className="h-4 w-4" /> Instagram
+                        </a>
+                      )}
+                      {checkout.contacts.whatsapp && (
+                        <a
+                          href={checkout.contacts.whatsapp}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-foreground hover:text-muted-foreground flex items-center gap-1.5 text-[13px] font-bold transition-colors"
+                        >
+                          <MessageCircle className="h-4 w-4" /> WhatsApp
+                        </a>
+                      )}
+                      {checkout.contacts.telegram && (
+                        <a
+                          href={checkout.contacts.telegram}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-foreground hover:text-muted-foreground flex items-center gap-1.5 text-[13px] font-bold transition-colors"
+                        >
+                          <Send className="h-4 w-4" /> Telegram
+                        </a>
+                      )}
+                    </div>
+                  </div>
+
+                  {error && (
+                    <div className="bg-destructive/10 text-destructive mt-5 rounded-lg p-4 text-sm">
+                      {error}
+                    </div>
+                  )}
+
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      className="border-border-strong hover:border-muted-foreground rounded-[10px] border px-6 py-4 text-[13px] font-bold transition-colors disabled:opacity-50"
+                      onClick={() => setCurrentStep("shipping")}
+                      disabled={isProcessing}
+                    >
+                      {checkout.payment.back}
+                    </button>
+                    <button
+                      type="button"
+                      className="flex-1 rounded-[10px] bg-white px-7 py-4 text-[13px] font-extrabold tracking-[0.06em] text-black transition-colors hover:bg-[#e5e5e5] disabled:cursor-not-allowed disabled:opacity-50"
+                      onClick={handleSubmitOrder}
+                      disabled={isProcessing}
+                    >
+                      {isProcessing ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          {checkout.payment.submitting}
+                        </span>
+                      ) : (
+                        `${checkout.payment.submit} — ${formatPrice(total)}`
+                      )}
+                    </button>
+                  </div>
+                </div>
               )}
             </form>
           </Form>
         </div>
 
-        {/* Order Summary */}
-        <div className="lg:sticky lg:top-8 lg:self-start">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ShoppingBag className="h-5 w-5" />
-                Order Summary
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="max-h-64 space-y-4 overflow-y-auto">
-                {items.map((item) => (
-                  <div key={`${item.productId}-${item.variantId || ""}`} className="flex gap-4">
+        {/* Ваше замовлення */}
+        <div className="lg:sticky lg:top-24 lg:self-start">
+          <div className="bg-card border-border rounded-[20px] border p-7">
+            <h2 className="text-lg font-extrabold">{checkout.summary.heading}</h2>
+            <div className="mt-5 flex max-h-64 flex-col gap-3.5 overflow-y-auto">
+              {items.map((item) => {
+                const variantLine = [item.color, item.size, checkout.summary.qty(item.quantity)]
+                  .filter(Boolean)
+                  .join(" · ");
+                return (
+                  <div
+                    key={`${item.productId}-${item.variantId || ""}`}
+                    className="flex items-center gap-3.5"
+                  >
                     {item.image ? (
                       <Image
                         src={item.image}
                         alt={item.name}
-                        width={64}
+                        width={56}
                         height={64}
-                        className="h-16 w-16 rounded-md object-cover"
+                        className="h-16 w-14 shrink-0 rounded-[10px] object-cover"
                       />
                     ) : (
-                      <div className="bg-muted flex h-16 w-16 items-center justify-center rounded-md">
-                        <ShoppingBag className="text-muted-foreground h-6 w-6" />
+                      <div className="bg-muted flex h-16 w-14 shrink-0 items-center justify-center rounded-[10px]">
+                        <ShoppingBag className="text-muted-foreground h-5 w-5" />
                       </div>
                     )}
-                    <div className="flex-1">
-                      <p className="line-clamp-2 text-sm font-medium">{item.name}</p>
-                      <p className="text-muted-foreground text-sm">Qty: {item.quantity}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[13.5px] font-bold">{item.name}</p>
+                      <p className="text-muted-foreground text-xs">{variantLine}</p>
                     </div>
-                    <p className="text-sm font-medium">{formatPrice(item.price * item.quantity)}</p>
+                    <p className="text-[13.5px] font-extrabold whitespace-nowrap">
+                      {formatPrice(item.price * item.quantity)}
+                    </p>
                   </div>
-                ))}
+                );
+              })}
+            </div>
+            <div className="border-border mt-5 flex flex-col gap-2.5 border-t pt-4 text-[13.5px]">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">{checkout.summary.itemsLabel}</span>
+                <span className="font-bold whitespace-nowrap">{formatPrice(subtotal)}</span>
               </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span>{formatPrice(subtotal)}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Shipping</span>
-                  <span>
-                    {selectedShipping ? formatPrice(shippingCost) : "Calculated at next step"}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Tax</span>
-                  <span>{formatPrice(0)}</span>
-                </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">{checkout.summary.shippingLabel}</span>
+                <span className="font-bold whitespace-nowrap">{formatPrice(shippingCost)}</span>
               </div>
-
-              <Separator />
-
-              <div className="flex justify-between font-semibold">
-                <span>Total</span>
-                <span>{formatPrice(total)}</span>
+              <div className="mt-1.5 flex justify-between text-base">
+                <span className="font-bold">{checkout.summary.totalLabel}</span>
+                <span className="font-extrabold whitespace-nowrap">{formatPrice(total)}</span>
               </div>
-
-              {orderNumber && (
-                <div className="bg-muted rounded-lg p-3 text-center text-sm">
-                  Order #{orderNumber}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+            </div>
+            <p className="text-muted-foreground mt-4 flex items-center justify-center gap-2 text-xs font-semibold">
+              <Lock className="h-3.5 w-3.5" />
+              {checkout.secureNote}
+            </p>
+          </div>
         </div>
       </div>
     </div>
