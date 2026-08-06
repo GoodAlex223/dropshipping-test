@@ -30,7 +30,7 @@ interface OrderEmailData {
     line2?: string;
     city: string;
     state?: string;
-    postalCode: string;
+    postalCode?: string;
     country: string;
   };
   shippingMethod: string;
@@ -59,7 +59,7 @@ function generateOrderConfirmationHtml(data: OrderEmailData): string {
     ${data.shippingAddress.company ? `${data.shippingAddress.company}<br>` : ""}
     ${data.shippingAddress.line1}<br>
     ${data.shippingAddress.line2 ? `${data.shippingAddress.line2}<br>` : ""}
-    ${data.shippingAddress.city}${data.shippingAddress.state ? `, ${data.shippingAddress.state}` : ""} ${data.shippingAddress.postalCode}<br>
+    ${data.shippingAddress.city}${data.shippingAddress.state ? `, ${data.shippingAddress.state}` : ""} ${data.shippingAddress.postalCode ?? ""}<br>
     ${data.shippingAddress.country}
   `;
 
