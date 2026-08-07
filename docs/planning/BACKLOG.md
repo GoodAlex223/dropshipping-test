@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-08-04
+**Last Updated**: 2026-08-06
 
 ---
 
@@ -639,6 +639,34 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
   our users are coming from" — i.e. TASK-043's promo work is not just a discount mechanism but
   the launch attribution channel. Weight TASK-043's priority accordingly when v1.4 is planned.
   (Med value) `[relates-to: TASK-043]`
+
+### [2026-08-06] From: G2 brainstorm / client steer
+
+- 🟤 **create-order idempotency key** — the COD endpoint has no server-side double-submit
+  protection (the Stripe path had paymentIntent uniqueness); client-side button disabling only.
+  Add an idempotency token when order volume makes duplicates plausible. [G2 spec §4]
+- 🟤 **Dormant Stripe path: retire or revive decision** — `create-payment-intent`,
+  `confirm-order`, `PaymentForm.tsx`, `stripe.ts`, `stripe-client.ts` are unreferenced by the
+  live checkout since G2. Decide at TASK-048 time whether they're the revival base (LiqPay
+  adapter) or dead code to remove. Until then they must stay untouched. [G2 spec §5]
+- 🟤 **Stripe-Elements dark-theme BACKLOG note is moot for checkout** — the existing entry about
+  Elements' dark theme being unverifiable locally no longer applies to the live checkout (no
+  Elements rendered); annotate that entry rather than delete (dormant path may return). [G2]
+- 🔵 **Free-shipping threshold revisit** — with real UAH shipping amounts now charged
+  (80/120/70), the retracted «безкоштовна доставка від X грн» announcement becomes
+  implementable the day the client confirms a threshold (site.ts announcement + shipping.ts
+  price rule + honest copy). Client-gated. [G2 / TASK-056]
+- 🟤 **create-order stock decrement lacks a sufficiency guard** — no `stock: { gte: quantity }`
+  condition; concurrent low-stock COD orders can oversell/drive stock negative. Parity with the
+  dormant confirm-order route, surfaced by Task-4 review. [G2 task-4 review]
+- 🟤 **COD orders store currency "USD" (schema default) on UAH amounts** — create-order doesn't
+  set `Order.currency`; with no Stripe involvement in the COD path the documented USD-mismatch
+  rationale no longer applies. Set `currency: "UAH"` on COD orders when touched next (TASK-048
+  context). [G2 task-4 review]
+- 🟤 **Seed orders lack G2-shaped fixtures** — all 7 seeded orders have `shippingMethod: null`
+  and a legacy address shape (`fullName`/`addressLine1` vs the checkout's `name`/`line1`), so
+  confirmation-page legacy/NP rendering can't be exercised from seed data alone. Add one order
+  with a legacy method id + one NP-era COD order. [G2 task-7 verification]
 
 ---
 

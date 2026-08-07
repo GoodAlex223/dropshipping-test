@@ -34,6 +34,7 @@
 🔵 User · storefront/checkout · **5 SP** · Wed
 
 > Visual + language only per `Mirox Checkout.dc.html`'s shell — the Stripe rails, step logic and order creation stay untouched (payment/delivery integration is TASK-048/049). Risk: Stripe Elements' dark theme is unverifiable locally (no keys — known BACKLOG note); the visual gate covers the rest.
+> **Scope change (client steer, 2026-08-06, ruled in-task)**: launch WITHOUT payment processing — checkout is now a guest-capable no-prepayment COD flow (new `create-order` API, NP methods, content-gated prepay block); Stripe path dormant. 5 SP → ~8 SP. Spec: [2026-08-06-g2-checkout-restyle-cod-design.md](../superpowers/specs/2026-08-06-g2-checkout-restyle-cod-design.md).
 
 - [ ] 3-step checkout restyle + Ukrainian copy (information/shipping/payment steps, PaymentForm labels) — [src/app/(shop)/checkout/page.tsx](<../../src/app/(shop)/checkout/page.tsx>) (3) — BACKLOG [2026-08-04] weekly-planning steer [HIGH]
 - [ ] Shipping methods: replace English "Standard/Express/Overnight" (5.99/12.99/24.99 USD) with Nova-Poshta-style Ukrainian labels; in-task decision on interim numeric amounts (NP published rates 80/120/70 as numerics under the documented Stripe-USD-mismatch convention) — checkout page local list + `SHIPPING_METHODS` in [src/lib/stripe.ts](../../src/lib/stripe.ts) (1) — BACKLOG [2026-07-29] TASK-057 group (checkout pointer)

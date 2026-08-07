@@ -183,9 +183,9 @@ prisma/
     └── subscribers.ts      # Newsletter subscribers with various statuses
 ```
 
-**Key data flow**: Customer checkout -> Stripe payment intent -> Order created -> BullMQ job queued -> Worker forwards to supplier -> Status sync worker polls supplier updates.
+**Key data flow**: Customer checkout -> COD order created directly via `/api/checkout/create-order` (no payment processing since G2, 2026-08-06; Stripe payment-intent path dormant) -> BullMQ job queued -> Worker forwards to supplier -> Status sync worker polls supplier updates.
 
-**Auth flow**: NextAuth v5 with JWT strategy. Middleware protects `/account`, `/checkout` (auth required) and `/admin` (ADMIN role required). API routes use `requireAdmin()` / `requireAuth()` guards from `api-utils.ts`.
+**Auth flow**: NextAuth v5 with JWT strategy. Middleware protects `/account` (auth required) and `/admin` (ADMIN role required); `/checkout` is deliberately public since G2 (guest COD checkout — orders link to the account when a session exists). API routes use `requireAdmin()` / `requireAuth()` guards from `api-utils.ts`.
 
 **Test infrastructure**: Vitest for unit tests (`tests/unit/`), Playwright for E2E (`tests/e2e/`). Test helpers in `tests/helpers/api-test-utils.ts` provide `createNextRequest()` and `createRouteParams()` for API route testing. All API tests mock `@/lib/auth` and `@/lib/db` at module level. E2E tests use global setup validation (`tests/global-setup.ts`) to verify database connectivity and seed data before running.
 

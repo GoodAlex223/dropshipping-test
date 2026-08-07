@@ -12,6 +12,17 @@
 > - ❓ — **not settleable from public sources** (negotiated rates, private SLAs). These require merchant confirmation or a sales quote. **No figure here is a guess** — where we could not verify, we say so instead of filling the gap.
 > - **[live]** — verified _behaviourally_ against a production API rather than a doc page (see §6).
 
+> **Addendum 2026-08-06 (client steer, supersedes the launch sequencing below):** the client
+> directed launching **without any payment processing** — COD at the Nova Poshta branch is the
+> only rail at launch, with optional manual full prepayment via card details shown on the
+> checkout page (content-gated) and manager contacts (Instagram/WhatsApp/Telegram). Implemented
+> in G2 (spec `2026-08-06-g2-checkout-restyle-cod-design.md`): guest checkout, `create-order`
+> API (orders `PENDING`/`cod`), NP-style methods at 80/120/70 грн. The LiqPay/card gateway work
+> (TASK-048) is **deferred until the client asks for online payments**; this doc's gateway
+> analysis remains the blueprint for that day. The document body below is unchanged (frozen).
+> Root CLAUDE.md's auth-flow and key-data-flow lines were corrected in the same change (guest
+> `/checkout`, COD order path).
+
 ## 1. Executive summary & recommendation
 
 Stripe does not onboard Ukrainian merchants, so Mirox Shop needs a Ukrainian gateway. This document settles that choice, scopes Nova Poshta delivery, and fixes the currency strategy, so that TASK-048 and TASK-049 can be planned without re-discovery.
