@@ -183,7 +183,7 @@ prisma/
     └── subscribers.ts      # Newsletter subscribers with various statuses
 ```
 
-**Key data flow**: Customer checkout -> COD order created directly via `/api/checkout/create-order` (no payment processing since G2, 2026-08-06; Stripe payment-intent path dormant) -> BullMQ job queued -> Worker forwards to supplier -> Status sync worker polls supplier updates.
+**Key data flow**: Customer checkout -> COD order created directly via `/api/checkout/create-order` (no payment processing since G2, 2026-08-06; Stripe payment-intent path dormant) -> supplier forwarding is currently a manual admin action (BullMQ auto-queue after checkout is an open BACKLOG item from TASK-031) -> Status sync worker polls supplier updates.
 
 **Auth flow**: NextAuth v5 with JWT strategy. Middleware protects `/account` (auth required) and `/admin` (ADMIN role required); `/checkout` is deliberately public since G2 (guest COD checkout — orders link to the account when a session exists). API routes use `requireAdmin()` / `requireAuth()` guards from `api-utils.ts`.
 
