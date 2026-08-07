@@ -100,6 +100,18 @@ describe("POST /api/checkout/create-order", () => {
     expect(res.status).toBe(400);
   });
 
+  it("only orders active products (isActive gate in the catalog lookup)", async () => {
+    mockTx();
+    await POST(
+      createNextRequest({ url: "/api/checkout/create-order", method: "POST", body: validBody })
+    );
+    expect(mockFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ isActive: true }),
+      })
+    );
+  });
+
   it("creates a guest COD order with PENDING status and server-computed totals", async () => {
     const tx = mockTx();
     const res = await POST(

@@ -642,9 +642,13 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 
 ### [2026-08-06] From: G2 brainstorm / client steer
 
-- 🟤 **create-order idempotency key** — the COD endpoint has no server-side double-submit
+- 🟤 **create-order hardening bundle** — the COD endpoint has no server-side double-submit
   protection (the Stripe path had paymentIntent uniqueness); client-side button disabling only.
-  Add an idempotency token when order volume makes duplicates plausible. [G2 spec §4]
+  When order volume makes abuse plausible, land together: an idempotency token; an
+  ownership/email check on the public confirmation page (order PII currently sits behind the
+  order-number capability URL alone); and a CSPRNG order-number suffix —
+  `generateOrderNumber()` uses `Math.random()` (`stripe.ts:70`, the file's still-live export,
+  so the dormant-file invariant needs a carve-out there). [G2 spec §4 + PR #29 review round 2]
 - 🟤 **Dormant Stripe path: retire or revive decision** — `create-payment-intent`,
   `confirm-order`, `PaymentForm.tsx`, `stripe.ts`, `stripe-client.ts` are unreferenced by the
   live checkout since G2. Decide at TASK-048 time whether they're the revival base (LiqPay
