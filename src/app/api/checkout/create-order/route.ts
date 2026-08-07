@@ -60,10 +60,17 @@ export async function POST(request: NextRequest) {
 
       if (item.variantId) {
         const variant = product.variants.find((v) => v.id === item.variantId);
-        if (variant) {
-          if (variant.price) price = Number(variant.price);
-          variantInfo = `${variant.name}: ${variant.value}`;
+        // A variantId that doesn't resolve within its product is either a stale
+        // cart line or a forged id targeting another product's stock — reject
+        // rather than drop, so a size line never silently disappears (PR #29 r3).
+        if (!variant) {
+          return NextResponse.json(
+            { error: "Invalid variant for ordered product" },
+            { status: 400 }
+          );
         }
+        if (variant.price) price = Number(variant.price);
+        variantInfo = `${variant.name}: ${variant.value}`;
       }
 
       const itemTotal = price * item.quantity;
@@ -122,7 +129,10 @@ export async function POST(request: NextRequest) {
         include: { items: true },
       });
 
-      for (const item of data.items) {
+      // Decrement from the filtered order lines, never the raw client items —
+      // products dropped by the isActive/existence gate must not lose stock
+      // (and a hard-deleted product no longer P2025s the transaction).
+      for (const item of orderItemsData) {
         if (item.variantId) {
           await tx.productVariant.update({
             where: { id: item.variantId },

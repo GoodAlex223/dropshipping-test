@@ -663,10 +663,11 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
   implementable the day the client confirms a threshold (site.ts announcement + shipping.ts
   price rule + honest copy). Client-gated. [G2 / TASK-056]
 - 🟤 **create-order stock decrement lacks a sufficiency guard** — no `stock: { gte: quantity }`
-  condition; concurrent low-stock COD orders can oversell/drive stock negative. Also: `quantity`
-  has no upper bound and the decrement targets client-supplied `variantId` without checking it
-  belongs to the ordered product — both guest-reachable (final-review sharpening). Parity with
-  the dormant confirm-order route, surfaced by Task-4 review. [G2 task-4 review + final review]
+  condition; concurrent low-stock COD orders can oversell/drive stock negative, and `quantity`
+  has no upper bound (guest-reachable). Parity with the dormant confirm-order route, surfaced
+  by Task-4 review. (The variant-ownership half and the phantom-decrement path were FIXED
+  in-branch — PR #29 review round 3: decrement iterates the filtered order lines, foreign
+  `variantId` → 400.) [G2 task-4 review + final review + PR #29 r3]
 - 🟤 **COD orders store currency "USD" (schema default) on UAH amounts** — create-order doesn't
   set `Order.currency`; with no Stripe involvement in the COD path the documented USD-mismatch
   rationale no longer applies. Set `currency: "UAH"` on COD orders when touched next (TASK-048

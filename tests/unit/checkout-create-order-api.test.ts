@@ -100,6 +100,51 @@ describe("POST /api/checkout/create-order", () => {
     expect(res.status).toBe(400);
   });
 
+  it("does not decrement stock for items dropped by the catalog gate", async () => {
+    const tx = mockTx();
+    await POST(
+      createNextRequest({
+        url: "/api/checkout/create-order",
+        method: "POST",
+        body: {
+          ...validBody,
+          items: [
+            { productId: "prod-1", quantity: 2 },
+            { productId: "prod-deactivated", quantity: 5 },
+          ],
+        },
+      })
+    );
+    // findMany (mocked) only returns prod-1 — the dropped item must not reach
+    // the decrement loop as a phantom write.
+    expect(tx.product.update).toHaveBeenCalledTimes(1);
+    expect(tx.product.update).toHaveBeenCalledWith({
+      where: { id: "prod-1" },
+      data: { stock: { decrement: 2 } },
+    });
+  });
+
+  it("returns 400 when a variantId does not belong to the ordered product", async () => {
+    mockFindMany.mockResolvedValue([
+      {
+        ...dbProduct,
+        variants: [{ id: "var-1", name: "Розмір", value: "L", price: 1390 }],
+      },
+    ]);
+    const res = await POST(
+      createNextRequest({
+        url: "/api/checkout/create-order",
+        method: "POST",
+        body: {
+          ...validBody,
+          items: [{ productId: "prod-1", variantId: "var-of-other-product", quantity: 1 }],
+        },
+      })
+    );
+    expect(res.status).toBe(400);
+    expect(mockTransaction).not.toHaveBeenCalled();
+  });
+
   it("only orders active products (isActive gate in the catalog lookup)", async () => {
     mockTx();
     await POST(
