@@ -205,7 +205,7 @@ export default function CheckoutPage() {
             <span className="flex h-6 w-6 items-center justify-center rounded-full border border-white bg-transparent text-[11.5px]">
               <ShoppingBag className="h-3 w-3" />
             </span>
-            {checkout.steps.cart}
+            <span className="hidden sm:inline">{checkout.steps.cart}</span>
           </Link>
           <span className="text-muted-foreground mx-1">→</span>
         </div>
@@ -234,7 +234,7 @@ export default function CheckoutPage() {
                 >
                   {i + 1}
                 </span>
-                {step.label}
+                <span className={isActive ? "" : "hidden sm:inline"}>{step.label}</span>
               </button>
             </div>
           );
