@@ -36,9 +36,11 @@
 > Visual + language only per `Mirox Checkout.dc.html`'s shell — the Stripe rails, step logic and order creation stay untouched (payment/delivery integration is TASK-048/049). Risk: Stripe Elements' dark theme is unverifiable locally (no keys — known BACKLOG note); the visual gate covers the rest.
 > **Scope change (client steer, 2026-08-06, ruled in-task)**: launch WITHOUT payment processing — checkout is now a guest-capable no-prepayment COD flow (new `create-order` API, NP methods, content-gated prepay block); Stripe path dormant. 5 SP → ~8 SP. Spec: [2026-08-06-g2-checkout-restyle-cod-design.md](../superpowers/specs/2026-08-06-g2-checkout-restyle-cod-design.md).
 
-- [ ] 3-step checkout restyle + Ukrainian copy (information/shipping/payment steps, PaymentForm labels) — [src/app/(shop)/checkout/page.tsx](<../../src/app/(shop)/checkout/page.tsx>) (3) — BACKLOG [2026-08-04] weekly-planning steer [HIGH]
-- [ ] Shipping methods: replace English "Standard/Express/Overnight" (5.99/12.99/24.99 USD) with Nova-Poshta-style Ukrainian labels; in-task decision on interim numeric amounts (NP published rates 80/120/70 as numerics under the documented Stripe-USD-mismatch convention) — checkout page local list + `SHIPPING_METHODS` in [src/lib/stripe.ts](../../src/lib/stripe.ts) (1) — BACKLOG [2026-07-29] TASK-057 group (checkout pointer)
-- [ ] Order confirmation page Ukrainian + Mirox alignment — `src/app/(shop)/checkout/confirmation/` (1) — BACKLOG [2026-08-04] weekly-planning steer
+- [x] 3-step checkout restyle + Ukrainian copy (information/shipping/payment steps, PaymentForm labels) — [src/app/(shop)/checkout/page.tsx](<../../src/app/(shop)/checkout/page.tsx>) (3) — BACKLOG [2026-08-04] weekly-planning steer [HIGH]
+- [x] Shipping methods: replace English "Standard/Express/Overnight" (5.99/12.99/24.99 USD) with Nova-Poshta-style Ukrainian labels; in-task decision on interim numeric amounts (NP published rates 80/120/70 as numerics under the documented Stripe-USD-mismatch convention) — checkout page local list + `SHIPPING_METHODS` in [src/lib/stripe.ts](../../src/lib/stripe.ts) (1) — BACKLOG [2026-07-29] TASK-057 group (checkout pointer)
+- [x] Order confirmation page Ukrainian + Mirox alignment — `src/app/(shop)/checkout/confirmation/` (1) — BACKLOG [2026-08-04] weekly-planning steer
+
+> ✅ Shipped 2026-08-07 (Thu, +1 day) — PR [#29](https://github.com/GoodAlex223/dropshipping-test/pull/29) merged `cf308f9`. Delivered the scope-change form: guest COD checkout (no payment processing), NP methods 80/120/70 грн, `create-order` API, UA confirmation page + cart-crumb stepper. Six user-posted review rounds (13 findings fixed incl. isActive gate, phantom decrement, foreign-variantId reject, coded UA errors, cart unavailable-status, quantity cap). Stripe path dormant, zero diff.
 
 ### G3. Params Fix [solo]
 
@@ -100,7 +102,7 @@
 
 ### Wednesday — Checkout + broken routes
 
-- **[G2](#g2-checkout-restyle-batch)** 🔵 — the riskiest restyle, front-loaded.
+- ✅ **[G2](#g2-checkout-restyle-batch)** 🔵 — the riskiest restyle, front-loaded. Shipped Thu 2026-08-07 (+1 day: client COD scope-change absorbed in-task), PR [#29](https://github.com/GoodAlex223/dropshipping-test/pull/29).
 - **[G3](#g3-params-fix-solo)** 🟤 — 4-route `use(params)` fix.
 
 ### Thursday — Peripheral sweep + reviews start
@@ -122,7 +124,7 @@
 | ID  | Group                                  | Domain              | Source      | Tasks  | Total SP | Day     | Status        |
 | --- | -------------------------------------- | ------------------- | ----------- | ------ | -------- | ------- | ------------- |
 | G1  | Cart and Drawer Restyle `[batch]`      | storefront/cart     | 🔵 User     | 3      | 5        | Tue     | ✅ PR #28     |
-| G2  | Checkout Restyle `[batch]`             | storefront/checkout | 🔵 User     | 3      | 5        | Wed     | ☐ Planned     |
+| G2  | Checkout Restyle `[batch]`             | storefront/checkout | 🔵 User     | 3      | 5        | Wed     | ✅ PR #29     |
 | G3  | Params Fix `[solo]`                    | Next.js routing     | 🟤 Auto     | 1      | 2        | Wed     | ☐ Planned     |
 | G4  | Peripheral Surfaces Sweep `[batch]`    | auth/account/system | 🔵 User     | 3      | 5        | Thu     | ☐ Planned     |
 | G5  | Transactional Emails `[solo]` 🏆       | email templates     | 🔵 User     | 2      | 3        | Fri     | ☐ Planned     |

@@ -2,11 +2,32 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-08-04
+**Last Updated**: 2026-08-07
 
 ---
 
 ## 2026-08 (August)
+
+### [2026-08-07] G2 - Checkout Restyle + No-Prepayment COD Flow (WEEKLY batch)
+
+**Plan**: [docs/archive/plans/2026-08-06_g2-checkout-restyle.md](../archive/plans/2026-08-06_g2-checkout-restyle.md)
+**Spec**: [2026-08-06-g2-checkout-restyle-cod-design.md](../superpowers/specs/2026-08-06-g2-checkout-restyle-cod-design.md) (§4 carries a round-4 superseding note)
+**PR**: [#29](https://github.com/GoodAlex223/dropshipping-test/pull/29) — merged `cf308f9` (2026-08-07)
+**SDD ledger**: `.superpowers/sdd/2026-08-06_g2-checkout-restyle/progress.md` (removed post-completion; PR carries the review arc)
+
+**Summary**: `/checkout` rebuilt to `Mirox Checkout.dc.html` as a **guest-capable, no-prepayment COD flow** — a mid-brainstorm client steer (2026-08-06: "no payment processing; COD at the post office; optional manual prepay; manager contacts") superseded the planned visual-only scope (5 SP → ~8). Three steps regrouped per handoff: «Контакти» (ім'я/телефон/email; phone now **required** — COD's fulfillment channel) → «Доставка» (NP methods «відділення» 80 / «кур'єр» 120 / «поштомат» 70 грн via new `src/lib/shipping.ts`, місто + відділення + comment) → «Оплата» (COD pre-selected, «Працюємо без передоплати», content-gated prepay-card block + manager contacts — cardNumber/WhatsApp null until the client supplies them via TASK-056). New guest `POST /api/checkout/create-order` (orders `PENDING`/`cod`, DB-recomputed UAH totals, transactional stock decrement); `/checkout` public in middleware; **Stripe path dormant with verified zero diff**. Confirmation page fully Ukrainian (COD payment line, `getShippingMethodLabel()` legacy lookup, order-comment block, guest-aware CTA); cart stepper crumb «Кошик»; cart shipping row flipped to «За тарифами Нової Пошти»; Ukraine-fixed slim address form (hidden `country: "UA"`, postalCode optional, no oblast/company/line2 rendered). New `src/content/checkout.ts` content module (TASK-039 extraction point).
+
+**Key changes**:
+
+- 20 commits; unit tests 606 → **632** (+1 todo; route suite 14 tests); new `checkout.spec.ts` E2E (guest no-redirect, full COD round-trip to a real PENDING order, UA validation errors) — 45/45 across all five local browser projects, chromium+webkit in CI
+- Executed subagent-driven (9 tasks, per-task reviews, 2 task-level fix rounds), final whole-branch review (fable) + one fix wave; user visual gate passed with fixes (mirox_shop handles, cart-badge hydration mount-gate, mobile stepper label collapse, crumb aria-label); post-gate Q&A ruled guest-tracking/NP-dropdown/email-config/variant-rename follow-ups into BACKLOG
+- **PR review: six user-posted rounds, 13 findings fixed** — r1: WhatsApp dead-link null-gating + `np-office Shipping` email concat (+ `capitalize` Cyrillic distortion); r2: `isActive` gate restored (transient schema coupling with dormant `create-payment-intent` ruled acceptable — branch merges atomically); r3: phantom stock decrement (loop walked raw client items post-gate) + foreign-`variantId` arbitrary-decrement primitive (reject-over-drop); r4: coded errors + UA map (EN strings were unreachable-fallback), silent product-drop → whole-order 400 (spec §4 superseded); r5: cart's missing `isAvailable === false` status (deactivated-with-stock dead-end loop) + user copy off `err.message` (browser-English TypeErrors) + React-Compiler lint cascade (`useWatch`, `useSyncExternalStore` hydration gate); r6 (final, clean): quantity `.max(100)` split from the sufficiency guard, BACKLOG census/trigger corrections
+- Docs in-branch: WEEKLY scope-change note, payments-decision-doc addendum (TASK-048 deferred until the client asks for online payments), 12+ BACKLOG rows (hardening bundle with before-real-traffic ownership check, compiler-lint sweep census, guest order tracking, NP branch dropdown → TASK-049, prod email config → G5, variant-name rename), 2 TASK-056 asks (prepay card details, WhatsApp number), root CLAUDE.md propagation (COD capabilities/data-flow/auth-flow, module tree)
+- EXTRACT quota: ≥2 satisfied many times over by the in-branch BACKLOG intake groups `[2026-08-06]` and `[2026-08-07]`
+
+**Learnings**: a filter added to a lookup must be followed through every consumer of the unfiltered collection (r2's `isActive` fix moved the bug into a phantom decrement instead of closing it); a mid-branch guard can invert the premise of an earlier same-branch design decision (the silent-skip parity died the moment deactivation became the routine trigger); compiler-backed lint rules report one diagnostic per file per pass — clean lint on HEAD does not mean the file is diagnostic-free after an edit (r5's cascade: `form.watch` warning, then a `set-state-in-effect` error, each surfaced only after the prior fix).
+
+---
 
 ### [2026-08-04] G1 - Cart & Drawer Restyle (WEEKLY batch)
 

@@ -56,7 +56,7 @@ app/
 │   ├── auth/              # NextAuth route handler
 │   ├── cart/validate/     # Cart validation
 │   ├── categories/        # Public category API
-│   ├── checkout/          # Payment intent + order confirmation
+│   ├── checkout/          # create-order (guest COD, live) + dormant payment-intent/confirm-order (Stripe, since G2)
 │   ├── health/            # Health check endpoint
 │   ├── newsletter/        # Public newsletter endpoints
 │   │   ├── subscribe/route.ts    # POST (create subscriber, send confirmation)
@@ -111,7 +111,7 @@ app/
 - `@prisma/client` — Database queries in API routes
 - `stripe` — Server-side payment processing
 - `zod` — Request validation in API routes
-- `bullmq` — Queue job creation in checkout flow
+- `bullmq` — Supplier-order queue (jobs enqueued manually from admin; NOT wired into checkout — see BACKLOG TASK-031 item)
 - `next/og` — Open Graph image generation (`ImageResponse`)
 
 <!-- END AUTO-MANAGED -->

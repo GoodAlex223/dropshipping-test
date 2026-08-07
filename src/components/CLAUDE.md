@@ -24,7 +24,7 @@ components/
 │   ├── PurchaseTracker.tsx  # One-time purchase event tracker (useRef pattern)
 │   └── WebVitalsReporter.tsx  # Core Web Vitals tracking to GA4 (dynamic import, client-only)
 ├── checkout/
-│   ├── PaymentForm.tsx    # Stripe Elements payment form
+│   ├── PaymentForm.tsx    # Stripe Elements payment form (dormant since G2 — unreferenced by the live COD checkout)
 │   └── index.ts
 ├── common/
 │   ├── Header.tsx         # Site header with nav, cart, auth
