@@ -4,8 +4,10 @@ import { NextResponse } from "next/server";
 // Force Node.js runtime for crypto module compatibility with NextAuth
 export const runtime = "nodejs";
 
-// Routes that require authentication
-const protectedRoutes = ["/account", "/checkout"];
+// Routes that require authentication. /checkout is deliberately public —
+// guest COD checkout (G2 spec §5); orders still link to the account when a
+// session exists.
+const protectedRoutes = ["/account"];
 
 // Routes that require admin role
 const adminRoutes = ["/admin"];

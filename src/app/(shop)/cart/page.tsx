@@ -104,6 +104,10 @@ export default function CartPage() {
       if (info.currentStock === 0) return { type: "error", message: cart.stock.outOfStock };
       if (info.currentStock < item.quantity)
         return { type: "warning", message: cart.stock.onlyN(info.currentStock) };
+      // Deactivated product with stock remaining: validate reports unavailable
+      // but neither stock branch fires — without this the line looks fine here
+      // while checkout 400s PRODUCT_UNAVAILABLE in a loop (PR #29 r5).
+      return { type: "error", message: cart.stock.unavailable };
     }
     return null;
   };

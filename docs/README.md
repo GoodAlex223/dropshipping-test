@@ -2,7 +2,7 @@
 
 Central index for all project documentation.
 
-**Last Updated**: 2026-08-04
+**Last Updated**: 2026-08-06
 
 ---
 
@@ -33,10 +33,10 @@ Central index for all project documentation.
 | Document                                                                                                             | Purpose                                                                       | Last Updated |
 | -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------ |
 | [planning/README.md](planning/README.md)                                                                             | Planning overview                                                             | 2026-01-05   |
-| [planning/WEEKLY.md](planning/WEEKLY.md)                                                                             | Current week's plan                                                           | 2026-08-04   |
-| [planning/TODO.md](planning/TODO.md)                                                                                 | Active tasks                                                                  | 2026-08-04   |
+| [planning/WEEKLY.md](planning/WEEKLY.md)                                                                             | Current week's plan                                                           | 2026-08-06   |
+| [planning/TODO.md](planning/TODO.md)                                                                                 | Active tasks                                                                  | 2026-08-06   |
 | [planning/DONE.md](planning/DONE.md)                                                                                 | Completed tasks                                                               | 2026-08-04   |
-| [planning/BACKLOG.md](planning/BACKLOG.md)                                                                           | Unprioritized ideas                                                           | 2026-08-04   |
+| [planning/BACKLOG.md](planning/BACKLOG.md)                                                                           | Unprioritized ideas                                                           | 2026-08-07   |
 | [planning/ROADMAP.md](planning/ROADMAP.md)                                                                           | Long-term vision                                                              | 2026-07-14   |
 | [planning/GOALS.md](planning/GOALS.md)                                                                               | Objectives & metrics                                                          | 2026-01-26   |
 | [planning/MILESTONES.md](planning/MILESTONES.md)                                                                     | Key targets                                                                   | 2026-01-26   |
@@ -59,6 +59,7 @@ Central index for all project documentation.
 | [superpowers/specs/2026-07-31-task-036-catalog-redesign-design.md](superpowers/specs/2026-07-31-task-036-catalog-redesign-design.md)           | TASK-036 design: catalog filter bar, 4-sort set incl. Популярні, card quick-view/quick-buy, image carousel, hydration-gate preservation (§8a revision round)                                           | 2026-08-01   |
 | [superpowers/specs/2026-08-01-task-037-product-page-redesign-design.md](superpowers/specs/2026-08-01-task-037-product-page-redesign-design.md) | TASK-037 design: PDP rebuild to `Mirox Product.dc.html` — gallery/buy panel, `styleGroup` colorway siblings, SizePicker, honest-sum BoughtTogether, RecentlyViewed, reviews restyle, deviations ledger | 2026-08-01   |
 | [superpowers/specs/2026-08-04-cart-drawer-restyle-design.md](superpowers/specs/2026-08-04-cart-drawer-restyle-design.md)                       | G1 design: cart page + CartDrawer restyle to `Mirox Cart.dc.html` — staleness audit, cart content module, `CartItem` color/size, neutral shipping copy, promo-field exclusion                          | 2026-08-04   |
+| [superpowers/specs/2026-08-06-g2-checkout-restyle-cod-design.md](superpowers/specs/2026-08-06-g2-checkout-restyle-cod-design.md)               | **G2 design**: checkout restyle to `Mirox Checkout.dc.html` + no-prepayment COD flow (client steer 2026-08-06) — NP shipping methods, guest checkout, `create-order` API, content-gated prepay block   | 2026-08-06   |
 | [design/design_handoff_mirox/README.md](design/design_handoff_mirox/README.md)                                                                 | **Design handoff** — 7 HTML screen prototypes (Home/Catalog/Product/Cart/Checkout/Contacts/Mobile) + design spec, reconstructed from the client mockup and client-approved                             | 2026-07-27   |
 | [reference/client-brief.md](reference/client-brief.md)                                                                                         | **Client brief (verbatim)** — Mirox Shop requirement lists #1 and #2, RU + EN                                                                                                                          | 2026-07-19   |
 

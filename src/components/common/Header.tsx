@@ -49,6 +49,7 @@ export function Header() {
   const { data: session, status } = useSession();
   const { getTotalItems, openCart } = useCartStore();
   const totalItems = getTotalItems();
+  const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -57,6 +58,10 @@ export function Header() {
   const [categories, setCategories] = useState<Category[]>([]);
 
   const debouncedQuery = useDebounce(searchQuery, 300);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Fetch categories for navigation
   useEffect(() => {
@@ -477,7 +482,7 @@ export function Header() {
 
           <Button variant="ghost" size="icon" className="relative" onClick={openCart}>
             <ShoppingCart className="h-5 w-5" />
-            {totalItems > 0 && (
+            {mounted && totalItems > 0 && (
               <span className="bg-primary text-primary-foreground absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-xs">
                 {totalItems > 99 ? "99+" : totalItems}
               </span>

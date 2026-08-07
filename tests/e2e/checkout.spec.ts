@@ -1,0 +1,87 @@
+import { test, expect } from "@playwright/test";
+
+// Guest COD checkout flow (G2). The checkout page renders a loader until the
+// client mounts (mounted gate), so form fields existing at all implies
+// hydration — no pre-hydration fill risk (WebKit lesson: never fill() before
+// a hydration-only render signal).
+test.describe("Checkout (guest COD)", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => localStorage.clear());
+  });
+
+  test("guest reaches checkout without a login redirect", async ({ page }) => {
+    await page.goto("/checkout");
+    await expect(page).toHaveURL(/\/checkout/);
+    // Empty cart → Ukrainian empty state (still proves no auth redirect)
+    await expect(page.getByText(/кошик порожній/i)).toBeVisible();
+  });
+
+  test("guest can place a COD order end-to-end", async ({ page }) => {
+    // Add a product to the cart (same pattern as cart.spec.ts: click the
+    // card heading, not the card center — quick-view overlay).
+    await page.goto("/products");
+    await page.waitForSelector("[data-testid='product-card']");
+    await Promise.all([
+      page.waitForURL(/\/products\/[^/]+$/),
+      page.locator("[data-testid='product-card']").first().getByRole("heading").click(),
+    ]);
+    await page.waitForSelector('[data-hydrated="true"]');
+    await page.getByRole("button", { name: /^додати в кошик$/i }).click();
+    await expect(page.getByRole("button", { name: /додано в кошик/i })).toBeVisible({
+      timeout: 5000,
+    });
+
+    await page.goto("/checkout");
+
+    // Step 1 — Контакти (fields only exist post-mount, so fill is safe)
+    await page.getByLabel(/^ім'я$/i).fill("Тест Тестовий");
+    await page.getByLabel(/^телефон$/i).fill("+380501234567");
+    await page.getByLabel(/^email$/i).fill("guest-e2e@example.com");
+    await page.getByRole("button", { name: /далі — доставка/i }).click();
+
+    // Step 2 — Доставка (np-office pre-selected; fill city + branch)
+    await expect(page.getByText("Нова Пошта — відділення")).toBeVisible();
+    await page.getByLabel(/^місто$/i).fill("Київ");
+    await page.getByLabel(/відділення \/ адреса/i).fill("Відділення №12");
+    await page.getByRole("button", { name: /далі — оплата/i }).click();
+
+    // Step 3 — Оплата (COD, no payment processing)
+    await expect(page.getByText(/працюємо без передоплати/i)).toBeVisible();
+    await page.getByRole("button", { name: /підтвердити замовлення/i }).click();
+
+    // Confirmation — a real PENDING order was created
+    await page.waitForURL(/\/checkout\/confirmation\?order=/, { timeout: 15000 });
+    await expect(page.getByText(/замовлення прийнято/i)).toBeVisible();
+    // Deviation from the task-8 brief's verbatim /оплата при отриманні/i: the
+    // site-wide Footer BenefitStrip (src/content/site.ts footerBenefits) also
+    // renders the exact title "Оплата при отриманні" on every page, so that
+    // regex is a strict-mode violation (2 matches) here — confirmed failing
+    // identically on all 5 local browser projects, not a browser flake.
+    // Matching the confirmation page's own longer copy («…у відділенні»,
+    // checkout.confirmation.paymentCod) is unique and also asserts the
+    // specific order.paymentMethod === "cod" branch, not just any COD text
+    // on the page.
+    await expect(page.getByText(/оплата при отриманні у відділенні/i)).toBeVisible();
+  });
+
+  test("step 1 shows Ukrainian validation errors on empty submit", async ({ page }) => {
+    // Need a non-empty cart to see the form at all
+    await page.goto("/products");
+    await page.waitForSelector("[data-testid='product-card']");
+    await Promise.all([
+      page.waitForURL(/\/products\/[^/]+$/),
+      page.locator("[data-testid='product-card']").first().getByRole("heading").click(),
+    ]);
+    await page.waitForSelector('[data-hydrated="true"]');
+    await page.getByRole("button", { name: /^додати в кошик$/i }).click();
+    await expect(page.getByRole("button", { name: /додано в кошик/i })).toBeVisible({
+      timeout: 5000,
+    });
+
+    await page.goto("/checkout");
+    await page.getByRole("button", { name: /далі — доставка/i }).click();
+    await expect(page.getByText("Вкажіть ім'я")).toBeVisible();
+    await expect(page.getByText("Вкажіть номер телефону")).toBeVisible();
+  });
+});

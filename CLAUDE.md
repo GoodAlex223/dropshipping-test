@@ -14,8 +14,8 @@ Key capabilities:
 - Admin panel for products, categories, orders, customers, suppliers, reviews, and newsletter subscribers
 - Product review system with verified purchase requirements, star ratings, and admin reply functionality
 - Newsletter subscription with double opt-in email confirmation and admin management
-- Stripe payment integration
-- Automated order forwarding to suppliers via background workers (BullMQ)
+- No-prepayment COD checkout (guest-capable, Nova Poshta delivery methods; Stripe integration dormant since G2, 2026-08-06)
+- Order forwarding to suppliers via background workers (BullMQ; jobs queued manually from admin — auto-queue after checkout is BACKLOG'd)
 - CSV product import, S3 image storage, email notifications (Resend)
 - Multi-theme showcase system (bold, luxury, organic design variants)
 - SEO with dynamic sitemap, robots.txt, dynamic Open Graph images, Google Shopping XML feed, and review-based JSON-LD structured data
@@ -119,6 +119,7 @@ src/
 ├── content/                # Typed content-config layer (Ukrainian copy, extraction-ready for TASK-039 i18n)
 │   ├── brand.ts            # Brand name/tagline constants — deliberately import-free (consumed by seo.ts)
 │   ├── cart.ts             # Cart + CartDrawer copy (summary/empty/clear/stock strings, itemsCount plural via pluralizeUk)
+│   ├── checkout.ts         # Checkout + confirmation copy (steps, COD/prepay block config, manager contacts — cardNumber/whatsapp are CLIENT-SUPPLIED-pending)
 │   ├── home.ts             # Homepage copy (hero, benefits, whyChooseUs, rails, testimonials)
 │   └── site.ts             # Site-wide config (announcement, socials, client claims, footer benefits)
 ├── hooks/                  # Custom React hooks (use-debounce, use-toast)
@@ -126,8 +127,9 @@ src/
 │   ├── auth.ts             # NextAuth v5 config (JWT + Prisma adapter)
 │   ├── db.ts               # Prisma client (Neon adapter for prod)
 │   ├── api-utils.ts        # API response helpers, auth guards
-│   ├── stripe.ts           # Stripe server-side
-│   ├── stripe-client.ts    # Stripe client-side
+│   ├── stripe.ts           # Stripe server-side (payment-intent path dormant since G2; generateOrderNumber still live)
+│   ├── stripe-client.ts    # Stripe client-side (dormant since G2)
+│   ├── shipping.ts         # Nova Poshta delivery methods (np-office/np-courier/np-postomat, UAH) + legacy label lookup
 │   ├── email.ts            # Resend email service (order confirmations, newsletter)
 │   ├── format.ts           # formatPrice() — the only sanctioned UAH price formatter (uk-UA, Intl.NumberFormat)
 │   ├── newsletter.ts       # Newsletter utilities (token generation, URL builders, HMAC unsubscribe)
@@ -183,9 +185,9 @@ prisma/
     └── subscribers.ts      # Newsletter subscribers with various statuses
 ```
 
-**Key data flow**: Customer checkout -> Stripe payment intent -> Order created -> BullMQ job queued -> Worker forwards to supplier -> Status sync worker polls supplier updates.
+**Key data flow**: Customer checkout -> COD order created directly via `/api/checkout/create-order` (no payment processing since G2, 2026-08-06; Stripe payment-intent path dormant) -> supplier forwarding is currently a manual admin action (BullMQ auto-queue after checkout is an open BACKLOG item from TASK-031) -> Status sync worker polls supplier updates.
 
-**Auth flow**: NextAuth v5 with JWT strategy. Middleware protects `/account`, `/checkout` (auth required) and `/admin` (ADMIN role required). API routes use `requireAdmin()` / `requireAuth()` guards from `api-utils.ts`.
+**Auth flow**: NextAuth v5 with JWT strategy. Middleware protects `/account` (auth required) and `/admin` (ADMIN role required); `/checkout` is deliberately public since G2 (guest COD checkout — orders link to the account when a session exists). API routes use `requireAdmin()` / `requireAuth()` guards from `api-utils.ts`.
 
 **Test infrastructure**: Vitest for unit tests (`tests/unit/`), Playwright for E2E (`tests/e2e/`). Test helpers in `tests/helpers/api-test-utils.ts` provide `createNextRequest()` and `createRouteParams()` for API route testing. All API tests mock `@/lib/auth` and `@/lib/db` at module level. E2E tests use global setup validation (`tests/global-setup.ts`) to verify database connectivity and seed data before running.
 

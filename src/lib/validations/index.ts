@@ -67,23 +67,25 @@ export const updateCartItemSchema = z.object({
   quantity: z.number().int().positive("Quantity must be at least 1"),
 });
 
-// Checkout validations
+// Checkout validations — G2 slim UA form (spec §7): phone is the COD
+// fulfillment channel (required); NP branch number replaces the postal code
+// (optional); country stays required — the client always submits "UA".
 export const shippingAddressSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  name: z.string().min(1, "Вкажіть ім'я"),
   company: z.string().optional(),
-  line1: z.string().min(1, "Address is required"),
+  line1: z.string().min(1, "Вкажіть відділення або адресу"),
   line2: z.string().optional(),
-  city: z.string().min(1, "City is required"),
+  city: z.string().min(1, "Вкажіть місто"),
   state: z.string().optional(),
-  postalCode: z.string().min(1, "Postal code is required"),
-  country: z.string().min(2, "Country is required"),
-  phone: z.string().optional(),
+  postalCode: z.string().optional(),
+  country: z.string().min(2, "Вкажіть країну"),
+  phone: z.string().min(1, "Вкажіть номер телефону"),
 });
 
 export const checkoutSchema = z.object({
-  email: z.string().email("Invalid email address"),
+  email: z.string().email("Введіть коректну email-адресу"),
   shippingAddress: shippingAddressSchema,
-  shippingMethod: z.string().min(1, "Shipping method is required"),
+  shippingMethod: z.string().min(1, "Оберіть спосіб доставки"),
   customerNotes: z.string().max(500).optional(),
 });
 

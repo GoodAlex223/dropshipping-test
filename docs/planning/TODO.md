@@ -1,6 +1,6 @@
 # TODO
 
-**Last Updated**: 2026-08-04
+**Last Updated**: 2026-08-06
 
 Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-shop-program-design.md) · Current week: [WEEKLY.md](WEEKLY.md)
 
@@ -96,3 +96,7 @@ _None._
 - [ ] Contact details (phone/email/address) for the `/contact` page (feeds TASK-055)
 - [ ] Size charts (feeds TASK-037/TASK-045 — `SizePicker.tsx`'s height/weight formula is an interim placeholder until these arrive; **the PDP's «Відкрити фото замірів» button was omitted by TASK-037 (spec §7 ledger #3) and gets restored when measurement photos arrive with these charts**)
 - [ ] Legal-page content or lawyer engagement (feeds TASK-055)
+- [ ] Bank-card details for the checkout prepay block (card number + holder name) — lights up
+      `src/content/checkout.ts` `payment.prepay` (G2, 2026-08-06)
+- [ ] WhatsApp contact number/link for checkout manager contacts — `src/content/checkout.ts`
+      `contacts.whatsapp` (G2, 2026-08-06)

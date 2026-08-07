@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-08-04
+**Last Updated**: 2026-08-07
 
 ---
 
@@ -639,6 +639,79 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
   our users are coming from" — i.e. TASK-043's promo work is not just a discount mechanism but
   the launch attribution channel. Weight TASK-043's priority accordingly when v1.4 is planned.
   (Med value) `[relates-to: TASK-043]`
+
+### [2026-08-06] From: G2 brainstorm / client steer
+
+- 🟤 **create-order hardening bundle** — the COD endpoint has no server-side double-submit
+  protection (the Stripe path had paymentIntent uniqueness); client-side button disabling only.
+  When order volume makes abuse plausible, land: an idempotency token and a CSPRNG order-number
+  suffix — `generateOrderNumber()` uses `Math.random()` (`stripe.ts:70`, the file's still-live
+  export, so the dormant-file invariant needs a carve-out there). **Different trigger for the
+  ownership/email check on the public confirmation page**: order PII sits behind the
+  order-number capability URL alone, so that piece is a privacy item and must land **before
+  real customer traffic**, not on the volume trigger (PR #29 r6 caveat).
+  [G2 spec §4 + PR #29 review rounds 2/6]
+- 🟤 **Dormant Stripe path: retire or revive decision** — `create-payment-intent`,
+  `confirm-order`, `PaymentForm.tsx`, `stripe.ts`, `stripe-client.ts` are unreferenced by the
+  live checkout since G2. Decide at TASK-048 time whether they're the revival base (LiqPay
+  adapter) or dead code to remove. Until then they must stay untouched. On revival, re-audit
+  phone requiredness: `create-payment-intent` inherits the shared `checkoutSchema`, whose
+  `phone` became required in G2. [G2 spec §5]
+- 🟤 **Stripe-Elements dark-theme BACKLOG note is moot for checkout** — the existing entry about
+  Elements' dark theme being unverifiable locally no longer applies to the live checkout (no
+  Elements rendered); annotate that entry rather than delete (dormant path may return). [G2]
+- 🔵 **Free-shipping threshold revisit** — with real UAH shipping amounts now charged
+  (80/120/70), the retracted «безкоштовна доставка від X грн» announcement becomes
+  implementable the day the client confirms a threshold (site.ts announcement + shipping.ts
+  price rule + honest copy). Client-gated. [G2 / TASK-056]
+- 🟤 **create-order stock decrement lacks a sufficiency guard** — no `stock: { gte: quantity }`
+  condition; concurrent low-stock COD orders can oversell/drive stock negative. A correct fix
+  needs conditional updates + rollback semantics, not a one-liner (PR #29 r6 ruling). (Fixed
+  in-branch along the way: variant-ownership + phantom-decrement — r3; per-line `quantity`
+  `.max(100)` cap — r6.) [G2 task-4 review + final review + PR #29 r3/r6]
+- 🟤 **COD orders store currency "USD" (schema default) on UAH amounts** — create-order doesn't
+  set `Order.currency`; with no Stripe involvement in the COD path the documented USD-mismatch
+  rationale no longer applies. Set `currency: "UAH"` on COD orders when touched next (TASK-048
+  context). [G2 task-4 review]
+- 🟤 **Seed orders lack G2-shaped fixtures** — all 7 seeded orders have `shippingMethod: null`
+  and a legacy address shape (`fullName`/`addressLine1` vs the checkout's `name`/`line1`), so
+  confirmation-page legacy/NP rendering can't be exercised from seed data alone. Add one order
+  with a legacy method id + one NP-era COD order. [G2 task-7 verification]
+
+### [2026-08-07] From: G2 post-gate review (user Q&A)
+
+- 🔵 **Guest order tracking** — guest COD orders (`userId: null`) are invisible in
+  `/account/orders`; the confirmation CTA is now hidden for guests, but there is no way for a
+  guest to check an order later. Add lookup by order number + email, and/or claim-by-email on
+  registration. Recommended before real launch. (High value, Med effort) [user Q4, 2026-08-07]
+- 🔵 **Nova Poshta branch drop-down selector** — replace the free-text «Відділення / адреса»
+  with the standard city → warehouse-list picker driven by the NP address API (needs the
+  client's NP API key). Explicit scope addition for the delivery integration task. (High value)
+  `[relates-to: TASK-049]` [user Q1, 2026-08-07]
+- 🔵 **Verify prod email config** — order emails silently skip when `RESEND_API_KEY` is unset
+  (by design); confirm the key + `EMAIL_FROM` on a Resend-verified domain exist in Vercel prod
+  env, else receipts never send. Natural home: G5 transactional-emails group. (High value, Low
+  effort) [user Q6, 2026-08-07]
+- 🟤 **Variant-name UA rename task** — seed variants are `"Size"`/`"Color"`, so receipts/emails
+  show «Size: M» on Ukrainian pages. Renaming is NOT seed-only: 12+ call sites filter by
+  `v.name === "Size"/"Color"` (ProductCard, QuickViewDialog, PDP page + client, styleGroup
+  colorway lookups). Needs: seed rename to «Розмір»/«Колір» + all call sites (or a
+  variant-name constant) + user-gated prod re-seed. (Med value, Med effort)
+  `[relates-to: TASK-039]` [G2 gate comment ruled hold-off, 2026-08-07]
+- 🟤 **eslint flat-config `globalIgnores` misses `playwright-report/`** — when the E2E artifact
+  dir exists locally, repo-wide lint drowns in thousands of phantom errors from generated JS
+  (same failure class as the PR #24 vendor-JS lesson). Add the dir to `globalIgnores` in
+  `eslint.config.mjs`. (Low effort) [G2 post-gate fix wave, 2026-08-07]
+- 🟤 **React-Compiler lint diagnostics surface lazily on edit** — the compiler-backed
+  react-hooks rules bail per-component and report one diagnostic at a time, so editing a file
+  can surface errors that were latent on the previous commit (PR #29 r5: `form.watch` →
+  `incompatible-library` warning, then `setMounted`-in-effect → `set-state-in-effect` ERROR,
+  each only after the prior fix). Checkout page now uses `useWatch` + a `useSyncExternalStore`
+  hydration gate. Corrected census (r6): five hydration-gate sites remain — four already carry
+  `eslint-disable-line react-hooks/set-state-in-effect` suppressions (cart page, CookieConsent,
+  CartDrawer, product-detail-client's `setHydrated`) and only Header.tsx is unsuppressed/latent.
+  Sweep = replace four suppressions with the `useSyncExternalStore` gate + fix Header.
+  (Med value, Low effort) [PR #29 review rounds 5–6, 2026-08-07]
 
 ---
 

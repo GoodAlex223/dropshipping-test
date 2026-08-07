@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 import { generateNewsletterConfirmationHtml } from "./email-templates/newsletter-confirmation";
 import { formatPrice } from "./format";
+import { getShippingMethodLabel } from "./shipping";
 
 const resendApiKey = process.env.RESEND_API_KEY;
 const emailFrom = process.env.EMAIL_FROM || "noreply@yourdomain.com";
@@ -30,7 +31,7 @@ interface OrderEmailData {
     line2?: string;
     city: string;
     state?: string;
-    postalCode: string;
+    postalCode?: string;
     country: string;
   };
   shippingMethod: string;
@@ -59,7 +60,7 @@ function generateOrderConfirmationHtml(data: OrderEmailData): string {
     ${data.shippingAddress.company ? `${data.shippingAddress.company}<br>` : ""}
     ${data.shippingAddress.line1}<br>
     ${data.shippingAddress.line2 ? `${data.shippingAddress.line2}<br>` : ""}
-    ${data.shippingAddress.city}${data.shippingAddress.state ? `, ${data.shippingAddress.state}` : ""} ${data.shippingAddress.postalCode}<br>
+    ${data.shippingAddress.city}${data.shippingAddress.state ? `, ${data.shippingAddress.state}` : ""} ${data.shippingAddress.postalCode ?? ""}<br>
     ${data.shippingAddress.country}
   `;
 
@@ -122,8 +123,8 @@ function generateOrderConfirmationHtml(data: OrderEmailData): string {
     </div>
     <div>
       <h3 style="margin: 0 0 8px 0; font-size: 14px; color: #6b7280;">Shipping Method</h3>
-      <p style="margin: 0; font-size: 14px; text-transform: capitalize;">
-        ${data.shippingMethod.replace("_", " ")} Shipping
+      <p style="margin: 0; font-size: 14px;">
+        ${getShippingMethodLabel(data.shippingMethod)}
       </p>
     </div>
   </div>

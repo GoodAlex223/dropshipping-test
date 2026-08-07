@@ -83,9 +83,9 @@ describe("cart content", () => {
     expect(cart.itemsCount(11)).toBe("11 товарів");
   });
 
-  it("keeps the shipping row neutral until G2 ships NP-style methods", () => {
-    expect(cart.summary.shippingValue).toBe("Розраховується при оформленні");
-    expect(cart.summary.shippingValue).not.toMatch(/Нової Пошти/i);
+  it("flips the shipping row to NP tariffs now that G2 ships real methods", () => {
+    expect(cart.summary.shippingValue).toBe("За тарифами Нової Пошти");
+    expect(cart.summary.shippingValue).toMatch(/Нової Пошти/i);
   });
 
   it("shares the uppercase checkout CTA across page and drawer", () => {
