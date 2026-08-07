@@ -118,6 +118,13 @@ disables the submit button while processing — parity with today's double-submi
 rate limiting (none exists on sibling routes); item-vanished-at-submit behavior stays parity
 with confirm-order (missing product skipped from the order).
 
+> **Superseded (PR #29 review round 4, 2026-08-07):** the silent-skip parity above was written
+> when "item vanished" meant a rare hard delete. The round-2 `isActive` gate made routine
+> deactivation the trigger, so silently skipping an item would routinely alter the total the
+> customer approved. The route now rejects the whole order with a coded 400
+> (`PRODUCT_UNAVAILABLE`, mapped to Ukrainian copy client-side); the idempotency/rate-limit
+> gaps above still stand.
+
 ## 5. Dormant Stripe path
 
 Untouched and unreferenced by the live checkout: `api/checkout/create-payment-intent`,

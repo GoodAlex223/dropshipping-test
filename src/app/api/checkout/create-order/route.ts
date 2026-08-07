@@ -29,7 +29,12 @@ export async function POST(request: NextRequest) {
 
     const deliveryMethod = getDeliveryMethod(data.shippingMethod);
     if (!deliveryMethod) {
-      return NextResponse.json({ error: "Invalid shipping method" }, { status: 400 });
+      // `error` strings are for logs/API consumers; the client maps `code` to
+      // localized copy (PR #29 r4 — the UA fallback was otherwise unreachable).
+      return NextResponse.json(
+        { error: "Invalid shipping method", code: "INVALID_SHIPPING_METHOD" },
+        { status: 400 }
+      );
     }
 
     const productIds = data.items.map((item) => item.productId);
@@ -53,7 +58,16 @@ export async function POST(request: NextRequest) {
 
     for (const item of data.items) {
       const product = products.find((p) => p.id === item.productId);
-      if (!product) continue;
+      // Missing OR deactivated (filtered by the isActive gate above): reject the
+      // whole order instead of silently skipping the line — a skip would alter
+      // the total the customer approved, and deactivation is routine, not rare
+      // (PR #29 r4; supersedes the spec §4 silent-skip parity).
+      if (!product) {
+        return NextResponse.json(
+          { error: "Ordered product is unavailable", code: "PRODUCT_UNAVAILABLE" },
+          { status: 400 }
+        );
+      }
 
       let price = Number(product.price);
       let variantInfo: string | undefined;
@@ -65,7 +79,7 @@ export async function POST(request: NextRequest) {
         // rather than drop, so a size line never silently disappears (PR #29 r3).
         if (!variant) {
           return NextResponse.json(
-            { error: "Invalid variant for ordered product" },
+            { error: "Invalid variant for ordered product", code: "INVALID_VARIANT" },
             { status: 400 }
           );
         }
@@ -86,10 +100,6 @@ export async function POST(request: NextRequest) {
         unitPrice: price,
         totalPrice: itemTotal,
       });
-    }
-
-    if (orderItemsData.length === 0) {
-      return NextResponse.json({ error: "No valid items in order" }, { status: 400 });
     }
 
     const shippingCost = deliveryMethod.price;
@@ -176,11 +186,14 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid order data", details: error.issues },
+        { error: "Invalid order data", code: "INVALID_ORDER_DATA", details: error.issues },
         { status: 400 }
       );
     }
 
-    return NextResponse.json({ error: "Failed to create order" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to create order", code: "ORDER_CREATE_FAILED" },
+      { status: 500 }
+    );
   }
 }

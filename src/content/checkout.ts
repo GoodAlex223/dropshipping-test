@@ -55,7 +55,18 @@ export const checkout = {
     submit: "ПІДТВЕРДИТИ ЗАМОВЛЕННЯ",
     submitting: "Обробка…",
     errors: {
+      /** Generic fallback for unknown/absent server codes. */
       orderFailed: "Не вдалося оформити замовлення. Спробуйте ще раз.",
+      /** PRODUCT_UNAVAILABLE — an ordered product was deactivated/removed. */
+      productUnavailable:
+        "Деякі товари з вашого замовлення більше недоступні. Оновіть кошик і спробуйте ще раз.",
+      /** INVALID_VARIANT — stale/foreign variant on an order line. */
+      invalidVariant:
+        "Один із товарів недоступний у вибраному варіанті. Оновіть кошик і спробуйте ще раз.",
+      /** INVALID_SHIPPING_METHOD */
+      invalidShippingMethod: "Оберіть коректний спосіб доставки.",
+      /** INVALID_ORDER_DATA */
+      invalidOrderData: "Перевірте правильність заповнених даних.",
     },
   },
   /**

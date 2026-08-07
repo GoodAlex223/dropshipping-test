@@ -38,6 +38,15 @@ const STEPS: Array<{ id: CheckoutStep; label: string }> = [
 
 const inputClass = "border-border-strong bg-background rounded-[10px] border px-3.5 py-3 text-sm";
 
+// Server error codes → localized copy; the API's `error` text is for logs.
+// Unknown/absent codes fall back to errors.orderFailed (PR #29 r4).
+const ORDER_ERROR_MESSAGES: Record<string, string> = {
+  PRODUCT_UNAVAILABLE: checkout.payment.errors.productUnavailable,
+  INVALID_VARIANT: checkout.payment.errors.invalidVariant,
+  INVALID_SHIPPING_METHOD: checkout.payment.errors.invalidShippingMethod,
+  INVALID_ORDER_DATA: checkout.payment.errors.invalidOrderData,
+};
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { data: session } = useSession();
@@ -151,10 +160,13 @@ export default function CheckoutPage() {
         }),
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => null);
 
-      if (!response.ok) {
-        throw new Error(data.error || checkout.payment.errors.orderFailed);
+      if (!response.ok || !data?.orderNumber) {
+        const code = data?.code as string | undefined;
+        throw new Error(
+          (code && ORDER_ERROR_MESSAGES[code]) || checkout.payment.errors.orderFailed
+        );
       }
 
       clearCart();

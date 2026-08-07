@@ -100,9 +100,9 @@ describe("POST /api/checkout/create-order", () => {
     expect(res.status).toBe(400);
   });
 
-  it("does not decrement stock for items dropped by the catalog gate", async () => {
-    const tx = mockTx();
-    await POST(
+  it("rejects the whole order when any item's product is missing or inactive", async () => {
+    mockTx();
+    const res = await POST(
       createNextRequest({
         url: "/api/checkout/create-order",
         method: "POST",
@@ -115,13 +115,12 @@ describe("POST /api/checkout/create-order", () => {
         },
       })
     );
-    // findMany (mocked) only returns prod-1 — the dropped item must not reach
-    // the decrement loop as a phantom write.
-    expect(tx.product.update).toHaveBeenCalledTimes(1);
-    expect(tx.product.update).toHaveBeenCalledWith({
-      where: { id: "prod-1" },
-      data: { stock: { decrement: 2 } },
-    });
+    // findMany (mocked) only returns prod-1 — no partial order, no phantom
+    // decrement: the request 400s before the transaction (PR #29 r4).
+    expect(res.status).toBe(400);
+    const json = await res.json();
+    expect(json.code).toBe("PRODUCT_UNAVAILABLE");
+    expect(mockTransaction).not.toHaveBeenCalled();
   });
 
   it("returns 400 when a variantId does not belong to the ordered product", async () => {
@@ -142,6 +141,8 @@ describe("POST /api/checkout/create-order", () => {
       })
     );
     expect(res.status).toBe(400);
+    const json = await res.json();
+    expect(json.code).toBe("INVALID_VARIANT");
     expect(mockTransaction).not.toHaveBeenCalled();
   });
 
