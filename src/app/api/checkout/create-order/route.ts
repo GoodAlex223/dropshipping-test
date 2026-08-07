@@ -15,7 +15,11 @@ const createOrderSchema = checkoutSchema.extend({
       z.object({
         productId: z.string(),
         variantId: z.string().optional(),
-        quantity: z.number().int().positive(),
+        // Capped: an uncapped quantity was a free arbitrary-stock-negative
+        // primitive on an unauthenticated COD route (PR #29 r6). 100 per line
+        // is far above any legitimate order; the stock-sufficiency guard
+        // (gte) remains separately BACKLOG'd.
+        quantity: z.number().int().positive().max(100),
       })
     )
     .min(1),

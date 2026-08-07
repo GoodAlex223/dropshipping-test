@@ -644,11 +644,13 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 
 - 🟤 **create-order hardening bundle** — the COD endpoint has no server-side double-submit
   protection (the Stripe path had paymentIntent uniqueness); client-side button disabling only.
-  When order volume makes abuse plausible, land together: an idempotency token; an
-  ownership/email check on the public confirmation page (order PII currently sits behind the
-  order-number capability URL alone); and a CSPRNG order-number suffix —
-  `generateOrderNumber()` uses `Math.random()` (`stripe.ts:70`, the file's still-live export,
-  so the dormant-file invariant needs a carve-out there). [G2 spec §4 + PR #29 review round 2]
+  When order volume makes abuse plausible, land: an idempotency token and a CSPRNG order-number
+  suffix — `generateOrderNumber()` uses `Math.random()` (`stripe.ts:70`, the file's still-live
+  export, so the dormant-file invariant needs a carve-out there). **Different trigger for the
+  ownership/email check on the public confirmation page**: order PII sits behind the
+  order-number capability URL alone, so that piece is a privacy item and must land **before
+  real customer traffic**, not on the volume trigger (PR #29 r6 caveat).
+  [G2 spec §4 + PR #29 review rounds 2/6]
 - 🟤 **Dormant Stripe path: retire or revive decision** — `create-payment-intent`,
   `confirm-order`, `PaymentForm.tsx`, `stripe.ts`, `stripe-client.ts` are unreferenced by the
   live checkout since G2. Decide at TASK-048 time whether they're the revival base (LiqPay
@@ -663,11 +665,10 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
   implementable the day the client confirms a threshold (site.ts announcement + shipping.ts
   price rule + honest copy). Client-gated. [G2 / TASK-056]
 - 🟤 **create-order stock decrement lacks a sufficiency guard** — no `stock: { gte: quantity }`
-  condition; concurrent low-stock COD orders can oversell/drive stock negative, and `quantity`
-  has no upper bound (guest-reachable). Parity with the dormant confirm-order route, surfaced
-  by Task-4 review. (The variant-ownership half and the phantom-decrement path were FIXED
-  in-branch — PR #29 review round 3: decrement iterates the filtered order lines, foreign
-  `variantId` → 400.) [G2 task-4 review + final review + PR #29 r3]
+  condition; concurrent low-stock COD orders can oversell/drive stock negative. A correct fix
+  needs conditional updates + rollback semantics, not a one-liner (PR #29 r6 ruling). (Fixed
+  in-branch along the way: variant-ownership + phantom-decrement — r3; per-line `quantity`
+  `.max(100)` cap — r6.) [G2 task-4 review + final review + PR #29 r3/r6]
 - 🟤 **COD orders store currency "USD" (schema default) on UAH amounts** — create-order doesn't
   set `Order.currency`; with no Stripe involvement in the COD path the documented USD-mismatch
   rationale no longer applies. Set `currency: "UAH"` on COD orders when touched next (TASK-048
@@ -706,9 +707,11 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
   can surface errors that were latent on the previous commit (PR #29 r5: `form.watch` →
   `incompatible-library` warning, then `setMounted`-in-effect → `set-state-in-effect` ERROR,
   each only after the prior fix). Checkout page now uses `useWatch` + a `useSyncExternalStore`
-  hydration gate; other files with the `setMounted` pattern (Header badge, CookieConsent, cart
-  page) carry the same latent diagnostic — proactive sweep candidate before they bite mid-PR.
-  (Med value, Low effort) [PR #29 review round 5, 2026-08-07]
+  hydration gate. Corrected census (r6): five hydration-gate sites remain — four already carry
+  `eslint-disable-line react-hooks/set-state-in-effect` suppressions (cart page, CookieConsent,
+  CartDrawer, product-detail-client's `setHydrated`) and only Header.tsx is unsuppressed/latent.
+  Sweep = replace four suppressions with the `useSyncExternalStore` gate + fix Header.
+  (Med value, Low effort) [PR #29 review rounds 5–6, 2026-08-07]
 
 ---
 

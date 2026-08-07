@@ -123,6 +123,21 @@ describe("POST /api/checkout/create-order", () => {
     expect(mockTransaction).not.toHaveBeenCalled();
   });
 
+  it("returns 400 for a quantity above the per-line cap", async () => {
+    mockTx();
+    const res = await POST(
+      createNextRequest({
+        url: "/api/checkout/create-order",
+        method: "POST",
+        body: { ...validBody, items: [{ productId: "prod-1", quantity: 999999999 }] },
+      })
+    );
+    expect(res.status).toBe(400);
+    const json = await res.json();
+    expect(json.code).toBe("INVALID_ORDER_DATA");
+    expect(mockTransaction).not.toHaveBeenCalled();
+  });
+
   it("returns 400 when a variantId does not belong to the ordered product", async () => {
     mockFindMany.mockResolvedValue([
       {
