@@ -20,10 +20,10 @@ export const cart = {
     title: "Разом",
     itemsLabel: "Товари",
     shippingLabel: "Доставка",
-    // Neutral by explicit decision (spec §2): the handoff's «за тарифами
-    // Нової Пошти» is false until G2 converts the ship methods; G2 flips
-    // this string when that lands.
-    shippingValue: "Розраховується при оформленні",
+    // G2 flipped this from the G1-era neutral «Розраховується при
+    // оформленні» — the checkout now really ships via Nova Poshta methods
+    // (src/lib/shipping.ts), so the handoff's original copy is true.
+    shippingValue: "За тарифами Нової Пошти",
     totalLabel: "До сплати",
     checkoutCta: "ОФОРМИТИ ЗАМОВЛЕННЯ",
     validating: "Перевірка…",
