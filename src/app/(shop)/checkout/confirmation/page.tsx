@@ -1,14 +1,15 @@
 export const dynamic = "force-dynamic";
 import { Suspense } from "react";
-import { CheckCircle2, Package, Mail, ArrowRight, Loader2 } from "lucide-react";
+import { CheckCircle2, Package, Mail, ArrowRight, Loader2, Banknote } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { PurchaseTracker } from "@/components/analytics/PurchaseTracker";
 import { formatPrice } from "@/lib/format";
+import { getShippingMethodLabel } from "@/lib/shipping";
+import { checkout } from "@/content/checkout";
+
+const t = checkout.confirmation;
 
 interface ConfirmationPageProps {
   searchParams: Promise<{ order?: string }>;
@@ -33,7 +34,7 @@ async function OrderConfirmation({ orderNumber }: { orderNumber: string }) {
     line2?: string;
     city: string;
     state?: string;
-    postalCode: string;
+    postalCode?: string;
     country: string;
   };
 
@@ -57,128 +58,129 @@ async function OrderConfirmation({ orderNumber }: { orderNumber: string }) {
           <div className="bg-muted mx-auto flex h-16 w-16 items-center justify-center rounded-full">
             <CheckCircle2 className="text-foreground h-10 w-10" />
           </div>
-          <h1 className="mt-6 text-3xl font-bold">Order Confirmed!</h1>
+          <h1 className="mt-6 text-3xl font-extrabold">{t.title}</h1>
           <p className="text-muted-foreground mt-2">
-            Thank you for your order. We&apos;ve sent a confirmation email to{" "}
-            <span className="text-foreground font-medium">{order.email}</span>
+            {t.emailSentPrefix} <span className="text-foreground font-medium">{order.email}</span>
           </p>
-          <p className="mt-4 text-lg font-medium">Order #{order.orderNumber}</p>
+          <p className="mt-4 text-lg font-bold">
+            {t.orderNumberLabel}
+            {order.orderNumber}
+          </p>
         </div>
 
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Package className="h-5 w-5" />
-              Order Details
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Order Items */}
-            <div className="space-y-4">
-              {order.items.map((item) => (
-                <div key={item.id} className="flex items-center justify-between gap-4">
-                  <div className="flex-1">
-                    <p className="font-medium">{item.productName}</p>
-                    {item.variantInfo && (
-                      <p className="text-muted-foreground text-sm">{item.variantInfo}</p>
-                    )}
-                    <p className="text-muted-foreground text-sm">
-                      Qty: {item.quantity} × {formatPrice(Number(item.unitPrice))}
-                    </p>
-                  </div>
-                  <p className="font-medium">{formatPrice(Number(item.totalPrice))}</p>
+        <div className="bg-card border-border mt-8 rounded-[20px] border p-7">
+          <h2 className="flex items-center gap-2 text-lg font-extrabold">
+            <Package className="h-5 w-5" />
+            {t.detailsHeading}
+          </h2>
+
+          <div className="mt-6 space-y-4">
+            {order.items.map((item) => (
+              <div key={item.id} className="flex items-center justify-between gap-4">
+                <div className="flex-1">
+                  <p className="font-bold">{item.productName}</p>
+                  {item.variantInfo && (
+                    <p className="text-muted-foreground text-sm">{item.variantInfo}</p>
+                  )}
+                  <p className="text-muted-foreground text-sm">
+                    {checkout.summary.qty(item.quantity)} × {formatPrice(Number(item.unitPrice))}
+                  </p>
                 </div>
-              ))}
-            </div>
-
-            <Separator />
-
-            {/* Totals */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Subtotal</span>
-                <span>{formatPrice(Number(order.subtotal))}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Shipping</span>
-                <span>{formatPrice(Number(order.shippingCost))}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Tax</span>
-                <span>{formatPrice(Number(order.tax))}</span>
-              </div>
-              <Separator />
-              <div className="flex justify-between font-semibold">
-                <span>Total</span>
-                <span>{formatPrice(Number(order.total))}</span>
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Shipping Address */}
-            <div>
-              <h3 className="mb-2 font-medium">Shipping Address</h3>
-              <p className="text-muted-foreground text-sm">
-                {shippingAddress.name}
-                {shippingAddress.company && (
-                  <>
-                    <br />
-                    {shippingAddress.company}
-                  </>
-                )}
-                <br />
-                {shippingAddress.line1}
-                {shippingAddress.line2 && (
-                  <>
-                    <br />
-                    {shippingAddress.line2}
-                  </>
-                )}
-                <br />
-                {shippingAddress.city}
-                {shippingAddress.state && `, ${shippingAddress.state}`} {shippingAddress.postalCode}
-                <br />
-                {shippingAddress.country}
-              </p>
-            </div>
-
-            {/* Shipping Method */}
-            {order.shippingMethod && (
-              <div>
-                <h3 className="mb-2 font-medium">Shipping Method</h3>
-                <p className="text-muted-foreground text-sm capitalize">
-                  {order.shippingMethod.replace("_", " ")} Shipping
+                <p className="font-bold whitespace-nowrap">
+                  {formatPrice(Number(item.totalPrice))}
                 </p>
               </div>
-            )}
-          </CardContent>
-        </Card>
+            ))}
+          </div>
 
-        <Card className="mt-6">
-          <CardContent className="flex items-center gap-4 py-4">
-            <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-full">
-              <Mail className="text-primary h-5 w-5" />
+          <div className="border-border mt-6 space-y-2 border-t pt-4 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">{t.subtotalLabel}</span>
+              <span className="font-bold">{formatPrice(Number(order.subtotal))}</span>
             </div>
-            <div className="flex-1">
-              <p className="font-medium">Confirmation Email</p>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">{t.shippingLabel}</span>
+              <span className="font-bold">{formatPrice(Number(order.shippingCost))}</span>
+            </div>
+            <div className="mt-1 flex justify-between text-base">
+              <span className="font-bold">{t.totalLabel}</span>
+              <span className="font-extrabold">{formatPrice(Number(order.total))}</span>
+            </div>
+          </div>
+
+          <div className="border-border mt-6 border-t pt-4">
+            <h3 className="mb-2 flex items-center gap-2 font-bold">
+              <Banknote className="h-4 w-4" />
+              {t.paymentLabel}
+            </h3>
+            <p className="text-muted-foreground text-sm">
+              {order.paymentMethod === "cod" ? t.paymentCod : t.paymentCard}
+            </p>
+          </div>
+
+          <div className="border-border mt-6 border-t pt-4">
+            <h3 className="mb-2 font-bold">{t.addressHeading}</h3>
+            <p className="text-muted-foreground text-sm">
+              {shippingAddress.name}
+              {shippingAddress.company && (
+                <>
+                  <br />
+                  {shippingAddress.company}
+                </>
+              )}
+              <br />
+              {shippingAddress.line1}
+              {shippingAddress.line2 && (
+                <>
+                  <br />
+                  {shippingAddress.line2}
+                </>
+              )}
+              <br />
+              {shippingAddress.city}
+              {shippingAddress.state && `, ${shippingAddress.state}`}
+              {shippingAddress.postalCode && ` ${shippingAddress.postalCode}`}
+            </p>
+          </div>
+
+          {order.shippingMethod && (
+            <div className="border-border mt-6 border-t pt-4">
+              <h3 className="mb-2 font-bold">{t.methodHeading}</h3>
               <p className="text-muted-foreground text-sm">
-                We&apos;ve sent order details to {order.email}
+                {getShippingMethodLabel(order.shippingMethod)}
               </p>
             </div>
-          </CardContent>
-        </Card>
+          )}
+        </div>
+
+        <div className="bg-card border-border mt-6 rounded-[20px] border">
+          <div className="flex items-center gap-4 p-5">
+            <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-full">
+              <Mail className="text-foreground h-5 w-5" />
+            </div>
+            <div className="flex-1">
+              <p className="font-bold">{t.emailCardTitle}</p>
+              <p className="text-muted-foreground text-sm">
+                {t.emailCardTextPrefix} {order.email}
+              </p>
+            </div>
+          </div>
+        </div>
 
         <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:justify-center">
-          <Button asChild>
-            <Link href="/products">
-              Continue Shopping
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link href="/account/orders">View Order History</Link>
-          </Button>
+          <Link
+            href="/products"
+            className="inline-flex items-center justify-center gap-2 rounded-[10px] bg-white px-7 py-4 text-[13px] font-extrabold tracking-[0.06em] text-black transition-colors hover:bg-[#e5e5e5]"
+          >
+            {t.continueShopping}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/account/orders"
+            className="border-border-strong hover:border-muted-foreground inline-flex items-center justify-center rounded-[10px] border px-7 py-4 text-[13px] font-bold transition-colors"
+          >
+            {t.viewOrders}
+          </Link>
         </div>
       </div>
     </div>
@@ -190,7 +192,7 @@ function LoadingConfirmation() {
     <div className="container flex min-h-[60vh] items-center justify-center py-12">
       <div className="text-center">
         <Loader2 className="text-muted-foreground mx-auto h-8 w-8 animate-spin" />
-        <p className="text-muted-foreground mt-4">Loading order details...</p>
+        <p className="text-muted-foreground mt-4">{t.loading}</p>
       </div>
     </div>
   );
@@ -200,13 +202,14 @@ function NoOrderNumber() {
   return (
     <div className="container py-12">
       <div className="mx-auto max-w-md text-center">
-        <h1 className="text-2xl font-semibold">Order Not Found</h1>
-        <p className="text-muted-foreground mt-2">
-          We couldn&apos;t find an order with the provided number.
-        </p>
-        <Button className="mt-6" asChild>
-          <Link href="/products">Continue Shopping</Link>
-        </Button>
+        <h1 className="text-2xl font-extrabold">{t.notFoundTitle}</h1>
+        <p className="text-muted-foreground mt-2">{t.notFoundText}</p>
+        <Link
+          href="/products"
+          className="mt-6 inline-block rounded-[10px] bg-white px-7 py-4 text-[13px] font-extrabold tracking-[0.06em] text-black transition-colors hover:bg-[#e5e5e5]"
+        >
+          {t.continueShopping}
+        </Link>
       </div>
     </div>
   );
