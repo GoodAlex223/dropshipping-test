@@ -14,8 +14,8 @@ Key capabilities:
 - Admin panel for products, categories, orders, customers, suppliers, reviews, and newsletter subscribers
 - Product review system with verified purchase requirements, star ratings, and admin reply functionality
 - Newsletter subscription with double opt-in email confirmation and admin management
-- Stripe payment integration
-- Automated order forwarding to suppliers via background workers (BullMQ)
+- No-prepayment COD checkout (guest-capable, Nova Poshta delivery methods; Stripe integration dormant since G2, 2026-08-06)
+- Order forwarding to suppliers via background workers (BullMQ; jobs queued manually from admin — auto-queue after checkout is BACKLOG'd)
 - CSV product import, S3 image storage, email notifications (Resend)
 - Multi-theme showcase system (bold, luxury, organic design variants)
 - SEO with dynamic sitemap, robots.txt, dynamic Open Graph images, Google Shopping XML feed, and review-based JSON-LD structured data
@@ -119,6 +119,7 @@ src/
 ├── content/                # Typed content-config layer (Ukrainian copy, extraction-ready for TASK-039 i18n)
 │   ├── brand.ts            # Brand name/tagline constants — deliberately import-free (consumed by seo.ts)
 │   ├── cart.ts             # Cart + CartDrawer copy (summary/empty/clear/stock strings, itemsCount plural via pluralizeUk)
+│   ├── checkout.ts         # Checkout + confirmation copy (steps, COD/prepay block config, manager contacts — cardNumber/whatsapp are CLIENT-SUPPLIED-pending)
 │   ├── home.ts             # Homepage copy (hero, benefits, whyChooseUs, rails, testimonials)
 │   └── site.ts             # Site-wide config (announcement, socials, client claims, footer benefits)
 ├── hooks/                  # Custom React hooks (use-debounce, use-toast)
@@ -126,8 +127,9 @@ src/
 │   ├── auth.ts             # NextAuth v5 config (JWT + Prisma adapter)
 │   ├── db.ts               # Prisma client (Neon adapter for prod)
 │   ├── api-utils.ts        # API response helpers, auth guards
-│   ├── stripe.ts           # Stripe server-side
-│   ├── stripe-client.ts    # Stripe client-side
+│   ├── stripe.ts           # Stripe server-side (payment-intent path dormant since G2; generateOrderNumber still live)
+│   ├── stripe-client.ts    # Stripe client-side (dormant since G2)
+│   ├── shipping.ts         # Nova Poshta delivery methods (np-office/np-courier/np-postomat, UAH) + legacy label lookup
 │   ├── email.ts            # Resend email service (order confirmations, newsletter)
 │   ├── format.ts           # formatPrice() — the only sanctioned UAH price formatter (uk-UA, Intl.NumberFormat)
 │   ├── newsletter.ts       # Newsletter utilities (token generation, URL builders, HMAC unsubscribe)
