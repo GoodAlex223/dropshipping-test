@@ -197,6 +197,18 @@ export default function CheckoutPage() {
 
       {/* Step nav — numbered circles per handoff */}
       <div className="mt-6 mb-8 flex items-center gap-2 text-[13px] font-bold">
+        <div className="flex items-center gap-2">
+          <Link
+            href="/cart"
+            className="text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors"
+          >
+            <span className="flex h-6 w-6 items-center justify-center rounded-full border border-white bg-transparent text-[11.5px]">
+              <ShoppingBag className="h-3 w-3" />
+            </span>
+            {checkout.steps.cart}
+          </Link>
+          <span className="text-muted-foreground mx-1">→</span>
+        </div>
         {STEPS.map((step, i) => {
           const isActive = i === stepIndex;
           const isDone = i < stepIndex;

@@ -8,6 +8,7 @@ import { PurchaseTracker } from "@/components/analytics/PurchaseTracker";
 import { formatPrice } from "@/lib/format";
 import { getShippingMethodLabel } from "@/lib/shipping";
 import { checkout } from "@/content/checkout";
+import { auth } from "@/lib/auth";
 
 const t = checkout.confirmation;
 
@@ -16,6 +17,7 @@ interface ConfirmationPageProps {
 }
 
 async function OrderConfirmation({ orderNumber }: { orderNumber: string }) {
+  const session = await auth();
   const order = await prisma.order.findUnique({
     where: { orderNumber },
     include: {
@@ -151,6 +153,13 @@ async function OrderConfirmation({ orderNumber }: { orderNumber: string }) {
               </p>
             </div>
           )}
+
+          {order.customerNotes && (
+            <div className="border-border mt-6 border-t pt-4">
+              <h3 className="mb-2 font-bold">{t.notesHeading}</h3>
+              <p className="text-muted-foreground text-sm">{order.customerNotes}</p>
+            </div>
+          )}
         </div>
 
         <div className="bg-card border-border mt-6 rounded-[20px] border">
@@ -175,12 +184,14 @@ async function OrderConfirmation({ orderNumber }: { orderNumber: string }) {
             {t.continueShopping}
             <ArrowRight className="h-4 w-4" />
           </Link>
-          <Link
-            href="/account/orders"
-            className="border-border-strong hover:border-muted-foreground inline-flex items-center justify-center rounded-[10px] border px-7 py-4 text-[13px] font-bold transition-colors"
-          >
-            {t.viewOrders}
-          </Link>
+          {session?.user && (
+            <Link
+              href="/account/orders"
+              className="border-border-strong hover:border-muted-foreground inline-flex items-center justify-center rounded-[10px] border px-7 py-4 text-[13px] font-bold transition-colors"
+            >
+              {t.viewOrders}
+            </Link>
+          )}
         </div>
       </div>
     </div>

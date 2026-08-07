@@ -5,14 +5,14 @@ import { site } from "./site";
  * §2/§6/§8). Single extraction point for TASK-039 i18n — plain typed strings.
  *
  * CLIENT-SUPPLIED, PENDING (TASK-056 ask, added 2026-08-06): `payment.prepay.cardNumber`
- * / `cardHolder` (manual full-prepayment card details) and `contacts` whatsapp href.
- * While null, the UI renders the contact-the-manager fallback / hides the link —
- * filling the value lights the block up with no code change.
+ * / `cardHolder` (manual full-prepayment card details). While null, the UI renders the
+ * contact-the-manager fallback — filling the value lights the block up with no code change.
  */
 export const checkout = {
   title: "Оформлення замовлення",
   secureNote: "Захищене оформлення",
   steps: {
+    cart: "Кошик",
     contacts: "Контакти",
     delivery: "Доставка",
     payment: "Оплата",
@@ -58,11 +58,15 @@ export const checkout = {
       orderFailed: "Не вдалося оформити замовлення. Спробуйте ще раз.",
     },
   },
-  /** Manager contact links. whatsapp is CLIENT-SUPPLIED, PENDING (null hides the link). */
+  /**
+   * Manager contact links. whatsapp is a CLIENT-SUPPLIED placeholder number
+   * (+380 00 000 0000) — real number pending via the TASK-056 ask. Placeholder
+   * number until the client confirms real URLs, mirroring site.ts's socials convention.
+   */
   contacts: {
     instagram: site.socials.find((s) => s.platform === "instagram")?.href ?? null,
     telegram: site.socials.find((s) => s.platform === "telegram")?.href ?? null,
-    whatsapp: null as string | null,
+    whatsapp: "https://wa.me/380000000000" as string | null,
   },
   summary: {
     heading: "Ваше замовлення",
@@ -90,6 +94,7 @@ export const checkout = {
     totalLabel: "До сплати",
     addressHeading: "Адреса доставки",
     methodHeading: "Спосіб доставки",
+    notesHeading: "Коментар до замовлення",
     emailCardTitle: "Лист із підтвердженням",
     emailCardTextPrefix: "Деталі замовлення надіслано на",
     continueShopping: "Продовжити покупки",

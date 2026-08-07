@@ -63,11 +63,16 @@ export const site = {
     {
       platform: "instagram",
       label: "Instagram",
-      href: "https://instagram.com/miroxshop",
+      href: "https://instagram.com/mirox_shop",
       followers: null,
     },
-    { platform: "tiktok", label: "TikTok", href: "https://tiktok.com/@miroxshop", followers: null },
-    { platform: "telegram", label: "Telegram", href: "https://t.me/miroxshop", followers: null },
+    {
+      platform: "tiktok",
+      label: "TikTok",
+      href: "https://tiktok.com/@mirox_shop",
+      followers: null,
+    },
+    { platform: "telegram", label: "Telegram", href: "https://t.me/mirox_shop", followers: null },
   ] as SocialLink[],
 
   /**
