@@ -407,6 +407,7 @@ export default function CheckoutPage() {
                             <Textarea
                               className={`${inputClass} resize-none`}
                               placeholder={checkout.delivery.notes.placeholder}
+                              maxLength={500}
                               {...field}
                             />
                           </FormControl>

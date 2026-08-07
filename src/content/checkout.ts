@@ -59,14 +59,15 @@ export const checkout = {
     },
   },
   /**
-   * Manager contact links. whatsapp is a CLIENT-SUPPLIED placeholder number
-   * (+380 00 000 0000) — real number pending via the TASK-056 ask. Placeholder
-   * number until the client confirms real URLs, mirroring site.ts's socials convention.
+   * Manager contact links. whatsapp is CLIENT-SUPPLIED, PENDING (TASK-056 ask):
+   * null hides the link — unlike site.ts's socials there is no real handle to
+   * fall back on, and a zero-filled wa.me number would render as a clickable
+   * dead link (PR #29 review). Fill with the real number to light it up.
    */
   contacts: {
     instagram: site.socials.find((s) => s.platform === "instagram")?.href ?? null,
     telegram: site.socials.find((s) => s.platform === "telegram")?.href ?? null,
-    whatsapp: "https://wa.me/380000000000" as string | null,
+    whatsapp: null as string | null,
   },
   summary: {
     heading: "Ваше замовлення",
