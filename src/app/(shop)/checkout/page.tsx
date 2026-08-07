@@ -200,6 +200,7 @@ export default function CheckoutPage() {
         <div className="flex items-center gap-2">
           <Link
             href="/cart"
+            aria-label={checkout.steps.cart}
             className="text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors"
           >
             <span className="flex h-6 w-6 items-center justify-center rounded-full border border-white bg-transparent text-[11.5px]">
