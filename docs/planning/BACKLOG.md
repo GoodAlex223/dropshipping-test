@@ -701,6 +701,14 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
   dir exists locally, repo-wide lint drowns in thousands of phantom errors from generated JS
   (same failure class as the PR #24 vendor-JS lesson). Add the dir to `globalIgnores` in
   `eslint.config.mjs`. (Low effort) [G2 post-gate fix wave, 2026-08-07]
+- 🟤 **React-Compiler lint diagnostics surface lazily on edit** — the compiler-backed
+  react-hooks rules bail per-component and report one diagnostic at a time, so editing a file
+  can surface errors that were latent on the previous commit (PR #29 r5: `form.watch` →
+  `incompatible-library` warning, then `setMounted`-in-effect → `set-state-in-effect` ERROR,
+  each only after the prior fix). Checkout page now uses `useWatch` + a `useSyncExternalStore`
+  hydration gate; other files with the `setMounted` pattern (Header badge, CookieConsent, cart
+  page) carry the same latent diagnostic — proactive sweep candidate before they bite mid-PR.
+  (Med value, Low effort) [PR #29 review round 5, 2026-08-07]
 
 ---
 

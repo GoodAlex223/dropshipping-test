@@ -1,12 +1,12 @@
 "use client";
 export const dynamic = "force-dynamic";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, ShoppingBag, Lock, Instagram, Send, MessageCircle } from "lucide-react";
 import {
@@ -47,11 +47,22 @@ const ORDER_ERROR_MESSAGES: Record<string, string> = {
   INVALID_ORDER_DATA: checkout.payment.errors.invalidOrderData,
 };
 
+// Hydration gate without a setState-in-effect (react-hooks/set-state-in-effect,
+// PR #29 r5): false during SSR + the hydration render, true right after —
+// same behavior as the old mounted flag, none of the cascading-render lint.
+const emptySubscribe = () => () => {};
+const useHydrated = () =>
+  useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { data: session } = useSession();
   const { items, getTotalPrice, clearCart } = useCartStore();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useHydrated();
   const [currentStep, setCurrentStep] = useState<CheckoutStep>("information");
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -75,10 +86,6 @@ export default function CheckoutPage() {
       customerNotes: "",
     },
   });
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (session?.user?.email) {
@@ -108,7 +115,10 @@ export default function CheckoutPage() {
   }, [items]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const subtotal = getTotalPrice();
-  const selectedShipping = DELIVERY_METHODS.find((m) => m.id === form.watch("shippingMethod"));
+  // useWatch, not form.watch — the React Compiler lint rule flags watch() as
+  // an unmemoizable API (surfaced by the r5 handler restructure).
+  const shippingMethodId = useWatch({ control: form.control, name: "shippingMethod" });
+  const selectedShipping = DELIVERY_METHODS.find((m) => m.id === shippingMethodId);
   const shippingCost = selectedShipping?.price || 0;
   const total = subtotal + shippingCost;
 
@@ -163,16 +173,18 @@ export default function CheckoutPage() {
       const data = await response.json().catch(() => null);
 
       if (!response.ok || !data?.orderNumber) {
+        // User-facing copy never routes through err.message — a fetch
+        // TypeError would surface browser-English otherwise (PR #29 r5).
         const code = data?.code as string | undefined;
-        throw new Error(
-          (code && ORDER_ERROR_MESSAGES[code]) || checkout.payment.errors.orderFailed
-        );
+        setError((code && ORDER_ERROR_MESSAGES[code]) || checkout.payment.errors.orderFailed);
+        setIsProcessing(false);
+        return;
       }
 
       clearCart();
       router.push(`/checkout/confirmation?order=${data.orderNumber}`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : checkout.payment.errors.orderFailed);
+    } catch {
+      setError(checkout.payment.errors.orderFailed);
       setIsProcessing(false);
     }
   };

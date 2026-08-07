@@ -36,6 +36,8 @@ export const cart = {
   stock: {
     outOfStock: "Немає в наявності",
     onlyN: (n: number) => `Доступно лише ${n}`,
+    /** Deactivated product (stock may remain) — checkout would reject it. */
+    unavailable: "Товар більше недоступний",
   },
   clear: {
     action: "Очистити кошик",
