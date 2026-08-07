@@ -66,6 +66,7 @@ beforeEach(() => {
 
 describe("POST /api/checkout/create-order", () => {
   it("returns 400 when phone is missing", async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- destructure-omit idiom
     const { phone: _p, ...noPhone } = validBody.shippingAddress;
     const res = await POST(
       createNextRequest({

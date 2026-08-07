@@ -20,6 +20,7 @@ describe("checkoutSchema (G2 slim UA form)", () => {
   });
 
   it("rejects a missing phone (required for COD fulfillment)", () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- destructure-omit idiom
     const { phone: _phone, ...addressNoPhone } = validInput.shippingAddress;
     const result = checkoutSchema.safeParse({
       ...validInput,
@@ -48,6 +49,7 @@ describe("checkoutSchema (G2 slim UA form)", () => {
   });
 
   it("keeps country required", () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- destructure-omit idiom
     const { country: _c, ...addressNoCountry } = validInput.shippingAddress;
     const result = checkoutSchema.safeParse({
       ...validInput,
