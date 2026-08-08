@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Pencil,
@@ -95,8 +95,8 @@ const STATUS_COLORS: Record<string, string> = {
   failed: "bg-red-100 text-red-800",
 };
 
-export default function SupplierDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export default function SupplierDetailPage() {
+  const { id } = useParams<{ id: string }>()!;
   const router = useRouter();
 
   const [supplier, setSupplier] = useState<Supplier | null>(null);
