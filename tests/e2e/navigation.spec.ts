@@ -92,7 +92,8 @@ test.describe("Navigation", () => {
     await page.getByRole("dialog").getByRole("link", { name: "Категорії", exact: true }).click();
 
     await expect(page).toHaveURL(/\/categories/);
-    await expect(page.getByRole("heading", { level: 1, name: /categories/i })).toBeVisible();
+    // Task 11 renamed the /categories H1 to «Категорії» (src/app/(shop)/categories/page.tsx).
+    await expect(page.getByRole("heading", { level: 1, name: "Категорії" })).toBeVisible();
   });
 
   test("cart icon is visible in header", async ({ page }) => {
