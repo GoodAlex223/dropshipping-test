@@ -59,7 +59,7 @@ describe("dynamic-route params regression (use(params) → useParams)", () => {
 
   it("/account/orders/[id] renders and fetches by route id", async () => {
     render(<AccountOrderDetailPage />);
-    expect(await screen.findByText("Order not found")).toBeInTheDocument();
+    expect(await screen.findByText("Замовлення не знайдено")).toBeInTheDocument();
     expect(global.fetch).toHaveBeenCalledWith("/api/orders/test-id");
   });
 });
