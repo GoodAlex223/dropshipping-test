@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   Package,
   ArrowLeft,
@@ -143,12 +143,9 @@ const ORDER_TIMELINE = [
   { status: "DELIVERED", label: "Delivered", icon: CheckCircle2 },
 ];
 
-interface AdminOrderDetailPageProps {
-  params: Promise<{ id: string }>;
-}
-
-export default function AdminOrderDetailPage({ params }: AdminOrderDetailPageProps) {
-  const { id } = use(params);
+export default function AdminOrderDetailPage() {
+  // non-null: the pages-compat types in next-env.d.ts make useParams() nullable; App Router always supplies params
+  const { id } = useParams<{ id: string }>()!;
   const router = useRouter();
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);

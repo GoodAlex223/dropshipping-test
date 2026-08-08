@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProductForm } from "@/components/admin";
@@ -26,12 +27,9 @@ interface Product {
   isFeatured: boolean;
 }
 
-interface EditProductPageProps {
-  params: Promise<{ id: string }>;
-}
-
-export default function EditProductPage({ params }: EditProductPageProps) {
-  const { id } = use(params);
+export default function EditProductPage() {
+  // non-null: the pages-compat types in next-env.d.ts make useParams() nullable; App Router always supplies params
+  const { id } = useParams<{ id: string }>()!;
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

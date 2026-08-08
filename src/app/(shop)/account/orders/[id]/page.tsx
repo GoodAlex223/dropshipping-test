@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   Package,
   ArrowLeft,
@@ -81,12 +81,9 @@ const CANCELLED_TIMELINE = [
   { status: "CANCELLED", label: "Cancelled", icon: XCircle },
 ];
 
-interface OrderDetailPageProps {
-  params: Promise<{ id: string }>;
-}
-
-export default function OrderDetailPage({ params }: OrderDetailPageProps) {
-  const { id } = use(params);
+export default function OrderDetailPage() {
+  // non-null: the pages-compat types in next-env.d.ts make useParams() nullable; App Router always supplies params
+  const { id } = useParams<{ id: string }>()!;
   const router = useRouter();
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
