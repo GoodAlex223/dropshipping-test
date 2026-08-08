@@ -6,8 +6,10 @@ export async function GET(request: NextRequest) {
   try {
     const token = request.nextUrl.searchParams.get("token");
 
+    // `error`/`message` strings are for logs/API consumers; clients map
+    // `code` to Ukrainian copy (src/content/newsletter.ts).
     if (!token) {
-      return apiError("Confirmation token is required", 400);
+      return apiError("Confirmation token is required", 400, "TOKEN_REQUIRED");
     }
 
     const subscriber = await prisma.subscriber.findUnique({
@@ -15,15 +17,22 @@ export async function GET(request: NextRequest) {
     });
 
     if (!subscriber) {
-      return apiError("Invalid confirmation link", 404);
+      return apiError("Invalid confirmation link", 404, "INVALID_TOKEN");
     }
 
     if (subscriber.status === "ACTIVE") {
-      return apiSuccess({ message: "Your subscription is already confirmed" });
+      return apiSuccess({
+        code: "ALREADY_CONFIRMED",
+        message: "Your subscription is already confirmed",
+      });
     }
 
     if (!subscriber.confirmationExpiry || subscriber.confirmationExpiry < new Date()) {
-      return apiError("This confirmation link has expired. Please subscribe again.", 410);
+      return apiError(
+        "This confirmation link has expired. Please subscribe again.",
+        410,
+        "LINK_EXPIRED"
+      );
     }
 
     await prisma.subscriber.update({
@@ -36,8 +45,8 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    return apiSuccess({ message: "Your subscription has been confirmed" });
+    return apiSuccess({ code: "CONFIRMED", message: "Your subscription has been confirmed" });
   } catch {
-    return apiError("Failed to confirm subscription", 500);
+    return apiError("Failed to confirm subscription", 500, "CONFIRM_FAILED");
   }
 }
