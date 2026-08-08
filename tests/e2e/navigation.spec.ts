@@ -62,7 +62,7 @@ test.describe("Navigation", () => {
     // just off-screen) — real mobile users reach it via the hamburger menu
     // instead, so open that first rather than clicking an invisible element.
     if (isMobile) {
-      await page.getByRole("button", { name: /menu/i }).click();
+      await page.getByRole("button", { name: /меню/i }).click();
       await page.getByRole("dialog").getByRole("link", { name: "Каталог", exact: true }).click();
     } else {
       // Scoped to <header>: Footer.tsx has its own "Каталог" link too.
@@ -88,7 +88,7 @@ test.describe("Navigation", () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/");
 
-    await page.getByRole("button", { name: /menu/i }).click();
+    await page.getByRole("button", { name: /меню/i }).click();
     await page.getByRole("dialog").getByRole("link", { name: "Категорії", exact: true }).click();
 
     await expect(page).toHaveURL(/\/categories/);
@@ -109,7 +109,7 @@ test.describe("Navigation", () => {
     await page.goto("/");
 
     // Look for mobile menu button
-    const menuButton = page.getByRole("button", { name: /menu/i });
+    const menuButton = page.getByRole("button", { name: /меню/i });
 
     if (await menuButton.isVisible()) {
       await menuButton.click();
