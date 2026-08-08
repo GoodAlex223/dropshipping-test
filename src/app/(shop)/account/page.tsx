@@ -3,10 +3,11 @@ export const dynamic = "force-dynamic";
 
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Package, MapPin, Settings, ArrowRight } from "lucide-react";
+import { Package, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { account } from "@/content/account";
 
 export default function AccountPage() {
   const { data: session, status } = useSession();
@@ -30,11 +31,9 @@ export default function AccountPage() {
       <Card>
         <CardContent className="py-6">
           <h2 className="text-xl font-semibold">
-            Welcome back, {session?.user?.name || "Customer"}!
+            {account.overview.welcome(session?.user?.name || account.overview.nameFallback)}
           </h2>
-          <p className="text-muted-foreground mt-1">
-            Manage your orders, addresses, and account settings.
-          </p>
+          <p className="text-muted-foreground mt-1">{account.overview.description}</p>
         </CardContent>
       </Card>
 
@@ -45,49 +44,15 @@ export default function AccountPage() {
             <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
               <Package className="text-primary h-5 w-5" />
             </div>
-            <CardTitle className="text-base">Orders</CardTitle>
+            <CardTitle className="text-base">{account.overview.ordersCard.title}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground mb-4 text-sm">View and track your orders</p>
+            <p className="text-muted-foreground mb-4 text-sm">
+              {account.overview.ordersCard.description}
+            </p>
             <Button variant="outline" size="sm" asChild>
               <Link href="/account/orders">
-                View Orders
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="transition-shadow hover:shadow-md">
-          <CardHeader className="flex flex-row items-center gap-4 pb-2">
-            <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
-              <MapPin className="text-primary h-5 w-5" />
-            </div>
-            <CardTitle className="text-base">Addresses</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4 text-sm">Manage your shipping addresses</p>
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/account/addresses">
-                Manage Addresses
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="transition-shadow hover:shadow-md">
-          <CardHeader className="flex flex-row items-center gap-4 pb-2">
-            <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
-              <Settings className="text-primary h-5 w-5" />
-            </div>
-            <CardTitle className="text-base">Settings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4 text-sm">Update your account settings</p>
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/account/settings">
-                Account Settings
+                {account.overview.ordersCard.cta}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
@@ -98,16 +63,20 @@ export default function AccountPage() {
       {/* Account Info */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Account Information</CardTitle>
+          <CardTitle className="text-base">{account.overview.info.title}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <p className="text-muted-foreground text-sm font-medium">Name</p>
-              <p>{session?.user?.name || "Not set"}</p>
+              <p className="text-muted-foreground text-sm font-medium">
+                {account.overview.info.name}
+              </p>
+              <p>{session?.user?.name || account.overview.info.notSet}</p>
             </div>
             <div>
-              <p className="text-muted-foreground text-sm font-medium">Email</p>
+              <p className="text-muted-foreground text-sm font-medium">
+                {account.overview.info.email}
+              </p>
               <p>{session?.user?.email}</p>
             </div>
           </div>
