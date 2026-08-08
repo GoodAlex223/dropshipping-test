@@ -96,6 +96,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function SupplierDetailPage() {
+  // non-null: the pages-compat types in next-env.d.ts make useParams() nullable; App Router always supplies params
   const { id } = useParams<{ id: string }>()!;
   const router = useRouter();
 

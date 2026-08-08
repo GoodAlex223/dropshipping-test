@@ -28,6 +28,7 @@ interface Product {
 }
 
 export default function EditProductPage() {
+  // non-null: the pages-compat types in next-env.d.ts make useParams() nullable; App Router always supplies params
   const { id } = useParams<{ id: string }>()!;
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);

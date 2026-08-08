@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-08-07
+**Last Updated**: 2026-08-08
 
 ---
 
@@ -732,6 +732,12 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
   Follow-up: determine whether the `pages/` stubs are still load-bearing; if they can go, the
   compat reference disappears on the next `next-env.d.ts` regen and the four `!` assertions can
   drop. (Low value, Low effort) [G3 fix-round adjudication, 2026-08-08]
+- 🟤 **`Function components cannot be given refs` console warning on admin product edit** — the
+  browser console shows the React ref warning for `Textarea` inside `ProductForm.tsx` when
+  opening `/admin/products/[id]`; pre-existing (not introduced by G3 — surfaced during its
+  Task-4 browser pass). Likely a `Textarea` usage (or wrapper) not forwarding refs where
+  react-hook-form supplies one. Cosmetic console noise today, but it masks real warnings.
+  (Low value, Low effort) [G3 Task-4 browser pass, 2026-08-08]
 
 ---
 

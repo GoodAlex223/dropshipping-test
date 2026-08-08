@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 
 const push = vi.fn();
@@ -22,7 +22,14 @@ import AccountOrderDetailPage from "@/app/(shop)/account/orders/[id]/page";
 
 beforeEach(() => {
   vi.clearAllMocks();
-  global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 404, json: async () => ({}) });
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue({ ok: false, status: 404, json: async () => ({}) })
+  );
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
 });
 
 // Regression for BACKLOG [2026-07-18]: on Next 14.2.35 these four client pages

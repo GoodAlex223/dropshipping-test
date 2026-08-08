@@ -82,6 +82,7 @@ const CANCELLED_TIMELINE = [
 ];
 
 export default function OrderDetailPage() {
+  // non-null: the pages-compat types in next-env.d.ts make useParams() nullable; App Router always supplies params
   const { id } = useParams<{ id: string }>()!;
   const router = useRouter();
   const [order, setOrder] = useState<Order | null>(null);
