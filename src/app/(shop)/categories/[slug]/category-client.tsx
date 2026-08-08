@@ -20,7 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { ProductCard } from "@/components/products";
 import { trackViewItemList, trackSelectItem, type GA4Item } from "@/lib/analytics";
-import { formatPrice } from "@/lib/format";
+import { formatPrice, pluralizeUk } from "@/lib/format";
 
 interface Product {
   id: string;
@@ -172,11 +172,11 @@ export function CategoryClient({ category }: CategoryClientProps) {
       {/* Breadcrumb */}
       <nav className="text-muted-foreground mb-6 flex items-center gap-2 text-sm">
         <Link href="/" className="hover:text-foreground">
-          Home
+          Головна
         </Link>
         <span>/</span>
         <Link href="/categories" className="hover:text-foreground">
-          Categories
+          Категорії
         </Link>
         {category.parent && (
           <>
@@ -222,7 +222,7 @@ export function CategoryClient({ category }: CategoryClientProps) {
         )}
 
         <p className="text-muted-foreground mt-4 text-sm">
-          {pagination.total} {pagination.total === 1 ? "product" : "products"}
+          {pagination.total} {pluralizeUk(pagination.total, "товар", "товари", "товарів")}
         </p>
       </div>
 
@@ -237,7 +237,7 @@ export function CategoryClient({ category }: CategoryClientProps) {
               setCurrentPage(1);
             }}
           >
-            All
+            Всі
           </Button>
           {category.children.map((child) => (
             <Button
@@ -262,7 +262,7 @@ export function CategoryClient({ category }: CategoryClientProps) {
           <SheetTrigger asChild>
             <Button variant="outline" className="md:hidden">
               <SlidersHorizontal className="mr-2 h-4 w-4" />
-              Filters
+              Фільтри
               {activeFiltersCount > 0 && (
                 <Badge variant="secondary" className="ml-2">
                   {activeFiltersCount}
@@ -272,12 +272,12 @@ export function CategoryClient({ category }: CategoryClientProps) {
           </SheetTrigger>
           <SheetContent side="left" className="w-[300px]">
             <SheetHeader>
-              <SheetTitle>Filters</SheetTitle>
+              <SheetTitle>Фільтри</SheetTitle>
             </SheetHeader>
             <div className="mt-6 space-y-6">
               {/* Price Range */}
               <div className="space-y-4">
-                <Label>Price Range</Label>
+                <Label>Ціна</Label>
                 <Slider
                   value={priceRange}
                   onValueChange={(value) => setPriceRange(value as [number, number])}
@@ -290,14 +290,14 @@ export function CategoryClient({ category }: CategoryClientProps) {
                   <span>{formatPrice(priceRange[1])}</span>
                 </div>
                 <Button variant="outline" size="sm" className="w-full" onClick={applyPriceFilter}>
-                  Apply Price Filter
+                  Застосувати
                 </Button>
               </div>
 
               <Separator />
 
               <Button variant="outline" className="w-full" onClick={clearFilters}>
-                Clear All Filters
+                Скинути фільтри
               </Button>
             </div>
           </SheetContent>
@@ -308,7 +308,7 @@ export function CategoryClient({ category }: CategoryClientProps) {
           <div className="hidden flex-wrap items-center gap-2 md:flex">
             {appliedPriceRange && (
               <Badge variant="secondary" className="gap-1">
-                Price: {formatPrice(appliedPriceRange[0])} - {formatPrice(appliedPriceRange[1])}
+                Ціна: {formatPrice(appliedPriceRange[0])} – {formatPrice(appliedPriceRange[1])}
                 <button onClick={() => setAppliedPriceRange(null)}>
                   <X className="h-3 w-3" />
                 </button>
@@ -320,15 +320,15 @@ export function CategoryClient({ category }: CategoryClientProps) {
         {/* Sort */}
         <Select value={`${sortBy}-${sortOrder}`} onValueChange={handleSortChange}>
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Sort by" />
+            <SelectValue placeholder="Сортування" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="createdAt-desc">Newest</SelectItem>
-            <SelectItem value="createdAt-asc">Oldest</SelectItem>
-            <SelectItem value="price-asc">Price: Low to High</SelectItem>
-            <SelectItem value="price-desc">Price: High to Low</SelectItem>
-            <SelectItem value="name-asc">Name: A to Z</SelectItem>
-            <SelectItem value="name-desc">Name: Z to A</SelectItem>
+            <SelectItem value="createdAt-desc">Новинки</SelectItem>
+            <SelectItem value="createdAt-asc">Найстаріші</SelectItem>
+            <SelectItem value="price-asc">Ціна: за зростанням</SelectItem>
+            <SelectItem value="price-desc">Ціна: за спаданням</SelectItem>
+            <SelectItem value="name-asc">Назва: А–Я</SelectItem>
+            <SelectItem value="name-desc">Назва: Я–А</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -349,13 +349,13 @@ export function CategoryClient({ category }: CategoryClientProps) {
       ) : products.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16">
           <Package className="text-muted-foreground h-16 w-16" />
-          <h2 className="mt-4 text-xl font-semibold">No products found</h2>
+          <h2 className="mt-4 text-xl font-semibold">Товарів не знайдено</h2>
           <p className="text-muted-foreground mt-2">
-            Try adjusting your filters or check back later.
+            Спробуйте змінити фільтри або поверніться пізніше.
           </p>
           {activeFiltersCount > 0 && (
             <Button variant="outline" className="mt-4" onClick={clearFilters}>
-              Clear Filters
+              Скинути фільтри
             </Button>
           )}
         </div>
@@ -395,10 +395,10 @@ export function CategoryClient({ category }: CategoryClientProps) {
             disabled={!pagination.hasPrev}
           >
             <ChevronLeft className="mr-1 h-4 w-4" />
-            Previous
+            Назад
           </Button>
           <span className="text-muted-foreground text-sm">
-            Page {pagination.page} of {pagination.totalPages}
+            Сторінка {pagination.page} з {pagination.totalPages}
           </span>
           <Button
             variant="outline"
@@ -406,7 +406,7 @@ export function CategoryClient({ category }: CategoryClientProps) {
             onClick={() => handlePageChange(pagination.page + 1)}
             disabled={!pagination.hasNext}
           >
-            Next
+            Далі
             <ChevronRight className="ml-1 h-4 w-4" />
           </Button>
         </div>
@@ -422,13 +422,11 @@ export function CategoryNotFound() {
     <div className="container py-16">
       <div className="flex flex-col items-center justify-center text-center">
         <Package className="text-muted-foreground h-16 w-16" />
-        <h1 className="mt-4 text-2xl font-bold">Category not found</h1>
-        <p className="text-muted-foreground mt-2">
-          The category you&apos;re looking for doesn&apos;t exist or has been removed.
-        </p>
+        <h1 className="mt-4 text-2xl font-bold">Категорію не знайдено</h1>
+        <p className="text-muted-foreground mt-2">Такої категорії не існує або її було видалено.</p>
         <Button className="mt-6" onClick={() => router.push("/categories")}>
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Categories
+          До категорій
         </Button>
       </div>
     </div>

@@ -7,6 +7,7 @@ import { Package } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { prisma } from "@/lib/db";
 import { getCategoriesListingMetadata } from "@/lib/seo";
+import { pluralizeUk } from "@/lib/format";
 
 export const metadata: Metadata = getCategoriesListingMetadata();
 
@@ -51,16 +52,18 @@ export default async function CategoriesPage() {
     <div className="container py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Categories</h1>
-        <p className="text-muted-foreground mt-2">Browse our products by category</p>
+        <h1 className="text-3xl font-bold tracking-tight">Категорії</h1>
+        <p className="text-muted-foreground mt-2">Перегляньте наші товари за категоріями</p>
       </div>
 
       {/* Categories Grid */}
       {categories.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16">
           <Package className="text-muted-foreground h-16 w-16" />
-          <h2 className="mt-4 text-xl font-semibold">No categories yet</h2>
-          <p className="text-muted-foreground mt-2">Check back later for our product categories.</p>
+          <h2 className="mt-4 text-xl font-semibold">Категорій поки немає</h2>
+          <p className="text-muted-foreground mt-2">
+            Незабаром тут з&apos;являться категорії товарів.
+          </p>
         </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -97,7 +100,7 @@ export default async function CategoriesPage() {
                       </p>
                     )}
                     <p className="text-primary mt-3 text-sm font-medium">
-                      {totalProducts} {totalProducts === 1 ? "product" : "products"}
+                      {totalProducts} {pluralizeUk(totalProducts, "товар", "товари", "товарів")}
                     </p>
 
                     {/* Subcategories */}
@@ -113,7 +116,7 @@ export default async function CategoriesPage() {
                         ))}
                         {category.children.length > 4 && (
                           <span className="bg-muted rounded-full px-3 py-1 text-xs font-medium">
-                            +{category.children.length - 4} more
+                            ще {category.children.length - 4}
                           </span>
                         )}
                       </div>
