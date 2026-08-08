@@ -5,6 +5,7 @@ import Script from "next/script";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Button } from "@/components/ui/button";
+import { system } from "@/content/system";
 
 type ConsentStatus = "pending" | "accepted" | "declined";
 
@@ -70,16 +71,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       {status === "pending" && (
         <div className="bg-background fixed inset-x-0 bottom-0 z-50 border-t p-4 shadow-lg">
           <div className="container mx-auto flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-muted-foreground text-sm">
-              We use cookies to analyze site traffic and improve your experience. By clicking
-              &ldquo;Accept&rdquo;, you consent to analytics tracking.
-            </p>
+            <p className="text-muted-foreground text-sm">{system.cookies.message}</p>
             <div className="flex shrink-0 gap-2">
               <Button variant="outline" size="sm" onClick={decline}>
-                Decline
+                {system.cookies.decline}
               </Button>
               <Button size="sm" onClick={accept}>
-                Accept
+                {system.cookies.accept}
               </Button>
             </div>
           </div>

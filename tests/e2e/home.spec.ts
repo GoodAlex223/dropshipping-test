@@ -36,7 +36,7 @@ test.describe("Homepage", () => {
     // for every fresh Playwright browser context). Waiting for it first,
     // before interacting with anything else on the page, is a reliable
     // "hydration has definitely happened" gate without touching product code.
-    await page.getByRole("button", { name: "Decline" }).waitFor();
+    await page.getByRole("button", { name: "Відхилити" }).waitFor();
     await page.getByRole("link", { name: "ПЕРЕЙТИ В КАТАЛОГ" }).click();
     await expect(page).toHaveURL(/\/products$/);
   });
@@ -45,7 +45,7 @@ test.describe("Homepage", () => {
     // Same hydration-race root cause as the primary CTA test above — see its
     // comment for the full diagnosis. Same fix: wait for the post-hydration-
     // only cookie-consent banner before clicking.
-    await page.getByRole("button", { name: "Decline" }).waitFor();
+    await page.getByRole("button", { name: "Відхилити" }).waitFor();
     await page.getByRole("link", { name: "ПЕРЕГЛЯНУТИ НОВИНКИ" }).first().click();
     await expect(page).toHaveURL(/sort=new/);
   });
