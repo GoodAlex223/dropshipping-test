@@ -109,6 +109,8 @@ Note: no commit yet — the red tests commit together with the fix in Task 2 (CI
 
 ### Task 2: Replace `use(params)` with `useParams()` in the 4 pages
 
+> **As shipped:** the four call sites carry a trailing non-null assertion — `useParams<{ id: string }>()!` — not the bare call shown in the steps below. See the 2026-08-08 adjudication entry in the Progress Log (pages-compat types make `useParams` nullable project-wide).
+
 **Files:**
 
 - Modify: `src/app/(admin)/admin/orders/[id]/page.tsx` (lines 3, 6, 146–151)
