@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { loginSchema, type LoginInput } from "@/lib/validations";
+import { auth } from "@/content/auth";
 
 function LoginFormInner() {
   const router = useRouter();
@@ -39,7 +40,7 @@ function LoginFormInner() {
       });
 
       if (result?.error) {
-        setError("Invalid email or password");
+        setError(auth.login.errors.invalidCredentials);
         return;
       }
 
@@ -47,7 +48,7 @@ function LoginFormInner() {
       router.refresh();
     } catch (error) {
       console.error("[Login Error]", error);
-      setError("Something went wrong. Please try again.");
+      setError(auth.login.errors.generic);
     } finally {
       setIsLoading(false);
     }
@@ -56,8 +57,8 @@ function LoginFormInner() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">Sign in</CardTitle>
-        <CardDescription>Enter your email and password to sign in to your account</CardDescription>
+        <CardTitle className="text-2xl font-bold">{auth.login.title}</CardTitle>
+        <CardDescription>{auth.login.description}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -66,11 +67,11 @@ function LoginFormInner() {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{auth.login.email.label}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="name@example.com"
+              placeholder={auth.login.email.placeholder}
               {...register("email")}
               disabled={isLoading}
             />
@@ -78,11 +79,11 @@ function LoginFormInner() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{auth.login.password.label}</Label>
             <Input
               id="password"
               type="password"
-              placeholder="Enter your password"
+              placeholder={auth.login.password.placeholder}
               {...register("password")}
               disabled={isLoading}
             />
@@ -92,14 +93,14 @@ function LoginFormInner() {
           </div>
 
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Signing in..." : "Sign in"}
+            {isLoading ? auth.login.submitting : auth.login.submit}
           </Button>
         </form>
 
         <div className="mt-4 text-center text-sm">
-          Don&apos;t have an account?{" "}
+          {auth.login.noAccount}{" "}
           <Link href="/register" className="text-primary underline-offset-4 hover:underline">
-            Sign up
+            {auth.login.signUpLink}
           </Link>
         </div>
       </CardContent>
@@ -111,8 +112,8 @@ function LoginFormSkeleton() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">Sign in</CardTitle>
-        <CardDescription>Enter your email and password to sign in to your account</CardDescription>
+        <CardTitle className="text-2xl font-bold">{auth.login.title}</CardTitle>
+        <CardDescription>{auth.login.description}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">

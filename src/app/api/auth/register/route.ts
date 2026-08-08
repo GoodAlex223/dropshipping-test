@@ -32,7 +32,11 @@ export async function POST(request: Request) {
     });
 
     if (existingUser) {
-      return NextResponse.json({ error: "Email already registered" }, { status: 409 });
+      // Client maps `code` to Ukrainian (src/content/auth.ts); `error` stays log text.
+      return NextResponse.json(
+        { error: "Email already registered", code: "EMAIL_EXISTS" },
+        { status: 409 }
+      );
     }
 
     // Hash password

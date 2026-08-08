@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { registerSchema, type RegisterInput } from "@/lib/validations";
+import { auth } from "@/content/auth";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -41,7 +42,9 @@ export default function RegisterForm() {
       const result = await response.json();
 
       if (!response.ok) {
-        setError(result.error || "Registration failed");
+        setError(
+          (result.code && auth.register.errors.byCode[result.code]) || auth.register.errors.generic
+        );
         return;
       }
 
@@ -62,7 +65,7 @@ export default function RegisterForm() {
       router.refresh();
     } catch (error) {
       console.error("[Register Error]", error);
-      setError("Something went wrong. Please try again.");
+      setError(auth.register.errors.generic);
     } finally {
       setIsLoading(false);
     }
@@ -72,8 +75,8 @@ export default function RegisterForm() {
     <div className="flex min-h-screen items-center justify-center px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
-          <CardDescription>Enter your details to create your account</CardDescription>
+          <CardTitle className="text-2xl font-bold">{auth.register.title}</CardTitle>
+          <CardDescription>{auth.register.description}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -84,11 +87,11 @@ export default function RegisterForm() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">{auth.register.name.label}</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="John Doe"
+                placeholder={auth.register.name.placeholder}
                 {...register("name")}
                 disabled={isLoading}
               />
@@ -96,11 +99,11 @@ export default function RegisterForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{auth.register.email.label}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="name@example.com"
+                placeholder={auth.register.email.placeholder}
                 {...register("email")}
                 disabled={isLoading}
               />
@@ -108,11 +111,11 @@ export default function RegisterForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{auth.register.password.label}</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Create a password"
+                placeholder={auth.register.password.placeholder}
                 {...register("password")}
                 disabled={isLoading}
               />
@@ -122,11 +125,11 @@ export default function RegisterForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">{auth.register.confirmPassword.label}</Label>
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder="Confirm your password"
+                placeholder={auth.register.confirmPassword.placeholder}
                 {...register("confirmPassword")}
                 disabled={isLoading}
               />
@@ -136,14 +139,14 @@ export default function RegisterForm() {
             </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Creating account..." : "Create account"}
+              {isLoading ? auth.register.submitting : auth.register.submit}
             </Button>
           </form>
 
           <div className="mt-4 text-center text-sm">
-            Already have an account?{" "}
+            {auth.register.hasAccount}{" "}
             <Link href="/login" className="text-primary underline-offset-4 hover:underline">
-              Sign in
+              {auth.register.signInLink}
             </Link>
           </div>
         </CardContent>
