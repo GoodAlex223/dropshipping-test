@@ -713,6 +713,26 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
   Sweep = replace four suppressions with the `useSyncExternalStore` gate + fix Header.
   (Med value, Low effort) [PR #29 review rounds 5–6, 2026-08-07]
 
+### [2026-08-08] From: G3 params fix (spec §5)
+
+**Origin**: G3 design decision — browser-level regression coverage deferred out of the 2 SP box. 🟤 Auto-Generated.
+
+- 🟤 **E2E auth/login helper + authenticated smoke tests for dynamic `[id]` routes** — the four
+  client routes fixed in G3 (`/admin/orders/[id]`, `/admin/products/[id]`, `/admin/suppliers/[id]`,
+  `/account/orders/[id]`) are covered by RTL render tests only (`tests/unit/dynamic-route-params.test.tsx`);
+  middleware redirects unauthenticated visitors, so Playwright cannot reach these pages without
+  login infrastructure. Build a reusable login helper (admin + customer, seeded credentials) and
+  smoke tests loading each route (expect 200 + rendered detail view). (Med value, Med effort)
+  [G3 spec §2/§5, 2026-08-08]
+- 🟤 **Navigation hooks are typed nullable project-wide by the pages-router compat reference** —
+  `next-env.d.ts` references `next/navigation-types/compat/navigation` because the repo keeps
+  `pages/_app.js`/`_document.js`/`_error.js` stubs (added during the Jan 2026 Next 14/React 18
+  downgrade), so `useParams`/`usePathname`/`useSearchParams` all return `| null` in TypeScript
+  even in App Router code — this is why the G3 fix needs `useParams<{ id: string }>()!`.
+  Follow-up: determine whether the `pages/` stubs are still load-bearing; if they can go, the
+  compat reference disappears on the next `next-env.d.ts` regen and the four `!` assertions can
+  drop. (Low value, Low effort) [G3 fix-round adjudication, 2026-08-08]
+
 ---
 
 ## Technical Debt
