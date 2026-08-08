@@ -110,6 +110,22 @@ describe("apiError", () => {
     const response = apiError("Bad request");
     expect(response.status).toBe(400);
   });
+
+  it("includes a machine code when provided", async () => {
+    const response = apiError("Invalid confirmation link", 404, "INVALID_TOKEN");
+
+    expect(response.status).toBe(404);
+    const body = await response.json();
+    expect(body).toEqual({ error: "Invalid confirmation link", code: "INVALID_TOKEN" });
+  });
+
+  it("omits the code key entirely when not provided", async () => {
+    const response = apiError("Plain");
+    const body = await response.json();
+
+    expect(body).toEqual({ error: "Plain" });
+    expect("code" in body).toBe(false);
+  });
 });
 
 describe("apiSuccess", () => {
