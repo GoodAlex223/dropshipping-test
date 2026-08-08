@@ -443,6 +443,7 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 
 - 🟤 **Automate the `docs/README.md` index-freshness check — this defect class has now recurred three consecutive times** — PR #16 (`04a2593`), PR #17 (`3207425`) and PR #19 (`8a98850`) each shipped with the sole review findings being stale index rows, despite `docs/README.md` stating the indexing rule in its own body. Three manual catches in a row is the signal to automate. Shape it like `tests/unit/no-bright-colors.test.ts` (a plain unit test, no new tooling). **Critical design note — a naive implementation is worse than nothing:** a first pass during PR #19 flagged 17 rows, and 16 were false positives. The check MUST understand two shapes before it can be trusted: (1) only tables whose column header is literally `Last Updated` hold dates — the `archive/plans/` tables carry a separate **Status** column (`COMPLETE`/`ACTIVE`) that is not a date at all; (2) specs under `superpowers/specs/` carry `**Date**:`, not `**Last Updated**:`, so "no stamp found" must mean _skip_, never _fail_. Compare a row's date only against a file that actually declares `**Last Updated**:`. Retiring this class is worth more than a fourth manual catch. (Med value, Low effort) `[relates-to: docs-hygiene entries from PR #16/#17]`
   **Update (2026-08-03, PR #27 — recurrence #7, now OVERDUE):** the class recurred in PR #23, #26 and twice in #27 — where the round that fixed the BACKLOG header re-created the drift in the index row (the "fix moved the drift" failure mode a check would have caught). PR #27's final review measured the naive full audit firing on ~20 rows, all of them the known false-positive classes above — confirming the guards are the load-bearing part of the design and providing that row set as a ready-made test fixture. Promote this entry instead of making an 8th manual catch.
+  **Update (2026-08-08, PR #30 — recurrences #8/#9):** the class recurred twice more in PR #30 (`docs/README.md`'s own header, and the BACKLOG header + index-row pair); both halves were caught in one review pass and fixed together in one commit (`9aae7bc`), avoiding #27's "fix moved the drift" mode. Ninth manual catch. Promote.
 
 ### [2026-07-18] From: TASK-034 post-merge deploy verification
 
@@ -732,12 +733,17 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
   Follow-up: determine whether the `pages/` stubs are still load-bearing; if they can go, the
   compat reference disappears on the next `next-env.d.ts` regen and the four `!` assertions can
   drop. (Low value, Low effort) [G3 fix-round adjudication, 2026-08-08]
-- 🟤 **`Function components cannot be given refs` console warning on admin product edit** — the
-  browser console shows the React ref warning for `Textarea` inside `ProductForm.tsx` when
-  opening `/admin/products/[id]`; pre-existing (not introduced by G3 — surfaced during its
-  Task-4 browser pass). Likely a `Textarea` usage (or wrapper) not forwarding refs where
-  react-hook-form supplies one. Cosmetic console noise today, but it masks real warnings.
-  (Low value, Low effort) [G3 Task-4 browser pass, 2026-08-08]
+- 🟤 **`Textarea` drops refs — react-hook-form cannot focus admin product fields** — the browser
+  console shows `Function components cannot be given refs` for `Textarea` on
+  `/admin/products/[id]`; pre-existing (surfaced during G3's Task-4 browser pass, not introduced
+  by it). Confirmed cause: `src/components/ui/textarea.tsx` is a plain function component
+  (React-19-era shadcn) while sibling `input.tsx` wraps `React.forwardRef` — on React 18.3.1 the
+  ref from `{...register("shortDesc")}` / `{...register("description")}` (`ProductForm.tsx`) is
+  not just warned about but dropped, so RHF holds no element for those fields and cannot
+  focus/scroll to them on validation error. Fix is one line of `forwardRef` symmetry with
+  `Input`; the ROADMAP'd React 19 upgrade retires the warning on its own, so if the upgrade
+  lands first this entry closes with it. (Med value, Low effort)
+  [G3 Task-4 browser pass; cause confirmed PR #30 review round 2, 2026-08-08]
 
 ---
 
