@@ -326,7 +326,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 Find the bullet starting `- **Async params unwrapping (currently broken)**:` in Detected Patterns and replace the whole bullet with:
 
 ```markdown
-- **Dynamic-route params in client pages**: client-component dynamic routes read their segment via `useParams<{ id: string }>()` from `next/navigation` — fixed in G3 after all 4 `[id]` client pages (`/admin/orders/[id]`, `/admin/products/[id]`, `/admin/suppliers/[id]`, `/account/orders/[id]`) 500'd calling `use(params)` on Next 14.2.35, which passes `params` as a plain object (Promise-based params is Next 15 behavior). `useParams` works unchanged on Next 14/15/16, so the ROADMAP'd upgrade needs no re-migration. Server components and API handlers keep Promise-typed `await params` (tolerant on 14, correct on 15+). Regression: `tests/unit/dynamic-route-params.test.tsx`
+- **Dynamic-route params in client pages**: client-component dynamic routes read their segment via `useParams<{ id: string }>()!` from `next/navigation` — fixed in G3 after all 4 `[id]` client pages (`/admin/orders/[id]`, `/admin/products/[id]`, `/admin/suppliers/[id]`, `/account/orders/[id]`) 500'd calling `use(params)` on Next 14.2.35, which passes `params` as a plain object (Promise-based params is Next 15 behavior). The trailing `!` is required: `next-env.d.ts` references the pages-router compat types (the repo keeps `pages/` error stubs), which redeclare `useParams(): T | null` project-wide. `useParams` works unchanged on Next 14/15/16, so the ROADMAP'd upgrade needs no re-migration. Server components and API handlers keep Promise-typed `await params` (tolerant on 14, correct on 15+). Regression: `tests/unit/dynamic-route-params.test.tsx`
 ```
 
 - [ ] **Step 2: `src/app/CLAUDE.md` — replace the broken-pattern bullet**
@@ -334,7 +334,7 @@ Find the bullet starting `- **Async params unwrapping (currently broken)**:` in 
 Find the bullet starting `- **Async params (broken on the pinned Next 14.2.35)**:` in Module-Specific Conventions and replace the whole bullet with:
 
 ```markdown
-- **Dynamic-route params in client pages**: client-component dynamic pages read their segment via `useParams<{ id: string }>()` from `next/navigation` (G3 fix — `use(params)` threw on Next 14.2.35 because client components receive plain-object params; Promise params is Next 15 behavior). The four `[id]` pages (`admin/orders`, `admin/products`, `admin/suppliers`, `(shop)/account/orders`) are prop-less. Server-component `[slug]` pages and API handlers keep Promise-typed `await params`. Regression: `tests/unit/dynamic-route-params.test.tsx`
+- **Dynamic-route params in client pages**: client-component dynamic pages read their segment via `useParams<{ id: string }>()!` from `next/navigation` (G3 fix — `use(params)` threw on Next 14.2.35 because client components receive plain-object params; Promise params is Next 15 behavior; the `!` is needed because the pages-router compat types referenced by `next-env.d.ts` make `useParams` nullable project-wide). The four `[id]` pages (`admin/orders`, `admin/products`, `admin/suppliers`, `(shop)/account/orders`) are prop-less. Server-component `[slug]` pages and API handlers keep Promise-typed `await params`. Regression: `tests/unit/dynamic-route-params.test.tsx`
 ```
 
 - [ ] **Step 3: BACKLOG — add the deferred E2E coverage entry**
@@ -353,6 +353,14 @@ In `docs/planning/BACKLOG.md`, directly after the last entry of the `### [2026-0
   login infrastructure. Build a reusable login helper (admin + customer, seeded credentials) and
   smoke tests loading each route (expect 200 + rendered detail view). (Med value, Med effort)
   [G3 spec §2/§5, 2026-08-08]
+- 🟤 **Navigation hooks are typed nullable project-wide by the pages-router compat reference** —
+  `next-env.d.ts` references `next/navigation-types/compat/navigation` because the repo keeps
+  `pages/_app.js`/`_document.js`/`_error.js` stubs (added during the Jan 2026 Next 14/React 18
+  downgrade), so `useParams`/`usePathname`/`useSearchParams` all return `| null` in TypeScript
+  even in App Router code — this is why the G3 fix needs `useParams<{ id: string }>()!`.
+  Follow-up: determine whether the `pages/` stubs are still load-bearing; if they can go, the
+  compat reference disappears on the next `next-env.d.ts` regen and the four `!` assertions can
+  drop. (Low value, Low effort) [G3 fix-round adjudication, 2026-08-08]
 ```
 
 - [ ] **Step 4: Commit**
@@ -415,3 +423,4 @@ After user approval + PR merge: BACKLOG `[2026-07-18]` `use(params)` entry resol
 ## Progress Log
 
 - 2026-08-08: Plan written from approved spec (`2026-08-08-g3-params-fix-design.md`); branch `feat/g3-params-fix` created; spec committed (`d19828a`).
+- 2026-08-08: Tasks 1+2 complete (commit `c55b621`) — red→green verified (red in jsdom = `use is not a function`, an environment artifact: stable React 18.3.1 lacks `use`; the prod 500 came from Next's vendored canary). **Deviation from Task 2's exact code, controller-adjudicated:** `useParams<{ id: string }>()` alone does not typecheck — `next-env.d.ts` references `next/navigation-types/compat/navigation` (present because of the `pages/` error-stub dir kept since the Jan 2026 Next-14 downgrade), which redeclares `useParams(): T | null` project-wide. Ruling: the non-null assertion `useParams<{ id: string }>()!` stands (App Router always supplies params at runtime; a null-guard would add a render branch, violating the no-behavioral-change constraint). Review finding demanding `!` removal overruled on verified evidence (TS2339 reproduced with `!` removed; augmentation traced). Task 3 doc-bullets and BACKLOG text amended above to match.
