@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { site } from "@/content/site";
 import { formatPrice } from "@/lib/format";
 import { useCartStore } from "@/stores/cart.store";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -182,12 +183,12 @@ export function Header() {
           <SheetTrigger asChild className="md:hidden">
             <Button variant="ghost" size="icon">
               <Menu className="h-5 w-5" />
-              <span className="sr-only">Toggle menu</span>
+              <span className="sr-only">{site.header.toggleMenu}</span>
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-[300px] sm:w-[350px]">
             <SheetHeader className="text-left">
-              <SheetTitle>Menu</SheetTitle>
+              <SheetTitle>{site.header.menu}</SheetTitle>
             </SheetHeader>
 
             <nav className="mt-6 flex flex-col gap-2">
@@ -206,7 +207,7 @@ export function Header() {
                 onClick={closeMobileMenu}
                 className="hover:bg-muted flex items-center rounded-lg px-3 py-2 text-lg font-medium transition-colors"
               >
-                Categories
+                {site.header.categories}
               </Link>
               {categories.length > 0 && (
                 <div className="ml-4 flex flex-col gap-1">
@@ -229,7 +230,7 @@ export function Header() {
                   className="text-primary hover:bg-muted flex items-center rounded-lg px-3 py-2 text-lg font-medium transition-colors"
                 >
                   <Settings className="mr-2 h-5 w-5" />
-                  Admin Panel
+                  {site.header.adminPanel}
                 </Link>
               )}
             </nav>
@@ -255,7 +256,7 @@ export function Header() {
                   className="hover:bg-muted flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors"
                 >
                   <User className="mr-2 h-4 w-4" />
-                  Account
+                  {site.header.account}
                 </Link>
                 <Link
                   href="/account/orders"
@@ -263,24 +264,24 @@ export function Header() {
                   className="hover:bg-muted flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors"
                 >
                   <ShoppingCart className="mr-2 h-4 w-4" />
-                  Orders
+                  {site.header.orders}
                 </Link>
                 <button
                   onClick={handleSignOut}
                   className="hover:bg-muted text-destructive flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
-                  Sign out
+                  {site.header.signOut}
                 </button>
               </div>
             ) : (
               <div className="space-y-2 px-3">
                 <Link href="/login" onClick={closeMobileMenu}>
-                  <Button className="w-full">Sign in</Button>
+                  <Button className="w-full">{site.header.signIn}</Button>
                 </Link>
                 <Link href="/register" onClick={closeMobileMenu}>
                   <Button variant="outline" className="w-full">
-                    Create account
+                    {site.header.createAccount}
                   </Button>
                 </Link>
               </div>
@@ -317,7 +318,7 @@ export function Header() {
               href="/admin"
               className="text-muted-foreground hover:text-foreground text-sm font-semibold transition-colors"
             >
-              Admin Panel
+              {site.header.adminPanel}
             </Link>
           )}
         </nav>
@@ -332,20 +333,20 @@ export function Header() {
             aria-label="Пошук"
           >
             <Search className="h-5 w-5" />
-            <span className="sr-only">Search (Ctrl+K)</span>
+            <span className="sr-only">{site.header.search.srOpen}</span>
           </Button>
 
           {/* Search Dialog */}
           <Dialog open={searchOpen} onOpenChange={setSearchOpen}>
             <DialogContent className="p-0 sm:max-w-[500px]">
               <DialogHeader className="sr-only">
-                <DialogTitle>Search Products</DialogTitle>
+                <DialogTitle>{site.header.search.dialogTitle}</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSearchSubmit}>
                 <div className="flex items-center border-b px-3">
                   <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
                   <Input
-                    placeholder="Search products..."
+                    placeholder={site.header.search.placeholder}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="placeholder:text-muted-foreground flex h-12 w-full border-0 bg-transparent py-3 text-sm outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
@@ -391,7 +392,7 @@ export function Header() {
                     className="text-muted-foreground hover:bg-muted flex w-full items-center gap-2 rounded-md p-2 text-sm"
                   >
                     <Search className="h-4 w-4" />
-                    View all results for &quot;{searchQuery}&quot;
+                    {site.header.search.viewAll(searchQuery)}
                   </button>
                 </div>
               )}
@@ -399,14 +400,14 @@ export function Header() {
               {/* No Results */}
               {searchQuery.length >= 2 && !isSearching && searchResults.length === 0 && (
                 <div className="text-muted-foreground p-4 text-center text-sm">
-                  No products found for &quot;{searchQuery}&quot;
+                  {site.header.search.noResults(searchQuery)}
                 </div>
               )}
 
               {/* Empty State */}
               {searchQuery.length < 2 && (
                 <div className="text-muted-foreground p-4 text-center text-sm">
-                  Type at least 2 characters to search...
+                  {site.header.search.minChars}
                 </div>
               )}
             </DialogContent>
@@ -442,13 +443,13 @@ export function Header() {
                 <DropdownMenuItem asChild>
                   <Link href="/account" className="cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
-                    Account
+                    {site.header.account}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/account/orders" className="cursor-pointer">
                     <ShoppingCart className="mr-2 h-4 w-4" />
-                    Orders
+                    {site.header.orders}
                   </Link>
                 </DropdownMenuItem>
                 {isAdmin && (
@@ -457,7 +458,7 @@ export function Header() {
                     <DropdownMenuItem asChild>
                       <Link href="/admin" className="cursor-pointer">
                         <Settings className="mr-2 h-4 w-4" />
-                        Admin Panel
+                        {site.header.adminPanel}
                       </Link>
                     </DropdownMenuItem>
                   </>
@@ -468,14 +469,14 @@ export function Header() {
                   className="text-destructive cursor-pointer"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
-                  Sign out
+                  {site.header.signOut}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <Link href="/login">
               <Button variant="ghost" size="sm">
-                Sign in
+                {site.header.signIn}
               </Button>
             </Link>
           )}
@@ -487,7 +488,7 @@ export function Header() {
                 {totalItems > 99 ? "99+" : totalItems}
               </span>
             )}
-            <span className="sr-only">Кошик</span>
+            <span className="sr-only">{site.header.cart}</span>
           </Button>
         </div>
       </div>
