@@ -1,6 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { OrderStatus } from "@prisma/client";
-import { getOrderStatusStyle, getOrderStatusLabel, ORDER_STATUS_STYLES } from "@/lib/order-status";
+import {
+  getOrderStatusStyle,
+  getOrderStatusLabel,
+  ORDER_STATUS_STYLES,
+  ORDER_STATUS_LABELS,
+} from "@/lib/order-status";
 
 describe("order-status", () => {
   // Iterates the real Prisma enum rather than a hardcoded local list, so that
@@ -26,8 +31,14 @@ describe("order-status", () => {
     }
   });
 
-  it("labels known statuses and falls back to the raw value", () => {
-    expect(getOrderStatusLabel("SHIPPED")).toBe("Shipped");
+  it("labels known statuses in Ukrainian and falls back to the raw value", () => {
+    expect(getOrderStatusLabel("SHIPPED")).toBe("Відправлено");
     expect(getOrderStatusLabel("WEIRD")).toBe("WEIRD");
+  });
+
+  it("defines a label for every OrderStatus value", () => {
+    for (const s of Object.values(OrderStatus)) {
+      expect(ORDER_STATUS_LABELS[s]).toBeTruthy();
+    }
   });
 });
