@@ -2,11 +2,32 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-08-07
+**Last Updated**: 2026-08-08
 
 ---
 
 ## 2026-08 (August)
+
+### [2026-08-08] G3 - `use(params)` Fix Across 4 Dynamic Client Routes (WEEKLY solo)
+
+**Plan**: [docs/archive/plans/2026-08-08_g3-params-fix.md](../archive/plans/2026-08-08_g3-params-fix.md) (Progress Log carries the full arc incl. the `!` adjudication and both PR review rounds)
+**Spec**: [2026-08-08-g3-params-fix-design.md](../superpowers/specs/2026-08-08-g3-params-fix-design.md)
+**PR**: [#30](https://github.com/GoodAlex223/dropshipping-test/pull/30) — merged `6f81f95` (2026-08-08)
+**SDD ledger**: removed post-completion; the plan's Progress Log is the surviving record
+
+**Summary**: The four client-component dynamic routes — `/admin/orders/[id]`, `/admin/products/[id]`, `/admin/suppliers/[id]`, `/account/orders/[id]` — 500'd on the pinned Next 14.2.35 calling React's `use(params)` (Next 14 passes plain-object params to client components; Promise semantics is Next 15). All four now read `const { id } = useParams<{ id: string }>()!;` and are prop-less (dead `params: Promise<…>` interfaces removed); `useParams` survives the ROADMAP'd Next 16 upgrade unchanged. The trailing `!` is a **mid-task adjudicated deviation** from the spec'd bare call: `next-env.d.ts` references `next/navigation-types/compat/navigation` (the repo keeps `pages/` error stubs from the Jan 2026 downgrade), which redeclares `useParams(): T | null` project-wide, so the bare call fails typecheck (TS2339). A task-review finding demanding the assertion's removal was overruled on directly reproduced evidence — the reviewer had read the base declaration that the compat augmentation overrides, while the implementer's disputed tsc claim proved true.
+
+**Key changes**:
+
+- 9 commits; unit tests 632 → **636** — new `tests/unit/dynamic-route-params.test.tsx` renders all four pages with mocked `useParams`/`fetch` and asserts the route id reaches each fetch URL (red→green TDD; jsdom red = `use is not a function`, an environment artifact — stable React 18.3.1 lacks `use`; prod's throw came from Next's vendored canary)
+- Docs propagation in-branch: root + `src/app` CLAUDE.md bullets flipped from "currently broken" to the fixed pattern; `!` rationale comments at all four call sites; BACKLOG `[2026-08-08]` group with 3 🟤 entries (E2E auth/login helper + authenticated smoke tests; pages-compat nullable navigation types; Textarea ref drop)
+- Verified: gates green across three separate runs; real-browser pass (Playwright MCP) — all four routes 200 with rendered detail views under seeded admin + customer logins, dev-server log clean of `use()` errors and 500s
+- **PR review: two rounds.** r1: 2 findings, both real — docs-freshness recurrences **#8/#9** (`docs/README.md` own header; `BACKLOG.md` header + index-row pair, fixed together in one commit avoiding #27's "fix moved the drift" mode) + chat-surfaced near-misses fixed (`vi.stubGlobal` fetch hardening, `!` comments). r2: clean on code, CI fully green; 2 BACKLOG-wording refinements applied (linter-entry recurrence trail #8/#9; Textarea entry upgraded with confirmed cause — plain function component vs `Input`'s `forwardRef`, RHF ref dropped for `shortDesc`/`description` → no focus/scroll on validation error, Med/Low); **pushed back** on r2's claim that the old fetch stub leaked across test files (vitest default per-file isolation disproves it)
+- EXTRACT quota: satisfied by the 3 in-branch 🟤 entries in BACKLOG `[2026-08-08]`
+
+**Learnings**: the type a call site sees is the _resolved_ type, not the declaration you read — a `declare module` augmentation (here via `next-env.d.ts`'s compat reference) silently overrides the package's own `.d.ts`, and grepping the "obvious" declaration file proves nothing; when an implementer and a reviewer assert contradictory facts about the same environment, reproduce the disputed claim directly before spending another fix round (one 30-second tsc run settled what two subagent rounds could not); a "cosmetic" console warning can hide a functional gap (the dropped Textarea ref costs react-hook-form its focus-on-error behavior).
+
+---
 
 ### [2026-08-07] G2 - Checkout Restyle + No-Prepayment COD Flow (WEEKLY batch)
 

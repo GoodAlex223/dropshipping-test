@@ -48,7 +48,9 @@
 
 > The only 🟤 group this week (≤1-group cap). Solo-2-SP exception: kept separate from G4 so every group stays single-source; it is one mechanical pattern across 4 files. `/account/orders/[id]` is also squarely inside this week's theme — a 500 page is the ultimate stale surface.
 
-- [ ] Fix `use(params)` on Next 14.2.35 (plain object, not a Promise) in all 4 broken client routes — `/admin/orders/[id]`, `/admin/products/[id]`, `/admin/suppliers/[id]`, `/account/orders/[id]` — each currently 500s; add a regression check (2) — BACKLOG [2026-07-18] TASK-034 Task 12 [HIGH]
+- [x] Fix `use(params)` on Next 14.2.35 (plain object, not a Promise) in all 4 broken client routes — `/admin/orders/[id]`, `/admin/products/[id]`, `/admin/suppliers/[id]`, `/account/orders/[id]` — each currently 500s; add a regression check (2) — BACKLOG [2026-07-18] TASK-034 Task 12 [HIGH]
+
+> ✅ Shipped 2026-08-08 (Fri, +2 days — G2 spillover) — PR [#30](https://github.com/GoodAlex223/dropshipping-test/pull/30) merged `6f81f95`. All four routes now `useParams<{ id: string }>()!` and prop-less; the `!` is forced by the pages-compat types `next-env.d.ts` pulls in (adjudicated mid-task, reviewer finding overruled on reproduced tsc evidence). RTL regression file `dynamic-route-params.test.tsx` (red→green); browser-verified 200s under admin + customer logins. Unit 632 → **636**. Two review rounds: r1 docs-freshness recurrences #8/#9 + chat near-misses fixed; r2 clean on code, 2 BACKLOG-wording refinements.
 
 ### G4. Peripheral Surfaces Sweep [batch]
 
@@ -103,7 +105,7 @@
 ### Wednesday — Checkout + broken routes
 
 - ✅ **[G2](#g2-checkout-restyle-batch)** 🔵 — the riskiest restyle, front-loaded. Shipped Thu 2026-08-07 (+1 day: client COD scope-change absorbed in-task), PR [#29](https://github.com/GoodAlex223/dropshipping-test/pull/29).
-- **[G3](#g3-params-fix-solo)** 🟤 — 4-route `use(params)` fix.
+- ✅ **[G3](#g3-params-fix-solo)** 🟤 — 4-route `use(params)` fix. Shipped Fri 2026-08-08 (+2 days: G2's COD scope-change spillover pushed the queue), PR [#30](https://github.com/GoodAlex223/dropshipping-test/pull/30).
 
 ### Thursday — Peripheral sweep + reviews start
 
@@ -125,7 +127,7 @@
 | --- | -------------------------------------- | ------------------- | ----------- | ------ | -------- | ------- | ------------- |
 | G1  | Cart and Drawer Restyle `[batch]`      | storefront/cart     | 🔵 User     | 3      | 5        | Tue     | ✅ PR #28     |
 | G2  | Checkout Restyle `[batch]`             | storefront/checkout | 🔵 User     | 3      | 5        | Wed     | ✅ PR #29     |
-| G3  | Params Fix `[solo]`                    | Next.js routing     | 🟤 Auto     | 1      | 2        | Wed     | ☐ Planned     |
+| G3  | Params Fix `[solo]`                    | Next.js routing     | 🟤 Auto     | 1      | 2        | Wed     | ✅ PR #30     |
 | G4  | Peripheral Surfaces Sweep `[batch]`    | auth/account/system | 🔵 User     | 3      | 5        | Thu     | ☐ Planned     |
 | G5  | Transactional Emails `[solo]` 🏆       | email templates     | 🔵 User     | 2      | 3        | Fri     | ☐ Planned     |
 | G6  | Weekly Reviews `[batch]`               | recurring reviews   | ⚪ Overhead | 4      | 5        | Thu–Fri | ☐ Planned     |
