@@ -254,3 +254,23 @@ Expected unit growth: ~15–25 tests from 636.
   CookieConsent's existing `mounted` gate is untouched.
 - **TASK-039 scope grows** by the four new content modules — the designed trade, per WEEKLY's
   "TASK-039 interaction" note.
+
+---
+
+## Superseded notes (post-merge, 2026-08-09 — PR #31 `eb630f4`)
+
+Frozen-spec corrections; the implementation record is the plan's Progress log and DONE.md.
+
+1. **§5 "`dynamic-route-params.test.tsx` — no change expected" was falsified in execution**
+   (plan Task 10): the test's `/account/orders/[id]` case asserts the page's not-found string,
+   which the conversion changed — one assertion updated to «Замовлення не знайдено» (the three
+   admin assertions stay English). The `useParams` pattern the row was really about is intact.
+2. **§3.2/§9's `not-found.tsx` "canary" claim was overstated**: the `StatusAction` union permits
+   `onClick` members from any caller — only the doc comment constrains server callers to `href`
+   actions — and `not-found.tsx` is `force-dynamic`, so a violation would surface as a runtime
+   error on request, not a loud build failure. Shipped code is correct; do not lean on that
+   canary when editing StatusScreen consumers (final-review minor #5 on PR #31).
+3. **§8 spawn 3 (`AUTH_TRUST_HOST` docs note) was correctly skipped as already filed** — and the
+   visual gate added a nuance (scripted `signIn()` still MissingCSRF's under the documented
+   workaround), recorded as a `[possible-dup-of]` extension in BACKLOG `[2026-08-09] From: G4
+execution`.

@@ -2,11 +2,34 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-08-08
+**Last Updated**: 2026-08-09
 
 ---
 
 ## 2026-08 (August)
+
+### [2026-08-09] G4 - Peripheral Surfaces Sweep: Ukrainian + Mirox Alignment (WEEKLY batch)
+
+**Plan**: [docs/archive/plans/2026-08-08_g4-peripheral-surfaces.md](../archive/plans/2026-08-08_g4-peripheral-surfaces.md) (all 15 tasks checked off; Progress log carries per-task commits, fix rounds, and the visual-gate record)
+**Spec**: [2026-08-08-g4-peripheral-surfaces-design.md](../superpowers/specs/2026-08-08-g4-peripheral-surfaces-design.md) (+ post-merge superseded notes)
+**PR**: [#31](https://github.com/GoodAlex223/dropshipping-test/pull/31) — merged `eb630f4` (2026-08-09); prod live-verified (`/login` «Вхід», `/categories` DB-backed 200)
+**SDD ledger**: removed post-completion; the plan's Progress log is the surviving record
+
+**Summary**: Converted every remaining English customer-facing surface to Ukrainian with derived Mirox alignment (no mockup exists for these pages — consistency judged against shipped siblings at a user-signed visual gate). Scope ruled to the G1 audit's definitive boundary + the G3-unblocked order detail: auth (login/register/error), account (layout/overview/orders/detail), newsletter pages + footer signup toast, 404/root error/cookie banner, categories chrome, Header residuals. Mechanisms: 4 new `src/content/` modules + `site.header`; shared hook-free `StatusScreen` for the 5 status pages; machine `code`s on the newsletter API + register 409 with client-side code→UA mapping (G2 convention; `apiError()` gained an optional `code` param, backward compat pinned); `ORDER_STATUS_LABELS`/`PAYMENT_STATUS_LABELS` in content (lib re-exports only the order map); dead `/account/addresses|settings` links removed; `uk-UA` dates. In-task growth 5 → ~9 SP (audit-definitive ruling), the G2 pattern.
+
+**Key changes**:
+
+- 23 commits; unit tests 636 → **672** (new: status-screen, newsletter-status-pages, newsletter-signup, auth-register-api; extended: content/order-status/newsletter-api/api-utils)
+- SDD execution: 15 tasks, haiku implementers + sonnet task reviews, 3 in-loop fix rounds (signup-mapping coverage; `/меню/i` locators broken by the UA accessible name — traced by the reviewer through lucide's `aria-hidden` + accessible-name computation; the carried «Категорії» heading assertion), fable final review (0 Critical) + one fix wave
+- Visual gate: 38-capture montage vs shipped siblings, user-approved with one revision — the account quick-links grid became dynamic (user-picked auto-fill option), which took two rounds because **Tailwind v4 silently drops nested-comma arbitrary grid templates** (both `grid-cols-[repeat(…)]` and `[grid-template-columns:…]` produce no CSS rule; inline style is the landed fallback, verified against compiled CSS)
+- Execution finds (all filed): `/etc/environment` carries a third `NODE_ENV=development` (local prod-CSS corruption); newsletter confirm double-fetch clobbers success under Strict Mode; scripted `signIn()` hits MissingCSRF despite the audit workaround; SEO/metadata layer still EN (final-review find — recorded so "no EN left" never propagates unqualified)
+- Gate review (user) spawned 2 🔵: **categories→catalog redesign** (redirect + DB-driven facet + API parent rollup; next-week candidate) and the parent-category «Всі»=0 rollup bug (all products leaf-attached; API exact-slug match vs the card counts that do roll up)
+- **PR review: two rounds + CI round.** r1: 1 finding, real — account.ts docblock overclaimed the label-map re-export (only ORDER_STATUS_LABELS crosses lib; fixed by narrowing, pushback on adding the re-export accepted with the reviewer's own stronger evidence: it's the codebase's sole content re-export among 30 direct-import sites). r2: clean. Then **CI E2E failed** where local runs couldn't catch it: `products.spec` filled `getByPlaceholder(/search/i)` — the pre-G4 English placeholder — while the adjacent `name: "Пошук"` click survived via substring matching; only 2 of 5 specs had run branch-locally. Fixed + class-swept in `01d55e5`
+- EXTRACT quota: 9 in-branch BACKLOG entries (4 groups) + 2 at completion (shared newsletter-codes constant; archived-plans index gap)
+
+**Learnings**: a string rename must be swept through every _locator type_ across every spec file — role-name queries surviving via substring matching proves nothing about placeholder/label regexes one line away, and specs that don't run locally run in CI; Tailwind v4 arbitrary values with nested commas are silent no-ops here — "class in JSX" ≠ "rule in CSS", verify compiled output (the css-token lesson's second variant); an SDD gate agent can describe a wrong outcome as success when it doesn't know the intended rendering — the controller must check outcome evidence (the full-width card read as "done" until compared against the auto-fill math); haiku implementer reports embellish itemized evidence while top-line numbers stay honest — trust totals, verify breakdowns.
+
+---
 
 ### [2026-08-08] G3 - `use(params)` Fix Across 4 Dynamic Client Routes (WEEKLY solo)
 

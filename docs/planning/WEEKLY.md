@@ -58,9 +58,11 @@
 
 > Tokens are already global, so this is mostly copy conversion + component alignment to the Mirox look; G1's audit fixes the exact file list.
 
-- [ ] Auth: login/register forms → Ukrainian + Mirox alignment — `src/app/(auth)/login/`, `src/app/(auth)/register/` (2) — BACKLOG [2026-08-04] weekly-planning steer
-- [ ] Account: layout ("My Account"), overview, orders list/detail ("Order History") → Ukrainian + restyle — `src/app/(shop)/account/**` (2) — BACKLOG [2026-08-04] weekly-planning steer
-- [ ] Newsletter confirm/unsubscribe pages + root error/404 pages → Ukrainian — `src/app/newsletter/**`, [src/app/error.tsx](../../src/app/error.tsx) ("Something went wrong"), [src/app/not-found.tsx](../../src/app/not-found.tsx) ("Page not found") (1) — BACKLOG [2026-08-04] weekly-planning steer
+- [x] Auth: login/register forms → Ukrainian + Mirox alignment — `src/app/(auth)/login/`, `src/app/(auth)/register/` (2) — BACKLOG [2026-08-04] weekly-planning steer
+- [x] Account: layout ("My Account"), overview, orders list/detail ("Order History") → Ukrainian + restyle — `src/app/(shop)/account/**` (2) — BACKLOG [2026-08-04] weekly-planning steer
+- [x] Newsletter confirm/unsubscribe pages + root error/404 pages → Ukrainian — `src/app/newsletter/**`, [src/app/error.tsx](../../src/app/error.tsx) ("Something went wrong"), [src/app/not-found.tsx](../../src/app/not-found.tsx) ("Page not found") (1) — BACKLOG [2026-08-04] weekly-planning steer
+
+> ✅ Shipped 2026-08-09 (Sat, +2 days — queue spillover behind G2/G3) — PR [#31](https://github.com/GoodAlex223/dropshipping-test/pull/31) merged `eb630f4`; prod verified live (Vercel Git integration deploy, `/login` serving «Вхід»). Scope grew 5 → ~9 SP to the audit-definitive boundary (categories chrome, CookieConsent, Header residuals, the G3-unblocked `orders/[id]`, coded newsletter API) — the same in-task-growth pattern as G2. Visual gate signed off with one user revision (auto-fill account grid); gate review spawned the 🔵 categories→catalog redesign (next week's candidate) + the parent-category rollup bug. 636 → 672 unit tests.
 
 ### G5. Transactional Emails [solo] 🏆
 
@@ -109,7 +111,7 @@
 
 ### Thursday — Peripheral sweep + reviews start
 
-- **[G4](#g4-peripheral-surfaces-sweep-batch)** 🔵 — auth/account/newsletter/error pages.
+- ✅ **[G4](#g4-peripheral-surfaces-sweep-batch)** 🔵 — auth/account/newsletter/error pages. Shipped Sat 2026-08-09 (+2 days: G2/G3 queue spillover), PR [#31](https://github.com/GoodAlex223/dropshipping-test/pull/31).
 - **[G6](#g6-weekly-reviews-batch)** ⚪ — part 1 (queue creation + plugins slot).
 
 ### Friday — Reviews close + stretch
@@ -128,7 +130,7 @@
 | G1  | Cart and Drawer Restyle `[batch]`      | storefront/cart     | 🔵 User     | 3      | 5        | Tue     | ✅ PR #28     |
 | G2  | Checkout Restyle `[batch]`             | storefront/checkout | 🔵 User     | 3      | 5        | Wed     | ✅ PR #29     |
 | G3  | Params Fix `[solo]`                    | Next.js routing     | 🟤 Auto     | 1      | 2        | Wed     | ✅ PR #30     |
-| G4  | Peripheral Surfaces Sweep `[batch]`    | auth/account/system | 🔵 User     | 3      | 5        | Thu     | ☐ Planned     |
+| G4  | Peripheral Surfaces Sweep `[batch]`    | auth/account/system | 🔵 User     | 3      | 5        | Thu     | ✅ PR #31     |
 | G5  | Transactional Emails `[solo]` 🏆       | email templates     | 🔵 User     | 2      | 3        | Fri     | ☐ Planned     |
 | G6  | Weekly Reviews `[batch]`               | recurring reviews   | ⚪ Overhead | 4      | 5        | Thu–Fri | ☐ Planned     |
 | G7  | Client Content Ask (TASK-056) `[solo]` | client content      | 🔵 User     | 1      | 2        | Fri     | ☐ Planned     |

@@ -832,6 +832,24 @@ Auto-Generated finding — recorded so G4's "converted to Ukrainian" scope isn't
   metadata (rendered strings only) — recording the exception so "G4 = no EN left" never
   propagates unqualified; natural home is TASK-039 i18n. (Low-Med value, Low effort)
 
+### [2026-08-09] From: G4 completion
+
+**Origin**: completion-workflow extraction after PR #31 merged (`eb630f4`) — final-review minors
+deliberately not fixed in-branch plus a docs-index gap found during Task 15's freshness pass.
+
+- 🟤 **Newsletter outcome codes: shared constant between routes and content tests** — the three
+  newsletter routes hardcode their `code` strings and `tests/unit/content.test.ts` re-enumerates
+  the same strings in its "covers every code the API emits" lists; a code added to a route later
+  fails nothing and silently lands on the generic fallback (safe, but the test names overstate).
+  Export the code sets from a shared module (or the routes) and iterate those in both the routes'
+  types and the coverage tests so they self-true. Final-review minor #3 on PR #31. (Low value,
+  Low effort)
+- 🟤 **WEEKLY-group archived plans missing from docs/README.md's Archived Plans table** — the
+  table indexes TASK-NNN plans through TASK-037, but G1/G2/G3's archived plans (and now G4's
+  `2026-08-08_g4-peripheral-surfaces.md`) are absent. Surfaced by Task 15's docs-freshness pass
+  and left per follow-existing-convention; decide the convention (index WEEKLY-group plans too,
+  or note the table's TASK-only scope) and apply in one sweep. (Low value, Low effort)
+
 ---
 
 ## Technical Debt
