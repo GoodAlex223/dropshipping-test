@@ -3,8 +3,10 @@ import { pluralizeUk } from "@/lib/format";
 /**
  * Account area copy (layout nav, overview, orders list/detail) plus the
  * customer-facing OrderStatus / PaymentStatus label maps. Single extraction
- * point for TASK-039 i18n. The status maps live here (not lib/) because they
- * are customer copy; lib/order-status.ts re-exports for style/label lookup.
+ * point for TASK-039 i18n. The maps live here (not lib/) because they are
+ * customer copy. lib/order-status.ts re-exports ORDER_STATUS_LABELS only, so
+ * its consumers keep one import for the style+label pair; PAYMENT_STATUS_LABELS
+ * has no lib pairing and is imported directly from this module.
  */
 export const ORDER_STATUS_LABELS: Record<string, string> = {
   PENDING: "Очікує підтвердження",
