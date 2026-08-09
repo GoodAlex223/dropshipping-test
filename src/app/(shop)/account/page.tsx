@@ -16,9 +16,7 @@ export default function AccountPage() {
     return (
       <div className="space-y-6">
         <Skeleton className="h-24 w-full" />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Skeleton className="h-32" />
-          <Skeleton className="h-32" />
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(16rem,1fr))] gap-4">
           <Skeleton className="h-32" />
         </div>
       </div>
@@ -38,7 +36,7 @@ export default function AccountPage() {
       </Card>
 
       {/* Quick Links */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(16rem,1fr))] gap-4">
         <Card className="transition-shadow hover:shadow-md">
           <CardHeader className="flex flex-row items-center gap-4 pb-2">
             <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
