@@ -162,6 +162,7 @@ describe("newsletter content", () => {
       "ALREADY_UNSUBSCRIBED",
       "SUBSCRIBER_NOT_FOUND",
       "INVALID_UNSUBSCRIBE_LINK",
+      "VALIDATION_ERROR",
     ]) {
       expect(newsletter.unsubscribe.byCode[code]).toBeTruthy();
     }

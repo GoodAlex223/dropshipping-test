@@ -330,10 +330,9 @@ export function Header() {
             variant="ghost"
             size="icon"
             onClick={() => setSearchOpen(true)}
-            aria-label="Пошук"
+            aria-label={site.header.search.srOpen}
           >
             <Search className="h-5 w-5" />
-            <span className="sr-only">{site.header.search.srOpen}</span>
           </Button>
 
           {/* Search Dialog */}

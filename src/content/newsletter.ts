@@ -66,6 +66,10 @@ export const newsletter = {
         title: "Недійсне посилання",
         description: "Посилання для відписки недійсне.",
       },
+      VALIDATION_ERROR: {
+        title: "Недійсне посилання",
+        description: "Посилання для відписки недійсне або неповне.",
+      },
     } as Record<string, NewsletterOutcomeCopy>,
     fallback: {
       title: "Щось пішло не так",

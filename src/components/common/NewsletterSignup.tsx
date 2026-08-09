@@ -7,8 +7,9 @@ import { Loader2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { newsletter } from "@/content/newsletter";
 
-// TASK-039: externalize — hardcoded Ukrainian strings below stay inline
-// until the i18n library lands; this component has no English consumer.
+// TASK-039: externalize — success-path strings below stay inline until the
+// i18n library lands; error-path copy already lives in src/content/newsletter.ts
+// (G4 code mapping).
 export function NewsletterSignup() {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);

@@ -819,6 +819,19 @@ by implementers/reviewers while executing the G4 plan's 15 tasks. All 🟤 Auto-
   `[possible-dup-of: the categories→catalog redesign entry above — its rollup fix resolves this]`;
   ship as a standalone fix if the redesign slips. (Med value, Low effort)
 
+### [2026-08-09] From: G4 final review
+
+**Origin**: final branch review of `feat/g4-peripheral-surfaces` before merge. One 🟤
+Auto-Generated finding — recorded so G4's "converted to Ukrainian" scope isn't overstated.
+
+- 🟤 **SEO/metadata layer still English on converted surfaces** — `src/lib/seo.ts:229-235`
+  `getAuthMetadata` emits "Sign In"/"Create Account" titles + EN descriptions on the Ukrainian
+  login/register pages; `src/app/(shop)/categories/[slug]/page.tsx:56` emits
+  `title: "Category Not Found"`, lines ~79-80 emit JSON-LD breadcrumbs "Home"/"Categories"; the
+  whole seo.ts metadata layer is EN by pre-existing convention. G4 deliberately did not own
+  metadata (rendered strings only) — recording the exception so "G4 = no EN left" never
+  propagates unqualified; natural home is TASK-039 i18n. (Low-Med value, Low effort)
+
 ---
 
 ## Technical Debt

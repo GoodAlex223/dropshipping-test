@@ -124,7 +124,7 @@ src/
 │   ├── checkout.ts         # Checkout + confirmation copy (steps, COD/prepay block config, manager contacts — cardNumber/whatsapp are CLIENT-SUPPLIED-pending)
 │   ├── home.ts             # Homepage copy (hero, benefits, whyChooseUs, rails, testimonials)
 │   ├── newsletter.ts       # Newsletter pages + footer-signup copy; byCode maps translate API outcome codes to Ukrainian
-│   ├── site.ts             # Site-wide config (announcement, socials, client claims, footer benefits)
+│   ├── site.ts             # Site-wide config (announcement, socials, client claims, footer benefits, header chrome strings — site.header, G4)
 │   └── system.ts           # System pages copy (404, root error boundary, cookie consent banner)
 ├── hooks/                  # Custom React hooks (use-debounce, use-toast)
 ├── lib/                    # Core utilities
