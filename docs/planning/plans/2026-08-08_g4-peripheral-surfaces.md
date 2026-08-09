@@ -37,7 +37,7 @@
 - Consumes: nothing new.
 - Produces: `apiError(message: string, status?: number, code?: string)` → JSON `{ error }` or `{ error, code }`. Tasks 2 and 7 rely on the 3-arg form.
 
-- [ ] **Step 1: Write the failing tests** — append inside `describe("apiError", …)` in `tests/unit/api-utils.test.ts`:
+- [x] **Step 1: Write the failing tests** — append inside `describe("apiError", …)` in `tests/unit/api-utils.test.ts`:
 
 ```ts
 it("includes a machine code when provided", async () => {
@@ -57,12 +57,12 @@ it("omits the code key entirely when not provided", async () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify the first fails**
+- [x] **Step 2: Run to verify the first fails**
 
 Run: `npm run test:run -- tests/unit/api-utils.test.ts`
 Expected: FAIL — body equals `{ error: … }` without `code` (first new test).
 
-- [ ] **Step 3: Implement** — replace the `apiError` function in `src/lib/api-utils.ts`:
+- [x] **Step 3: Implement** — replace the `apiError` function in `src/lib/api-utils.ts`:
 
 ```ts
 export function apiError(message: string, status: number = 400, code?: string) {
@@ -72,12 +72,12 @@ export function apiError(message: string, status: number = 400, code?: string) {
 }
 ```
 
-- [ ] **Step 4: Run to verify pass**
+- [x] **Step 4: Run to verify pass**
 
 Run: `npm run test:run -- tests/unit/api-utils.test.ts`
 Expected: PASS (all).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/api-utils.ts tests/unit/api-utils.test.ts
@@ -101,7 +101,7 @@ git commit -m "feat(api): optional machine code on apiError responses"
   - confirm: `TOKEN_REQUIRED` 400 · `INVALID_TOKEN` 404 · `ALREADY_CONFIRMED` 200 · `LINK_EXPIRED` 410 · `CONFIRMED` 200 · `CONFIRM_FAILED` 500
   - unsubscribe: `VALIDATION_ERROR` 400 · `SUBSCRIBER_NOT_FOUND` 404 · `ALREADY_UNSUBSCRIBED` 200 · `INVALID_UNSUBSCRIBE_LINK` 400 · `UNSUBSCRIBED` 200 · `UNSUBSCRIBE_FAILED` 500
 
-- [ ] **Step 1: Extend existing tests (red first).** In `tests/unit/newsletter-api.test.ts`, add a `body.code` assertion to each listed test. Keep every existing EN `toContain` assertion. Worked example for the 409 test:
+- [x] **Step 1: Extend existing tests (red first).** In `tests/unit/newsletter-api.test.ts`, add a `body.code` assertion to each listed test. Keep every existing EN `toContain` assertion. Worked example for the 409 test:
 
 ```ts
 it("returns 409 when email is already active", async () => {
@@ -137,12 +137,12 @@ Apply the same pattern (read body if the test doesn't already, then `expect(body
 
 Note: the two 400-validation tests currently assert only `res.status` — add the body read + code assertion there.
 
-- [ ] **Step 2: Run to verify red**
+- [x] **Step 2: Run to verify red**
 
 Run: `npm run test:run -- tests/unit/newsletter-api.test.ts`
 Expected: FAIL — `body.code` is `undefined` in every extended test.
 
-- [ ] **Step 3: Attach codes in the three routes.** Exact replacements (English prose unchanged):
+- [x] **Step 3: Attach codes in the three routes.** Exact replacements (English prose unchanged):
 
 `subscribe/route.ts`:
 
@@ -176,12 +176,12 @@ Add above the first changed line the G2-style comment:
 - `apiSuccess({ message: "You have been unsubscribed successfully" })` → `apiSuccess({ code: "UNSUBSCRIBED", message: "You have been unsubscribed successfully" })`
 - `apiError("Failed to process unsubscribe", 500)` → `…, 500, "UNSUBSCRIBE_FAILED")`
 
-- [ ] **Step 4: Run to verify green**
+- [x] **Step 4: Run to verify green**
 
 Run: `npm run test:run -- tests/unit/newsletter-api.test.ts`
 Expected: PASS (all 17+).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/app/api/newsletter tests/unit/newsletter-api.test.ts
@@ -203,7 +203,7 @@ git commit -m "feat(newsletter): machine codes on every API outcome (G2 coded-ou
 - Consumes: `pluralizeUk` from `@/lib/format`.
 - Produces (exact, used by Tasks 5–12): `auth`, `account`, `ORDER_STATUS_LABELS`, `PAYMENT_STATUS_LABELS` (from `@/content/account`), `newsletter`, `NewsletterOutcomeCopy` (from `@/content/newsletter`), `system`, `site.header`. `@/lib/order-status` keeps exporting `ORDER_STATUS_LABELS`, `getOrderStatusLabel`, `getOrderStatusStyle`, `ORDER_STATUS_STYLES` (labels now Ukrainian).
 
-- [ ] **Step 1: Write failing content-shape tests** — append to `tests/unit/content.test.ts` (extend the existing import block too):
+- [x] **Step 1: Write failing content-shape tests** — append to `tests/unit/content.test.ts` (extend the existing import block too):
 
 ```ts
 import { auth } from "@/content/auth";
@@ -289,7 +289,7 @@ describe("site header content", () => {
 });
 ```
 
-- [ ] **Step 2: Update `tests/unit/order-status.test.ts`** — replace the last `it` block and add enum coverage for labels:
+- [x] **Step 2: Update `tests/unit/order-status.test.ts`** — replace the last `it` block and add enum coverage for labels:
 
 ```ts
 it("labels known statuses in Ukrainian and falls back to the raw value", () => {
@@ -306,12 +306,12 @@ it("defines a label for every OrderStatus value", () => {
 
 Extend the import to `import { getOrderStatusStyle, getOrderStatusLabel, ORDER_STATUS_STYLES, ORDER_STATUS_LABELS } from "@/lib/order-status";` (re-export keeps working).
 
-- [ ] **Step 3: Run to verify red**
+- [x] **Step 3: Run to verify red**
 
 Run: `npm run test:run -- tests/unit/content.test.ts tests/unit/order-status.test.ts`
 Expected: FAIL — modules don't exist yet; `getOrderStatusLabel("SHIPPED")` still `"Shipped"`.
 
-- [ ] **Step 4: Create `src/content/auth.ts`** (complete file):
+- [x] **Step 4: Create `src/content/auth.ts`** (complete file):
 
 ```ts
 /**
@@ -365,7 +365,7 @@ export const auth = {
 };
 ```
 
-- [ ] **Step 5: Create `src/content/account.ts`** (complete file):
+- [x] **Step 5: Create `src/content/account.ts`** (complete file):
 
 ```ts
 import { pluralizeUk } from "@/lib/format";
@@ -474,7 +474,7 @@ export const account = {
 };
 ```
 
-- [ ] **Step 6: Create `src/content/newsletter.ts`** (complete file):
+- [x] **Step 6: Create `src/content/newsletter.ts`** (complete file):
 
 ```ts
 /**
@@ -564,7 +564,7 @@ export const newsletter = {
 };
 ```
 
-- [ ] **Step 7: Create `src/content/system.ts`** (complete file):
+- [x] **Step 7: Create `src/content/system.ts`** (complete file):
 
 ```ts
 /**
@@ -593,7 +593,7 @@ export const system = {
 };
 ```
 
-- [ ] **Step 8: Add `header` to `src/content/site.ts`** — insert as a new key right after `tagline: BRAND_TAGLINE,`:
+- [x] **Step 8: Add `header` to `src/content/site.ts`** — insert as a new key right after `tagline: BRAND_TAGLINE,`:
 
 ```ts
   /** Header chrome strings (G4). Nav item labels stay in Header.tsx's
@@ -620,7 +620,7 @@ export const system = {
   },
 ```
 
-- [ ] **Step 9: Move the label map out of `src/lib/order-status.ts`** — replace the whole file with:
+- [x] **Step 9: Move the label map out of `src/lib/order-status.ts`** — replace the whole file with:
 
 ```ts
 import { ORDER_STATUS_LABELS } from "@/content/account";
@@ -653,12 +653,12 @@ export function getOrderStatusLabel(status: string): string {
 }
 ```
 
-- [ ] **Step 10: Run to verify green**
+- [x] **Step 10: Run to verify green**
 
 Run: `npm run test:run -- tests/unit/content.test.ts tests/unit/order-status.test.ts`
 Expected: PASS. Then `npm run typecheck` — expect PASS (nothing consumes the new modules yet; admin pages import only `getOrderStatusStyle`).
 
-- [ ] **Step 11: Commit**
+- [x] **Step 11: Commit**
 
 ```bash
 git add src/content tests/unit/content.test.ts tests/unit/order-status.test.ts src/lib/order-status.ts
@@ -696,7 +696,7 @@ export function StatusScreen(props: {
 }): JSX.Element;
 ```
 
-- [ ] **Step 1: Write the failing test** — `tests/unit/status-screen.test.tsx` (complete file):
+- [x] **Step 1: Write the failing test** — `tests/unit/status-screen.test.tsx` (complete file):
 
 ```tsx
 import { describe, it, expect, vi } from "vitest";
@@ -748,12 +748,12 @@ describe("StatusScreen", () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify red**
+- [x] **Step 2: Run to verify red**
 
 Run: `npm run test:run -- tests/unit/status-screen.test.tsx`
 Expected: FAIL — module not found.
 
-- [ ] **Step 3: Implement `src/components/common/StatusScreen.tsx`** (complete file — note: NO `"use client"`, no hooks):
+- [x] **Step 3: Implement `src/components/common/StatusScreen.tsx`** (complete file — note: NO `"use client"`, no hooks):
 
 ```tsx
 import type { LucideIcon } from "lucide-react";
@@ -840,12 +840,12 @@ export function StatusScreen({
 
 Add to `src/components/common/index.ts`: `export { StatusScreen } from "./StatusScreen";` (match the file's existing export style).
 
-- [ ] **Step 4: Run to verify green**
+- [x] **Step 4: Run to verify green**
 
 Run: `npm run test:run -- tests/unit/status-screen.test.tsx`
 Expected: PASS (4).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/components/common/StatusScreen.tsx src/components/common/index.ts tests/unit/status-screen.test.tsx
@@ -865,7 +865,7 @@ git commit -m "feat(common): StatusScreen — shared hook-free status-page treat
 - Consumes: `StatusScreen`/`StatusAction` (Task 4), `system` (Task 3).
 - Produces: nothing downstream.
 
-- [ ] **Step 1: Replace `src/app/not-found.tsx`** (complete file — keeps `force-dynamic`, stays a server component, href action only):
+- [x] **Step 1: Replace `src/app/not-found.tsx`** (complete file — keeps `force-dynamic`, stays a server component, href action only):
 
 ```tsx
 export const dynamic = "force-dynamic";
@@ -883,7 +883,7 @@ export default function NotFound() {
 }
 ```
 
-- [ ] **Step 2: Replace `src/app/error.tsx`** (complete file — keeps the `window.location.href` home action: the router may be broken inside a crashed boundary):
+- [x] **Step 2: Replace `src/app/error.tsx`** (complete file — keeps the `window.location.href` home action: the router may be broken inside a crashed boundary):
 
 ```tsx
 "use client";
@@ -924,7 +924,7 @@ export default function Error({
 }
 ```
 
-- [ ] **Step 3: Localize `CookieConsent.tsx`** — add `import { system } from "@/content/system";`, then replace the banner block's copy:
+- [x] **Step 3: Localize `CookieConsent.tsx`** — add `import { system } from "@/content/system";`, then replace the banner block's copy:
 
 - the `<p>` text `We use cookies … analytics tracking.` (including the `&ldquo;Accept&rdquo;` entities) → `{system.cookies.message}`
 - `>Decline<` → `>{system.cookies.decline}<`
@@ -932,14 +932,14 @@ export default function Error({
 
 Zustand store, GTM script block, and `mounted` gate untouched.
 
-- [ ] **Step 4: Update `tests/e2e/home.spec.ts`** — both `getByRole("button", { name: "Decline" })` occurrences (lines ~39 and ~48) → `getByRole("button", { name: "Відхилити" })`.
+- [x] **Step 4: Update `tests/e2e/home.spec.ts`** — both `getByRole("button", { name: "Decline" })` occurrences (lines ~39 and ~48) → `getByRole("button", { name: "Відхилити" })`.
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Run: `npm run typecheck && npm run test:run -- tests/unit/no-bright-colors.test.ts tests/unit/home-page.test.tsx`
 Expected: PASS. (Full e2e runs in Task 13/CI.)
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/app/not-found.tsx src/app/error.tsx src/components/common/CookieConsent.tsx tests/e2e/home.spec.ts
@@ -960,7 +960,7 @@ git commit -m "feat(system): 404 + root error via StatusScreen; Ukrainian cookie
 - Consumes: `StatusScreen` (Task 4), `newsletter`/`NewsletterOutcomeCopy` (Task 3), API codes (Task 2).
 - Produces: nothing downstream.
 
-- [ ] **Step 1: Write the failing RTL tests** — `tests/unit/newsletter-status-pages.test.tsx` (complete file):
+- [x] **Step 1: Write the failing RTL tests** — `tests/unit/newsletter-status-pages.test.tsx` (complete file):
 
 ```tsx
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
@@ -1056,12 +1056,12 @@ describe("newsletter unsubscribe page", () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify red**
+- [x] **Step 2: Run to verify red**
 
 Run: `npm run test:run -- tests/unit/newsletter-status-pages.test.tsx`
 Expected: FAIL — pages still render the old EN strings.
 
-- [ ] **Step 3: Replace `src/app/newsletter/confirm/page.tsx`** (complete file):
+- [x] **Step 3: Replace `src/app/newsletter/confirm/page.tsx`** (complete file):
 
 ```tsx
 "use client";
@@ -1158,7 +1158,7 @@ export default function NewsletterConfirmPage() {
 }
 ```
 
-- [ ] **Step 4: Replace `src/app/newsletter/unsubscribe/page.tsx`** (complete file):
+- [x] **Step 4: Replace `src/app/newsletter/unsubscribe/page.tsx`** (complete file):
 
 ```tsx
 "use client";
@@ -1278,7 +1278,7 @@ export default function NewsletterUnsubscribePage() {
 }
 ```
 
-- [ ] **Step 5: Map codes in `NewsletterSignup.tsx`** — add `import { newsletter } from "@/content/newsletter";` and replace the response-handling block inside `handleSubmit`:
+- [x] **Step 5: Map codes in `NewsletterSignup.tsx`** — add `import { newsletter } from "@/content/newsletter";` and replace the response-handling block inside `handleSubmit`:
 
 ```ts
       const data = await response.json().catch(() => ({}));
@@ -1299,12 +1299,12 @@ export default function NewsletterUnsubscribePage() {
 
 (The `throw new Error(data.error || …)` line and the `error instanceof Error` toast disappear; the catch becomes bare.)
 
-- [ ] **Step 6: Run to verify green**
+- [x] **Step 6: Run to verify green**
 
 Run: `npm run test:run -- tests/unit/newsletter-status-pages.test.tsx tests/unit/footer.test.tsx tests/unit/no-bright-colors.test.ts`
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/app/newsletter src/components/common/NewsletterSignup.tsx tests/unit/newsletter-status-pages.test.tsx
@@ -1325,7 +1325,7 @@ git commit -m "feat(newsletter): pages via StatusScreen with code-mapped Ukraini
 - Consumes: `auth` (Task 3), `StatusScreen` (Task 4).
 - Produces: register 409 body `{ error: "Email already registered", code: "EMAIL_EXISTS" }`.
 
-- [ ] **Step 1: Write the failing register-API test** — `tests/unit/auth-register-api.test.ts` (complete file):
+- [x] **Step 1: Write the failing register-API test** — `tests/unit/auth-register-api.test.ts` (complete file):
 
 ```ts
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -1399,12 +1399,12 @@ describe("POST /api/auth/register", () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify red**
+- [x] **Step 2: Run to verify red**
 
 Run: `npm run test:run -- tests/unit/auth-register-api.test.ts`
 Expected: FAIL — `body.code` undefined on the 409.
 
-- [ ] **Step 3: Add the code in `src/app/api/auth/register/route.ts`**:
+- [x] **Step 3: Add the code in `src/app/api/auth/register/route.ts`**:
 
 ```ts
 if (existingUser) {
@@ -1416,7 +1416,7 @@ if (existingUser) {
 }
 ```
 
-- [ ] **Step 4: Translate the auth Zod messages** in `src/lib/validations/index.ts` (these serve the client-side RHF resolvers directly — G2 `shippingAddressSchema` precedent; newsletter schemas stay EN because only the API consumes them and codes drive that UI):
+- [x] **Step 4: Translate the auth Zod messages** in `src/lib/validations/index.ts` (these serve the client-side RHF resolvers directly — G2 `shippingAddressSchema` precedent; newsletter schemas stay EN because only the API consumes them and codes drive that UI):
 
 ```ts
 export const loginSchema = z.object({
@@ -1437,7 +1437,7 @@ export const registerSchema = z
   });
 ```
 
-- [ ] **Step 5: Convert `login-form.tsx`.** Keep the whole structure (Suspense/skeleton/Card); replace only strings and error-setting. Add `import { auth } from "@/content/auth";`. Replacements in **both** `LoginFormInner` and `LoginFormSkeleton`:
+- [x] **Step 5: Convert `login-form.tsx`.** Keep the whole structure (Suspense/skeleton/Card); replace only strings and error-setting. Add `import { auth } from "@/content/auth";`. Replacements in **both** `LoginFormInner` and `LoginFormSkeleton`:
 
 | Old                                                                                                | New                                                             |
 | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
@@ -1453,7 +1453,7 @@ export const registerSchema = z
 | `Don&apos;t have an account?{" "}`                                                                 | `{auth.login.noAccount}{" "}`                                   |
 | `>Sign up</Link>`                                                                                  | `>{auth.login.signUpLink}</Link>`                               |
 
-- [ ] **Step 6: Convert `register-form.tsx`.** Add `import { auth } from "@/content/auth";`. Replacements:
+- [x] **Step 6: Convert `register-form.tsx`.** Add `import { auth } from "@/content/auth";`. Replacements:
 
 | Old                                                                            | New                                                                                                     |
 | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
@@ -1473,7 +1473,7 @@ export const registerSchema = z
 | `Already have an account?{" "}`                                                | `{auth.register.hasAccount}{" "}`                                                                       |
 | `>Sign in</Link>`                                                              | `>{auth.register.signInLink}</Link>`                                                                    |
 
-- [ ] **Step 7: Replace `src/app/(auth)/error.tsx`** (complete file):
+- [x] **Step 7: Replace `src/app/(auth)/error.tsx`** (complete file):
 
 ```tsx
 "use client";
@@ -1510,13 +1510,13 @@ export default function AuthError({
 }
 ```
 
-- [ ] **Step 8: Verify green**
+- [x] **Step 8: Verify green**
 
 Run: `npm run test:run -- tests/unit/auth-register-api.test.ts tests/unit/checkout-schema.test.ts && npm run typecheck`
 Expected: PASS (checkout-schema guards that the shared validations file edit broke nothing).
 Also run: `grep -rn "at least 8\|Invalid email address" tests/ src/` — review hits: the two changed auth messages must have no remaining consumer asserting them; the newsletter schemas legitimately keep `"Invalid email address"`.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add src/lib/validations/index.ts "src/app/(auth)" src/app/api/auth/register/route.ts tests/unit/auth-register-api.test.ts
@@ -1536,7 +1536,7 @@ git commit -m "feat(auth): Ukrainian login/register/error surfaces; UA zod messa
 - Consumes: `account` (Task 3).
 - Produces: nothing downstream.
 
-- [ ] **Step 1: Layout** — replace the nav array + title in `layout.tsx`; drop the now-unused `MapPin`/`Settings` imports:
+- [x] **Step 1: Layout** — replace the nav array + title in `layout.tsx`; drop the now-unused `MapPin`/`Settings` imports:
 
 ```tsx
 import { User, Package } from "lucide-react";
@@ -1554,7 +1554,7 @@ const accountNav = [
 
 and `<h1 className="mb-8 text-2xl font-bold">My Account</h1>` → `…>{account.title}</h1>`.
 
-- [ ] **Step 2: Overview page** — in `page.tsx`: add `import { account } from "@/content/account";`; delete the entire Addresses and Settings `<Card>` blocks (and the `MapPin`, `Settings` imports); keep the Orders card in the same grid. String replacements:
+- [x] **Step 2: Overview page** — in `page.tsx`: add `import { account } from "@/content/account";`; delete the entire Addresses and Settings `<Card>` blocks (and the `MapPin`, `Settings` imports); keep the Orders card in the same grid. String replacements:
 
 | Old                                                    | New                                                                                  |
 | ------------------------------------------------------ | ------------------------------------------------------------------------------------ |
@@ -1568,9 +1568,9 @@ and `<h1 className="mb-8 text-2xl font-bold">My Account</h1>` → `…>{account.
 | `>Email</p>`                                           | `>{account.overview.info.email}</p>`                                                 |
 | `{session?.user?.name \|\| "Not set"}`                 | `{session?.user?.name \|\| account.overview.info.notSet}`                            |
 
-- [ ] **Step 3: Verify** — `npm run typecheck && npm run lint` → PASS (unused imports would fail lint).
+- [x] **Step 3: Verify** — `npm run typecheck && npm run lint` → PASS (unused imports would fail lint).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add "src/app/(shop)/account/layout.tsx" "src/app/(shop)/account/page.tsx"
@@ -1590,7 +1590,7 @@ git commit -m "feat(account): Ukrainian layout + overview; drop links to unbuilt
 - Consumes: `account` (Task 3), `getOrderStatusLabel` (UA since Task 3).
 - Produces: nothing downstream.
 
-- [ ] **Step 1: Convert strings.** Add `import { account } from "@/content/account";`. Replace the status `SelectContent` with label-map-driven items (keeps today's 6-status set — REFUNDED intentionally still absent, matching current behavior):
+- [x] **Step 1: Convert strings.** Add `import { account } from "@/content/account";`. Replace the status `SelectContent` with label-map-driven items (keeps today's 6-status set — REFUNDED intentionally still absent, matching current behavior):
 
 ```tsx
 const ORDER_FILTER_STATUSES = [
@@ -1638,9 +1638,9 @@ Remaining replacements:
 | `Page {pagination.page} of {pagination.totalPages}` | `{account.orders.pagination.pageOf(pagination.page, pagination.totalPages)}` |
 | `Next`                                              | `{account.orders.pagination.next}`                                           |
 
-- [ ] **Step 2: Verify** — `npm run typecheck` → PASS.
+- [x] **Step 2: Verify** — `npm run typecheck` → PASS.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add "src/app/(shop)/account/orders/page.tsx"
@@ -1661,11 +1661,11 @@ git commit -m "feat(account): Ukrainian orders list with label-map status filter
 - Consumes: `account`, `PAYMENT_STATUS_LABELS` (Task 3).
 - Produces: nothing downstream.
 
-- [ ] **Step 1: Update the regression assertion first (red).** In `tests/unit/dynamic-route-params.test.tsx` line 62: `findByText("Order not found")` → `findByText("Замовлення не знайдено")`. (Deviation from spec §5 "no change expected" — the test asserts the account page's error string; recorded here, propagate at completion. The three admin assertions stay EN.)
+- [x] **Step 1: Update the regression assertion first (red).** In `tests/unit/dynamic-route-params.test.tsx` line 62: `findByText("Order not found")` → `findByText("Замовлення не знайдено")`. (Deviation from spec §5 "no change expected" — the test asserts the account page's error string; recorded here, propagate at completion. The three admin assertions stay EN.)
 
 Run: `npm run test:run -- tests/unit/dynamic-route-params.test.tsx` → the `/account/orders/[id]` test FAILS (page still EN).
 
-- [ ] **Step 2: Convert the page.** Keep `useParams<{ id: string }>()!` and the `!` comment untouched. Add `import { account, PAYMENT_STATUS_LABELS } from "@/content/account";`. Replace the timeline constants:
+- [x] **Step 2: Convert the page.** Keep `useParams<{ id: string }>()!` and the `!` comment untouched. Add `import { account, PAYMENT_STATUS_LABELS } from "@/content/account";`. Replace the timeline constants:
 
 ```tsx
 const ORDER_TIMELINE = [
@@ -1713,12 +1713,12 @@ Remaining replacements:
 | `>Paid on</span>`                                                       | `>{account.orderDetail.payment.paidOn}</span>`                                |
 | `>Order Notes</CardTitle>`                                              | `>{account.orderDetail.notes.title}</CardTitle>`                              |
 
-- [ ] **Step 3: Verify green**
+- [x] **Step 3: Verify green**
 
 Run: `npm run test:run -- tests/unit/dynamic-route-params.test.tsx && npm run typecheck`
 Expected: PASS — all four regression tests green again.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add "src/app/(shop)/account/orders/[id]/page.tsx" tests/unit/dynamic-route-params.test.tsx
@@ -1738,7 +1738,7 @@ git commit -m "feat(account): Ukrainian order detail — timeline, payment label
 - Consumes: `pluralizeUk` from `@/lib/format` (both files import it).
 - Produces: nothing downstream.
 
-- [ ] **Step 1: `/categories` page.** Add `import { pluralizeUk } from "@/lib/format";`. Replacements:
+- [x] **Step 1: `/categories` page.** Add `import { pluralizeUk } from "@/lib/format";`. Replacements:
 
 | Old                                                              | New                                                                          |
 | ---------------------------------------------------------------- | ---------------------------------------------------------------------------- |
@@ -1749,7 +1749,7 @@ git commit -m "feat(account): Ukrainian order detail — timeline, payment label
 | `{totalProducts} {totalProducts === 1 ? "product" : "products"}` | `{totalProducts} {pluralizeUk(totalProducts, "товар", "товари", "товарів")}` |
 | `+{category.children.length - 4} more`                           | `ще {category.children.length - 4}`                                          |
 
-- [ ] **Step 2: `category-client.tsx`.** Add `import { pluralizeUk } from "@/lib/format";`. Replacements (sort options translated **in place** — the 4-option unification with /products is BACKLOG'd, not done here):
+- [x] **Step 2: `category-client.tsx`.** Add `import { pluralizeUk } from "@/lib/format";`. Replacements (sort options translated **in place** — the 4-option unification with /products is BACKLOG'd, not done here):
 
 | Old                                                                            | New                                                                                |
 | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
@@ -1780,9 +1780,9 @@ git commit -m "feat(account): Ukrainian order detail — timeline, payment label
 | `The category you&apos;re looking for doesn&apos;t exist or has been removed.` | `Такої категорії не існує або її було видалено.`                                   |
 | `Back to Categories`                                                           | `До категорій`                                                                     |
 
-- [ ] **Step 3: Verify** — `npm run typecheck && npm run test:run -- tests/unit/no-bright-colors.test.ts` → PASS.
+- [x] **Step 3: Verify** — `npm run typecheck && npm run test:run -- tests/unit/no-bright-colors.test.ts` → PASS.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add "src/app/(shop)/categories"
@@ -1802,7 +1802,7 @@ git commit -m "feat(categories): Ukrainian chrome — headers, counts, filters, 
 - Consumes: `site.header` (Task 3).
 - Produces: nothing downstream.
 
-- [ ] **Step 1: Consume `site.header`.** Add `import { site } from "@/content/site";`. Replacements:
+- [x] **Step 1: Consume `site.header`.** Add `import { site } from "@/content/site";`. Replacements:
 
 | Old                                                    | New                                                            |
 | ------------------------------------------------------ | -------------------------------------------------------------- |
@@ -1826,11 +1826,11 @@ git commit -m "feat(categories): Ukrainian chrome — headers, counts, filters, 
 
 (The `aria-label="Пошук"` and the `navigation` array are already Ukrainian — untouched.)
 
-- [ ] **Step 2: Update `tests/e2e/navigation.spec.ts`** — all three `name: "Categories"` assertions (lines ~47, ~95, ~128) → `name: "Категорії"`. Adjust the adjacent comments where they name the link.
+- [x] **Step 2: Update `tests/e2e/navigation.spec.ts`** — all three `name: "Categories"` assertions (lines ~47, ~95, ~128) → `name: "Категорії"`. Adjust the adjacent comments where they name the link.
 
-- [ ] **Step 3: Verify** — `npm run test:run -- tests/unit/header.test.tsx && npm run typecheck` → PASS (that test asserts only Каталог/Новинки/Бестселери/Пошук, all unchanged).
+- [x] **Step 3: Verify** — `npm run test:run -- tests/unit/header.test.tsx && npm run typecheck` → PASS (that test asserts only Каталог/Новинки/Бестселери/Пошук, all unchanged).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/components/common/Header.tsx tests/e2e/navigation.spec.ts
@@ -1845,7 +1845,7 @@ git commit -m "feat(header): Ukrainian residuals — menu, search dialog, auth e
 
 - Modify: whatever the sweep finds (expect: nothing or small stragglers).
 
-- [ ] **Step 1: EN literal sweep** over every touched surface — review each hit by eye (identifiers/props don't count, rendered text does):
+- [x] **Step 1: EN literal sweep** over every touched surface — review each hit by eye (identifiers/props don't count, rendered text does):
 
 ```bash
 grep -rnE '>[^<>{}]*[A-Za-z]{3,}[^<>{}]*<' \
@@ -1857,10 +1857,10 @@ grep -rnE '>[^<>{}]*[A-Za-z]{3,}[^<>{}]*<' \
 
 Also `grep -rn '"en-US"' "src/app/(shop)/account"` → expect zero. Fix any real residual, matching the owning content module.
 
-- [ ] **Step 2: Full unit suite** — `npm run test:run` → all pass (expect roughly 636 → 655–665; record the exact number in the progress log).
-- [ ] **Step 3: Static checks** — `npm run lint && npm run typecheck && npm run format:check` → PASS.
-- [ ] **Step 4: Local prod build** — `npm run build` → succeeds (StatusScreen-in-server-tree canary: a function passed from `not-found.tsx` would fail here).
-- [ ] **Step 5: Touched e2e specs locally** (needs dev DB seeded + port 3001 per playwright config):
+- [x] **Step 2: Full unit suite** — `npm run test:run` → all pass (expect roughly 636 → 655–665; record the exact number in the progress log).
+- [x] **Step 3: Static checks** — `npm run lint && npm run typecheck && npm run format:check` → PASS.
+- [x] **Step 4: Local prod build** — `npm run build` → succeeds (StatusScreen-in-server-tree canary: a function passed from `not-found.tsx` would fail here).
+- [x] **Step 5: Touched e2e specs locally** (needs dev DB seeded + port 3001 per playwright config):
 
 ```bash
 npx playwright test tests/e2e/home.spec.ts tests/e2e/navigation.spec.ts --project=chromium
@@ -1868,7 +1868,7 @@ npx playwright test tests/e2e/home.spec.ts tests/e2e/navigation.spec.ts --projec
 
 Expected: PASS with the «Відхилити»/«Категорії» names.
 
-- [ ] **Step 6: Commit** any sweep fixes:
+- [x] **Step 6: Commit** any sweep fixes:
 
 ```bash
 git add -A && git commit -m "fix(g4): EN-residual sweep fixes"   # only if the sweep changed files
@@ -1906,12 +1906,12 @@ git add -A && git commit -m "fix(g4): EN-residual sweep fixes"   # only if the s
 
 - Modify: `CLAUDE.md` (root), `src/app/CLAUDE.md`, `src/components/CLAUDE.md`, `docs/planning/BACKLOG.md`, this plan file (final log).
 
-- [ ] **Step 1: Root `CLAUDE.md`** — in the `src/content/` tree listing add four lines (auth.ts, account.ts, newsletter.ts, system.ts — one-line descriptions matching the existing style, e.g. `account.ts # Account area copy + ORDER_STATUS_LABELS/PAYMENT_STATUS_LABELS (customer label maps)`); note in the `order-status` mention that labels live in `content/account.ts` since G4; add a Detected-Patterns line: **Coded API outcomes** — newsletter routes + register 409 return machine `code`s alongside EN prose; clients map code → UA via `src/content/` (G2 create-order convention, extended in G4).
-- [ ] **Step 2: `src/app/CLAUDE.md`** — newsletter pages + account pages now UA via content modules; newsletter API coded outcomes; account nav omits addresses/settings (BACKLOG'd).
-- [ ] **Step 3: `src/components/CLAUDE.md`** — add `StatusScreen.tsx` to the common/ listing (hook-free shared status-page treatment, server-usable, href-only actions from server callers); note CookieConsent + NewsletterSignup copy sources.
-- [ ] **Step 4: BACKLOG** — add under `### [2026-08-08] From: G4 brainstorm` (🟤): (1) restore account Addresses/Settings nav links when pages are built (pairs with the TASK-056 content-gap row; links removed in G4); (2) products↔categories sort-set unification (shared options + `getSalesRanking()`; behavior change deliberately deferred out of G4). The `AUTH_TRUST_HOST` note is **already filed** (existing entry ~line 622) — do not duplicate.
-- [ ] **Step 5: Docs-freshness manual check** — `docs/README.md` index rows ↔ headers both directions + neighbouring rows for every doc touched this task.
-- [ ] **Step 6: Commit + push + PR**
+- [x] **Step 1: Root `CLAUDE.md`** — in the `src/content/` tree listing add four lines (auth.ts, account.ts, newsletter.ts, system.ts — one-line descriptions matching the existing style, e.g. `account.ts # Account area copy + ORDER_STATUS_LABELS/PAYMENT_STATUS_LABELS (customer label maps)`); note in the `order-status` mention that labels live in `content/account.ts` since G4; add a Detected-Patterns line: **Coded API outcomes** — newsletter routes + register 409 return machine `code`s alongside EN prose; clients map code → UA via `src/content/` (G2 create-order convention, extended in G4).
+- [x] **Step 2: `src/app/CLAUDE.md`** — newsletter pages + account pages now UA via content modules; newsletter API coded outcomes; account nav omits addresses/settings (BACKLOG'd).
+- [x] **Step 3: `src/components/CLAUDE.md`** — add `StatusScreen.tsx` to the common/ listing (hook-free shared status-page treatment, server-usable, href-only actions from server callers); note CookieConsent + NewsletterSignup copy sources.
+- [x] **Step 4: BACKLOG** — add under `### [2026-08-08] From: G4 brainstorm` (🟤): (1) restore account Addresses/Settings nav links when pages are built (pairs with the TASK-056 content-gap row; links removed in G4); (2) products↔categories sort-set unification (shared options + `getSalesRanking()`; behavior change deliberately deferred out of G4). The `AUTH_TRUST_HOST` note is **already filed** (existing entry ~line 622) — do not duplicate.
+- [x] **Step 5: Docs-freshness manual check** — `docs/README.md` index rows ↔ headers both directions + neighbouring rows for every doc touched this task.
+- [x] **Step 6: Commit + push + PR**
 
 ```bash
 git add CLAUDE.md src/app/CLAUDE.md src/components/CLAUDE.md docs/planning/BACKLOG.md docs/planning/plans/2026-08-08_g4-peripheral-surfaces.md
@@ -1930,4 +1930,19 @@ PR review rounds → user approval → merge → completion workflow (DONE.md tr
 
 ## Progress log
 
-- 2026-08-08: Plan written from the approved spec (brainstorm same day; spec commit `80dc69a`). Branch `feat/g4-peripheral-surfaces` active. No tasks executed yet.
+- 2026-08-08: Plan written from the approved spec (brainstorm same day; spec commit `80dc69a`). Branch `feat/g4-peripheral-surfaces` active, plan committed `e3a6add`. Executed via subagent-driven-development (haiku implementers, sonnet reviewers, fable final review — G3 SDD pattern); full per-task trail in `.superpowers/sdd/2026-08-08_g4-peripheral-surfaces/progress.md`.
+- Task 1 (`apiError` optional `code` param): complete, commits `e3a6add..316c5bd`, review clean.
+- Task 2 (Newsletter API coded outcomes): complete, commits `316c5bd..f9c049f`, review clean.
+- Task 3 (Content modules auth/account/newsletter/system + site.header, label-map move): complete, commits `f9c049f..cfaae78`, review clean on code. 1 minor deferred: the implementer report's test-breakdown didn't match the file structure (reviewer verified the real top-line 33-pass count independently) — a report-evidence calibration note, no code impact.
+- Task 4 (`StatusScreen` shared component): complete, commits `cfaae78..5cc22cc`, review clean. 1 minor deferred: `key={action.label}` would collide on duplicate action labels in one `actions` array — plan-mandated shape, negligible risk since CTA copy is always distinct.
+- Task 5 (System pages — 404, root error boundary, cookie banner + home.spec names): complete, commits `5cc22cc..598cd44`, review clean.
+- Task 6 (Newsletter pages + footer signup mapping): fix round 1/5 (3 findings addressed — signup mapping tests added, report corrections; intermediate commit `3a2cfa2`), then complete, commits `598cd44..80bf53c`, review clean after the fix round. 1 minor deferred: a TASK-039 comment in `NewsletterSignup.tsx` (lines 10-11) is now slightly imprecise since the error-path strings moved to `content/newsletter.ts` — pre-existing comment, cosmetic.
+- Task 7 (Auth — Zod UA messages, login/register forms, auth error boundary, register EMAIL_EXISTS): complete, commits `80bf53c..3ec7118`, review clean.
+- Task 8 (Account layout + overview, dead links removed): complete, commits `3ec7118..1a11a1c`, review clean. 1 minor deferred: the overview grid keeps `lg:grid-cols-3` with a single Orders card (plan-mandated) — flagged for the Task 14 visual gate to eyeball.
+- Task 9 (Account orders list): complete, commits `1a11a1c..558f0dd`, review clean.
+- Task 10 (Account order detail, G3-unblocked): complete, commits `558f0dd..a1e25a0`, review clean. **Deviation**: falsifies spec §5's "dynamic-route-params: no change expected" row — `tests/unit/dynamic-route-params.test.tsx:62`'s `/account/orders/[id]` assertion had to move from the English `"Order not found"` to `"Замовлення не знайдено"` (the three admin-route assertions stay English); recorded in-task per the spec's own instruction, superseded note owed to the spec at merge-completion (out of this task's scope, see Post-plan section above).
+- Task 11 (Categories chrome — inline strings, catalog-domain convention): complete, commits `a1e25a0..4837632`, review clean.
+- Task 12 (Header residuals + navigation.spec names): fix round 1/5 (3 findings addressed — 3 `/menu/i` locators in `navigation.spec.ts` broken by the new Ukrainian accessible name, now `/меню/i`; 2 report corrections; intermediate commit `4dc2574`), then complete, commits `4837632..a0520b2`, review clean after the fix round. Carried forward to Task 13 (controller-verified): `navigation.spec.ts:95`'s heading assertion (`/categories/i`) doesn't match Task 11's new «Категорії» H1 — a deterministic failure needing a fix in Task 13; also noted the `products-page` local test failure is a pre-existing dev-server race (fails on `main` too, passes in the CI prod build) — not chased, not masked.
+- Task 13 (Full-suite verification + EN-residual sweep): complete, commits `a0520b2..8471500`, review clean. Fixed the carried `navigation.spec.ts:95` assertion (only change); full suite 672 passed + 1 todo, build + static checks clean, e2e 11/11. New finding carried to Task 15's BACKLOG: `NODE_ENV=development` in `/etc/environment` (a third source beyond the two TASK-057 removed, local prod-CSS corruption only). One adjudication note (no action taken): a reviewer's "Important" on the implementer report was a mis-attribution, not a fabrication — the quoted "Record its status verbatim…" text is verbatim from the controller's own dispatch prompt, not a fabricated workspace-file citation.
+- Task 14 (Visual consistency gate, user sign-off required): captures complete (38 PNGs + an HTML montage, `g4-visual-gate/g4-montage.html`; controller spot-checked login/orders/newsletter-success for consistency). Three execution finds carried to Task 15's BACKLOG: (1) the newsletter confirm page's `useEffect` fetch has no stale-response guard — React Strict-Mode's dev double-invoke clobbers the success render with a false error; (2) a scripted client-side `signIn()` still hits `MissingCSRF` even under the documented `AUTH_TRUST_HOST` workaround — worked around with a direct `/api/auth/callback/credentials` POST; (3) the `NODE_ENV`/`/etc/environment` finding carried from Task 13. **Gate**: user reviewed all 8 captured surfaces — items 1, 3, 4, 6, 7, 8 approved as-is; item 2 (account overview) approved with an option-A grid revision requested, fixed in two rounds (`21eb067` then `1ad7a9e` — the first arbitrary Tailwind class silently no-op'd producing a full-width card, and the follow-up arbitrary-_property_ variant no-op'd too; an inline `style` was the only fallback that actually compiled, verified against the SSR HTML and a fresh screenshot, ~304px track) — this is where the Tailwind-v4 nested-comma no-op was discovered; item 5 (`/categories`) approved visually and spawned two user-raised 🔵 BACKLOG items (categories→catalog redesign; the parent-category «Всі»=0 rollup bug, controller-verified against the products API and seed data). **Gate SIGNED OFF** (montage copied to the repo-root `.superpowers/…/visual-gate/`, git-ignored, for host browsing).
+- Task 15 (Docs, BACKLOG spawns, plan close-out — this task): root/`src/app`/`src/components` `CLAUDE.md` propagation (new content modules, the coded-API-outcomes pattern, `StatusScreen`, an `order-status.ts` tree entry noting the label move to `content/account.ts`, two Known-challenges extensions for the `/etc/environment` NODE_ENV source and the Tailwind v4 nested-comma no-op). Three new BACKLOG groups added: `[2026-08-08] From: G4 brainstorm` (2× 🟤 — restore account nav links, sort-set unification), `[2026-08-09] From: G4 execution` (4× 🟤 — NODE_ENV third source, newsletter confirm race guard, Tailwind arbitrary-value no-op, scripted-signIn CSRF nuance), `[2026-08-09] From: G4 visual gate (user)` (2× 🔵 — categories→catalog redesign, parent-category rollup bug). Plan checkboxes bulk-closed (`- [ ] **Step` → `- [x] **Step`, 79 boxes across Tasks 1-15; Task 14's non-Step setup/capture/gate checklist intentionally left as-is, out of the bulk-check's scope) and this progress log rewritten from the SDD ledger. `docs/README.md` docs-freshness pass (G4 spec row added following the G1/G2/G3 sibling convention; BACKLOG index-date synced; own header date bumped; G4's plan intentionally NOT added to the Implementation Plans/Archived Plans tables — matches the G1/G2/G3 sibling precedent of not listing G-numbered plans there). **Deviation (task split, not a plan defect):** per the controller's dispatch, this task stops at the commit — push + PR (plan Step 6's second half) is deferred until after a final branch review the controller runs separately.

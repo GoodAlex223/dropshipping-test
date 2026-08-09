@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-08-08
+**Last Updated**: 2026-08-09
 
 ---
 
@@ -744,6 +744,80 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
   `Input`; the ROADMAP'd React 19 upgrade retires the warning on its own, so if the upgrade
   lands first this entry closes with it. (Med value, Low effort)
   [G3 Task-4 browser pass; cause confirmed PR #30 review round 2, 2026-08-08]
+
+### [2026-08-08] From: G4 brainstorm
+
+**Origin**: G4 design brainstorm (spec `2026-08-08-g4-peripheral-surfaces-design.md`), scope-boundary
+decisions that were deliberately left out of the sweep. All 🟤 Auto-Generated.
+
+- 🟤 **Restore account «Адреси»/«Налаштування» nav links + overview cards when
+  `/account/addresses` and `/account/settings` are built** — G4 removed both links from
+  `(shop)/account/layout.tsx`'s nav (and their overview-page cards) under the no-dead-links
+  rule; a code comment in `account/layout.tsx` marks the spot and points back here. Companion
+  to the `[2026-08-04]` G1 entry "`/account/addresses` and `/account/settings` are dead 404
+  links," which this task resolved by removing the links — same TASK-056 content gap, now
+  documented on the other side of it. (Low value, Low effort) `[relates-to: TASK-056]`
+- 🟤 **Products↔categories sort-set unification** — `/products` (TASK-036) and
+  `/categories/[slug]` carry independent sort-option sets; sharing one options list (and
+  `getSalesRanking()`) is a deliberate behavior change, out of G4's copy-only scope (spec §3.1
+  keeps categories chrome inline for this reason).
+  `[possible-dup-of: categories→catalog redesign, 2026-08-09 visual-gate group]` — subsumed if
+  that redesign lands, since it retires `category-client.tsx` outright. (Low value, Low effort)
+
+### [2026-08-09] From: G4 execution
+
+**Origin**: `.superpowers/sdd/2026-08-08_g4-peripheral-surfaces/progress.md` — findings surfaced
+by implementers/reviewers while executing the G4 plan's 15 tasks. All 🟤 Auto-Generated.
+
+- 🟤 **`NODE_ENV=development` in `/etc/environment` — a third source beyond the two TASK-057
+  removed** — devcontainer `containerEnv` and `.env.example`'s own line were fixed in
+  TASK-057; `/etc/environment` carries an independent third copy that corrupts responsive
+  (`sm:`/`md:`/`lg:`/`xl:`) Tailwind utilities in a **local** `next build`'s compiled CSS the
+  same way (dev server and Vercel unaffected). Found during Task 13's full-suite verification.
+  Remove or override the file; CLAUDE.md's Known-challenges note now documents this third
+  source (this task). (Low value, Low effort)
+- 🟤 **Newsletter confirm page: `useEffect` fetch has no stale-response guard** — React
+  Strict-Mode's dev double-invoke fires the confirm fetch twice; the token is consumed by the
+  first call, so the second 404s (`INVALID_TOKEN`) and clobbers the success render with an
+  error. Reproduced during the Task 14 visual gate. Pre-existing shape (a single unguarded
+  `useEffect` fetch), preserved unchanged by G4's `StatusScreen` conversion — add a
+  cancellation/ignore-stale-response guard (e.g. a `cancelled` flag or `AbortController`) to
+  `src/app/newsletter/confirm/page.tsx`. (Med value, Low effort)
+- 🟤 **Tailwind v4 arbitrary grid-template values with nested commas silently produce no CSS
+  rule in this repo** — verified absent from compiled CSS for both
+  `grid-cols-[repeat(auto-fill,minmax(16rem,1fr))]` and
+  `[grid-template-columns:repeat(auto-fill,minmax(16rem,1fr))]`; the account overview grid
+  ships an inline-`style` fallback instead (Task 14 gate revision, commit `1ad7a9e`).
+  Root-cause the parser behavior (the un-escaped comma inside the arbitrary-value bracket is
+  the prime suspect) and audit the repo for other comma-carrying arbitrary values that may be
+  silently no-op'ing the same way. (Med value, Med effort)
+- 🟤 **Scripted client-side `signIn()` fails with `MissingCSRF` even under the documented
+  `AUTH_TRUST_HOST` workaround** — the Task 14 visual gate needed a real customer session to
+  capture `/account/**`; `AUTH_TRUST_HOST=true` plus a matched `NEXTAUTH_URL` (the existing
+  documented workaround) still rejected a scripted `next-auth/react` `signIn()` call. Worked
+  around by fetching a CSRF token and POSTing directly to `/api/auth/callback/credentials`.
+  `[possible-dup-of: the AUTH_TRUST_HOST local-login entry, 2026-08-04 G1 group]` — this is a
+  nuance extension (scripted/programmatic login specifically), not a new base fact. (Low
+  value, Low effort)
+
+### [2026-08-09] From: G4 visual gate (user)
+
+**Origin**: user feedback at the G4 visual-consistency gate (Task 14). Both 🔵 User-Flagged.
+
+- 🔵 **Categories→catalog redesign** — `/categories/[slug]` becomes a thin 307 redirect to
+  `/products?category=<slug>`; a DB-driven category facet in the catalog `FilterBar` (parent
+  groups with children, auto-grows with new categories); retire `category-client.tsx` (~436
+  lines); fix the parent-category rollup in the products API (parent slug should match
+  descendants' products — see the entry below); consider a desktop «Категорії» nav entry (the
+  user couldn't find the entry point during the gate). User-proposed at the G4 visual gate,
+  2026-08-09; next-week WEEKLY candidate (~5 SP). (High value, Med effort)
+- 🔵 **Parent-category «Всі» shows 0 products** — `/api/products`'s
+  `where.category = { slug }` (`src/app/api/products/route.ts:70-71`) matches only the exact
+  category, with no child rollup, while the `/categories` cards DO roll up counts — so a
+  top-level page (e.g. `/categories/odyah`, `/categories/aksesuary`) claims N товарів on its
+  own card but lists zero products when visited. Launch-visible.
+  `[possible-dup-of: the categories→catalog redesign entry above — its rollup fix resolves this]`;
+  ship as a standalone fix if the redesign slips. (Med value, Low effort)
 
 ---
 

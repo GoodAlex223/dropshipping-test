@@ -117,11 +117,15 @@ src/
 │   ├── ui/                 # shadcn/ui primitives (button, card, dialog, etc.)
 │   └── providers.tsx       # Context providers wrapper (auth, toast, cookie consent, web vitals)
 ├── content/                # Typed content-config layer (Ukrainian copy, extraction-ready for TASK-039 i18n)
+│   ├── account.ts          # Account area copy + ORDER_STATUS_LABELS/PAYMENT_STATUS_LABELS (customer label maps)
+│   ├── auth.ts             # Auth surfaces copy (login, register, auth error boundary)
 │   ├── brand.ts            # Brand name/tagline constants — deliberately import-free (consumed by seo.ts)
 │   ├── cart.ts             # Cart + CartDrawer copy (summary/empty/clear/stock strings, itemsCount plural via pluralizeUk)
 │   ├── checkout.ts         # Checkout + confirmation copy (steps, COD/prepay block config, manager contacts — cardNumber/whatsapp are CLIENT-SUPPLIED-pending)
 │   ├── home.ts             # Homepage copy (hero, benefits, whyChooseUs, rails, testimonials)
-│   └── site.ts             # Site-wide config (announcement, socials, client claims, footer benefits)
+│   ├── newsletter.ts       # Newsletter pages + footer-signup copy; byCode maps translate API outcome codes to Ukrainian
+│   ├── site.ts             # Site-wide config (announcement, socials, client claims, footer benefits)
+│   └── system.ts           # System pages copy (404, root error boundary, cookie consent banner)
 ├── hooks/                  # Custom React hooks (use-debounce, use-toast)
 ├── lib/                    # Core utilities
 │   ├── auth.ts             # NextAuth v5 config (JWT + Prisma adapter)
@@ -132,6 +136,7 @@ src/
 │   ├── shipping.ts         # Nova Poshta delivery methods (np-office/np-courier/np-postomat, UAH) + legacy label lookup
 │   ├── email.ts            # Resend email service (order confirmations, newsletter)
 │   ├── format.ts           # formatPrice() — the only sanctioned UAH price formatter (uk-UA, Intl.NumberFormat)
+│   ├── order-status.ts     # OrderStatus/PaymentStatus label + style lookup; labels live in content/account.ts since G4 (re-exported here so consumers keep one import)
 │   ├── newsletter.ts       # Newsletter utilities (token generation, URL builders, HMAC unsubscribe)
 │   ├── og-fonts.ts         # Fetches Cyrillic-subset Manrope TTFs for next/og (Satori) OG image routes; fails safe to []
 │   ├── queue.ts            # BullMQ queue setup
@@ -293,6 +298,7 @@ prisma/
 - **Cross-field validation pattern**: Use Zod `.refine()` for validations requiring multiple fields; comparePrice must exceed price if provided; validation message targets specific field via `path` option; enforced on both server (API routes) and client (form validation)
 - **API error handling pattern**: API routes use `try/catch` with `apiError()` helper for consistent error responses; no `console.error()` calls in API routes (removed during TASK-029 cleanup); catch blocks with unused error variables use bare `catch` syntax without error parameter (ESLint recommended pattern from TASK-031); structured error responses via `NextResponse.json()` with appropriate status codes
 - **Bare catch syntax**: When catch block doesn't use error variable, use bare `catch` without parameter (e.g., `} catch {` instead of `} catch (error) {`); pattern enforced by ESLint and applied across API routes, client components, server pages, and utilities during TASK-031 code quality sweep
+- **Coded API outcomes**: newsletter routes (`api/newsletter/{subscribe,confirm,unsubscribe}`) and the register 409 (`api/auth/register`) return a machine `code` alongside English prose; clients map `code` → Ukrainian via `src/content/` (G2 `create-order` convention, extended in G4 to the newsletter confirm/unsubscribe pages and the footer signup toast)
 
 <!-- END AUTO-MANAGED -->
 
@@ -303,7 +309,7 @@ prisma/
 - **Commit style**: Conventional commits (`feat:`, `fix:`, `docs:`, `chore:`) with optional scope (`feat(seo):`, `feat(perf):`, `fix(ci):`, `fix(e2e):`, `feat(deploy):`)
 - **Branch naming**: `feat/task-NNN-description` pattern
 - **Recent focus**: Project freeze completed (2026-02-09 to 2026-02-12) with all stability and cleanup tasks finished; code quality sweep (ESLint warnings → 0, dead code removal), documentation finalization (16 files updated), test coverage improvement (246 tests, 89.82% coverage), technical debt cleanup, dependency audit (30 packages updated, 1 HIGH vulnerability fixed); post-freeze code review added 2 backlog items (DONE.md statistics accuracy, precise test counts in docs)
-- **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability (React.cache not available in React 18); NextAuth requires `AUTH_TRUST_HOST=true` in CI E2E tests; E2E tests need seeded database with categories and active products; a container-wide `NODE_ENV=development` (devcontainer `containerEnv` + `.env.example`'s own line) silently corrupted every responsive (`sm:`/`md:`/`lg:`/`xl:`) Tailwind utility in a **local** `next build`'s compiled CSS (Vercel unaffected — the platform sets its own `NODE_ENV=production` first) — fixed by removing both (TASK-057); do not re-add a `NODE_ENV` line to either file
+- **Known challenges**: Prisma + Vercel serverless requires Neon adapter; Next.js 14/React 18 pinned for stability (React.cache not available in React 18); NextAuth requires `AUTH_TRUST_HOST=true` in CI E2E tests; E2E tests need seeded database with categories and active products; a container-wide `NODE_ENV=development` (devcontainer `containerEnv` + `.env.example`'s own line) silently corrupted every responsive (`sm:`/`md:`/`lg:`/`xl:`) Tailwind utility in a **local** `next build`'s compiled CSS (Vercel unaffected — the platform sets its own `NODE_ENV=production` first) — fixed by removing both (TASK-057); do not re-add a `NODE_ENV` line to either file; a third copy in `/etc/environment` corrupts local `next build` CSS the same way (found in G4) — dev server and Vercel unaffected; do not trust local prod-build visuals in this container until removed; separately, Tailwind v4 arbitrary values with nested commas (e.g. grid-template functions like `repeat(auto-fill,minmax(16rem,1fr))`) silently don't compile here — always verify against the compiled CSS, not just the className; an inline `style` is the sanctioned fallback (account overview precedent, G4)
 - **CI improvements**: E2E infrastructure overhaul with global setup validation, separated build and test jobs, PostgreSQL 16 + Redis 7 services with health checks; deployment workflow with graceful secret validation, dual-target support (Vercel/VPS), conditional job execution, and comprehensive deployment documentation; JS files auto-formatted on commit via lint-staged; E2E tests run chromium + webkit in CI (webkit added in TASK-038a — CI was chromium-only, which is why a WebKit-only failure went unnoticed) with port 3000, pre-built app, and optimized timeouts
 - **Deployment strategy**: Dual-path deployment via `DEPLOYMENT_TARGET` variable (vercel/vps); graceful degradation when secrets missing (skip with notice if unset, fail with error if explicitly set); Vercel path uses CLI for pull/build/deploy + migrations; VPS path uses SSH action with git pull + pm2 restart; both paths validate secrets before execution. **In practice the Actions Vercel job is a no-op (secrets unset); production is deployed by the Vercel Git integration, and migrations are applied by the `vercel-build` script (`scripts/vercel-build.sh` → `prisma migrate deploy` via `DIRECT_URL`), added in PR #22.** See the "Operative reality" note under Deployment pipeline above
 - **Latest release**: v1.2.0 (2026-02-12, tag at commit 1ab109a) - Freeze complete with all MVP features (TASK-001 through TASK-016), post-MVP enhancements (TASK-017 through TASK-024), and freeze cleanup (TASK-027 through TASK-032) finished; project tagged and ready for post-freeze resumption
