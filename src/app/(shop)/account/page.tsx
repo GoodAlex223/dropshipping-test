@@ -16,7 +16,11 @@ export default function AccountPage() {
     return (
       <div className="space-y-6">
         <Skeleton className="h-24 w-full" />
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(16rem,1fr))] gap-4">
+        {/* inline: Tailwind v4 arbitrary grid template with nested commas doesn't compile here — see task-14 report */}
+        <div
+          className="grid gap-4"
+          style={{ gridTemplateColumns: "repeat(auto-fill, minmax(16rem, 1fr))" }}
+        >
           <Skeleton className="h-32" />
         </div>
       </div>
@@ -36,7 +40,11 @@ export default function AccountPage() {
       </Card>
 
       {/* Quick Links */}
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(16rem,1fr))] gap-4">
+      {/* inline: Tailwind v4 arbitrary grid template with nested commas doesn't compile here — see task-14 report */}
+      <div
+        className="grid gap-4"
+        style={{ gridTemplateColumns: "repeat(auto-fill, minmax(16rem, 1fr))" }}
+      >
         <Card className="transition-shadow hover:shadow-md">
           <CardHeader className="flex flex-row items-center gap-4 pb-2">
             <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
