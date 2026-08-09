@@ -5,9 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { newsletter } from "@/content/newsletter";
 
-// TASK-039: externalize — hardcoded Ukrainian strings below stay inline
-// until the i18n library lands; this component has no English consumer.
+// TASK-039: externalize — success-path strings below stay inline until the
+// i18n library lands; error-path copy already lives in src/content/newsletter.ts
+// (G4 code mapping).
 export function NewsletterSignup() {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -25,17 +27,21 @@ export function NewsletterSignup() {
         body: JSON.stringify({ email }),
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(data.error || "Не вдалося підписатися");
+        // data.error is EN API/log text — map the machine code instead.
+        toast.error(
+          (data.code && newsletter.signup.byCode[data.code]) || newsletter.signup.fallback
+        );
+        return;
       }
 
       setIsSuccess(true);
       setEmail("");
       toast.success("Перевірте пошту, щоб підтвердити підписку");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Не вдалося підписатися");
+    } catch {
+      toast.error(newsletter.signup.fallback);
     } finally {
       setIsLoading(false);
     }

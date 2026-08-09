@@ -9,8 +9,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const result = unsubscribeNewsletterSchema.safeParse(body);
 
+    // `error`/`message` strings are for logs/API consumers; clients map
+    // `code` to Ukrainian copy (src/content/newsletter.ts).
     if (!result.success) {
-      return apiError(result.error.issues[0].message, 400);
+      return apiError(result.error.issues[0].message, 400, "VALIDATION_ERROR");
     }
 
     const { email, token } = result.data;
@@ -21,17 +23,17 @@ export async function POST(request: NextRequest) {
     });
 
     if (!subscriber) {
-      return apiError("Subscriber not found", 404);
+      return apiError("Subscriber not found", 404, "SUBSCRIBER_NOT_FOUND");
     }
 
     if (subscriber.status === "UNSUBSCRIBED") {
-      return apiSuccess({ message: "You are already unsubscribed" });
+      return apiSuccess({ code: "ALREADY_UNSUBSCRIBED", message: "You are already unsubscribed" });
     }
 
     // Verify HMAC token matches
     const expectedToken = generateUnsubscribeToken(subscriber.id);
     if (token !== expectedToken) {
-      return apiError("Invalid unsubscribe link", 400);
+      return apiError("Invalid unsubscribe link", 400, "INVALID_UNSUBSCRIBE_LINK");
     }
 
     await prisma.subscriber.update({
@@ -42,8 +44,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return apiSuccess({ message: "You have been unsubscribed successfully" });
+    return apiSuccess({ code: "UNSUBSCRIBED", message: "You have been unsubscribed successfully" });
   } catch {
-    return apiError("Failed to process unsubscribe", 500);
+    return apiError("Failed to process unsubscribe", 500, "UNSUBSCRIBE_FAILED");
   }
 }

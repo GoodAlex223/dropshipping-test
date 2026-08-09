@@ -16,8 +16,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const result = subscribeNewsletterSchema.safeParse(body);
 
+    // `error`/`message` strings are for logs/API consumers; clients map
+    // `code` to Ukrainian copy (src/content/newsletter.ts).
     if (!result.success) {
-      return apiError(result.error.issues[0].message, 400);
+      return apiError(result.error.issues[0].message, 400, "VALIDATION_ERROR");
     }
 
     const { email } = result.data;
@@ -28,7 +30,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existing?.status === "ACTIVE") {
-      return apiError("This email is already subscribed", 409);
+      return apiError("This email is already subscribed", 409, "ALREADY_SUBSCRIBED");
     }
 
     const token = generateConfirmationToken();
@@ -75,7 +77,10 @@ export async function POST(request: NextRequest) {
             });
           }
           return apiSuccess(
-            { message: "Please check your email to confirm your subscription" },
+            {
+              code: "CONFIRMATION_PENDING",
+              message: "Please check your email to confirm your subscription",
+            },
             201
           );
         }
@@ -91,8 +96,14 @@ export async function POST(request: NextRequest) {
       unsubscribeUrl,
     });
 
-    return apiSuccess({ message: "Please check your email to confirm your subscription" }, 201);
+    return apiSuccess(
+      {
+        code: "CONFIRMATION_PENDING",
+        message: "Please check your email to confirm your subscription",
+      },
+      201
+    );
   } catch {
-    return apiError("Failed to process subscription", 500);
+    return apiError("Failed to process subscription", 500, "SUBSCRIBE_FAILED");
   }
 }

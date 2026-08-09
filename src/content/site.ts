@@ -38,6 +38,29 @@ export const site = {
   name: BRAND_NAME,
   tagline: BRAND_TAGLINE,
 
+  /** Header chrome strings (G4). Nav item labels stay in Header.tsx's
+   *  `navigation` array (pre-existing UA); these are the residuals. */
+  header: {
+    menu: "Меню",
+    toggleMenu: "Відкрити меню",
+    categories: "Категорії",
+    adminPanel: "Адмін-панель",
+    account: "Акаунт",
+    orders: "Замовлення",
+    signIn: "Увійти",
+    signOut: "Вийти",
+    createAccount: "Створити акаунт",
+    cart: "Кошик",
+    search: {
+      srOpen: "Пошук (Ctrl+K)",
+      dialogTitle: "Пошук товарів",
+      placeholder: "Пошук товарів…",
+      viewAll: (q: string) => `Всі результати для «${q}»`,
+      noResults: (q: string) => `Нічого не знайдено за запитом «${q}»`,
+      minChars: "Введіть щонайменше 2 символи для пошуку…",
+    },
+  },
+
   /**
    * RETRACTED, not merely unconfirmed — was "Free delivery on orders over
    * 1000 UAH", read off the AI-generated concept mockup

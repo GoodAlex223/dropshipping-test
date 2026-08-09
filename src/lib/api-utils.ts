@@ -34,8 +34,10 @@ export async function requireAuth() {
   return { error: null, session };
 }
 
-export function apiError(message: string, status: number = 400) {
-  return NextResponse.json({ error: message }, { status });
+export function apiError(message: string, status: number = 400, code?: string) {
+  // `code` is machine-readable for clients that map outcomes to localized
+  // copy (see the newsletter routes); `message` stays log/consumer text.
+  return NextResponse.json(code ? { error: message, code } : { error: message }, { status });
 }
 
 export function apiSuccess<T>(data: T, status: number = 200) {

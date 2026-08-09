@@ -2,14 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { User, Package, MapPin, Settings } from "lucide-react";
+import { User, Package } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { account } from "@/content/account";
 
 const accountNav = [
-  { href: "/account", label: "Overview", icon: User },
-  { href: "/account/orders", label: "Orders", icon: Package },
-  { href: "/account/addresses", label: "Addresses", icon: MapPin },
-  { href: "/account/settings", label: "Settings", icon: Settings },
+  { href: "/account", label: account.nav.overview, icon: User },
+  { href: "/account/orders", label: account.nav.orders, icon: Package },
+  // «Адреси» and «Налаштування» are deliberately absent: /account/addresses
+  // and /account/settings don't exist yet (404 today). Restore when the pages
+  // are built — BACKLOG [2026-08-08] From: G4 brainstorm (Footer shopLinks
+  // precedent for omitting links to unbuilt pages).
 ];
 
 export default function AccountLayout({ children }: { children: React.ReactNode }) {
@@ -17,7 +20,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
 
   return (
     <div className="container py-8">
-      <h1 className="mb-8 text-2xl font-bold">My Account</h1>
+      <h1 className="mb-8 text-2xl font-bold">{account.title}</h1>
       <div className="grid gap-8 lg:grid-cols-[240px_1fr]">
         {/* Sidebar Navigation */}
         <nav className="space-y-1">

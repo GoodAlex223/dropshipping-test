@@ -21,6 +21,7 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getOrderStatusStyle, getOrderStatusLabel } from "@/lib/order-status";
 import { formatPrice } from "@/lib/format";
+import { account, PAYMENT_STATUS_LABELS } from "@/content/account";
 
 interface OrderItem {
   id: string;
@@ -69,16 +70,16 @@ interface Order {
 }
 
 const ORDER_TIMELINE = [
-  { status: "PENDING", label: "Order Placed", icon: Clock },
-  { status: "CONFIRMED", label: "Order Confirmed", icon: CheckCircle2 },
-  { status: "PROCESSING", label: "Processing", icon: Package },
-  { status: "SHIPPED", label: "Shipped", icon: Truck },
-  { status: "DELIVERED", label: "Delivered", icon: CheckCircle2 },
+  { status: "PENDING", label: account.orderDetail.timeline.placed, icon: Clock },
+  { status: "CONFIRMED", label: account.orderDetail.timeline.confirmed, icon: CheckCircle2 },
+  { status: "PROCESSING", label: account.orderDetail.timeline.processing, icon: Package },
+  { status: "SHIPPED", label: account.orderDetail.timeline.shipped, icon: Truck },
+  { status: "DELIVERED", label: account.orderDetail.timeline.delivered, icon: CheckCircle2 },
 ];
 
 const CANCELLED_TIMELINE = [
-  { status: "PENDING", label: "Order Placed", icon: Clock },
-  { status: "CANCELLED", label: "Cancelled", icon: XCircle },
+  { status: "PENDING", label: account.orderDetail.timeline.placed, icon: Clock },
+  { status: "CANCELLED", label: account.orderDetail.timeline.cancelled, icon: XCircle },
 ];
 
 export default function OrderDetailPage() {
@@ -95,16 +96,16 @@ export default function OrderDetailPage() {
         const response = await fetch(`/api/orders/${id}`);
         if (!response.ok) {
           if (response.status === 404) {
-            setError("Order not found");
+            setError(account.orderDetail.notFound);
           } else {
-            setError("Failed to load order");
+            setError(account.orderDetail.loadFailed);
           }
           return;
         }
         const data = await response.json();
         setOrder(data);
       } catch {
-        setError("Failed to load order");
+        setError(account.orderDetail.loadFailed);
       } finally {
         setIsLoading(false);
       }
@@ -114,7 +115,7 @@ export default function OrderDetailPage() {
   }, [id]);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString("uk-UA", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -151,9 +152,9 @@ export default function OrderDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <Package className="text-muted-foreground h-16 w-16" />
-        <h2 className="mt-4 text-lg font-medium">{error || "Order not found"}</h2>
+        <h2 className="mt-4 text-lg font-medium">{error || account.orderDetail.notFound}</h2>
         <Button className="mt-6" onClick={() => router.push("/account/orders")}>
-          Back to Orders
+          {account.orderDetail.backToOrders}
         </Button>
       </div>
     );
@@ -176,8 +177,12 @@ export default function OrderDetailPage() {
             </Link>
           </Button>
           <div>
-            <h2 className="text-xl font-semibold">Order {order.orderNumber}</h2>
-            <p className="text-muted-foreground text-sm">Placed on {formatDate(order.createdAt)}</p>
+            <h2 className="text-xl font-semibold">
+              {account.orderDetail.orderTitle(order.orderNumber)}
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              {account.orderDetail.placedOn(formatDate(order.createdAt))}
+            </p>
           </div>
         </div>
         <Badge variant="secondary" className={`${getOrderStatusStyle(order.status)} text-sm`}>
@@ -191,7 +196,7 @@ export default function OrderDetailPage() {
           {/* Order Status Timeline */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Order Status</CardTitle>
+              <CardTitle className="text-base">{account.orderDetail.timeline.title}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="relative">
@@ -234,7 +239,7 @@ export default function OrderDetailPage() {
                         {isCurrent && order.status === "SHIPPED" && order.trackingNumber && (
                           <div className="mt-2">
                             <p className="text-muted-foreground text-sm">
-                              Tracking: {order.trackingNumber}
+                              {account.orderDetail.timeline.tracking} {order.trackingNumber}
                             </p>
                             {order.trackingUrl && (
                               <Button variant="link" size="sm" className="h-auto p-0" asChild>
@@ -243,7 +248,7 @@ export default function OrderDetailPage() {
                                   target="_blank"
                                   rel="noopener noreferrer"
                                 >
-                                  Track Package
+                                  {account.orderDetail.timeline.trackPackage}
                                 </a>
                               </Button>
                             )}
@@ -260,7 +265,9 @@ export default function OrderDetailPage() {
           {/* Order Items */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Items ({order.items.length})</CardTitle>
+              <CardTitle className="text-base">
+                {account.orderDetail.items.title(order.items.length)}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {order.items.map((item) => (
@@ -290,7 +297,9 @@ export default function OrderDetailPage() {
                     {item.variantInfo && (
                       <p className="text-muted-foreground text-sm">{item.variantInfo}</p>
                     )}
-                    <p className="text-muted-foreground text-sm">SKU: {item.productSku}</p>
+                    <p className="text-muted-foreground text-sm">
+                      {account.orderDetail.items.sku} {item.productSku}
+                    </p>
                     <div className="mt-2 flex items-center justify-between">
                       <p className="text-sm">
                         {formatPrice(item.unitPrice)} × {item.quantity}
@@ -309,30 +318,36 @@ export default function OrderDetailPage() {
           {/* Order Summary */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Order Summary</CardTitle>
+              <CardTitle className="text-base">{account.orderDetail.summary.title}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Subtotal</span>
+                <span className="text-muted-foreground">
+                  {account.orderDetail.summary.subtotal}
+                </span>
                 <span>{formatPrice(order.subtotal)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Shipping</span>
+                <span className="text-muted-foreground">
+                  {account.orderDetail.summary.shipping}
+                </span>
                 <span>{formatPrice(order.shippingCost)}</span>
               </div>
               {parseFloat(order.discount) > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Discount</span>
+                  <span className="text-muted-foreground">
+                    {account.orderDetail.summary.discount}
+                  </span>
                   <span className="text-foreground">-{formatPrice(order.discount)}</span>
                 </div>
               )}
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Tax</span>
+                <span className="text-muted-foreground">{account.orderDetail.summary.tax}</span>
                 <span>{formatPrice(order.tax)}</span>
               </div>
               <Separator />
               <div className="flex justify-between font-semibold">
-                <span>Total</span>
+                <span>{account.orderDetail.summary.total}</span>
                 <span>{formatPrice(order.total)}</span>
               </div>
             </CardContent>
@@ -343,7 +358,7 @@ export default function OrderDetailPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <MapPin className="h-4 w-4" />
-                Shipping Address
+                {account.orderDetail.address.title}
               </CardTitle>
             </CardHeader>
             <CardContent className="text-sm">
@@ -366,26 +381,28 @@ export default function OrderDetailPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <CreditCard className="h-4 w-4" />
-                Payment
+                {account.orderDetail.payment.title}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Method</span>
-                <span className="capitalize">{order.paymentMethod || "Card"}</span>
+                <span className="text-muted-foreground">{account.orderDetail.payment.method}</span>
+                <span>{account.orderDetail.payment.methodLabel(order.paymentMethod)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Status</span>
+                <span className="text-muted-foreground">{account.orderDetail.payment.status}</span>
                 <Badge
                   variant={order.paymentStatus === "PAID" ? "default" : "secondary"}
                   className="text-xs"
                 >
-                  {order.paymentStatus}
+                  {PAYMENT_STATUS_LABELS[order.paymentStatus] ?? order.paymentStatus}
                 </Badge>
               </div>
               {order.paidAt && (
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Paid on</span>
+                  <span className="text-muted-foreground">
+                    {account.orderDetail.payment.paidOn}
+                  </span>
                   <span>{formatDate(order.paidAt)}</span>
                 </div>
               )}
@@ -396,7 +413,7 @@ export default function OrderDetailPage() {
           {order.customerNotes && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Order Notes</CardTitle>
+                <CardTitle className="text-base">{account.orderDetail.notes.title}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm">{order.customerNotes}</p>

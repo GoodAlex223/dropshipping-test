@@ -27,10 +27,11 @@ components/
 │   ├── PaymentForm.tsx    # Stripe Elements payment form (dormant since G2 — unreferenced by the live COD checkout)
 │   └── index.ts
 ├── common/
-│   ├── Header.tsx         # Site header with nav, cart, auth
+│   ├── Header.tsx         # Site header with nav, cart, auth; chrome strings from src/content/site.ts (site.header, G4)
 │   ├── Footer.tsx         # Site footer with NewsletterSignup component
-│   ├── NewsletterSignup.tsx  # Newsletter subscription form (email input, success state)
-│   ├── CookieConsent.tsx  # GDPR cookie consent banner + GTM loader (Zustand persisted)
+│   ├── NewsletterSignup.tsx  # Newsletter subscription form (email input, success state); copy from src/content/newsletter.ts (signup.byCode/fallback, G4)
+│   ├── CookieConsent.tsx  # GDPR cookie consent banner + GTM loader (Zustand persisted); copy from src/content/system.ts (cookies, G4)
+│   ├── StatusScreen.tsx   # Hook-free shared status-page treatment (icon/tone/title/description/meta/actions); no "use client" — server-usable, not-found.tsx renders it directly; server callers may only pass href actions since onClick functions can't cross the server→client boundary
 │   ├── ResourceHints.tsx  # Resource hints (preconnect/dns-prefetch for third-party domains)
 │   └── index.ts
 ├── products/

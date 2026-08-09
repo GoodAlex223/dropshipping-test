@@ -58,6 +58,8 @@ describe("POST /api/newsletter/subscribe", () => {
     const res = await POSTSubscribe(req);
 
     expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.code).toBe("VALIDATION_ERROR");
   });
 
   it("returns 409 when email is already active", async () => {
@@ -77,6 +79,7 @@ describe("POST /api/newsletter/subscribe", () => {
     expect(res.status).toBe(409);
     const body = await res.json();
     expect(body.error).toContain("already subscribed");
+    expect(body.code).toBe("ALREADY_SUBSCRIBED");
   });
 
   it("creates new subscriber with PENDING status", async () => {
@@ -94,6 +97,8 @@ describe("POST /api/newsletter/subscribe", () => {
     const res = await POSTSubscribe(req);
 
     expect(res.status).toBe(201);
+    const body = await res.json();
+    expect(body.code).toBe("CONFIRMATION_PENDING");
     expect(prisma.subscriber.create).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({
@@ -144,6 +149,8 @@ describe("POST /api/newsletter/subscribe", () => {
     const res = await POSTSubscribe(req);
 
     expect(res.status).toBe(201);
+    const body = await res.json();
+    expect(body.code).toBe("CONFIRMATION_PENDING");
     expect(prisma.subscriber.update).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { id: "sub-1" },
@@ -196,6 +203,8 @@ describe("POST /api/newsletter/subscribe", () => {
     const res = await POSTSubscribe(req);
 
     expect(res.status).toBe(201);
+    const body = await res.json();
+    expect(body.code).toBe("CONFIRMATION_PENDING");
   });
 });
 
@@ -211,6 +220,7 @@ describe("GET /api/newsletter/confirm", () => {
     expect(res.status).toBe(400);
     const body = await res.json();
     expect(body.error).toContain("token");
+    expect(body.code).toBe("TOKEN_REQUIRED");
   });
 
   it("returns 404 when token is invalid", async () => {
@@ -223,6 +233,8 @@ describe("GET /api/newsletter/confirm", () => {
     const res = await GETConfirm(req);
 
     expect(res.status).toBe(404);
+    const body = await res.json();
+    expect(body.code).toBe("INVALID_TOKEN");
   });
 
   it("returns success when already active", async () => {
@@ -241,6 +253,7 @@ describe("GET /api/newsletter/confirm", () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.message).toContain("already confirmed");
+    expect(body.code).toBe("ALREADY_CONFIRMED");
   });
 
   it("returns 410 when token is expired", async () => {
@@ -260,6 +273,7 @@ describe("GET /api/newsletter/confirm", () => {
     expect(res.status).toBe(410);
     const body = await res.json();
     expect(body.error).toContain("expired");
+    expect(body.code).toBe("LINK_EXPIRED");
   });
 
   it("returns 410 when confirmationExpiry is null", async () => {
@@ -277,6 +291,8 @@ describe("GET /api/newsletter/confirm", () => {
     const res = await GETConfirm(req);
 
     expect(res.status).toBe(410);
+    const body = await res.json();
+    expect(body.code).toBe("LINK_EXPIRED");
   });
 
   it("activates subscriber and clears token", async () => {
@@ -297,6 +313,7 @@ describe("GET /api/newsletter/confirm", () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.message).toContain("confirmed");
+    expect(body.code).toBe("CONFIRMED");
 
     expect(prisma.subscriber.update).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -325,6 +342,8 @@ describe("POST /api/newsletter/unsubscribe", () => {
     const res = await POSTUnsubscribe(req);
 
     expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.code).toBe("VALIDATION_ERROR");
   });
 
   it("returns 400 on validation error (missing token)", async () => {
@@ -336,6 +355,8 @@ describe("POST /api/newsletter/unsubscribe", () => {
     const res = await POSTUnsubscribe(req);
 
     expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.code).toBe("VALIDATION_ERROR");
   });
 
   it("returns 404 when subscriber not found", async () => {
@@ -349,6 +370,8 @@ describe("POST /api/newsletter/unsubscribe", () => {
     const res = await POSTUnsubscribe(req);
 
     expect(res.status).toBe(404);
+    const body = await res.json();
+    expect(body.code).toBe("SUBSCRIBER_NOT_FOUND");
   });
 
   it("returns success when already unsubscribed", async () => {
@@ -368,6 +391,7 @@ describe("POST /api/newsletter/unsubscribe", () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.message).toContain("already unsubscribed");
+    expect(body.code).toBe("ALREADY_UNSUBSCRIBED");
   });
 
   it("returns 400 when HMAC token is invalid", async () => {
@@ -387,6 +411,7 @@ describe("POST /api/newsletter/unsubscribe", () => {
     expect(res.status).toBe(400);
     const body = await res.json();
     expect(body.error).toContain("Invalid");
+    expect(body.code).toBe("INVALID_UNSUBSCRIBE_LINK");
   });
 
   it("unsubscribes successfully with valid HMAC token", async () => {
@@ -411,6 +436,7 @@ describe("POST /api/newsletter/unsubscribe", () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.message).toContain("unsubscribed successfully");
+    expect(body.code).toBe("UNSUBSCRIBED");
 
     expect(prisma.subscriber.update).toHaveBeenCalledWith(
       expect.objectContaining({

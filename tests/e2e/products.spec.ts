@@ -27,7 +27,7 @@ test.describe("Product Browsing", () => {
     // Search moved to the Header dialog in TASK-036 (the catalog filter bar
     // has no search input, per the Mirox mock).
     await page.getByRole("button", { name: "Пошук" }).first().click();
-    const searchInput = page.getByPlaceholder(/search/i);
+    const searchInput = page.getByPlaceholder(/пошук/i);
     await searchInput.fill("test");
     await searchInput.press("Enter");
     await page.waitForURL(/search=test/, { timeout: 15000 });

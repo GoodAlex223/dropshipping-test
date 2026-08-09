@@ -1,7 +1,11 @@
+import { ORDER_STATUS_LABELS } from "@/content/account";
+
 /**
  * Single source of truth for OrderStatus presentation.
  * Monochrome by policy; the destructive (red) token is reserved for the
  * negative terminal states CANCELLED and REFUNDED.
+ * Labels are customer copy and live in src/content/account.ts (G4);
+ * re-exported here so lookup stays one import for consumers.
  */
 export const ORDER_STATUS_STYLES: Record<string, string> = {
   PENDING: "bg-muted text-muted-foreground",
@@ -13,15 +17,7 @@ export const ORDER_STATUS_STYLES: Record<string, string> = {
   REFUNDED: "bg-destructive/10 text-destructive",
 };
 
-export const ORDER_STATUS_LABELS: Record<string, string> = {
-  PENDING: "Pending",
-  CONFIRMED: "Confirmed",
-  PROCESSING: "Processing",
-  SHIPPED: "Shipped",
-  DELIVERED: "Delivered",
-  CANCELLED: "Cancelled",
-  REFUNDED: "Refunded",
-};
+export { ORDER_STATUS_LABELS };
 
 export function getOrderStatusStyle(status: string): string {
   return ORDER_STATUS_STYLES[status] ?? "bg-muted text-muted-foreground";

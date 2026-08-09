@@ -2,19 +2,19 @@ import { z } from "zod";
 
 // Auth validations
 export const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  email: z.string().email("Введіть коректний email"),
+  password: z.string().min(8, "Пароль має містити щонайменше 8 символів"),
 });
 
 export const registerSchema = z
   .object({
-    name: z.string().min(2, "Name must be at least 2 characters"),
-    email: z.string().email("Invalid email address"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
+    name: z.string().min(2, "Ім'я має містити щонайменше 2 символи"),
+    email: z.string().email("Введіть коректний email"),
+    password: z.string().min(8, "Пароль має містити щонайменше 8 символів"),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
+    message: "Паролі не збігаються",
     path: ["confirmPassword"],
   });
 

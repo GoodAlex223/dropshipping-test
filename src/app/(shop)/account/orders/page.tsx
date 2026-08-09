@@ -18,6 +18,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { getOrderStatusStyle, getOrderStatusLabel } from "@/lib/order-status";
 import { formatPrice } from "@/lib/format";
+import { account } from "@/content/account";
 
 interface OrderItem {
   id: string;
@@ -48,6 +49,15 @@ interface OrdersResponse {
     totalPages: number;
   };
 }
+
+const ORDER_FILTER_STATUSES = [
+  "PENDING",
+  "CONFIRMED",
+  "PROCESSING",
+  "SHIPPED",
+  "DELIVERED",
+  "CANCELLED",
+] as const;
 
 function OrdersPageContent() {
   const router = useRouter();
@@ -105,7 +115,7 @@ function OrdersPageContent() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString("uk-UA", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -116,7 +126,7 @@ function OrdersPageContent() {
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Order History</h2>
+          <h2 className="text-xl font-semibold">{account.orders.title}</h2>
           <Skeleton className="h-10 w-40" />
         </div>
         {[1, 2, 3].map((i) => (
@@ -129,19 +139,18 @@ function OrdersPageContent() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-xl font-semibold">Order History</h2>
+        <h2 className="text-xl font-semibold">{account.orders.title}</h2>
         <Select value={statusFilter} onValueChange={handleStatusChange}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by status" />
+            <SelectValue placeholder={account.orders.filter.placeholder} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Orders</SelectItem>
-            <SelectItem value="PENDING">Pending</SelectItem>
-            <SelectItem value="CONFIRMED">Confirmed</SelectItem>
-            <SelectItem value="PROCESSING">Processing</SelectItem>
-            <SelectItem value="SHIPPED">Shipped</SelectItem>
-            <SelectItem value="DELIVERED">Delivered</SelectItem>
-            <SelectItem value="CANCELLED">Cancelled</SelectItem>
+            <SelectItem value="all">{account.orders.filter.all}</SelectItem>
+            {ORDER_FILTER_STATUSES.map((s) => (
+              <SelectItem key={s} value={s}>
+                {getOrderStatusLabel(s)}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
@@ -150,12 +159,12 @@ function OrdersPageContent() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <ShoppingBag className="text-muted-foreground h-16 w-16" />
-            <h3 className="mt-4 text-lg font-medium">No orders yet</h3>
+            <h3 className="mt-4 text-lg font-medium">{account.orders.empty.title}</h3>
             <p className="text-muted-foreground mt-2 text-center text-sm">
-              When you place an order, it will appear here.
+              {account.orders.empty.description}
             </p>
             <Button className="mt-6" asChild>
-              <Link href="/products">Start Shopping</Link>
+              <Link href="/products">{account.orders.empty.cta}</Link>
             </Button>
           </CardContent>
         </Card>
@@ -169,15 +178,19 @@ function OrdersPageContent() {
                   <div className="bg-muted/50 flex flex-wrap items-center justify-between gap-4 border-b p-4">
                     <div className="flex flex-wrap items-center gap-4">
                       <div>
-                        <p className="text-muted-foreground text-sm">Order placed</p>
+                        <p className="text-muted-foreground text-sm">
+                          {account.orders.card.placed}
+                        </p>
                         <p className="font-medium">{formatDate(order.createdAt)}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground text-sm">Total</p>
+                        <p className="text-muted-foreground text-sm">{account.orders.card.total}</p>
                         <p className="font-medium">{formatPrice(order.total)}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground text-sm">Order #</p>
+                        <p className="text-muted-foreground text-sm">
+                          {account.orders.card.number}
+                        </p>
                         <p className="font-medium">{order.orderNumber}</p>
                       </div>
                     </div>
@@ -188,7 +201,7 @@ function OrdersPageContent() {
                       <Button variant="outline" size="sm" asChild>
                         <Link href={`/account/orders/${order.id}`}>
                           <Eye className="mr-2 h-4 w-4" />
-                          View Details
+                          {account.orders.card.details}
                         </Link>
                       </Button>
                     </div>
@@ -214,14 +227,16 @@ function OrdersPageContent() {
                           )}
                           <div>
                             <p className="line-clamp-1 text-sm font-medium">{item.productName}</p>
-                            <p className="text-muted-foreground text-sm">Qty: {item.quantity}</p>
+                            <p className="text-muted-foreground text-sm">
+                              {account.orders.card.qty(item.quantity)}
+                            </p>
                           </div>
                         </div>
                       ))}
                       {order.items.length > 4 && (
                         <div className="flex items-center">
                           <span className="text-muted-foreground text-sm">
-                            +{order.items.length - 4} more items
+                            {account.orders.card.more(order.items.length - 4)}
                           </span>
                         </div>
                       )}
@@ -242,10 +257,10 @@ function OrdersPageContent() {
                 disabled={pagination.page <= 1}
               >
                 <ChevronLeft className="h-4 w-4" />
-                Previous
+                {account.orders.pagination.prev}
               </Button>
               <span className="text-muted-foreground text-sm">
-                Page {pagination.page} of {pagination.totalPages}
+                {account.orders.pagination.pageOf(pagination.page, pagination.totalPages)}
               </span>
               <Button
                 variant="outline"
@@ -253,7 +268,7 @@ function OrdersPageContent() {
                 onClick={() => handlePageChange(pagination.page + 1)}
                 disabled={pagination.page >= pagination.totalPages}
               >
-                Next
+                {account.orders.pagination.next}
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
@@ -268,7 +283,7 @@ function OrdersPageLoading() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Order History</h2>
+        <h2 className="text-xl font-semibold">{account.orders.title}</h2>
         <Skeleton className="h-10 w-40" />
       </div>
       {[1, 2, 3].map((i) => (

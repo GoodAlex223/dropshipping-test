@@ -47,6 +47,6 @@ describe("Header", () => {
 
   it("labels the search trigger for a11y and E2E", () => {
     render(<Header />);
-    expect(screen.getByRole("button", { name: "Пошук" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Пошук (Ctrl+K)" })).toBeInTheDocument();
   });
 });

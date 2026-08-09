@@ -2,6 +2,11 @@ import { describe, it, expect } from "vitest";
 import { site } from "@/content/site";
 import { home } from "@/content/home";
 import { cart } from "@/content/cart";
+import { auth } from "@/content/auth";
+import { account, ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS } from "@/content/account";
+import { newsletter } from "@/content/newsletter";
+import { system } from "@/content/system";
+import { OrderStatus, PaymentStatus } from "@prisma/client";
 
 describe("site content", () => {
   it("exposes the Mirox brand name", () => {
@@ -102,5 +107,82 @@ describe("cart content", () => {
     expect(cart.stock.onlyN(3)).toBe("Доступно лише 3");
     expect(cart.variant.color).toBe("Колір:");
     expect(cart.variant.size).toBe("Розмір:");
+  });
+});
+
+describe("auth content", () => {
+  it("keeps submit CTAs uppercase per the shipped checkout convention", () => {
+    expect(auth.login.submit).toBe(auth.login.submit.toUpperCase());
+    expect(auth.register.submit).toBe(auth.register.submit.toUpperCase());
+  });
+});
+
+describe("account content", () => {
+  it("labels every OrderStatus value in Ukrainian", () => {
+    for (const s of Object.values(OrderStatus)) {
+      expect(ORDER_STATUS_LABELS[s]).toBeTruthy();
+      expect(ORDER_STATUS_LABELS[s]).not.toMatch(/^[A-Za-z ]+$/);
+    }
+  });
+
+  it("labels every PaymentStatus value in Ukrainian", () => {
+    for (const s of Object.values(PaymentStatus)) {
+      expect(PAYMENT_STATUS_LABELS[s]).toBeTruthy();
+    }
+  });
+
+  it("pluralizes the more-items line", () => {
+    expect(account.orders.card.more(1)).toBe("+1 інший товар");
+    expect(account.orders.card.more(3)).toBe("+3 інші товари");
+    expect(account.orders.card.more(5)).toBe("+5 інших товарів");
+  });
+
+  it("maps cod and card payment methods", () => {
+    expect(account.orderDetail.payment.methodLabel("cod")).toBe("Оплата при отриманні");
+    expect(account.orderDetail.payment.methodLabel("card")).toBe("Карткою");
+  });
+});
+
+describe("newsletter content", () => {
+  it("covers every confirm code the API emits", () => {
+    for (const code of [
+      "CONFIRMED",
+      "ALREADY_CONFIRMED",
+      "LINK_EXPIRED",
+      "INVALID_TOKEN",
+      "TOKEN_REQUIRED",
+    ]) {
+      expect(newsletter.confirm.byCode[code]).toBeTruthy();
+    }
+  });
+
+  it("covers every unsubscribe code the API emits", () => {
+    for (const code of [
+      "UNSUBSCRIBED",
+      "ALREADY_UNSUBSCRIBED",
+      "SUBSCRIBER_NOT_FOUND",
+      "INVALID_UNSUBSCRIBE_LINK",
+      "VALIDATION_ERROR",
+    ]) {
+      expect(newsletter.unsubscribe.byCode[code]).toBeTruthy();
+    }
+  });
+
+  it("interpolates the unsubscribe prompt email", () => {
+    expect(newsletter.unsubscribe.idle.prompt("a@b.ua")).toContain("a@b.ua");
+  });
+});
+
+describe("system content", () => {
+  it("has the cookie banner button pair", () => {
+    expect(system.cookies.accept).toBe("Прийняти");
+    expect(system.cookies.decline).toBe("Відхилити");
+  });
+});
+
+describe("site header content", () => {
+  it("wraps search queries in Ukrainian guillemets", () => {
+    expect(site.header.search.viewAll("test")).toContain("«test»");
+    expect(site.header.search.noResults("test")).toContain("«test»");
   });
 });
