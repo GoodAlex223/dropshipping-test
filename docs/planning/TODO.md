@@ -98,5 +98,13 @@ _None._
 - [ ] Legal-page content or lawyer engagement (feeds TASK-055)
 - [ ] Bank-card details for the checkout prepay block (card number + holder name) — lights up
       `src/content/checkout.ts` `payment.prepay` (G2, 2026-08-06)
-- [ ] WhatsApp contact number/link for checkout manager contacts — `src/content/checkout.ts`
-      `contacts.whatsapp` (G2, 2026-08-06)
+- [ ] WhatsApp contact number/link for manager contacts — single-sourced as `WHATSAPP_HREF` in
+      `src/content/brand.ts` since G5 (2026-08-10); filling it lights up BOTH the checkout
+      payment-step contacts and the order-email contact block (G2, 2026-08-06 · G5 gate ruling)
+- [ ] **Transactional-email sending config** (G5, 2026-08-10 — user-verified ABSENT in Vercel prod
+      env, so order/newsletter emails currently hit the by-design silent skip path and never send):
+      client creates a Resend account → verifies the real sending domain's DNS (SPF + DKIM; **chains
+      behind the real-domain purchase** — a vercel.app subdomain can't be verified) → we set
+      `RESEND_API_KEY` + `EMAIL_FROM` (e.g. `noreply@<real-domain>`) in Vercel prod env and redeploy.
+      Interim smoke-test option only: Resend's `onboarding@resend.dev` sender delivers solely to the
+      account owner's inbox — never to customers. Closes BACKLOG's 🔵 "Verify prod email config"

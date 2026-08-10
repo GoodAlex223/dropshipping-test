@@ -1252,6 +1252,12 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 
 **Programmatic result: INCONCLUSIVE — env vars not readable from this container.**
 
+**RESOLVED (user dashboard check, 2026-08-10): `RESEND_API_KEY` and `EMAIL_FROM` are ABSENT from
+Vercel prod env** — prod order/newsletter emails currently hit the by-design silent skip path and
+never send. Client action items filed into TODO.md's TASK-056 checklist (Resend account → real-domain
+DNS verification (SPF/DKIM; chains behind the real-domain purchase) → set both vars → redeploy). The
+BACKLOG 🔵 "Verify prod email config" entry closes at the completion workflow with this pointer.
+
 - Vercel project located via MCP: `dropshipping-test` (`prj_IB5kKeCKmZ4AEUpKQSuScfoWo2c0`,
   team `goodalex223s-projects`), latest production deployment READY.
 - The Vercel MCP exposes no environment-variable listing; the Vercel CLI is not installed in
