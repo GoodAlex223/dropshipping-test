@@ -53,3 +53,11 @@ export const SOCIALS: SocialLink[] = [
   },
   { platform: "telegram", label: "Telegram", href: "https://t.me/mirox_shop", followers: null },
 ];
+
+/**
+ * CLIENT-SUPPLIED, PENDING (TASK-056 ask). Manager WhatsApp link (wa.me/…).
+ * null hides the link everywhere it's consumed (checkout payment step, order
+ * emails) — a zero-filled number would render as a clickable dead link
+ * (PR #29 review ruling). Fill with the real number to light both up.
+ */
+export const WHATSAPP_HREF: string | null = null;

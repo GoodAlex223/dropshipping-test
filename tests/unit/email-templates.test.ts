@@ -69,8 +69,23 @@ describe("emails content module", () => {
     expect(emails.newsletter.cta).toBe("ПІДТВЕРДИТИ ПІДПИСКУ");
   });
 
-  it("exposes only instagram and telegram as order-email contacts", () => {
+  it("exposes instagram and telegram while the WhatsApp number is pending", () => {
     expect(emails.order.contacts.map((s) => s.platform)).toEqual(["instagram", "telegram"]);
+  });
+
+  it("appends WhatsApp to order-email contacts once the client number is supplied", async () => {
+    vi.resetModules();
+    vi.doMock("@/content/brand", async (importOriginal) => ({
+      ...(await importOriginal<typeof import("@/content/brand")>()),
+      WHATSAPP_HREF: "https://wa.me/380501234567",
+    }));
+    const { emails: patched } = await import("@/content/emails");
+    expect(patched.order.contacts.map((s) => s.platform)).toEqual([
+      "instagram",
+      "telegram",
+      "whatsapp",
+    ]);
+    vi.doUnmock("@/content/brand");
   });
 });
 

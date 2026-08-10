@@ -1,4 +1,4 @@
-import { BRAND_NAME, SOCIALS } from "./brand";
+import { BRAND_NAME, SOCIALS, WHATSAPP_HREF } from "./brand";
 
 /**
  * Transactional email copy (spec 2026-08-10-g5-transactional-emails-design.md
@@ -37,8 +37,17 @@ export const emails = {
     contactHeading: "Питання щодо замовлення? Напишіть нам:",
     /** Pre-uppercased like checkout.payment.submit. */
     cta: "ІСТОРІЯ ЗАМОВЛЕНЬ",
-    /** Manager channels for the contact block — no WhatsApp (checkout.ts precedent: null until client supplies). */
-    contacts: SOCIALS.filter((s) => s.platform === "instagram" || s.platform === "telegram"),
+    /**
+     * Manager channels for the contact block — mirrors checkout.contacts:
+     * instagram/telegram now, WhatsApp appended once the client supplies the
+     * number (user gate ruling 2026-08-10).
+     */
+    contacts: [
+      ...SOCIALS.filter((s) => s.platform === "instagram" || s.platform === "telegram"),
+      ...(WHATSAPP_HREF
+        ? [{ platform: "whatsapp" as const, label: "WhatsApp", href: WHATSAPP_HREF }]
+        : []),
+    ],
   },
   newsletter: {
     subject: () => `Підтвердіть підписку на розсилку ${getStoreName()}`,

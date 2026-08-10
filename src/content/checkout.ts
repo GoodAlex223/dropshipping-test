@@ -1,4 +1,5 @@
 import { site } from "./site";
+import { WHATSAPP_HREF } from "./brand";
 
 /**
  * Checkout + confirmation copy (spec 2026-08-06-g2-checkout-restyle-cod-design.md
@@ -70,15 +71,16 @@ export const checkout = {
     },
   },
   /**
-   * Manager contact links. whatsapp is CLIENT-SUPPLIED, PENDING (TASK-056 ask):
-   * null hides the link — unlike site.ts's socials there is no real handle to
-   * fall back on, and a zero-filled wa.me number would render as a clickable
-   * dead link (PR #29 review). Fill with the real number to light it up.
+   * Manager contact links. whatsapp is single-sourced from brand.ts
+   * (WHATSAPP_HREF, CLIENT-SUPPLIED, PENDING TASK-056): null hides the link —
+   * unlike site.ts's socials there is no real handle to fall back on, and a
+   * zero-filled wa.me number would render as a clickable dead link (PR #29 review).
+   * Fill with the real number to light it up.
    */
   contacts: {
     instagram: site.socials.find((s) => s.platform === "instagram")?.href ?? null,
     telegram: site.socials.find((s) => s.platform === "telegram")?.href ?? null,
-    whatsapp: null as string | null,
+    whatsapp: WHATSAPP_HREF,
   },
   summary: {
     heading: "Ваше замовлення",
