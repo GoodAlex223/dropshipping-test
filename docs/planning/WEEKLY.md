@@ -2,7 +2,7 @@
 
 **Week**: Monday August 3 – Friday August 7, 2026
 **Created**: 2026-08-04
-**Sources**: [MILESTONES.md](MILESTONES.md) · [ROADMAP.md](ROADMAP.md) · [GOALS.md](GOALS.md) · [BACKLOG.md](BACKLOG.md) · [TODO.md](TODO.md) · prior WEEKLY (2026-07-27 week, archived below) · REVIEW-QUEUE.md (does not exist yet — created this week by G6)
+**Sources**: [MILESTONES.md](MILESTONES.md) · [ROADMAP.md](ROADMAP.md) · [GOALS.md](GOALS.md) · [BACKLOG.md](BACKLOG.md) · [TODO.md](TODO.md) · prior WEEKLY (2026-07-27 week, archived below) · [REVIEW-QUEUE.md](REVIEW-QUEUE.md) (created 2026-08-10 by G6's first run)
 **Cleanup Week?**: No — due by cadence (3 feature weeks since resumption, 🟤 pool ≫ 20 SP pending), but deferred by explicit user steer: this week finishes the rebrand and **next week (Aug 10–14) continues the visuals/translation launch push** (user, 2026-08-04 — "launch and show to users as fast as possible"). The OVERDUE docs-freshness linter competes for next week's single 🟤 slot; a full Cleanup Week is re-evaluated after the launch push.
 **Context**: Mirox program v1.3. User-directed theme (2026-08-04 brainstorm): **finish the redesign + Ukrainian translation of the storefront** — cart, checkout, auth, account, newsletter and error surfaces still carry pre-rebrand design and English copy (transactional emails as the stretch 🏆); the data side rides along as a user-gated prod re-seed plus the USD shipping constants decision inside the checkout group.
 
@@ -79,10 +79,13 @@
 
 > First-ever run of the standing batch — creates `REVIEW-QUEUE.md` (per-category Reviewed log + Next-up + Conventions). Exempt from the quota denominator; scheduled late-week per rule.
 
-- [ ] Create REVIEW-QUEUE.md; Plugins: review two independent tops — best not-yet-reviewed from the official Claude plugin store AND best from the wider internet, each logged with `source:` (2)
-- [ ] Claude best-practices: top not-yet-reviewed candidate via web search (1)
-- [ ] Non-Claude AI best-practices: same, for non-Claude models/tools (1)
-- [ ] Cross-project propagation (outbound): scan this week's DONE entries, merged PRs #24–#27, new memory files, config diffs → `propagate | pass | defer` rows; high bar, `propagate` files a TODO § Spawned Tasks row (1)
+- [x] Create REVIEW-QUEUE.md; Plugins: review two independent tops — best not-yet-reviewed from the official Claude plugin store AND best from the wider internet, each logged with `source:` (2) — `resend` → defer · `nextjs-marketplace` → pass
+- [x] Claude best-practices: top not-yet-reviewed candidate via web search (1) — CLAUDE.md trim + path-scoped `.claude/rules/` → **adopt** (the run's one)
+- [x] Non-Claude AI best-practices: same, for non-Claude models/tools (1) — pass (single-tool structural bias; bias-watch counter parked)
+- [x] Cross-project propagation (outbound): scan this week's DONE entries, merged PRs **#28–#31** plus Monday's #27 close-out, new memory files, config diffs → `propagate | pass | defer` rows; high bar, `propagate` files a TODO § 🔀 Spawned row (1) — 3 propagate / 1 defer / 1 pass (one `pass` corrected to `propagate` on the PR #32 review)
+      <!-- PR range corrected 2026-08-10: this line was written Tue Aug 4 (plan commit a4dab21, 02:16), when the week's only merge so far was Monday's PR #27 (cec8408, Aug 3 15:28 — TASK-037's spillover close-out). It therefore named the four then-most-recent PRs, #24–#27, of which only #27 belongs to this week. -->
+
+> ✅ Ran Mon 2026-08-10 (+3 days — queue spillover behind G2/G3/G4; displaced nothing, G6 is quota-exempt overhead and G5/G7 remain open) — PR [#32](https://github.com/GoodAlex223/dropshipping-test/pull/32). First-ever run in this repo: created [REVIEW-QUEUE.md](REVIEW-QUEUE.md) as the durable cross-week state **and** the batch's methodology of record (no `docs/prompts/` here), with 10 seeded conventions (9 at run time, +1 from the PR #32 review). Verdicts **1 adopt / 1 defer / 2 pass** inbound, **3 propagate / 1 defer / 1 pass** outbound. Design: [2026-08-10-g6-weekly-reviews-design.md](../superpowers/specs/2026-08-10-g6-weekly-reviews-design.md).
 
 ### G7. Client Content Ask (TASK-056) [solo]
 
@@ -112,11 +115,11 @@
 ### Thursday — Peripheral sweep + reviews start
 
 - ✅ **[G4](#g4-peripheral-surfaces-sweep-batch)** 🔵 — auth/account/newsletter/error pages. Shipped Sat 2026-08-09 (+2 days: G2/G3 queue spillover), PR [#31](https://github.com/GoodAlex223/dropshipping-test/pull/31).
-- **[G6](#g6-weekly-reviews-batch)** ⚪ — part 1 (queue creation + plugins slot).
+- ✅ **[G6](#g6-weekly-reviews-batch)** ⚪ — part 1 (queue creation + plugins slot). Ran Mon 2026-08-10 (+3 days, queue spillover) as a single session covering both parts.
 
 ### Friday — Reviews close + stretch
 
-- **[G6](#g6-weekly-reviews-batch)** ⚪ — part 2 (best-practices slots + propagation scan).
+- ✅ **[G6](#g6-weekly-reviews-batch)** ⚪ — part 2 (best-practices slots + propagation scan). Ran Mon 2026-08-10 alongside part 1.
 - **[G7](#g7-client-content-ask-task-056-solo)** 🔵 — consolidated client ask assembled + handed off.
 - **[G5](#g5-transactional-emails-solo-)** 🔵 🏆 — stretch: emails, if the core groups are green.
 - Week close-out: statuses → `✅ PR #N`, spillover check, next-week (launch-push continuation) seed list.
@@ -132,7 +135,7 @@
 | G3  | Params Fix `[solo]`                    | Next.js routing     | 🟤 Auto     | 1      | 2        | Wed     | ✅ PR #30     |
 | G4  | Peripheral Surfaces Sweep `[batch]`    | auth/account/system | 🔵 User     | 3      | 5        | Thu     | ✅ PR #31     |
 | G5  | Transactional Emails `[solo]` 🏆       | email templates     | 🔵 User     | 2      | 3        | Fri     | ☐ Planned     |
-| G6  | Weekly Reviews `[batch]`               | recurring reviews   | ⚪ Overhead | 4      | 5        | Thu–Fri | ☐ Planned     |
+| G6  | Weekly Reviews `[batch]`               | recurring reviews   | ⚪ Overhead | 4      | 5        | Thu–Fri | ✅ PR #32     |
 | G7  | Client Content Ask (TASK-056) `[solo]` | client content      | 🔵 User     | 1      | 2        | Fri     | ☐ Planned     |
 | P1  | Prod data re-seed                      | ops/data            | 🟡 Ops      | 1      | 1        | Tue     | ✅ 2026-08-04 |
 |     | **Total**                              |                     |             | **18** | **28**   |         |               |

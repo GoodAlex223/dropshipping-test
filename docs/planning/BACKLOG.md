@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-08-09
+**Last Updated**: 2026-08-10
 
 ---
 
@@ -849,6 +849,55 @@ deliberately not fixed in-branch plus a docs-index gap found during Task 15's fr
   `2026-08-08_g4-peripheral-surfaces.md`) are absent. Surfaced by Task 15's docs-freshness pass
   and left per follow-existing-convention; decide the convention (index WEEKLY-group plans too,
   or note the table's TASK-only scope) and apply in one sweep. (Low value, Low effort)
+  **Re-surfaced 2026-08-10 by the PR #32 review** as an instance of the same drift class G6's
+  Spawned row 3 propagates outward (the bidirectional docs-index check). Verified still open:
+  `docs/README.md:96` is the last archived-plan row (TASK-037) and four G-group plans sit in
+  `docs/archive/plans/`. Kept as the single in-tree entry — the Spawned row cites it as its
+  worked example rather than duplicating it.
+
+### [2026-08-10] From: G6 Weekly Reviews (first run)
+
+**Origin**: the standing ⚪ Overhead batch's first run in this repo — design
+[2026-08-10-g6-weekly-reviews-design.md](../superpowers/specs/2026-08-10-g6-weekly-reviews-design.md),
+verdict rows in [REVIEW-QUEUE.md](REVIEW-QUEUE.md). Entries here are incidental findings surfaced
+while evaluating candidates; they route 🟤 by the source rule, independent of any slot's verdict.
+
+- 🟤 **Email templates have no `lang` attribute on their `<html>` root** — both
+  [src/lib/email.ts](../../src/lib/email.ts) (order confirmation) and
+  [src/lib/email-templates/newsletter-confirmation.ts](../../src/lib/email-templates/newsletter-confirmation.ts)
+  open with a bare `<html>`. Harmless while the copy is English, but G5 converts both to
+  Ukrainian, and an unlabelled root leaves screen readers and mail clients guessing at language
+  for hyphenation, pronunciation and font selection. Add `lang="uk"` (and a `<title>`) as part of
+  G5's conversion. Surfaced by the slot-1 `email-best-practices` read; distinct from the
+  [2026-08-07] 🔵 "Verify prod email config" entry, which covers provisioning, not markup.
+  (Low value, Low effort) `[relates-to: G5]`
+- 🟤 **TASK-039 design input: next-intl's `useExtracted` + its "don't let agents translate"
+  guidance** — next-intl's official AI-agent workflow page documents `useExtracted`, a hook
+  purpose-built for agents that writes messages **inline at the usage site** and auto-extracts
+  them into catalogs. That is a different model from this repo's `src/content/*.ts` layer, which
+  was deliberately built as "extraction-ready" for a `useTranslations` + catalog migration — so
+  TASK-039 should weigh the two rather than default to the assumed one. The same page advises
+  **against** having agents translate message catalogs (missing context and nuance) and points to
+  professional translation, which matters here because the storefront is Ukrainian-first and the
+  client supplies copy. Source: <https://next-intl.dev/docs/workflows/agents> (fetched
+  2026-08-10). (Med value, Low effort) `[relates-to: TASK-039]`
+- 🟤 **Shrink CLAUDE.md to durable rules and move the rest into path-scoped `.claude/rules/`**
+  — _the run's one `adopt`._ Measured: project `CLAUDE.md` is **350 lines** against Anthropic's
+  documented "target under 200 lines per CLAUDE.md file… longer files consume more context and
+  reduce adherence", and **232 of those 350 lines (66%)** are the Architecture tree, Detected
+  Patterns and Git Insights sections — exactly the derivable content `/doctor`'s trim check is
+  documented to cut while keeping pitfalls, rationale and conventions. `.claude/rules/` does not
+  exist in this repo. Two steps: (1) run `/doctor` and take its proposed trims; (2) move the
+  surviving path-specific guidance into `.claude/rules/*.md` with `paths:` frontmatter (e.g.
+  admin surfaces, `tests/**`, `prisma/**`, `src/content/**`), so it loads only when Claude touches
+  those files. **Preconditions verified** against the installed CC **2.1.226**: the invalid-`[`
+  glob bug that made Read fail for every evaluated file was fixed in 2.1.207, and the
+  brace-expansion startup crash in 2.1.217 — both clear. **Known trade-off to design around**:
+  rules with `paths:` frontmatter are **not** re-injected after `/compact`; they reload only when
+  Claude next reads a matching file, so anything that must survive compaction stays in CLAUDE.md.
+  This also discharges the standing global-CLAUDE.md obligation to audit a project file whenever
+  it crosses ~200 lines. Source: <https://code.claude.com/docs/en/memory> (fetched 2026-08-10).
+  (High value, Med effort)
 
 ---
 
