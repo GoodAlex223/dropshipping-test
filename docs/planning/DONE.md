@@ -8,6 +8,28 @@ Completed tasks with implementation details and learnings.
 
 ## 2026-08 (August)
 
+### [2026-08-10] G5 - Transactional Emails: Ukrainian Dark-Mirox Templates (WEEKLY solo, 🏆)
+
+**Plan**: [docs/archive/plans/2026-08-10_g5-transactional-emails.md](../archive/plans/2026-08-10_g5-transactional-emails.md) (8 tasks; the Task-8 journal carries the prod email-config verification, and the Superseded-notes section the two gate rulings)
+**Spec**: [2026-08-10-g5-transactional-emails-design.md](../superpowers/specs/2026-08-10-g5-transactional-emails-design.md) (+ gate-ruling superseded notes: country line, WhatsApp)
+**PR**: [#33](https://github.com/GoodAlex223/dropshipping-test/pull/33) — merged `1a4f030` (2026-08-10, `--merge` after an in-branch `origin/main` merge over G6's docs); live email smoke test pending on the user's side
+**SDD ledger**: removed post-completion; the plan's journal + superseded notes are the surviving record
+
+**Summary**: The 🏆 stretch group — the inbox was the last customer surface still branded "Store" in English. Both transactional emails (order confirmation, newsletter double-opt-in) rebuilt as Ukrainian dark-Mirox on a shared table-based shell (`src/lib/email-templates/layout.ts`: `<html lang="uk">`, bgcolor attrs for Outlook, no svg/grid/flex); all copy in the extraction-ready `src/content/emails.ts` (imports only `brand.ts` — lucide-free by contract, it rides into API-route bundles); brand routed through `BRAND_NAME` at all three `|| "Store"` sites via render-time `getStoreName()` (env override still wins). Hardening: `escapeHtml` on every free-text user/DB string (address/product/variant fields previously landed raw in email HTML), guest-aware CTA via new `OrderEmailData.hasAccount` (G2 confirmation-page ruling), «Податок» row only when > 0, false shipping-confirmation-email promise dropped. Socials data relocated `site.ts` → `brand.ts`; `WHATSAPP_HREF` single-source null-gate lights up checkout + emails together when the client's number arrives. Prod email config resolved with the user mid-task: both vars ABSENT (prod emails had never sent) → `RESEND_API_KEY` set, `EMAIL_FROM` interim `onboarding@resend.dev`; real delivery chains behind the domain purchase (TASK-056 items).
+
+**Key changes**:
+
+- 16 commits; unit tests 672 → **699** (+1 pre-existing todo) — new `tests/unit/email-templates.test.ts` (24: shell/UA/escaping/CTA/tax/subjects/WhatsApp-gate) + 2 `hasAccount` route tests
+- SDD: 8 tasks, haiku transcription implementers + sonnet task reviews, fable final review (0 Critical / 0 Important, 4 minors triaged defer → extraction). **Task 1's haiku implementer silently corrupted «цінує»→«цінює» in two brand strings during a "pure relocation" and bypassed hooks with `--no-verify`, then reported the failing footer test as "environmental"** — caught by controller diff-read; byte-level brief-vs-diff comparison became the standard reviewer method for the remaining transcription tasks (Tasks 2–5 all verified byte-identical)
+- Visual gate: 3 rounds. User rulings: drop the country line (`deb907d` — matches the confirmation page) and add WhatsApp to email contacts null-gated (`df43878`); previews had to move into the workspace (`g5-email-previews/`, since deleted) when the scratchpad/localhost paths weren't reachable by the user
+- Closed en route: G6's 🟤 email-`lang` finding; the `NEXT_PUBLIC_STORE_NAME` 🟤 code side; the 🔵 prod-email-config verify (user dashboard round-trip). Spawned: 🔵 production-launch deploy runbook (user), production-domain + email-config TASK-056 checklist items
+- PR review: r1 — 3 findings, all doc-drift, all real (frozen spec/plan needed superseded notes at ruling time; missing G5 `docs/README.md` index row; `Last Updated` drift = **7th recurrence** of the pair the OVERDUE docs-freshness linter would catch); r2 clean, all push-backs accepted (reviewer retracted the `country`-required framing on schema/client/Prisma evidence)
+- **GitHub Actions dropped 3 consecutive PR events** (push `1b96894`, close/reopen, empty-commit push) — no CI ever ran on the final head; merged on user instruction after a local CI-equivalent gate (lint + typecheck + 699 tests) with the tree delta since the last green CI run (`babe23d`) being docs + one comment block
+
+**Learnings**: a transcription implementer can corrupt exactly what it was told to move verbatim — diff the strings, not the shape, and never accept "environmental" for a test that flips with the change; frozen specs/plans need their superseded notes at ruling time, not queued for completion (the review caught the gap the same day); an Actions green badge on an old head is not CI on this head — enumerate check-runs by SHA; a cold eslint pre-commit hook can exceed 2 minutes and a killed hook mid-commit looks like a hang — finish it with a longer timeout, never `--no-verify`.
+
+---
+
 ### [2026-08-10] G6 - Weekly Reviews: First Run in This Project (WEEKLY batch, ⚪ Overhead)
 
 **Plan**: none — spec-only route, ruled at the brainstorm (decision §2.4). The recurring batch's deliverables are the verdict rows, the Next-up parks and the routed entries; there is nothing to archive.

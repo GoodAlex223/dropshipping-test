@@ -449,7 +449,7 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 
 **Origin**: verifying the production deployment of merge commit `adaa278`. 🟤 Auto-Generated.
 
-- 🟤 **`NEXT_PUBLIC_STORE_NAME` is unset in production, so the transactional-email brand surface still says "Store"** — _(narrowed 2026-07-21 after TASK-035: the visual + SEO surface is now fixed.)_ TASK-035 changed `src/lib/seo.ts` to fall back to `BRAND_NAME` ("Mirox Shop") instead of `"Store"`, and PR #21 made the OG/Twitter card render the generated Mirox card — verified live, the prod `<title>` is now `Mirox Shop — Modern Clothing` and `og:image` resolves to `/opengraph-image`. **What still hardcodes `|| "Store"`**: `src/lib/email.ts`, `src/lib/email-templates/newsletter-confirmation.ts`, and `src/app/(admin)/admin/settings/page.tsx` — so order-confirmation emails, the newsletter double-opt-in email, and the admin settings label still brand as "Store". Fixing is either the same **config** fix (set `NEXT_PUBLIC_STORE_NAME` in Vercel — cheapest, one var), or route those three through `BRAND_NAME` like `seo.ts` now does (code fix, no env dependency). (Med value, Low effort) `[relates-to: TASK-039 i18n copy]`
+- 🟤 **`NEXT_PUBLIC_STORE_NAME` is unset in production, so the transactional-email brand surface still says "Store"** — _(narrowed 2026-07-21 after TASK-035: the visual + SEO surface is now fixed.)_ TASK-035 changed `src/lib/seo.ts` to fall back to `BRAND_NAME` ("Mirox Shop") instead of `"Store"`, and PR #21 made the OG/Twitter card render the generated Mirox card — verified live, the prod `<title>` is now `Mirox Shop — Modern Clothing` and `og:image` resolves to `/opengraph-image`. **What still hardcodes `|| "Store"`**: `src/lib/email.ts`, `src/lib/email-templates/newsletter-confirmation.ts`, and `src/app/(admin)/admin/settings/page.tsx` — so order-confirmation emails, the newsletter double-opt-in email, and the admin settings label still brand as "Store". Fixing is either the same **config** fix (set `NEXT_PUBLIC_STORE_NAME` in Vercel — cheapest, one var), or route those three through `BRAND_NAME` like `seo.ts` now does (code fix, no env dependency). (Med value, Low effort) `[relates-to: TASK-039 i18n copy]` **RESOLVED (code side) by G5 — PR #33 merged `1a4f030` (2026-08-10)**: all three sites now fall back to `BRAND_NAME` (emails via render-time `getStoreName()` in `src/content/emails.ts`; admin settings via direct import). `NEXT_PUBLIC_STORE_NAME` is now an optional override, no longer required for correct branding.
 - 🟤 **The Actions "Deploy to Vercel" job is a green no-op and is actively misleading** — confirmed on run `29662966424`: only the "Validate Vercel configuration" step executed; steps 3–9 (Checkout, Setup Node, Install Vercel CLI, Pull env, Build, Deploy, Run database migrations) all reported `skipped` because the Vercel secrets are unset, and the job still concluded `success`. It even posts a GitHub Deployment to a lowercase `production` environment whose "success" reflects the skipped job, sitting alongside the genuine capital-`Production` deployment created by `vercel[bot]`. The real deploys come from the Vercel Git integration and work fine. Either wire the secrets so the job does something, or delete the job — a permanently-green deploy badge that never deploys will eventually be trusted by someone. **Note the migration implication:** the "Run database migrations" step is inside the skipped block, so no migration has ever run from CI. (Med value, Low effort) `[relates-to: TASK-040 CI extensions; duplicate-of an earlier deploy-reality note]`
 
 ### [2026-07-21] From: TASK-035 Homepage Rebrand (PR #21 + code review)
@@ -692,7 +692,11 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 - 🔵 **Verify prod email config** — order emails silently skip when `RESEND_API_KEY` is unset
   (by design); confirm the key + `EMAIL_FROM` on a Resend-verified domain exist in Vercel prod
   env, else receipts never send. Natural home: G5 transactional-emails group. (High value, Low
-  effort) [user Q6, 2026-08-07]
+  effort) [user Q6, 2026-08-07] **RESOLVED by G5 (2026-08-10, PR #33)**: verified with the user —
+  both vars were ABSENT (prod emails had never sent); `RESEND_API_KEY` set 2026-08-10,
+  `EMAIL_FROM` interim `onboarding@resend.dev` (delivers only to the Resend owner's inbox); real
+  customer delivery chains behind the domain purchase → TASK-056 checklist items (domain +
+  email-sending config). Full record: G5 plan's Task-8 journal.
 - 🟤 **Variant-name UA rename task** — seed variants are `"Size"`/`"Color"`, so receipts/emails
   show «Size: M» on Ukrainian pages. Renaming is NOT seed-only: 12+ call sites filter by
   `v.name === "Size"/"Color"` (ProductCard, QuickViewDialog, PDP page + client, styleGroup
@@ -870,7 +874,9 @@ while evaluating candidates; they route 🟤 by the source rule, independent of 
   for hyphenation, pronunciation and font selection. Add `lang="uk"` (and a `<title>`) as part of
   G5's conversion. Surfaced by the slot-1 `email-best-practices` read; distinct from the
   [2026-08-07] 🔵 "Verify prod email config" entry, which covers provisioning, not markup.
-  (Low value, Low effort) `[relates-to: G5]`
+  (Low value, Low effort) `[relates-to: G5]` **RESOLVED by G5 (PR #33, 2026-08-10)**: both
+  templates render through the shared shell (`src/lib/email-templates/layout.ts`) with
+  `<html lang="uk">` + UA `<title>`, asserted by `tests/unit/email-templates.test.ts`.
 - 🟤 **TASK-039 design input: next-intl's `useExtracted` + its "don't let agents translate"
   guidance** — next-intl's official AI-agent workflow page documents `useExtracted`, a hook
   purpose-built for agents that writes messages **inline at the usage site** and auto-extracts
@@ -932,6 +938,24 @@ while evaluating candidates; they route 🟤 by the source rule, independent of 
   on the new domain, GA4/GTM firing, Search Console + feed re-registration). The operational
   slice of TASK-054's "Launch readiness"; assemble as a checklist doc the launch day executes
   verbatim. (High value, Med effort) `[relates-to: TASK-054]` [user, 2026-08-10]
+
+### [2026-08-10] From: G5 completion
+
+**Origin**: completion-workflow extraction after PR #33 merged (`1a4f030`) — final-review minors
+deliberately deferred in-branch.
+
+- 🟤 **Email links need a base-URL helper** — the order email's account CTA renders
+  `${process.env.NEXT_PUBLIC_APP_URL}/account/orders`, which becomes `undefined/account/orders`
+  when the var is unset (pre-existing pattern; prod var is set). Centralize a `getBaseUrl()`
+  (seo.ts already carries the `NEXT_PUBLIC_APP_URL || localhost` fallback) and use it for all
+  email hrefs. Final-review minor on PR #33. (Low value, Low effort)
+- 🟤 **Email polish batch: escape `orderNumber`, regroup test imports, narrow contacts type** —
+  `orderNumber` is the one unescaped interpolation in the order template (server-generated
+  `ORD-` + base36, zero injection risk today — a defensive `escapeHtml` makes the escaping rule
+  exceptionless); `tests/unit/email-templates.test.ts` accumulated mid-file imports from the
+  TDD append flow (ESLint-clean, tidy on next touch); `emails.order.contacts` widens to a
+  union type where a small shared interface would be cleaner. Final-review + task-review minors
+  on PR #33, all triaged defer. (Low value, Low effort)
 
 ---
 

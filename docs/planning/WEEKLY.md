@@ -70,8 +70,10 @@
 
 > The Weekly Challenge — see the 🏆 section below.
 
-- [ ] Order-confirmation + newsletter-confirmation emails → Ukrainian, Mirox-consistent styling — [src/lib/email.ts](../../src/lib/email.ts) ("Order Confirmation" / "Thank you for your order" today), `src/lib/email-templates/` (2) — BACKLOG [2026-08-04] weekly-planning steer
-- [ ] Route the brand through `BRAND_NAME` instead of `|| "Store"` fallbacks (email.ts, newsletter template, admin settings label) — closes the code side of the `NEXT_PUBLIC_STORE_NAME` entry (1) — BACKLOG [2026-07-18] post-merge deploy verification
+- [x] Order-confirmation + newsletter-confirmation emails → Ukrainian, Mirox-consistent styling — [src/lib/email.ts](../../src/lib/email.ts) ("Order Confirmation" / "Thank you for your order" today), `src/lib/email-templates/` (2) — BACKLOG [2026-08-04] weekly-planning steer
+- [x] Route the brand through `BRAND_NAME` instead of `|| "Store"` fallbacks (email.ts, newsletter template, admin settings label) — closes the code side of the `NEXT_PUBLIC_STORE_NAME` entry (1) — BACKLOG [2026-07-18] post-merge deploy verification
+
+> ✅ Shipped 2026-08-10 (Sun — the stretch delivered despite the week's queue spillover) — PR [#33](https://github.com/GoodAlex223/dropshipping-test/pull/33) merged `1a4f030`. Both emails now Ukrainian dark-Mirox on a shared table-based shell (`content/emails.ts` + `email-templates/layout.ts`); `BRAND_NAME` routed at all three `|| "Store"` sites; escaping + guest-aware-CTA hardening; `WHATSAPP_HREF` null-gate (checkout + emails together). 672 → 699 unit tests. Visual gate signed off after 2 revision rounds (country line dropped, WhatsApp wired). Prod email config resolved with the user: both vars were ABSENT — key set, interim `onboarding@resend.dev` sender; real delivery chains behind the domain purchase (TASK-056). Spec: [2026-08-10-g5-transactional-emails-design.md](../superpowers/specs/2026-08-10-g5-transactional-emails-design.md).
 
 ### G6. Weekly Reviews [batch]
 
@@ -121,7 +123,7 @@
 
 - ✅ **[G6](#g6-weekly-reviews-batch)** ⚪ — part 2 (best-practices slots + propagation scan). Ran Mon 2026-08-10 alongside part 1.
 - **[G7](#g7-client-content-ask-task-056-solo)** 🔵 — consolidated client ask assembled + handed off.
-- **[G5](#g5-transactional-emails-solo-)** 🔵 🏆 — stretch: emails, if the core groups are green.
+- ✅ **[G5](#g5-transactional-emails-solo-)** 🔵 🏆 — stretch: emails, if the core groups are green. Shipped Sun 2026-08-10 (+2 days — queue spillover), PR [#33](https://github.com/GoodAlex223/dropshipping-test/pull/33).
 - Week close-out: statuses → `✅ PR #N`, spillover check, next-week (launch-push continuation) seed list.
 
 ---
@@ -134,7 +136,7 @@
 | G2  | Checkout Restyle `[batch]`             | storefront/checkout | 🔵 User     | 3      | 5        | Wed     | ✅ PR #29     |
 | G3  | Params Fix `[solo]`                    | Next.js routing     | 🟤 Auto     | 1      | 2        | Wed     | ✅ PR #30     |
 | G4  | Peripheral Surfaces Sweep `[batch]`    | auth/account/system | 🔵 User     | 3      | 5        | Thu     | ✅ PR #31     |
-| G5  | Transactional Emails `[solo]` 🏆       | email templates     | 🔵 User     | 2      | 3        | Fri     | ☐ Planned     |
+| G5  | Transactional Emails `[solo]` 🏆       | email templates     | 🔵 User     | 2      | 3        | Fri     | ✅ PR #33     |
 | G6  | Weekly Reviews `[batch]`               | recurring reviews   | ⚪ Overhead | 4      | 5        | Thu–Fri | ✅ PR #32     |
 | G7  | Client Content Ask (TASK-056) `[solo]` | client content      | 🔵 User     | 1      | 2        | Fri     | ☐ Planned     |
 | P1  | Prod data re-seed                      | ops/data            | 🟡 Ops      | 1      | 1        | Tue     | ✅ 2026-08-04 |
