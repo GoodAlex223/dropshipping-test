@@ -84,8 +84,21 @@ one-to-three-sentence reasoning, and the routing target if any.
 5. **One 🟤 per `adopt` is a minimum, not a cap.** Incidental process findings surfaced during a run route
    🟤 by the source rule (Claude-surfaced), independent of any slot's verdict. What is forbidden is
    _manufacturing_ entries out of `pass` / `defer` verdicts.
-6. **Deferred: the three-scope lens** (decision §2.5). Re-trigger: a second active project starts consuming
+6. **Sibling-project review history is prior evidence, not an exclusion list** (decision §2.2). Skip a
+   candidate only when its rejection reason elsewhere was _universal_; re-evaluate any whose reason was
+   _project-specific_, and record the prior in the row.
+7. **Deferred: the three-scope lens** (decision §2.5). Re-trigger: a second active project starts consuming
    this repo's conventions, or a run produces a candidate with an obvious non-local fit and no sink for it.
+8. **No parallel subagent fan-out for web research** (§4). Sequential in-session only — fan-out is a
+   rate-limit hazard and gets OOM-killed in this devcontainer.
+9. **Slot 4 must scan the memory files, not just the PRs**, because auto-memory is per-project by
+   construction — and when testing whether something already propagated, grep the **specific strings** in the
+   live `~/.claude` tree rather than diffing it.
+10. **An "already present" claim requires reading the matched line, not the filename.** `grep -l` for a
+    _concept_ proves only that some line matched some pattern; quote the matched line into the row.
+
+> **Conventions 9 and 10 were not designed up front.** 9 was discovered by slot 4 during the run; 10 was
+> added by the PR #32 review after slot 4's own first pass violated 9's corollary. See §10.
 
 ## 4. The four slots
 
@@ -219,3 +232,29 @@ verification and its own verdict in this project's context.
 | Web-research rate limits / devcontainer OOM                           | Sequential in-session research only; no parallel subagent fan-out (§4)                                                    |
 | A `pass` row silently going unwritten                                 | Skeleton-first sequencing (§2.6) + Convention 1; the empty row is visible before research begins                          |
 | 🟤 pool growth pulling the Cleanup-Week trigger harder                | Defer-leaning bar; the Cleanup Week is already due and deferred by user steer, so this is a recorded cost, not a surprise |
+
+**A risk this table missed**, added post-review: _an "already covered" claim resting on an unread grep match_
+— the failure that produced the run's one wrong verdict (§10). Mitigation is now Convention 10.
+
+## 10. Post-review corrections (PR #32, 2026-08-10)
+
+This spec is **live**, not frozen, so review findings are corrected here rather than annotated as
+superseded. Two landed:
+
+1. **The Conventions list above was stale on arrival.** It shipped with 6 items while `REVIEW-QUEUE.md`
+   shipped 9, and the numbering had drifted — spec item 6 was queue item 7, and queue items 6, 8 and 9
+   appeared nowhere here. Conventions 6 and 8 were derivable from this spec's own prose at writing time
+   (decision §2.2 and §4's fan-out ban) and simply never made the list; convention 9 was discovered during
+   slot 4 and never propagated back. The list is now synced at 10, matching the file.
+
+2. **Slot 4 shipped one wrong verdict.** The bidirectional docs-index check was recorded `pass` on the claim
+   that `POLICIES/code-review.md` "already" carried the rule. It does not: the claim came from a `grep -l`
+   for the _concept_ (`bidirection\|both directions`) that matched `- [ ] Migration tested both directions`,
+   a database-migration checklist item. Re-verified as absent; the verdict is now `propagate` and the row is
+   filed. The sibling `pass` in the same block (the `✅ PR #N` close-out rule) was re-checked and **holds** —
+   it was a literal-string grep and all three hits are the rule verbatim, so the defect was confined to the
+   one concept-grep.
+
+The second finding is the more interesting one: the run wrote Convention 9's corollary — grep specific
+strings, don't diff trees — and then violated it in the same slot. The corollary was right; the run did not
+follow it. Convention 10 makes the unread-match failure explicit rather than leaving it implied.
