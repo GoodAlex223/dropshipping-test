@@ -219,3 +219,47 @@ describe("generateOrderConfirmationHtml", () => {
     expect(generateOrderConfirmationHtml(baseOrder)).not.toContain("shipping confirmation");
   });
 });
+
+import { generateNewsletterConfirmationHtml } from "@/lib/email-templates/newsletter-confirmation";
+
+// ---------------------------------------------------------------------------
+// email-templates/newsletter-confirmation.ts
+// ---------------------------------------------------------------------------
+
+const newsletterData = {
+  email: "customer@example.com",
+  confirmationUrl: "https://test.example.com/newsletter/confirm?token=abc123",
+};
+
+describe("generateNewsletterConfirmationHtml", () => {
+  it("renders the Ukrainian double-opt-in email in the dark shell", () => {
+    const html = generateNewsletterConfirmationHtml(newsletterData);
+    expect(html).toContain('<html lang="uk">');
+    expect(html).toContain('bgcolor="#000000"');
+    expect(html).toContain("Підтвердіть підписку");
+    expect(html).toContain("Ви залишили цю адресу для підписки на розсилку");
+    expect(html).toContain("customer@example.com");
+    expect(html).toContain("Посилання дійсне 24 години.");
+    expect(html).toContain(`href="${newsletterData.confirmationUrl}"`);
+    expect(html).not.toContain("Store");
+  });
+
+  it("escapes the email address", () => {
+    const html = generateNewsletterConfirmationHtml({
+      ...newsletterData,
+      email: '<b onmouseover="pwn()">x</b>@example.com',
+    });
+    expect(html).not.toContain('<b onmouseover="pwn()">');
+    expect(html).toContain("&lt;b onmouseover=");
+  });
+
+  it("renders the unsubscribe link only when provided", () => {
+    const withUnsub = generateNewsletterConfirmationHtml({
+      ...newsletterData,
+      unsubscribeUrl: "https://test.example.com/newsletter/unsubscribe?id=1",
+    });
+    expect(withUnsub).toContain("Відписатися");
+    expect(withUnsub).toContain('href="https://test.example.com/newsletter/unsubscribe?id=1"');
+    expect(generateNewsletterConfirmationHtml(newsletterData)).not.toContain("Відписатися");
+  });
+});
