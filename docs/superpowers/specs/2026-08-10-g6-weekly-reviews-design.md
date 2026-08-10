@@ -182,16 +182,22 @@ too?
 5. Slot 3 → verify → append row → commit.
 6. Slot 4 (internal scan) → append row → commit.
 7. Route every verdict to its sink (§5); park runners-up and defers under Next-up.
-8. Documentation & close-out (§7).
+8. **Re-check pass** — re-read every count and attribution against the artifact it describes, per
+   `REVIEW-QUEUE.md` § How this works → _Step 5 in full_. This step exists because run 1's review found that
+   three of its four real findings shared this one root cause, and because stating Conventions 9 and 10 did
+   not by itself prevent the run from violating them.
+9. Documentation & close-out (§7).
 
 ## 7. Documentation & completion
 
 **Two stale facts in WEEKLY.md are corrected as part of this run**, both artifacts of the plan having been
-written Tue 2026-08-04 before the week had shipped anything:
+written Tue 2026-08-04 (`a4dab21`, 02:16), when the week's only merge so far was Monday's PR #27 (`cec8408`,
+Aug 3 15:28 — TASK-037's spillover close-out):
 
-1. G6's slot-4 line says "merged PRs #24–#27". Those are mostly the _previous_ week's PRs. Corrected to
-   #28–#31 (plus Monday's #27 close-out), with a brief parenthetical recording why the original range was
-   written that way. This is a live doc, so it is corrected, not annotated as superseded.
+1. G6's slot-4 line says "merged PRs #24–#27" — the four then-most-recent PRs, of which only #27 belongs to
+   this week; the other three are the _previous_ week's. Corrected to #28–#31 (plus that #27 close-out), with
+   a brief parenthetical recording why the original range was written that way. This is a live doc, so it is
+   corrected, not annotated as superseded.
 2. The **Sources** line says REVIEW-QUEUE.md "does not exist yet — created this week by G6". True when
    written; false once step 1 lands. Updated at close-out.
 
@@ -280,3 +286,27 @@ Both round-2 items are finding 1's shape again — a figure or an attribution wr
 re-checked against the artifact it describes. That is now three of four findings in this review with a
 single root cause, which is the argument for making the count/attribution re-check a step of the run
 recipe rather than a thing each run remembers.
+
+**Round 3 — the re-raised framing, and the through-line acted on:**
+
+5. **"Before the week had shipped anything" was itself a claim written once and never checked.** The
+   correction rationale in §7, `WEEKLY.md` and `DONE.md` all justified the stale PR range by saying the plan
+   predated the week's first merge. It did not: PR #27 merged **Mon 2026-08-03 15:28** (`cec8408`), and the
+   plan was committed **Tue 2026-08-04 02:16** (`a4dab21`). The corrected range was right all along — its own
+   "plus Monday's #27" clause conceded the point — but the reason given for the error was wrong. All three
+   instances now state the real chronology; the review cited two, and the third here was found by sweeping
+   for the phrase rather than fixing only what was quoted.
+
+6. **The re-check is now step 5 of the run recipe**, not merely Conventions 9 and 10. The review's closing
+   argument is the load-bearing one: a convention a run can state and then violate one slot later is not yet
+   a control. `REVIEW-QUEUE.md` § How this works now carries _Step 5 in full_ — a five-item assertion list
+   (counts match source, tallies agree across files, "already covered" claims quote the matched line,
+   attributions fall inside their declared window, cadence descriptions match the run that happened) — and
+   §6 of this spec references it as an execution step. The conventions state the rules; the recipe step is
+   what makes a run perform them.
+
+Also re-surfaced, not duplicated: `docs/README.md`'s Archived Plans table ends at TASK-037 (line 96) while
+four G-group plans sit unindexed in `docs/archive/plans/`. That is the same drift class Spawned row 3
+propagates outward, and it was already filed as a 🟤 at G4 completion — so the Spawned row now cites it as a
+live worked example and the 🟤 gained a back-reference, rather than a second entry being created for one
+defect.

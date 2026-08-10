@@ -849,6 +849,11 @@ deliberately not fixed in-branch plus a docs-index gap found during Task 15's fr
   `2026-08-08_g4-peripheral-surfaces.md`) are absent. Surfaced by Task 15's docs-freshness pass
   and left per follow-existing-convention; decide the convention (index WEEKLY-group plans too,
   or note the table's TASK-only scope) and apply in one sweep. (Low value, Low effort)
+  **Re-surfaced 2026-08-10 by the PR #32 review** as an instance of the same drift class G6's
+  Spawned row 3 propagates outward (the bidirectional docs-index check). Verified still open:
+  `docs/README.md:96` is the last archived-plan row (TASK-037) and four G-group plans sit in
+  `docs/archive/plans/`. Kept as the single in-tree entry — the Spawned row cites it as its
+  worked example rather than duplicating it.
 
 ### [2026-08-10] From: G6 Weekly Reviews (first run)
 

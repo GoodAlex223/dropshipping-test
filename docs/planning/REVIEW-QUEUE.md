@@ -39,7 +39,31 @@ The sink asymmetry is intentional: inbound `adopt` schedules work **here**, outb
 3. Run slots 1 → 4 **sequentially, in-session** (`WebSearch` / `WebFetch`). Append each row immediately after
    its research; commit per slot.
 4. Route every verdict to its sink; park runners-up and defers under Next-up with re-trigger conditions.
-5. Close out: tick the WEEKLY checkboxes, flip its Summary-Table Status to `✅ PR #N`, update `docs/README.md`.
+5. **Re-check every count and attribution against the artifact it describes** — see below. Not optional, and
+   not satisfied by having written the conventions down.
+6. Close out: tick the WEEKLY checkboxes, flip its Summary-Table Status to `✅ PR #N`, update `docs/README.md`.
+
+#### Step 5 in full — the re-check pass
+
+Run 1 shipped four real review findings and **three shared one root cause**: a count or an attribution written
+once and never re-read against the thing it describes. Conventions 9 and 10 state the rules; this step is what
+makes them a control, because run 1 stated Convention 9's corollary and violated it one slot later. **A
+convention a run can state and then not follow is not yet a control.**
+
+Before close-out, assert each of these by re-reading the artifact — not from memory, and not from the note you
+wrote when you first made the claim:
+
+- [ ] **Counts match their source.** Every "N conventions", "N rows", "N adopts" claim equals what the file
+      actually contains. The spec's conventions list and this file's must align 1:1, item for item — a
+      convention added late must propagate back to the live spec.
+- [ ] **Verdict tallies agree across all files** that state them (`REVIEW-QUEUE.md`, `WEEKLY.md`, `DONE.md`).
+      Flipping one verdict invalidates every tally downstream of it.
+- [ ] **Every "already present / already covered" claim quotes the matched line** (Convention 10). A `grep -l`
+      hit is not evidence; read the line and paste it into the row.
+- [ ] **Every `Origin` / attribution cell names things inside the window it claims** — the dates, PR numbers
+      and task IDs must actually fall within the scan window recorded for that slot.
+- [ ] **Cadence and "typical" descriptions match the run that just happened**, not the run that was imagined
+      when the sentence was drafted.
 
 ### Standing lens
 

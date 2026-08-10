@@ -86,6 +86,12 @@ verify that out-of-tree work landed. Kept separate from the in-tree spawned task
       checklist item, and its "both directions" line is about database migrations. The drift class
       this prevents has been caught by human review on PRs #16, #17, #19, #21, #23 and #26 in this
       repo alone, and it applies to any project with an index doc.
+      **Worked example, live right now:** `docs/README.md`'s Archived Plans table ends at
+      TASK-037 while four G-group plans sit in `docs/archive/plans/` unindexed — the in-tree
+      instance is already filed as the 🟤 "WEEKLY-group archived plans missing from
+      docs/README.md's Archived Plans table" ([2026-08-09] From: G4 completion) and is **not**
+      duplicated here. Use it as the concrete case when writing the rule: a "was the index
+      touched?" check passes on it, a bidirectional one does not.
 
 #### [TASK-055] Content & legal pages
 
