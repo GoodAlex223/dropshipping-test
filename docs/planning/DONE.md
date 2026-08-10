@@ -13,7 +13,7 @@ Completed tasks with implementation details and learnings.
 **Plan**: none — spec-only route, ruled at the brainstorm (decision §2.4). The recurring batch's deliverables are the verdict rows, the Next-up parks and the routed entries; there is nothing to archive.
 **Spec**: [2026-08-10-g6-weekly-reviews-design.md](../superpowers/specs/2026-08-10-g6-weekly-reviews-design.md) — stays live as this repo's design record for the batch
 **Durable state**: [REVIEW-QUEUE.md](REVIEW-QUEUE.md) — created by this run; its "How this works" section is the methodology of record (no `docs/prompts/` in this repo)
-**PR**: [#32](https://github.com/GoodAlex223/dropshipping-test/pull/32)
+**PR**: [#32](https://github.com/GoodAlex223/dropshipping-test/pull/32) — merged `8298dab` (2026-08-10, `--merge`); docs-only, so there is nothing to verify in prod
 
 **Summary**: First-ever run of the standing ⚪ Overhead batch here, six-plus runs into its life in sibling projects. Docs-only: no code changed and no plugin was installed — an `adopt` files a BACKLOG entry, nothing more. Established the per-project instantiation (durable state file, exclusion sets, routing sinks, relevance lens) and ran all four slots sequentially in-session. Verdicts: **1 adopt / 1 defer / 2 pass** inbound, **3 propagate / 1 defer / 1 pass** outbound (one outbound `pass` corrected to `propagate` on the PR #32 review). Ran Mon 2026-08-10, **+3 days** behind the scheduled Thu–Fri slot as queue spillover behind G2/G3/G4; displaced nothing, since the batch is quota-exempt and G5/G7 remained open regardless.
 

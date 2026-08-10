@@ -881,6 +881,26 @@ while evaluating candidates; they route 🟤 by the source rule, independent of 
   professional translation, which matters here because the storefront is Ukrainian-first and the
   client supplies copy. Source: <https://next-intl.dev/docs/workflows/agents> (fetched
   2026-08-10). (Med value, Low effort) `[relates-to: TASK-039]`
+- 🟤 **Markdown: an inline code span carrying list-marker syntax across a line break makes Prettier
+  oscillate** — extracted at completion. Writing `` `- [ ] README updated if needed` `` inside a
+  wrapped list item put `format:check` into a state `--write` could not fix: Prettier's list parser
+  re-indented the continuation line on every pass and never reached a fixed point, so the CI Lint
+  job failed on a file the formatter had just "fixed" (PR #32, `53fa347`). This will recur — the
+  planning docs quote checklist items routinely. Cheapest mitigations, pick one: keep such quotes
+  as plain text, or force the code span onto a single line. Worth a line in the docs conventions
+  and, if the docs-freshness linter lands, a fixed-point assertion (`prettier --write` twice, diff
+  must be empty) rather than a single clean `--check`. (Low value, Low effort)
+  `[relates-to: docs-hygiene automation entries]`
+- 🟤 **Generalize the count/attribution re-check beyond the Weekly Reviews recipe** — extracted at
+  completion. PR #32's review found 6 issues, and **3 shared one root cause**: a count or an
+  attribution written once and never re-read against the artifact it describes. The fix landed as
+  step 5 of `REVIEW-QUEUE.md`'s run recipe, which only binds that batch — but the same class
+  produced G3/G4's docs-freshness recurrences (#8/#9) and the six-times-caught index-row drift, so
+  it is not G6-specific. Decide where it belongs repo-wide: a line in the completion workflow, an
+  extension of the OVERDUE docs-freshness linter's scope, or both. Note the reviewer's framing,
+  which is the reason this is not just "remember harder": a convention a run can state and then
+  violate one slot later is not yet a control. (Med value, Low effort)
+  `[relates-to: docs-freshness linter (OVERDUE), [2026-08-09] G4 completion entries]`
 - 🟤 **Shrink CLAUDE.md to durable rules and move the rest into path-scoped `.claude/rules/`**
   — _the run's one `adopt`._ Measured: project `CLAUDE.md` is **350 lines** against Anthropic's
   documented "target under 200 lines per CLAUDE.md file… longer files consume more context and
