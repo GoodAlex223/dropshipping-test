@@ -81,8 +81,9 @@ that only pays off post-launch defers by default. Re-scope this lens once the st
 
 ### 1. Plugins
 
-| Date | Run | Candidate | `source:` | Primary source | Verdict | Reasoning | Routed to |
-| ---- | --- | --------- | --------- | -------------- | ------- | --------- | --------- |
+| Date       | Run    | Candidate                            | `source:` | Primary source                                                                                                | Verdict   | Reasoning                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Routed to                                        |
+| ---------- | ------ | ------------------------------------ | --------- | ------------------------------------------------------------------------------------------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| 2026-08-10 | 1 (G6) | `resend` — Resend agent skills + MCP | official  | [resend/resend-skills](https://github.com/resend/resend-skills) @ `7fa08a1`, MIT; manifest fetched 2026-08-10 | **defer** | Maps to the immediate next group (G5 transactional emails), but its weight sits in `react-email` — a rewrite of the hand-rolled HTML-string templates, outside G5's copy/styling scope — and a hosted MCP needing OAuth. Read the actual `email-best-practices` SKILL.md rather than the blurb: it reduces to double opt-in (already implemented here) plus DNS authentication, whose provisioning half is already covered by the [2026-08-07] 🔵 "Verify prod email config" entry. | Next-up park; 1 incidental 🟤 (`lang` attribute) |
 
 ### 2. Claude best-practices
 
@@ -106,4 +107,22 @@ that only pays off post-launch defers by default. Re-scope this lens once the st
 Parked runners-up and `defer` verdicts. Each entry carries a **re-trigger condition** — check the condition
 cheaply, and if it is unmet, move on without re-reading the source (Convention 4).
 
-_Empty — populated by the first run._
+### From run 1 (2026-08-10, G6)
+
+- **`resend` — Resend agent skills + MCP** (slot 1, official) — `defer`.
+  **Re-trigger**: email work goes beyond copy/styling — i.e. a `react-email` migration of the
+  hand-rolled HTML-string templates is scoped, **or** the real sending domain is provisioned
+  (TASK-056 client round-trip) and deliverability/DNS-authentication work becomes actionable.
+  Until then the cheap check is the existing [2026-08-07] 🔵 "Verify prod email config" entry —
+  do not re-read the skill source (Convention 4).
+- **`typescript-lsp`** (slot 1 runner-up, official) — parked unreviewed.
+  **Measured**: the `typescript-language-server` binary is **not installed** in this container
+  (only `tsserver`, which is the compiler's server, not the LSP wrapper), so adopting it costs a
+  global npm install. It is the TypeScript analogue of the `pyright-lsp` adopt in the sibling
+  Python repos. **Re-trigger**: type-navigation or rename friction shows up in practice, or the
+  binary lands in the toolchain for another reason.
+- **`claude-security` / `security-guidance`** (slot 1 runners-up, official) — parked unreviewed.
+  Both are first-party. Noted here because this repo, unlike the sibling that passed
+  `security-guidance` for having no app-code web surface, **is** a Next.js app with auth, API
+  routes and order-creation code. **Re-trigger**: the pre-launch security pass is scheduled, or
+  real customer traffic is imminent (which is also the pin on the standing G2 hardening bundle).

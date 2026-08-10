@@ -850,6 +850,23 @@ deliberately not fixed in-branch plus a docs-index gap found during Task 15's fr
   and left per follow-existing-convention; decide the convention (index WEEKLY-group plans too,
   or note the table's TASK-only scope) and apply in one sweep. (Low value, Low effort)
 
+### [2026-08-10] From: G6 Weekly Reviews (first run)
+
+**Origin**: the standing ⚪ Overhead batch's first run in this repo — design
+[2026-08-10-g6-weekly-reviews-design.md](../superpowers/specs/2026-08-10-g6-weekly-reviews-design.md),
+verdict rows in [REVIEW-QUEUE.md](REVIEW-QUEUE.md). Entries here are incidental findings surfaced
+while evaluating candidates; they route 🟤 by the source rule, independent of any slot's verdict.
+
+- 🟤 **Email templates have no `lang` attribute on their `<html>` root** — both
+  [src/lib/email.ts](../../src/lib/email.ts) (order confirmation) and
+  [src/lib/email-templates/newsletter-confirmation.ts](../../src/lib/email-templates/newsletter-confirmation.ts)
+  open with a bare `<html>`. Harmless while the copy is English, but G5 converts both to
+  Ukrainian, and an unlabelled root leaves screen readers and mail clients guessing at language
+  for hyphenation, pronunciation and font selection. Add `lang="uk"` (and a `<title>`) as part of
+  G5's conversion. Surfaced by the slot-1 `email-best-practices` read; distinct from the
+  [2026-08-07] 🔵 "Verify prod email config" entry, which covers provisioning, not markup.
+  (Low value, Low effort) `[relates-to: G5]`
+
 ---
 
 ## Technical Debt
