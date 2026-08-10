@@ -117,3 +117,105 @@ describe("renderPanel / renderButton", () => {
     expect(html).toContain("color: #000000");
   });
 });
+
+import {
+  generateOrderConfirmationHtml,
+  type OrderEmailData,
+} from "@/lib/email-templates/order-confirmation";
+import { formatPrice } from "@/lib/format";
+
+// ---------------------------------------------------------------------------
+// email-templates/order-confirmation.ts
+// ---------------------------------------------------------------------------
+
+const baseOrder: OrderEmailData = {
+  orderNumber: "ORD-20260810-001",
+  email: "customer@example.com",
+  items: [
+    {
+      productName: "Худі Mirox Basic",
+      variantInfo: "Size: M",
+      quantity: 2,
+      unitPrice: 1290,
+      totalPrice: 2580,
+    },
+  ],
+  subtotal: 2580,
+  shippingCost: 80,
+  tax: 0,
+  total: 2660,
+  shippingAddress: {
+    name: "Тест Тестовий",
+    line1: "Відділення №12",
+    city: "Київ",
+    country: "UA",
+  },
+  shippingMethod: "np-office",
+  hasAccount: false,
+};
+
+describe("generateOrderConfirmationHtml", () => {
+  it("renders the Ukrainian order email in the dark shell", () => {
+    const html = generateOrderConfirmationHtml(baseOrder);
+    expect(html).toContain('<html lang="uk">');
+    expect(html).toContain('bgcolor="#000000"');
+    for (const marker of [
+      "Замовлення прийнято!",
+      "Дякуємо за замовлення!",
+      "Замовлення №",
+      "ORD-20260810-001",
+      "Товари",
+      "Доставка",
+      "До сплати",
+      "Адреса доставки",
+      "Спосіб доставки",
+      "Нова Пошта — відділення",
+      "Питання щодо замовлення?",
+    ]) {
+      expect(html).toContain(marker);
+    }
+    expect(html).toContain(formatPrice(2580));
+    expect(html).toContain(formatPrice(2660));
+    expect(html).not.toContain("Store");
+  });
+
+  it("escapes user-supplied strings (HTML injection)", () => {
+    const html = generateOrderConfirmationHtml({
+      ...baseOrder,
+      items: [{ ...baseOrder.items[0], productName: '<img src=x onerror="pwn()">' }],
+      shippingAddress: { ...baseOrder.shippingAddress, city: "<script>alert(1)</script>" },
+    });
+    expect(html).not.toContain("<img src=x");
+    expect(html).not.toContain("<script>alert(1)</script>");
+    expect(html).toContain("&lt;img src=x");
+    expect(html).toContain("&lt;script&gt;");
+  });
+
+  it("hides the account CTA for guest orders", () => {
+    const html = generateOrderConfirmationHtml({ ...baseOrder, hasAccount: false });
+    expect(html).not.toContain("ІСТОРІЯ ЗАМОВЛЕНЬ");
+    expect(html).not.toContain("/account/orders");
+  });
+
+  it("shows the account CTA for signed-in customers", () => {
+    const html = generateOrderConfirmationHtml({ ...baseOrder, hasAccount: true });
+    expect(html).toContain("ІСТОРІЯ ЗАМОВЛЕНЬ");
+    expect(html).toContain("https://test.example.com/account/orders");
+  });
+
+  it("renders the tax row only when tax > 0", () => {
+    expect(generateOrderConfirmationHtml({ ...baseOrder, tax: 0 })).not.toContain("Податок");
+    const withTax = generateOrderConfirmationHtml({ ...baseOrder, tax: 133 });
+    expect(withTax).toContain("Податок");
+    expect(withTax).toContain(formatPrice(133));
+  });
+
+  it("still resolves legacy Stripe-era shipping ids", () => {
+    const html = generateOrderConfirmationHtml({ ...baseOrder, shippingMethod: "standard" });
+    expect(html).toContain("Standard Shipping");
+  });
+
+  it("does not promise a nonexistent shipping-confirmation email", () => {
+    expect(generateOrderConfirmationHtml(baseOrder)).not.toContain("shipping confirmation");
+  });
+});
