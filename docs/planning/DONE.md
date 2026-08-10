@@ -2,11 +2,36 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-08-09
+**Last Updated**: 2026-08-10
 
 ---
 
 ## 2026-08 (August)
+
+### [2026-08-10] G6 - Weekly Reviews: First Run in This Project (WEEKLY batch, ⚪ Overhead)
+
+**Plan**: none — spec-only route, ruled at the brainstorm (decision §2.4). The recurring batch's deliverables are the verdict rows, the Next-up parks and the routed entries; there is nothing to archive.
+**Spec**: [2026-08-10-g6-weekly-reviews-design.md](../superpowers/specs/2026-08-10-g6-weekly-reviews-design.md) — stays live as this repo's design record for the batch
+**Durable state**: [REVIEW-QUEUE.md](REVIEW-QUEUE.md) — created by this run; its "How this works" section is the methodology of record (no `docs/prompts/` in this repo)
+**PR**: [#32](https://github.com/GoodAlex223/dropshipping-test/pull/32)
+
+**Summary**: First-ever run of the standing ⚪ Overhead batch here, six-plus runs into its life in sibling projects. Docs-only: no code changed and no plugin was installed — an `adopt` files a BACKLOG entry, nothing more. Established the per-project instantiation (durable state file, exclusion sets, routing sinks, relevance lens) and ran all four slots sequentially in-session. Verdicts: **1 adopt / 1 defer / 2 pass** inbound, **2 propagate / 1 defer / 2 pass** outbound. Ran Mon 2026-08-10, **+3 days** behind the scheduled Thu–Fri slot as queue spillover behind G2/G3/G4; displaced nothing, since the batch is quota-exempt and G5/G7 remained open regardless.
+
+**Key changes**:
+
+- 9 commits, docs-only. Skeleton-first sequencing (`REVIEW-QUEUE.md` committed before any research) so a `pass` row could not silently vanish — the failure mode that nearly dropped rows twice in sibling runs
+- **The adopt, decided on measurement rather than the write-up**: `CLAUDE.md` is **350 lines** against Anthropic's documented "target under 200 lines… longer files reduce adherence", and **232 of those 350 (66%)** are the Architecture tree, Detected Patterns and Git Insights — precisely the derivable content `/doctor`'s trim check is documented to cut. `.claude/rules/` does not exist here. Both preconditions verified against the installed **CC 2.1.226** (invalid-`[` glob bug fixed 2.1.207; brace-expansion startup crash 2.1.217). Trade-off recorded in the entry: path-scoped rules are **not** re-injected after `/compact`
+- Slot 1a `resend` → **defer**: read the actual `email-best-practices` SKILL.md instead of the marketplace blurb — it reduces to double opt-in (already implemented here) plus DNS authentication, whose provisioning half the [2026-08-07] 🔵 entry already covers; the plugin's weight is in `react-email`, a rewrite outside G5's scope
+- Slot 1b → **pass** on provenance: the exact-fit `nextjs-marketplace` is 1★, single-maintainer, and installs by copying directories; aggregator-hosted i18n "skills" have no traceable repo (mcpmarket.com 429'd outright). Unverifiable ⇒ not adoptable
+- Slot 3 → **pass** on the documented single-tool structural bias. No 🟤 manufactured from a `pass`; instead a **bias-watch counter** parked — if slot 3 passes for the same reason in two more runs, file a 🟤 to re-scope or pause the category
+- Slot 4 → 2 `propagate` (visual-fidelity gate; "never write execution records ahead of execution"), both verified absent from `CLAUDE.md`, `WORKFLOW.md`, `POLICIES/*` and `TEMPLATES/*`; 2 `pass` where two-trees already held (`✅ PR #N` close-out rule, bidirectional docs-index check), checked by grepping the specific strings in the live tree rather than assumed
+- **Two WEEKLY corrections**, both artifacts of the plan being written Tue Aug 4 before the week shipped anything: slot 4's scan range named PRs #24–#27 (mostly the _previous_ week's) → #28–#31 plus Monday's #27 close-out; and the Sources line no longer claims REVIEW-QUEUE.md "does not exist yet"
+- Routing: 3 🟤 (1 adopt + 2 incidental), 2 out-of-tree rows in `TODO.md` § 🔀 Spawned under a new **Cross-project propagation** subsection (status user-maintained — this repo cannot verify out-of-tree completion), 6 Next-up parks each with a re-trigger condition
+- One claim walked back mid-run: slot 1 initially read as having found an unrecorded launch-blocking deliverability gap; grepping the backlog showed the provisioning half already covered, so the row says that and the 🟤 narrowed to what is genuinely new (missing `lang` on the email `<html>` roots, which begins to matter once G5 makes the copy Ukrainian)
+
+**Learnings**: auto-memory is **per-project by construction**, so a durable process rule captured only there reaches no other project by any route — that is exactly where both propagations were found, while every convention that had reached a doc or template had already gone global (now Convention 9, with the corollary to grep specific strings in the live `~/.claude` tree, excluding `projects/` and `plugins/`, rather than diffing scrubbed trees); a candidate's marketplace blurb is not evidence of fit — reading the actual SKILL.md flipped slot 1a from a plausible adopt to a defer, and measuring the repo flipped slot 2 from a plausible pass to the run's one adopt; a `pass` verdict that produces a real incidental finding is a better outcome than a rubber-stamped adopt, and the source rule routes that finding independently of the verdict.
+
+---
 
 ### [2026-08-09] G4 - Peripheral Surfaces Sweep: Ukrainian + Mirox Alignment (WEEKLY batch)
 

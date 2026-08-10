@@ -85,7 +85,7 @@
 - [x] Cross-project propagation (outbound): scan this week's DONE entries, merged PRs **#28–#31** plus Monday's #27 close-out, new memory files, config diffs → `propagate | pass | defer` rows; high bar, `propagate` files a TODO § 🔀 Spawned row (1) — 2 propagate / 1 defer / 2 pass
       <!-- PR range corrected 2026-08-10: this line was written Tue Aug 4, before the week had merged anything, so it named the then-most-recent PRs (#24–#27), which are mostly the *previous* week's. -->
 
-> ✅ Ran Mon 2026-08-10 (+3 days — queue spillover behind G2/G3/G4; displaced nothing, G6 is quota-exempt overhead and G5/G7 remain open). First-ever run in this repo: created [REVIEW-QUEUE.md](REVIEW-QUEUE.md) as the durable cross-week state **and** the batch's methodology of record (no `docs/prompts/` here), with 9 seeded conventions. Verdicts **1 adopt / 1 defer / 2 pass** inbound, **2 propagate / 1 defer / 2 pass** outbound. Design: [2026-08-10-g6-weekly-reviews-design.md](../superpowers/specs/2026-08-10-g6-weekly-reviews-design.md).
+> ✅ Ran Mon 2026-08-10 (+3 days — queue spillover behind G2/G3/G4; displaced nothing, G6 is quota-exempt overhead and G5/G7 remain open) — PR [#32](https://github.com/GoodAlex223/dropshipping-test/pull/32). First-ever run in this repo: created [REVIEW-QUEUE.md](REVIEW-QUEUE.md) as the durable cross-week state **and** the batch's methodology of record (no `docs/prompts/` here), with 9 seeded conventions. Verdicts **1 adopt / 1 defer / 2 pass** inbound, **2 propagate / 1 defer / 2 pass** outbound. Design: [2026-08-10-g6-weekly-reviews-design.md](../superpowers/specs/2026-08-10-g6-weekly-reviews-design.md).
 
 ### G7. Client Content Ask (TASK-056) [solo]
 
@@ -135,7 +135,7 @@
 | G3  | Params Fix `[solo]`                    | Next.js routing     | 🟤 Auto     | 1      | 2        | Wed     | ✅ PR #30     |
 | G4  | Peripheral Surfaces Sweep `[batch]`    | auth/account/system | 🔵 User     | 3      | 5        | Thu     | ✅ PR #31     |
 | G5  | Transactional Emails `[solo]` 🏆       | email templates     | 🔵 User     | 2      | 3        | Fri     | ☐ Planned     |
-| G6  | Weekly Reviews `[batch]`               | recurring reviews   | ⚪ Overhead | 4      | 5        | Thu–Fri | ☐ Planned     |
+| G6  | Weekly Reviews `[batch]`               | recurring reviews   | ⚪ Overhead | 4      | 5        | Thu–Fri | ✅ PR #32     |
 | G7  | Client Content Ask (TASK-056) `[solo]` | client content      | 🔵 User     | 1      | 2        | Fri     | ☐ Planned     |
 | P1  | Prod data re-seed                      | ops/data            | 🟡 Ops      | 1      | 1        | Tue     | ✅ 2026-08-04 |
 |     | **Total**                              |                     |             | **18** | **28**   |         |               |
