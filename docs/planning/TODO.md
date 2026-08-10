@@ -80,10 +80,10 @@ verify that out-of-tree work landed. Kept separate from the in-tree spawned task
 - [ ] **Propagate the bidirectional docs-index check to `~/.claude/POLICIES/code-review.md`** — _filed
       2026-08-10 on the PR #32 review, correcting a wrong `pass`._ Verify a docs index and the docs'
       own headers agree **in both directions, plus neighbouring rows** — not just "was the index
-      touched". `POLICIES/code-review.md` today carries only a generic `- [ ] README updated if
-    needed`; its `both directions` line is about database migrations. The drift class this
-      prevents has been caught by human review on PRs #16, #17, #19, #21, #23 and #26 in this repo
-      alone, and it applies to any project with an index doc.
+      touched". `POLICIES/code-review.md` today carries only a generic "README updated if needed"
+      checklist item, and its "both directions" line is about database migrations. The drift class
+      this prevents has been caught by human review on PRs #16, #17, #19, #21, #23 and #26 in this
+      repo alone, and it applies to any project with an index doc.
 
 #### [TASK-055] Content & legal pages
 
