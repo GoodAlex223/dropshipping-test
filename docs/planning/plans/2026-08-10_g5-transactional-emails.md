@@ -1245,3 +1245,31 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 - **Spec coverage**: §4 shell → Task 3; §5 order → Tasks 4+6; §6 newsletter → Task 5; §7 structure/socials → Tasks 1, 2, 6; §8 escaping → Task 4 (+tests); §9 tests/visual gate → every task + Task 7; §10 prod config → Task 8; §11 propagation → Task 8 (in-PR part) + post-merge completion workflow (planning docs). No gaps.
 - **Placeholder scan**: clean — all steps carry exact code/commands.
 - **Type consistency**: `getStoreName`/`emails` (T2) ← T3/T4/T5/T6 imports match; `OrderEmailData.hasAccount` (T4) ← T6 call sites + tests match; `renderEmailShell/renderPanel/renderButton/EMAIL_COLORS` names consistent across T3–T5.
+
+---
+
+## Task 8 journal — prod email config verification (spec §10, executed 2026-08-10)
+
+**Programmatic result: INCONCLUSIVE — env vars not readable from this container.**
+
+- Vercel project located via MCP: `dropshipping-test` (`prj_IB5kKeCKmZ4AEUpKQSuScfoWo2c0`,
+  team `goodalex223s-projects`), latest production deployment READY.
+- The Vercel MCP exposes no environment-variable listing; the Vercel CLI is not installed in
+  this devcontainer; `.vercel/project.json` absent.
+- Runtime-log probe for the tell-tale `"Skipping email send - RESEND_API_KEY not configured"`
+  line: no logs in a 7-day window — plan-tier retention (Hobby: 1h) makes this probe
+  uninformative, not a proof of presence.
+
+**User action required (≈2 min, Vercel + Resend dashboards):**
+
+1. Vercel → `dropshipping-test` → Settings → Environment Variables (Production scope):
+   confirm `RESEND_API_KEY` and `EMAIL_FROM` exist.
+2. Resend dashboard → Domains: confirm the `EMAIL_FROM` domain is verified (SPF/DKIM green).
+3. Known hazard (spec §10): with only the API key set, the code fallback
+   `noreply@yourdomain.com` hard-fails Resend on the unverified domain — receipts silently
+   never send either way.
+
+**If anything is missing — client action items (route to the TASK-056 ask):**
+create a Resend account → verify the real sending domain's DNS (SPF + DKIM) → set
+`RESEND_API_KEY` + `EMAIL_FROM` in Vercel production env. Code ships regardless (decision 2);
+the BACKLOG 🔵 entry closes at the completion workflow with a pointer to wherever this lands.
