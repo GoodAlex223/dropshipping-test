@@ -71,9 +71,10 @@ one-to-three-sentence reasoning, and the routing target if any.
 
 **Conventions seeded on this first run:**
 
-1. **Every slot writes a Reviewed-log row regardless of verdict** — four-to-five rows per run, `pass`
-   included. Sibling runs twice nearly dropped `pass` rows by composing the log from memory after the
-   research; skeleton-first ordering plus this rule is the fix.
+1. **Every slot writes a Reviewed-log row regardless of verdict**, `pass` included — one row per candidate
+   considered, so four-to-five rows is the floor (one per slot), not the cadence; run 1 wrote 9. Sibling runs
+   twice nearly dropped `pass` rows by composing the log from memory after the research; skeleton-first
+   ordering plus this rule is the fix.
 2. **Derive the "already in use" exclusion set from live `enabledPlugins`**, never from a hardcoded list
    (a sibling first-run retro: the hardcoded set missed several enabled plugins).
 3. **Verification gate** — every top pick must be confirmed against a fetched primary source with a real
@@ -239,7 +240,9 @@ verification and its own verdict in this project's context.
 ## 10. Post-review corrections (PR #32, 2026-08-10)
 
 This spec is **live**, not frozen, so review findings are corrected here rather than annotated as
-superseded. Two landed:
+superseded.
+
+**Round 1 — the two posted findings:**
 
 1. **The Conventions list above was stale on arrival.** It shipped with 6 items while `REVIEW-QUEUE.md`
    shipped 9, and the numbering had drifted — spec item 6 was queue item 7, and queue items 6, 8 and 9
@@ -258,3 +261,22 @@ superseded. Two landed:
 The second finding is the more interesting one: the run wrote Convention 9's corollary — grep specific
 strings, don't diff trees — and then violated it in the same slot. The corollary was right; the run did not
 follow it. Convention 10 makes the unread-match failure explicit rather than leaving it implied.
+
+**Round 2 — sub-threshold findings from the same review, each checked before fixing:**
+
+3. **Convention 1's cadence was contradicted by the run that seeded it.** It read "four-to-five rows per
+   run" while run 1's Reviewed log carries **9** rows — slot 4's first-run memory sweep alone wrote 5.
+   Reworded in both this spec and `REVIEW-QUEUE.md`: four-to-five is the _floor_ (one row per slot), not
+   the cadence, and the unit is one row per candidate considered.
+
+4. **The visual-fidelity gate's Origin cell misattributed the gate.** It read "TASK-057 / TASK-036 /
+   TASK-037 / G1 / G4 (PRs #24–#31)" — tasks that _reinforced_ the gate, under a PR range that both
+   predates its actual origin (TASK-035 shipped a homepage that passed every automated gate and still
+   looked broken; PR #23 made the sign-off standing) and overruns this slot's own corrected #28–#31 plus
+   #27 scan window. Corrected in `REVIEW-QUEUE.md` and in the `TODO.md` Spawned row carrying the same
+   lineage.
+
+Both round-2 items are finding 1's shape again — a figure or an attribution written once and never
+re-checked against the artifact it describes. That is now three of four findings in this review with a
+single root cause, which is the argument for making the count/attribution re-check a step of the run
+recipe rather than a thing each run remembers.

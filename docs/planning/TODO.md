@@ -66,11 +66,13 @@ verify that out-of-tree work landed. Kept separate from the in-tree spawned task
 - [ ] **Propagate the visual-fidelity gate to `~/.claude/POLICIES/manual-testing.md`** — _filed
       2026-08-10, G6 run 1._ Verified absent: the global tree (`CLAUDE.md`, `WORKFLOW.md`,
       `POLICIES/*`, `TEMPLATES/*`) has no rule requiring UI work to be verified against the
-      **rendered** page. This project derived it the hard way across TASK-057, TASK-036, TASK-037,
-      G1 and G4 — screenshot the rendered page against the reference (or, absent a mockup, against
-      shipped sibling surfaces) and get human sign-off before claiming a design task done; it
-      caught real defects in four-plus tasks. It applies to any project with a UI. It currently
-      lives only in this project's auto-memory, which by construction reaches no other project.
+      **rendered** page. This project derived it the hard way: TASK-035 passed every automated gate
+      and six review rounds yet shipped a homepage that _looked broken_, and PR #23 made the
+      sign-off standing — screenshot the rendered page against the reference (or, absent a mockup,
+      against shipped sibling surfaces) and get human sign-off before claiming a design task done.
+      It has caught real defects in TASK-057, TASK-036, TASK-037, G1 and G4 since. It applies to any
+      project with a UI. It currently lives only in this project's auto-memory, which by
+      construction reaches no other project.
 - [ ] **Propagate "never write execution records ahead of execution" to
       `~/.claude/POLICIES/documentation.md` (or `WORKFLOW.md`)** — _filed 2026-08-10, G6 run 1._
       Verified absent from the global tree. The failure mode is universal, not project-specific:
