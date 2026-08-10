@@ -77,7 +77,6 @@ function renderAddress(a: OrderEmailData["shippingAddress"]): string {
     escapeHtml(a.line1),
     a.line2 ? escapeHtml(a.line2) : null,
     `${escapeHtml(a.city)}${a.state ? `, ${escapeHtml(a.state)}` : ""}${a.postalCode ? ` ${escapeHtml(a.postalCode)}` : ""}`,
-    escapeHtml(a.country),
   ]
     .filter(Boolean)
     .join("<br>");

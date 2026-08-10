@@ -183,6 +183,7 @@ describe("generateOrderConfirmationHtml", () => {
     expect(html).toContain(formatPrice(2580));
     expect(html).toContain(formatPrice(2660));
     expect(html).not.toContain("Store");
+    expect(html).not.toContain("<br>UA");
   });
 
   it("escapes user-supplied strings (HTML injection)", () => {
