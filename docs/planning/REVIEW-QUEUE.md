@@ -74,6 +74,13 @@ that only pays off post-launch defers by default. Re-scope this lens once the st
    candidate with an obvious non-local fit and no sink for it. _(2026-08-10.)_
 8. **No parallel subagent fan-out for web research.** Sequential in-session only — fan-out is a rate-limit
    hazard and gets OOM-killed in this devcontainer. _(2026-08-10.)_
+9. **Slot 4 must scan the memory files, not just the PRs.** Auto-memory lives in
+   `~/.claude/projects/<project>/memory/` and is **per-project by construction** — a durable process rule
+   captured only there reaches no other project by any route. That is precisely where both of run 1's
+   `propagate` verdicts were found, while the conventions that had reached a doc or template turned out to
+   have already gone global. Corollary for testing an existing propagation: grep the **specific changed
+   strings** in the live `~/.claude` tree, excluding `projects/` (per-project memory) and `plugins/`
+   (third-party caches) — never diff the trees, which are scrubbed and drifted by design. _(2026-08-10.)_
 
 ---
 
@@ -100,8 +107,13 @@ that only pays off post-launch defers by default. Re-scope this lens once the st
 
 ### 4. Cross-project propagation
 
-| Date | Run | Learning scanned | Origin | Verdict | Reasoning | Routed to |
-| ---- | --- | ---------------- | ------ | ------- | --------- | --------- |
+| Date       | Run    | Learning scanned                                                 | Origin                                                 | Verdict       | Reasoning                                                                                                                                                                                                                                                                                                                                              | Routed to                                      |
+| ---------- | ------ | ---------------------------------------------------------------- | ------------------------------------------------------ | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------- |
+| 2026-08-10 | 1 (G6) | **Visual-fidelity gate for design tasks**                        | TASK-057 / TASK-036 / TASK-037 / G1 / G4 (PRs #24–#31) | **propagate** | Verified absent from the whole global tree (`CLAUDE.md`, `WORKFLOW.md`, `POLICIES/*`, `TEMPLATES/*`) — grepped for screenshot / rendered-page / design-handoff concepts, hits only in plugin caches and per-project memory. Applies to any project with a UI; caught real defects in four-plus tasks here. Natural home: `POLICIES/manual-testing.md`. | `TODO.md` § 🔀 Spawned → Cross-project (row 1) |
+| 2026-08-10 | 1 (G6) | **"Never write execution records ahead of execution"**           | G4 self-review (PR #31)                                | **propagate** | Verified absent globally. Failure mode is universal, not project-shaped: a plan drafted with pre-checked boxes and invented SHAs / PR numbers before the work happened. One-line addition to `POLICIES/documentation.md`, pairing with the existing read-SHAs-from-`git rev-parse` rule.                                                               | `TODO.md` § 🔀 Spawned → Cross-project (row 2) |
+| 2026-08-10 | 1 (G6) | **String renames must sweep every locator type**                 | G4 / PR #31 CI failure                                 | **defer**     | Genuine and evidence-backed (a renamed UI string broke `getByPlaceholder` in CI after three sound-but-partial sweeps), but narrower than the two above — it is Playwright-locator-shaped, and no second project here runs E2E specs today. Parked rather than filed.                                                                                   | Next-up park                                   |
+| 2026-08-10 | 1 (G6) | **WEEKLY close-out convention (`✅ PR #N`, never a bare ✅)**    | G1–G4 close-outs                                       | **pass**      | Already global — present in `~/.claude/CLAUDE.md`, `WORKFLOW.md` **and** `TEMPLATES/docs_template/planning/WEEKLY.md`. Both halves landed; two-trees holds. Checked rather than assumed, per the standing method.                                                                                                                                      | —                                              |
+| 2026-08-10 | 1 (G6) | **Bidirectional docs-index check (rows ↔ headers + neighbours)** | G3 / G4 docs-freshness recurrences                     | **pass**      | Already present in `POLICIES/code-review.md`. No propagation needed.                                                                                                                                                                                                                                                                                   | —                                              |
 
 ---
 
@@ -141,3 +153,9 @@ cheaply, and if it is unmet, move on without re-reading the source (Convention 4
   project's workflow. Until then the cheap check is "is there a second tool?" — do not re-read the
   sources (Convention 4). Note the mechanism if it ever triggers: Claude Code reads `CLAUDE.md`, not
   `AGENTS.md`, and bridges via an `@AGENTS.md` import or a symlink.
+- **"String renames must sweep every locator type"** (slot 4) — `defer`, not filed outward.
+  Evidence-backed here (a renamed UI string broke `getByPlaceholder` in CI after three
+  sound-but-partial sweeps, PR #31), but Playwright-locator-shaped and narrower than the two rows
+  that did propagate. **Re-trigger**: a second project with an E2E suite enters the picture, or
+  `~/.claude/POLICIES/testing.md` is being edited anyway — fold it in then rather than as its own
+  errand.

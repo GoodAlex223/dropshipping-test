@@ -56,6 +56,28 @@ _None._
 
 ## 🔀 Spawned
 
+### Cross-project propagation (out-of-tree)
+
+Rows filed by the Weekly Reviews batch's cross-project-propagation slot (see
+[REVIEW-QUEUE.md](REVIEW-QUEUE.md) § Cross-project propagation). These target the **global config
+tree and other projects**, not this repository — so **status is user-maintained**: this repo cannot
+verify that out-of-tree work landed. Kept separate from the in-tree spawned tasks below.
+
+- [ ] **Propagate the visual-fidelity gate to `~/.claude/POLICIES/manual-testing.md`** — _filed
+      2026-08-10, G6 run 1._ Verified absent: the global tree (`CLAUDE.md`, `WORKFLOW.md`,
+      `POLICIES/*`, `TEMPLATES/*`) has no rule requiring UI work to be verified against the
+      **rendered** page. This project derived it the hard way across TASK-057, TASK-036, TASK-037,
+      G1 and G4 — screenshot the rendered page against the reference (or, absent a mockup, against
+      shipped sibling surfaces) and get human sign-off before claiming a design task done; it
+      caught real defects in four-plus tasks. It applies to any project with a UI. It currently
+      lives only in this project's auto-memory, which by construction reaches no other project.
+- [ ] **Propagate "never write execution records ahead of execution" to
+      `~/.claude/POLICIES/documentation.md` (or `WORKFLOW.md`)** — _filed 2026-08-10, G6 run 1._
+      Verified absent from the global tree. The failure mode is universal, not project-specific:
+      drafting a plan or completion record with **pre-checked boxes and invented commit SHAs / PR
+      numbers** before the work happens (caught on self-review during G4). Pair it with the
+      existing rule to read SHAs from `git rev-parse` rather than composing them.
+
 #### [TASK-055] Content & legal pages
 
 **Priority**: 🟠 High
