@@ -876,6 +876,23 @@ while evaluating candidates; they route 🟤 by the source rule, independent of 
   professional translation, which matters here because the storefront is Ukrainian-first and the
   client supplies copy. Source: <https://next-intl.dev/docs/workflows/agents> (fetched
   2026-08-10). (Med value, Low effort) `[relates-to: TASK-039]`
+- 🟤 **Shrink CLAUDE.md to durable rules and move the rest into path-scoped `.claude/rules/`**
+  — _the run's one `adopt`._ Measured: project `CLAUDE.md` is **350 lines** against Anthropic's
+  documented "target under 200 lines per CLAUDE.md file… longer files consume more context and
+  reduce adherence", and **232 of those 350 lines (66%)** are the Architecture tree, Detected
+  Patterns and Git Insights sections — exactly the derivable content `/doctor`'s trim check is
+  documented to cut while keeping pitfalls, rationale and conventions. `.claude/rules/` does not
+  exist in this repo. Two steps: (1) run `/doctor` and take its proposed trims; (2) move the
+  surviving path-specific guidance into `.claude/rules/*.md` with `paths:` frontmatter (e.g.
+  admin surfaces, `tests/**`, `prisma/**`, `src/content/**`), so it loads only when Claude touches
+  those files. **Preconditions verified** against the installed CC **2.1.226**: the invalid-`[`
+  glob bug that made Read fail for every evaluated file was fixed in 2.1.207, and the
+  brace-expansion startup crash in 2.1.217 — both clear. **Known trade-off to design around**:
+  rules with `paths:` frontmatter are **not** re-injected after `/compact`; they reload only when
+  Claude next reads a matching file, so anything that must survive compaction stays in CLAUDE.md.
+  This also discharges the standing global-CLAUDE.md obligation to audit a project file whenever
+  it crosses ~200 lines. Source: <https://code.claude.com/docs/en/memory> (fetched 2026-08-10).
+  (High value, Med effort)
 
 ---
 
