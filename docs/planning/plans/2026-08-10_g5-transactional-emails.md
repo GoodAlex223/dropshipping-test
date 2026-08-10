@@ -1248,6 +1248,20 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 
 ---
 
+## Superseded notes — visual-gate rulings (2026-08-10, during PR #33)
+
+Two user rulings at the visual gate deviate from this plan's frozen code blocks; the plan text
+above is left as written (execution record), these notes are the correction:
+
+1. **Task 4's `renderAddress()` pseudocode is superseded** — the shipped function drops the
+   `escapeHtml(a.country),` line entirely (commit `deb907d`): the confirmation page renders no
+   country and checkout always submits `"UA"`. `OrderEmailData.country` stays required (mirrors
+   the stored order address; schema always supplies it) but is deliberately unrendered — a
+   constraint comment in `src/lib/email-templates/order-confirmation.ts` records this.
+2. **Task 2's `emails.order.contacts` is superseded** — now `[instagram, telegram,
+...WhatsApp-when-WHATSAPP_HREF-set]`, single-sourced from `brand.ts` and null-gated per the
+   PR #29 no-dead-links ruling (commit `df43878`); a `vi.doMock` teeth-test covers the gate.
+
 ## Task 8 journal — prod email config verification (spec §10, executed 2026-08-10)
 
 **Programmatic result: INCONCLUSIVE — env vars not readable from this container.**

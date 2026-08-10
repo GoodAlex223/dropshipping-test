@@ -26,6 +26,11 @@ export interface OrderEmailData {
     city: string;
     state?: string;
     postalCode?: string;
+    /**
+     * Kept required — mirrors the stored order address (checkout always
+     * submits "UA") — but deliberately NOT rendered: the confirmation page
+     * shows no country line either (visual-gate ruling 2026-08-10).
+     */
     country: string;
   };
   shippingMethod: string;

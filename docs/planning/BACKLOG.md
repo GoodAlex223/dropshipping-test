@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-08-09
+**Last Updated**: 2026-08-10
 
 ---
 
@@ -537,7 +537,7 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 
 **Origin**: code review on PR #26 (TASK-036), user-posted — one process observation about the review itself, plus one pre-existing code finding the review surfaced and correctly ruled out of the PR's scope. All 🟤 Auto-Generated (reviewer-surfaced, not user-raised — same routing as the `[2026-07-31] From: PR #24` group).
 
-- 🟤 **Automate the `docs/README.md` ↔ doc-header `Last Updated` consistency check (6th recurrence)** — the same drift pair (a doc's own `**Last Updated**` header bumped without the matching `docs/README.md` index row, or vice versa, plus README's own header) has now been caught by human review on PRs #16, #17, #19, #21, #23 and #26. Both sides carry a machine-parseable `**Last Updated**:`/table-cell date, so this belongs in automation, not review: a pre-commit (lint-staged) or CI docs-lint script that, for any staged `docs/**/*.md`, verifies the index row and the header agree — plus bumping README's own header when the index changes.
+- 🟤 **Automate the `docs/README.md` ↔ doc-header `Last Updated` consistency check (7th recurrence)** — the same drift pair (a doc's own `**Last Updated**` header bumped without the matching `docs/README.md` index row, or vice versa, plus README's own header) has now been caught by human review on PRs #16, #17, #19, #21, #23, #26 and #33. Both sides carry a machine-parseable `**Last Updated**:`/table-cell date, so this belongs in automation, not review: a pre-commit (lint-staged) or CI docs-lint script that, for any staged `docs/**/*.md`, verifies the index row and the header agree — plus bumping README's own header when the index changes.
 
   **Scoping decision required before building** — the check does _not_ generalise to every indexed doc. Spec files under `docs/superpowers/specs/` carry `**Date**:` (authoring date, must **not** track edits), not `**Last Updated**:`. PR #26 itself produced a legitimate instance: the TASK-036 spec's index row was bumped to `2026-08-01` for its §8a revision round while the spec's own header correctly stays `**Date**: 2026-07-31`. A naive header↔row comparison would false-positive on exactly the row that commit fixed. Pick one before implementing: (a) give spec docs their own `**Last Updated**` line distinct from `**Date**`, or (b) scope the linter to docs that actually carry `**Last Updated**` and exempt `superpowers/specs/**`. Note the archive table also carries an extra `Status` column — parse by header name, not column index. This is the documented false-positive class behind `docs-readme-index-audit-false-positives`; sweeping the whole table is a known dead end.
 

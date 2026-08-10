@@ -8,6 +8,14 @@ gate (checkout confirmation page, `Mirox Checkout.dc.html` shell vocabulary)
 **Backlog inputs**: `NEXT_PUBLIC_STORE_NAME` entry (code side), 🔵 "Verify prod email config"
 (names G5 as natural home)
 
+> **⚠️ Superseded in part (visual gate, 2026-08-10 — user rulings during PR #33):**
+> (1) §5/§8's address composition **dropped the `country` line** — the shipped confirmation page
+> renders no country and checkout always submits `"UA"`, so the raw code diverged from the sibling
+> surface (commit `deb907d`; `OrderEmailData.country` stays a required field mirroring the stored
+> order address, deliberately unrendered). (2) §5's contact block gained **WhatsApp**, null-gated
+> on `brand.ts` `WHATSAPP_HREF` per the PR #29 no-dead-links ruling — hidden until the client
+> supplies a real number, then lights up checkout + emails together (commit `df43878`).
+
 ---
 
 ## 1. Ruled decisions (user-confirmed in the brainstorm)
@@ -152,6 +160,9 @@ both breaks the env-dependent tests in §9 and ignores runtime env in tests gene
 `shippingAddress.{name,company,line1,line2,city,state,postalCode,country}`, `productName`,
 `variantInfo`. (Order number, prices, and method labels are server-generated.) The newsletter
 template already escapes its one user string.
+
+> _Superseded note (2026-08-10 gate, `deb907d`): `country` left this list along with its rendering
+> — see the header note. The remaining fields are escaped as specified._
 
 ## 9. Testing & verification
 
