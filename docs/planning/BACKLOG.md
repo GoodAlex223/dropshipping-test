@@ -537,7 +537,7 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 
 **Origin**: code review on PR #26 (TASK-036), user-posted — one process observation about the review itself, plus one pre-existing code finding the review surfaced and correctly ruled out of the PR's scope. All 🟤 Auto-Generated (reviewer-surfaced, not user-raised — same routing as the `[2026-07-31] From: PR #24` group).
 
-- 🟤 **Automate the `docs/README.md` ↔ doc-header `Last Updated` consistency check (6th recurrence)** — the same drift pair (a doc's own `**Last Updated**` header bumped without the matching `docs/README.md` index row, or vice versa, plus README's own header) has now been caught by human review on PRs #16, #17, #19, #21, #23 and #26. Both sides carry a machine-parseable `**Last Updated**:`/table-cell date, so this belongs in automation, not review: a pre-commit (lint-staged) or CI docs-lint script that, for any staged `docs/**/*.md`, verifies the index row and the header agree — plus bumping README's own header when the index changes.
+- 🟤 **Automate the `docs/README.md` ↔ doc-header `Last Updated` consistency check (7th recurrence)** — the same drift pair (a doc's own `**Last Updated**` header bumped without the matching `docs/README.md` index row, or vice versa, plus README's own header) has now been caught by human review on PRs #16, #17, #19, #21, #23, #26 and #33. Both sides carry a machine-parseable `**Last Updated**:`/table-cell date, so this belongs in automation, not review: a pre-commit (lint-staged) or CI docs-lint script that, for any staged `docs/**/*.md`, verifies the index row and the header agree — plus bumping README's own header when the index changes.
 
   **Scoping decision required before building** — the check does _not_ generalise to every indexed doc. Spec files under `docs/superpowers/specs/` carry `**Date**:` (authoring date, must **not** track edits), not `**Last Updated**:`. PR #26 itself produced a legitimate instance: the TASK-036 spec's index row was bumped to `2026-08-01` for its §8a revision round while the spec's own header correctly stays `**Date**: 2026-07-31`. A naive header↔row comparison would false-positive on exactly the row that commit fixed. Pick one before implementing: (a) give spec docs their own `**Last Updated**` line distinct from `**Date**`, or (b) scope the linter to docs that actually carry `**Last Updated**` and exempt `superpowers/specs/**`. Note the archive table also carries an extra `Status` column — parse by header name, not column index. This is the documented false-positive class behind `docs-readme-index-audit-false-positives`; sweeping the whole table is a known dead end.
 
@@ -918,6 +918,20 @@ while evaluating candidates; they route 🟤 by the source rule, independent of 
   This also discharges the standing global-CLAUDE.md obligation to audit a project file whenever
   it crosses ~200 lines. Source: <https://code.claude.com/docs/en/memory> (fetched 2026-08-10).
   (High value, Med effort)
+
+### [2026-08-10] From: G5 prod email config round-trip (user)
+
+- 🔵 **Production-launch deploy runbook — pre/while/post steps** — user-raised during G5's prod
+  email-config check: a written, executable runbook for the real-domain production cutover, not
+  just a task list. Pre (domain purchased + DNS, Resend domain verified + `EMAIL_FROM` flipped
+  off `onboarding@resend.dev`, real product content staged, `NEXT_PUBLIC_APP_URL`/
+  `NEXT_PUBLIC_STORE_NAME` env review, user-gated prod re-seed plan, legal pages live per §5.3),
+  while (domain attach + SSL on Vercel, deploy via the Git integration, migration check —
+  `vercel-build` runs `prisma migrate deploy`), post (live smoke pass: homepage/PDP/checkout COD
+  order + confirmation email to a real inbox, newsletter double-opt-in round-trip, sitemap/robots
+  on the new domain, GA4/GTM firing, Search Console + feed re-registration). The operational
+  slice of TASK-054's "Launch readiness"; assemble as a checklist doc the launch day executes
+  verbatim. (High value, Med effort) `[relates-to: TASK-054]` [user, 2026-08-10]
 
 ---
 

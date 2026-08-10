@@ -135,5 +135,17 @@ verify that out-of-tree work landed. Kept separate from the in-tree spawned task
 - [ ] Legal-page content or lawyer engagement (feeds TASK-055)
 - [ ] Bank-card details for the checkout prepay block (card number + holder name) — lights up
       `src/content/checkout.ts` `payment.prepay` (G2, 2026-08-06)
-- [ ] WhatsApp contact number/link for checkout manager contacts — `src/content/checkout.ts`
-      `contacts.whatsapp` (G2, 2026-08-06)
+- [ ] WhatsApp contact number/link for manager contacts — single-sourced as `WHATSAPP_HREF` in
+      `src/content/brand.ts` since G5 (2026-08-10); filling it lights up BOTH the checkout
+      payment-step contacts and the order-email contact block (G2, 2026-08-06 · G5 gate ruling)
+- [ ] **Production domain purchase/choice** (G5, 2026-08-10): no real domain exists yet — it gates
+      transactional-email delivery (Resend DNS verification below), the real-domain deploy (where the
+      placeholder catalog gets replaced with real products), and SEO. Client question: which domain,
+      who buys it, who holds DNS access
+- [ ] **Transactional-email sending config** (G5, 2026-08-10 — was fully ABSENT; `RESEND_API_KEY`
+      **set by user 2026-08-10**, delivery still blocked on the domain): remaining chain — real
+      domain purchased (item above) → verify its DNS in Resend (SPF + DKIM; a vercel.app subdomain
+      CANNOT be verified — Vercel owns that DNS) → set `EMAIL_FROM=noreply@<real-domain>` in Vercel
+      prod env → redeploy. Interim smoke-test (works now): `EMAIL_FROM=onboarding@resend.dev` +
+      redeploy — Resend's test sender, delivers ONLY to the Resend account owner's own inbox, never
+      to customers. Closes BACKLOG's 🔵 "Verify prod email config"

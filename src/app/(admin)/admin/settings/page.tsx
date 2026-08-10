@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Save, Store, Mail, CreditCard, Truck, Bell, Shield } from "lucide-react";
+import { BRAND_NAME } from "@/content/brand";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,7 +18,7 @@ export default function AdminSettingsPage() {
 
   // Store settings
   const [storeSettings, setStoreSettings] = useState({
-    storeName: process.env.NEXT_PUBLIC_STORE_NAME || "Store",
+    storeName: process.env.NEXT_PUBLIC_STORE_NAME || BRAND_NAME,
     storeDescription: "Your one-stop shop for quality products",
     contactEmail: "support@store.com",
     supportPhone: "",

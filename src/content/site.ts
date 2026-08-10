@@ -1,5 +1,5 @@
 import { Truck, CreditCard, ShieldCheck, Headphones, type LucideIcon } from "lucide-react";
-import { BRAND_NAME, BRAND_TAGLINE } from "./brand";
+import { BRAND_NAME, BRAND_TAGLINE, SOCIALS } from "./brand";
 
 /**
  * Site-wide content, consumed by the homepage and the Footer.
@@ -9,17 +9,7 @@ import { BRAND_NAME, BRAND_TAGLINE } from "./brand";
  * placeholder. Source: docs/reference/client-brief.md.
  */
 
-export interface SocialLink {
-  platform: "instagram" | "tiktok" | "telegram";
-  label: string;
-  href: string;
-  /**
-   * CLIENT-SUPPLIED. Real follower count, or null for no counter.
-   * Never fabricate this — TODO.md AC requires counters only when real numbers
-   * are supplied, and invented social proof is out of scope per TASK-051.
-   */
-  followers: number | null;
-}
+export type { SocialLink } from "./brand";
 
 export interface ClientClaims {
   /** CLIENT-SUPPLIED, UNAUDITED (as provided 2026-07-14). null hides the claim. */
@@ -81,22 +71,8 @@ export const site = {
    */
   announcement: null as string | null,
 
-  /** CLIENT-SUPPLIED. Placeholder handles until the client confirms real URLs. */
-  socials: [
-    {
-      platform: "instagram",
-      label: "Instagram",
-      href: "https://instagram.com/mirox_shop",
-      followers: null,
-    },
-    {
-      platform: "tiktok",
-      label: "TikTok",
-      href: "https://tiktok.com/@mirox_shop",
-      followers: null,
-    },
-    { platform: "telegram", label: "Telegram", href: "https://t.me/mirox_shop", followers: null },
-  ] as SocialLink[],
+  /** CLIENT-SUPPLIED placeholder handles — data lives in brand.ts since G5. */
+  socials: SOCIALS,
 
   /**
    * CLIENT-SUPPLIED, UNAUDITED. The client's own claims about their OLX and

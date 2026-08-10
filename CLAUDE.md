@@ -119,9 +119,10 @@ src/
 ├── content/                # Typed content-config layer (Ukrainian copy, extraction-ready for TASK-039 i18n)
 │   ├── account.ts          # Account area copy + ORDER_STATUS_LABELS/PAYMENT_STATUS_LABELS (customer label maps)
 │   ├── auth.ts             # Auth surfaces copy (login, register, auth error boundary)
-│   ├── brand.ts            # Brand name/tagline constants — deliberately import-free (consumed by seo.ts)
+│   ├── brand.ts            # Brand name/tagline constants — deliberately import-free (consumed by seo.ts); also carries SOCIALS (relocated from site.ts, G5) and WHATSAPP_HREF (CLIENT-SUPPLIED-pending, null-gated)
 │   ├── cart.ts             # Cart + CartDrawer copy (summary/empty/clear/stock strings, itemsCount plural via pluralizeUk)
 │   ├── checkout.ts         # Checkout + confirmation copy (steps, COD/prepay block config, manager contacts — cardNumber/whatsapp are CLIENT-SUPPLIED-pending)
+│   ├── emails.ts           # Transactional email copy (subjects + bodies, UA); imports only brand.ts — lucide-free by contract (bundled into API routes)
 │   ├── home.ts             # Homepage copy (hero, benefits, whyChooseUs, rails, testimonials)
 │   ├── newsletter.ts       # Newsletter pages + footer-signup copy; byCode maps translate API outcome codes to Ukrainian
 │   ├── site.ts             # Site-wide config (announcement, socials, client claims, footer benefits, header chrome strings — site.header, G4)
@@ -134,7 +135,7 @@ src/
 │   ├── stripe.ts           # Stripe server-side (payment-intent path dormant since G2; generateOrderNumber still live)
 │   ├── stripe-client.ts    # Stripe client-side (dormant since G2)
 │   ├── shipping.ts         # Nova Poshta delivery methods (np-office/np-courier/np-postomat, UAH) + legacy label lookup
-│   ├── email.ts            # Resend email service (order confirmations, newsletter)
+│   ├── email.ts            # Resend wiring only — subjects from content/emails.ts, HTML from email-templates/
 │   ├── format.ts           # formatPrice() — the only sanctioned UAH price formatter (uk-UA, Intl.NumberFormat)
 │   ├── order-status.ts     # OrderStatus/PaymentStatus label + style lookup; labels live in content/account.ts since G4 (re-exported here so consumers keep one import)
 │   ├── newsletter.ts       # Newsletter utilities (token generation, URL builders, HMAC unsubscribe)
@@ -149,6 +150,8 @@ src/
 │   ├── web-vitals.ts       # Core Web Vitals reporting to GA4
 │   ├── utils.ts            # General utils (cn, etc.)
 │   ├── email-templates/    # HTML email templates
+│   │   ├── layout.ts       # Shared dark Mirox table-based shell (lang=uk, EMAIL_COLORS, renderEmailShell/renderPanel/renderButton)
+│   │   ├── order-confirmation.ts     # Order confirmation template (OrderEmailData, guest-aware CTA)
 │   │   └── newsletter-confirmation.ts  # Double opt-in confirmation email
 │   └── validations/        # Zod schemas for all entities
 │       ├── index.ts        # Product, category, order, user, review, newsletter schemas
@@ -170,6 +173,7 @@ tests/
 │   ├── admin-newsletter-api.test.ts  # Admin newsletter API tests (GET list, PATCH/DELETE [id], GET export)
 │   ├── admin-reviews-api.test.ts     # Admin review API tests (GET list/[id], DELETE, PUT reply/visibility)
 │   ├── api-utils.test.ts             # API utility tests (auth guards, response helpers, pagination, slug/SKU generation)
+│   ├── email-templates.test.ts       # Transactional email tests (getStoreName env fallback, shell/order/newsletter HTML, escaping)
 │   ├── newsletter-api.test.ts        # Public newsletter API tests (subscribe, confirm, unsubscribe)
 │   ├── newsletter.test.ts            # Newsletter utility tests (token generation, URL builders, HMAC, HTML escaping)
 │   ├── reviews-api.test.ts           # Customer review API tests (create, update, delete, eligibility)
@@ -299,6 +303,7 @@ prisma/
 - **API error handling pattern**: API routes use `try/catch` with `apiError()` helper for consistent error responses; no `console.error()` calls in API routes (removed during TASK-029 cleanup); catch blocks with unused error variables use bare `catch` syntax without error parameter (ESLint recommended pattern from TASK-031); structured error responses via `NextResponse.json()` with appropriate status codes
 - **Bare catch syntax**: When catch block doesn't use error variable, use bare `catch` without parameter (e.g., `} catch {` instead of `} catch (error) {`); pattern enforced by ESLint and applied across API routes, client components, server pages, and utilities during TASK-031 code quality sweep
 - **Coded API outcomes**: newsletter routes (`api/newsletter/{subscribe,confirm,unsubscribe}`) and the register 409 (`api/auth/register`) return a machine `code` alongside English prose; clients map `code` → Ukrainian via `src/content/` (G2 `create-order` convention, extended in G4 to the newsletter confirm/unsubscribe pages and the footer signup toast)
+- **Transactional email pattern** (G5): all emails (order confirmation, newsletter double opt-in) render on the shared dark Mirox table-based shell (`src/lib/email-templates/layout.ts` — `renderEmailShell`/`renderPanel`/`renderButton`, `lang="uk"`, bgcolor attrs for Outlook); UA copy sourced from `src/content/emails.ts`, never inlined; brand name resolved at render time via `getStoreName()` (`env NEXT_PUBLIC_STORE_NAME || BRAND_NAME`) — a module-scope const would freeze the env value at import and break env-dependent tests; every interpolated user/DB string passes through `escapeHtml` (item names, variant info, address fields, subscriber email); order CTA is guest-aware (`OrderEmailData.hasAccount`) — guest COD orders have no `/account/orders` to link to, so the button renders only for signed-in customers (G2 confirmation-page ruling); tax row renders only when `tax > 0` (COD is always 0); contact links pull from `brand.ts` `SOCIALS`/`WHATSAPP_HREF`, so WhatsApp stays hidden until the client supplies a real number
 
 <!-- END AUTO-MANAGED -->
 
