@@ -94,8 +94,9 @@ that only pays off post-launch defers by default. Re-scope this lens once the st
 
 ### 3. Non-Claude AI best-practices
 
-| Date | Run | Candidate | Primary source | Verdict | Reasoning | Routed to |
-| ---- | --- | --------- | -------------- | ------- | --------- | --------- |
+| Date       | Run    | Candidate                                                                                                                                                  | Primary source                                                                                                                                        | Verdict  | Reasoning                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Routed to                          |
+| ---------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| 2026-08-10 | 1 (G6) | Cross-tool agent practices — shared-context instruction files (`AGENTS.md` / `CODEX.md` / `.cursorrules`), multi-agent MCP memory, usage-budget monitoring | Survey of 2026 comparison write-ups (Cursor / Copilot coding agent / Codex / Antigravity); all aggregator-tier, no first-party source cleared the bar | **pass** | Every substantive practice is already satisfied, already consumed, or structurally inapplicable. Per-project instruction files: `CLAUDE.md` exists. Shared MCP memory across agents: the `memory` MCP server is already enabled here. Rules-file scoping (Cursor `globs` / Copilot `applyTo`): this is exactly what slot 2 adopted natively as `.claude/rules` `paths:` — recording it here too would double-file one finding. `AGENTS.md` and multi-agent shared context are gated on a **second agentic tool**, which a solo single-tool project does not have; that park's condition is unmet, so it got the cheap check and no re-read (Convention 4). | Next-up (category-bias watch only) |
 
 ### 4. Cross-project propagation
 
@@ -128,3 +129,15 @@ cheaply, and if it is unmet, move on without re-reading the source (Convention 4
   `security-guidance` for having no app-code web surface, **is** a Next.js app with auth, API
   routes and order-creation code. **Re-trigger**: the pre-launch security pass is scheduled, or
   real customer traffic is imminent (which is also the pin on the standing G2 hardening bundle).
+- **Slot 3 category-bias watch** (slot 3, process) — not a candidate; a counter.
+  Slot 3 passed on run 1 for the documented structural reason: a **single-tool, solo, no-runtime-LLM**
+  project cannot adopt cross-tool portability practices. Sibling projects hit the same wall
+  repeatedly and eventually filed a reframe request. One local data point is not a pattern, so
+  nothing is filed yet. **Re-trigger**: if slot 3 passes for this same reason in **two more runs
+  here** (i.e. runs 2 and 3), file a 🟤 to re-scope the category — or pause it and redistribute its
+  1 SP — rather than keep spending the slot to reach a foregone conclusion.
+- **`AGENTS.md` / cross-tool shared-context instruction files** (slot 3) — parked, condition unmet.
+  **Re-trigger**: a second agentic tool (Codex, Cursor, Copilot coding agent) actually enters this
+  project's workflow. Until then the cheap check is "is there a second tool?" — do not re-read the
+  sources (Convention 4). Note the mechanism if it ever triggers: Claude Code reads `CLAUDE.md`, not
+  `AGENTS.md`, and bridges via an `@AGENTS.md` import or a symlink.
