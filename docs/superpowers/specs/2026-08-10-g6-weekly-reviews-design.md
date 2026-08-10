@@ -22,7 +22,7 @@ own output for learnings worth pushing outward. It runs in four slots:
 | 4   | Cross-project propagation    | 1   | **Outbound** — here → other projects |
 
 This is the **first run in this repository**. The batch has six-plus prior runs in sibling projects
-(universal-config, rating*bot, social-stats), so the \_method* is established; what is new here is the
+(universal-config, `rating_bot`, social-stats), so the _method_ is established; what is new here is the
 per-project instantiation: this repo's durable state file, its exclusion sets, its routing sinks, and its
 relevance lens. That is why this run gets a spec at all — the standing playbook's own criterion is
 "no spec/no plan by default; a short spec only when the run is **first** at something."
@@ -51,7 +51,7 @@ All six were settled in the 2026-08-10 brainstorm and are binding for this run.
 
 This repo has no `docs/prompts/` directory (the sibling repos keep the cadence definition in
 `docs/prompts/weekly-planning.md`). Rather than create one for a single consumer, **REVIEW-QUEUE.md's
-"How this works" section is the methodology of record here**, matching the rating_bot instantiation.
+"How this works" section is the methodology of record here**, matching the `rating_bot` instantiation.
 
 ```
 # Review Queue
