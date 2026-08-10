@@ -2,11 +2,38 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-08-09
+**Last Updated**: 2026-08-10
 
 ---
 
 ## 2026-08 (August)
+
+### [2026-08-10] G6 - Weekly Reviews: First Run in This Project (WEEKLY batch, ⚪ Overhead)
+
+**Plan**: none — spec-only route, ruled at the brainstorm (decision §2.4). The recurring batch's deliverables are the verdict rows, the Next-up parks and the routed entries; there is nothing to archive.
+**Spec**: [2026-08-10-g6-weekly-reviews-design.md](../superpowers/specs/2026-08-10-g6-weekly-reviews-design.md) — stays live as this repo's design record for the batch
+**Durable state**: [REVIEW-QUEUE.md](REVIEW-QUEUE.md) — created by this run; its "How this works" section is the methodology of record (no `docs/prompts/` in this repo)
+**PR**: [#32](https://github.com/GoodAlex223/dropshipping-test/pull/32) — merged `8298dab` (2026-08-10, `--merge`); docs-only, so there is nothing to verify in prod
+
+**Summary**: First-ever run of the standing ⚪ Overhead batch here, six-plus runs into its life in sibling projects. Docs-only: no code changed and no plugin was installed — an `adopt` files a BACKLOG entry, nothing more. Established the per-project instantiation (durable state file, exclusion sets, routing sinks, relevance lens) and ran all four slots sequentially in-session. Verdicts: **1 adopt / 1 defer / 2 pass** inbound, **3 propagate / 1 defer / 1 pass** outbound (one outbound `pass` corrected to `propagate` on the PR #32 review). Ran Mon 2026-08-10, **+3 days** behind the scheduled Thu–Fri slot as queue spillover behind G2/G3/G4; displaced nothing, since the batch is quota-exempt and G5/G7 remained open regardless.
+
+**Key changes**:
+
+- 9 commits, docs-only. Skeleton-first sequencing (`REVIEW-QUEUE.md` committed before any research) so a `pass` row could not silently vanish — the failure mode that nearly dropped rows twice in sibling runs
+- **The adopt, decided on measurement rather than the write-up**: `CLAUDE.md` is **350 lines** against Anthropic's documented "target under 200 lines… longer files reduce adherence", and **232 of those 350 (66%)** are the Architecture tree, Detected Patterns and Git Insights — precisely the derivable content `/doctor`'s trim check is documented to cut. `.claude/rules/` does not exist here. Both preconditions verified against the installed **CC 2.1.226** (invalid-`[` glob bug fixed 2.1.207; brace-expansion startup crash 2.1.217). Trade-off recorded in the entry: path-scoped rules are **not** re-injected after `/compact`
+- Slot 1a `resend` → **defer**: read the actual `email-best-practices` SKILL.md instead of the marketplace blurb — it reduces to double opt-in (already implemented here) plus DNS authentication, whose provisioning half the [2026-08-07] 🔵 entry already covers; the plugin's weight is in `react-email`, a rewrite outside G5's scope
+- Slot 1b → **pass** on provenance: the exact-fit `nextjs-marketplace` is 1★, single-maintainer, and installs by copying directories; aggregator-hosted i18n "skills" have no traceable repo (mcpmarket.com 429'd outright). Unverifiable ⇒ not adoptable
+- Slot 3 → **pass** on the documented single-tool structural bias. No 🟤 manufactured from a `pass`; instead a **bias-watch counter** parked — if slot 3 passes for the same reason in two more runs, file a 🟤 to re-scope or pause the category
+- Slot 4 → 3 `propagate` (visual-fidelity gate; "never write execution records ahead of execution"; bidirectional docs-index check), all verified absent from `CLAUDE.md`, `WORKFLOW.md`, `POLICIES/*` and `TEMPLATES/*`; 1 `pass` where two-trees genuinely held (the `✅ PR #N` close-out rule — a literal-string grep whose three hits are the rule verbatim). **The third `propagate` shipped as a wrong `pass` and was corrected on the PR #32 review**: the "already present in `POLICIES/code-review.md`" claim came from a `grep -l` for the _concept_ that matched `- [ ] Migration tested both directions`, a database-migration item
+- **Two WEEKLY corrections**, both artifacts of the plan being written Tue Aug 4 (`a4dab21`), when the week's only merge so far was Monday's PR #27 (`cec8408`, TASK-037's spillover close-out): slot 4's scan range named the four then-most-recent PRs, #24–#27, of which only #27 belongs to this week → corrected to #28–#31 plus that #27 close-out; and the Sources line no longer claims REVIEW-QUEUE.md "does not exist yet"
+- Routing: 3 🟤 (1 adopt + 2 incidental), 2 out-of-tree rows in `TODO.md` § 🔀 Spawned under a new **Cross-project propagation** subsection (status user-maintained — this repo cannot verify out-of-tree completion), 6 Next-up parks each with a re-trigger condition
+- One claim walked back mid-run: slot 1 initially read as having found an unrecorded launch-blocking deliverability gap; grepping the backlog showed the provisioning half already covered, so the row says that and the 🟤 narrowed to what is genuinely new (missing `lang` on the email `<html>` roots, which begins to matter once G5 makes the copy Ukrainian)
+
+- **PR review: 3 rounds, 6 findings, all real and all fixed.** Round 3 corrected the re-raised framing (the stale-PR-range rationale claimed the plan predated the week's first merge; PR #27 merged Mon 15:28, the plan was committed Tue 02:16 — a third instance beyond the two cited was found by sweeping for the phrase) and acted on the review's through-line: **the count/attribution re-check is now step 5 of the run recipe**, not only Conventions 9 and 10, because a convention a run can state and then violate one slot later is not yet a control. Rounds 1–2 below (1) The live spec's Conventions list shipped at 6 while the queue shipped 9, with numbering drift — a live doc left uncorrected while a late-run addition propagated only to the queue; now synced at 10. (2) A slot-4 `pass` rested on an unread grep match — corrected to `propagate`, filed, and the failure mode written up as Convention 10. The sibling `pass` in the same block was re-checked and holds
+
+**Learnings**: auto-memory is **per-project by construction**, so a durable process rule captured only there reaches no other project by any route — that is exactly where both propagations were found, while every convention that had reached a doc or template had already gone global (now Convention 9, with the corollary to grep specific strings in the live `~/.claude` tree, excluding `projects/` and `plugins/`, rather than diffing scrubbed trees); a candidate's marketplace blurb is not evidence of fit — reading the actual SKILL.md flipped slot 1a from a plausible adopt to a defer, and measuring the repo flipped slot 2 from a plausible pass to the run's one adopt; a `pass` verdict that produces a real incidental finding is a better outcome than a rubber-stamped adopt, and the source rule routes that finding independently of the verdict; and — the round-1 review's sharpest catch — **`grep -l` for a _concept_ proves a file matched, not that it matched the concept you meant**: the run wrote the "grep specific strings" corollary into Convention 9 and then violated it one slot later, shipping a `pass` built on a database-migration checklist line. Read the matched line, or the "already covered" half of a `pass` is unverified.
+
+---
 
 ### [2026-08-09] G4 - Peripheral Surfaces Sweep: Ukrainian + Mirox Alignment (WEEKLY batch)
 
