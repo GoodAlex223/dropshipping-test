@@ -850,6 +850,20 @@ deliberately not fixed in-branch plus a docs-index gap found during Task 15's fr
   and left per follow-existing-convention; decide the convention (index WEEKLY-group plans too,
   or note the table's TASK-only scope) and apply in one sweep. (Low value, Low effort)
 
+### [2026-08-10] From: G5 prod email config round-trip (user)
+
+- 🔵 **Production-launch deploy runbook — pre/while/post steps** — user-raised during G5's prod
+  email-config check: a written, executable runbook for the real-domain production cutover, not
+  just a task list. Pre (domain purchased + DNS, Resend domain verified + `EMAIL_FROM` flipped
+  off `onboarding@resend.dev`, real product content staged, `NEXT_PUBLIC_APP_URL`/
+  `NEXT_PUBLIC_STORE_NAME` env review, user-gated prod re-seed plan, legal pages live per §5.3),
+  while (domain attach + SSL on Vercel, deploy via the Git integration, migration check —
+  `vercel-build` runs `prisma migrate deploy`), post (live smoke pass: homepage/PDP/checkout COD
+  order + confirmation email to a real inbox, newsletter double-opt-in round-trip, sitemap/robots
+  on the new domain, GA4/GTM firing, Search Console + feed re-registration). The operational
+  slice of TASK-054's "Launch readiness"; assemble as a checklist doc the launch day executes
+  verbatim. (High value, Med effort) `[relates-to: TASK-054]` [user, 2026-08-10]
+
 ---
 
 ## Technical Debt
