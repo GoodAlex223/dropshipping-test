@@ -262,6 +262,28 @@ describe("POST /api/checkout/create-order", () => {
     );
   });
 
+  it("passes hasAccount: false for guest orders", async () => {
+    mockAuth.mockResolvedValue(null);
+    mockTx();
+    await POST(
+      createNextRequest({ url: "/api/checkout/create-order", method: "POST", body: validBody })
+    );
+    expect(sendOrderConfirmationEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ hasAccount: false })
+    );
+  });
+
+  it("passes hasAccount: true when a session user exists", async () => {
+    mockAuth.mockResolvedValue({ user: { id: "user-1" } });
+    mockTx();
+    await POST(
+      createNextRequest({ url: "/api/checkout/create-order", method: "POST", body: validBody })
+    );
+    expect(sendOrderConfirmationEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ hasAccount: true })
+    );
+  });
+
   it("returns 500 when the transaction fails", async () => {
     mockTransaction.mockRejectedValue(new Error("db down"));
     const res = await POST(

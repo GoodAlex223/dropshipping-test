@@ -185,6 +185,7 @@ export async function POST(request: NextRequest) {
       total,
       shippingAddress: data.shippingAddress,
       shippingMethod: data.shippingMethod,
+      hasAccount: Boolean(session?.user?.id),
     }).catch(() => {
       // Email failure is non-critical — order is already created
     });

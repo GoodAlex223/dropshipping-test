@@ -2,7 +2,13 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 const { sendMock } = vi.hoisted(() => ({ sendMock: vi.fn() }));
 vi.mock("resend", () => ({
-  Resend: vi.fn(() => ({ emails: { send: sendMock } })),
+  // A vi.fn() implemented with an arrow function cannot back `new Resend()`
+  // (arrow functions aren't constructible — vitest throws "is not a
+  // constructor"); a plain function returning the mock object works because
+  // an explicit object return from a constructor call overrides `this`.
+  Resend: vi.fn(function () {
+    return { emails: { send: sendMock } };
+  }),
 }));
 
 import { getStoreName, emails } from "@/content/emails";
@@ -261,5 +267,39 @@ describe("generateNewsletterConfirmationHtml", () => {
     expect(withUnsub).toContain("Відписатися");
     expect(withUnsub).toContain('href="https://test.example.com/newsletter/unsubscribe?id=1"');
     expect(generateNewsletterConfirmationHtml(newsletterData)).not.toContain("Відписатися");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// email.ts — subject wiring (mocked Resend; module re-imported so the
+// module-scope RESEND_API_KEY read picks up the test value)
+// ---------------------------------------------------------------------------
+
+describe("email.ts subjects", () => {
+  it("sends the order email with the UA subject", async () => {
+    sendMock.mockResolvedValue({ error: null });
+    process.env.RESEND_API_KEY = "test-key";
+    vi.resetModules();
+    const { sendOrderConfirmationEmail } = await import("@/lib/email");
+    const result = await sendOrderConfirmationEmail({ ...baseOrder });
+    expect(result.success).toBe(true);
+    expect(sendMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: "customer@example.com",
+        subject: "Замовлення ORD-20260810-001 прийнято — Mirox Shop",
+      })
+    );
+  });
+
+  it("sends the newsletter email with the UA subject", async () => {
+    sendMock.mockResolvedValue({ error: null });
+    process.env.RESEND_API_KEY = "test-key";
+    vi.resetModules();
+    const { sendNewsletterConfirmationEmail } = await import("@/lib/email");
+    const result = await sendNewsletterConfirmationEmail(newsletterData);
+    expect(result.success).toBe(true);
+    expect(sendMock).toHaveBeenCalledWith(
+      expect.objectContaining({ subject: "Підтвердіть підписку на розсилку Mirox Shop" })
+    );
   });
 });
