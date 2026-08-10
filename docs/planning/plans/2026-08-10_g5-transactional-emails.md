@@ -1258,6 +1258,14 @@ never send. Client action items filed into TODO.md's TASK-056 checklist (Resend 
 DNS verification (SPF/DKIM; chains behind the real-domain purchase) → set both vars → redeploy). The
 BACKLOG 🔵 "Verify prod email config" entry closes at the completion workflow with this pointer.
 
+**Update (user, 2026-08-10, later same day): `RESEND_API_KEY` is now SET in Vercel prod env.**
+`EMAIL_FROM` remains the blocker: no real domain exists, and a vercel.app subdomain cannot be
+DNS-verified in Resend (Vercel owns that DNS), so `noreply@dropshipping-test.vercel.app` would be
+rejected on every send. Recommended interim: `EMAIL_FROM=onboarding@resend.dev` (+ redeploy) —
+Resend's test sender, delivers only to the Resend account owner's inbox, enabling a live prod
+smoke test of the new templates. Real delivery chains behind the domain purchase (now its own
+TASK-056 checklist line, alongside the narrowed email-config item).
+
 - Vercel project located via MCP: `dropshipping-test` (`prj_IB5kKeCKmZ4AEUpKQSuScfoWo2c0`,
   team `goodalex223s-projects`), latest production deployment READY.
 - The Vercel MCP exposes no environment-variable listing; the Vercel CLI is not installed in
