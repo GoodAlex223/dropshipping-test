@@ -866,6 +866,16 @@ while evaluating candidates; they route 🟤 by the source rule, independent of 
   G5's conversion. Surfaced by the slot-1 `email-best-practices` read; distinct from the
   [2026-08-07] 🔵 "Verify prod email config" entry, which covers provisioning, not markup.
   (Low value, Low effort) `[relates-to: G5]`
+- 🟤 **TASK-039 design input: next-intl's `useExtracted` + its "don't let agents translate"
+  guidance** — next-intl's official AI-agent workflow page documents `useExtracted`, a hook
+  purpose-built for agents that writes messages **inline at the usage site** and auto-extracts
+  them into catalogs. That is a different model from this repo's `src/content/*.ts` layer, which
+  was deliberately built as "extraction-ready" for a `useTranslations` + catalog migration — so
+  TASK-039 should weigh the two rather than default to the assumed one. The same page advises
+  **against** having agents translate message catalogs (missing context and nuance) and points to
+  professional translation, which matters here because the storefront is Ukrainian-first and the
+  client supplies copy. Source: <https://next-intl.dev/docs/workflows/agents> (fetched
+  2026-08-10). (Med value, Low effort) `[relates-to: TASK-039]`
 
 ---
 
