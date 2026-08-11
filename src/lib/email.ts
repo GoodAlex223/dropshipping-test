@@ -5,6 +5,7 @@ import {
   generateOrderConfirmationHtml,
   type OrderEmailData,
 } from "./email-templates/order-confirmation";
+import { generateFeedbackEmailHtml, type FeedbackEmailData } from "./email-templates/feedback";
 
 const resendApiKey = process.env.RESEND_API_KEY;
 const emailFrom = process.env.EMAIL_FROM || "noreply@yourdomain.com";
@@ -38,6 +39,7 @@ async function sendWithTimeout(
 }
 
 export type { OrderEmailData };
+export type { FeedbackEmailData };
 
 export async function sendOrderConfirmationEmail(
   data: OrderEmailData
@@ -104,6 +106,50 @@ export async function sendNewsletterConfirmationEmail(data: {
     return { success: true };
   } catch (error) {
     console.error("Error sending newsletter confirmation email:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+export async function sendFeedbackEmail(
+  data: FeedbackEmailData
+): Promise<{ success: boolean; error?: string }> {
+  if (!resend) {
+    console.log("Skipping email send - RESEND_API_KEY not configured");
+    console.log("Would send feedback to:", process.env.FEEDBACK_EMAIL || "(FEEDBACK_EMAIL unset)");
+    return { success: true };
+  }
+
+  // Read at call time, not module scope: a missing value must fail loud per
+  // request (the email IS the deliverable), and env-dependent tests stay
+  // honest (G5 getStoreName lesson).
+  const to = process.env.FEEDBACK_EMAIL;
+  if (!to) {
+    console.error("FEEDBACK_EMAIL is not configured - feedback email not sent");
+    return { success: false, error: "FEEDBACK_EMAIL not configured" };
+  }
+
+  try {
+    const { error } = await sendWithTimeout(
+      resend.emails.send({
+        from: emailFrom,
+        to,
+        ...(data.email ? { replyTo: data.email } : {}),
+        subject: emails.feedback.subject(),
+        html: generateFeedbackEmailHtml(data),
+      })
+    );
+
+    if (error) {
+      console.error("Failed to send feedback email:", error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error sending feedback email:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",
