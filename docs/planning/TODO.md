@@ -1,6 +1,6 @@
 # TODO
 
-**Last Updated**: 2026-08-10
+**Last Updated**: 2026-08-11
 
 Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-shop-program-design.md) · Current week: [WEEKLY.md](WEEKLY.md)
 
@@ -113,9 +113,13 @@ verify that out-of-tree work landed. Kept separate from the in-tree spawned task
 #### [TASK-056] Client content inventory
 
 **Priority**: 🟠 High
-**Status**: 📋 Planned
+**Status**: ⏸️ Deferred (user decision, 2026-08-11)
 **Effort**: S
 **Dependencies**: None
+
+**⏸️ Deferred to the pre-launch week (user, 2026-08-11)**: WEEKLY's G7 group was to assemble and hand off the consolidated ask on Fri 2026-08-07. The user's decision is to hold the whole client round-trip until the site is genuinely ready to operate in production with real data and real customers, rather than requesting assets against surfaces that don't exist yet. Nothing is dropped and nothing was partially sent — the checklist below is unchanged and carries forward at 🟠 High. Full rationale and the recorded counter-consideration (three items have multi-week client-side lead times and gate readiness itself) live in [WEEKLY.md](WEEKLY.md) § G7.
+
+**⚠️ Live consequence of the deferral — real customers currently receive no order email.** `EMAIL_FROM` in Vercel prod is the interim `onboarding@resend.dev`, which Resend delivers **only to the Resend account owner's own inbox**; a real customer placing a COD order today gets a confirmation page and nothing else. The order-confirmation code path itself is correct and verified live (G5 + the PR #34 await hotfix) — the gap is purely the sending domain, i.e. the "Production domain purchase/choice" and "Transactional-email sending config" items below. This must be closed before the store takes real orders, whenever the round-trip is finally run.
 
 **Description**: Single consolidated ask covering everything the client still owes for the Mirox rebrand to leave placeholder/retracted state, spawned by TASK-035's final review so these don't dribble out piecemeal across TASK-036/037/039. This task is the checklist and the client round-trip, not implementation.
 

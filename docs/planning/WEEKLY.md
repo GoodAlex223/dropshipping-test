@@ -11,7 +11,7 @@
 ## Parallel Work
 
 - 🟡 **P1 — Prod data re-seed (1 SP)**: ✅ **ran 2026-08-04, user-approved** — guarded `SEED_ALLOW_REMOTE=1` against the Neon direct endpoint, read-only preflight first. Verified in DB (both hoodies share `styleGroup: "hudi-mirox"`; kepka «Один розмір»; futbolka «Білий») and live (hudi PDP renders the white-sibling colorway link, kepka PDP shows «Один розмір», homepage 200). Prod PDPs now render the full swatch UI; the legacy fallback path is retired from prod.
-- **Client chases (zero-code, carry-forward)**: 9-item payments prerequisites checklist ([decision doc §5.3](../superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md)); `developers.novaposhta.ua` webhook question from an unblocked network (gates TASK-049); TASK-056 content asks (photography, logo vector, socials/claims, size charts, legal copy) — G1's audit sharpens this list; formal TASK-056 checklist assembly is scheduled Friday as G7.
+- **Client chases (zero-code, carry-forward)**: 9-item payments prerequisites checklist ([decision doc §5.3](../superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md)); `developers.novaposhta.ua` webhook question from an unblocked network (gates TASK-049); TASK-056 content asks (photography, logo vector, socials/claims, size charts, legal copy) — G1's audit sharpens this list; formal TASK-056 checklist assembly **was** scheduled Friday as G7 and is **deferred to the pre-launch week** (user, 2026-08-11 — see G7's deferral note), so this chase is paused, not merely unstarted.
 
 ---
 
@@ -97,6 +97,10 @@
 
 - [ ] Assemble the consolidated TASK-056 ask from TODO's checklist + G1-audit findings (real photography incl. the 7 missing back-view shots, logo vector, real socials/claims, size charts + measurement photos, contact details, legal copy, free-shipping threshold, announcement copy) and hand it to the user for forwarding to the client (2) — TODO.md TASK-056 [HIGH]
 
+> ⏸️ **Deferred 2026-08-11 by user decision** — not dropped, not partially sent. Rationale (user): hold the client round-trip until the site is genuinely ready to operate in production with real data and real customers, rather than asking for assets against surfaces that don't exist yet. TASK-056 carries forward to the pre-launch week; it stays 🟠 High in [TODO.md](TODO.md).
+>
+> **Recorded counter-consideration (Claude, 2026-08-11 — the decision stands, this is the cost being accepted):** three TASK-056 items have client-side lead times measured in weeks and gate readiness itself, so deferring the ask defers launch by roughly the same amount rather than resequencing it. (1) **The production domain** gates Resend DNS verification → order emails; the interim `EMAIL_FROM=onboarding@resend.dev` delivers **only to the Resend account owner's inbox**, so a real customer ordering today receives nothing (see the TODO.md TASK-056 warning). It also gates the real-domain deploy where the placeholder catalog is replaced, and all SEO. (2) **Legal copy / lawyer engagement** gates [TASK-055], whose public-offer / privacy / return pages are payment-gateway onboarding prerequisites ([decision doc §5.3](../superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md)). (3) **Product photography** — a shoot plus retouching; 7 of 8 SKUs still lack a second image. Engineering can proceed on every Tier-1/Tier-2 item without these, but cannot substitute for them.
+
 ---
 
 ## Daily Schedule
@@ -122,7 +126,7 @@
 ### Friday — Reviews close + stretch
 
 - ✅ **[G6](#g6-weekly-reviews-batch)** ⚪ — part 2 (best-practices slots + propagation scan). Ran Mon 2026-08-10 alongside part 1.
-- **[G7](#g7-client-content-ask-task-056-solo)** 🔵 — consolidated client ask assembled + handed off.
+- ⏸️ **[G7](#g7-client-content-ask-task-056-solo)** 🔵 — consolidated client ask assembled + handed off. **Deferred 2026-08-11 by user decision** to the pre-launch week; see the group's deferral note.
 - ✅ **[G5](#g5-transactional-emails-solo-)** 🔵 🏆 — stretch: emails, if the core groups are green. Shipped Sun 2026-08-10 (+2 days — queue spillover), PR [#33](https://github.com/GoodAlex223/dropshipping-test/pull/33).
 - Week close-out: statuses → `✅ PR #N`, spillover check, next-week (launch-push continuation) seed list.
 
@@ -138,7 +142,7 @@
 | G4  | Peripheral Surfaces Sweep `[batch]`    | auth/account/system | 🔵 User     | 3      | 5        | Thu     | ✅ PR #31     |
 | G5  | Transactional Emails `[solo]` 🏆       | email templates     | 🔵 User     | 2      | 3        | Fri     | ✅ PR #33     |
 | G6  | Weekly Reviews `[batch]`               | recurring reviews   | ⚪ Overhead | 4      | 5        | Thu–Fri | ✅ PR #32     |
-| G7  | Client Content Ask (TASK-056) `[solo]` | client content      | 🔵 User     | 1      | 2        | Fri     | ☐ Planned     |
+| G7  | Client Content Ask (TASK-056) `[solo]` | client content      | 🔵 User     | 1      | 2        | Fri     | ⏸️ Deferred   |
 | P1  | Prod data re-seed                      | ops/data            | 🟡 Ops      | 1      | 1        | Tue     | ✅ 2026-08-04 |
 |     | **Total**                              |                     |             | **18** | **28**   |         |               |
 
@@ -166,6 +170,7 @@ _Source legend: 🔵 User · 🟡 Ops · 🟤 Auto · ⚪ Overhead (exempt from 
 - Last Cleanup Week: never (Feb 2026 freeze week predates the cadence)
 - Compliance: ✅ all quotas met — deviation-free; the cadence deferral is recorded above with justification
 - _Denominator note_: Y = 28 total − 5 ⚪ (G6 Weekly Reviews) = 23.
+- _Delivery note (2026-08-11)_: quotas above describe the plan **as written**. As **delivered**, G7's 2 🔵 SP were deferred rather than executed, so the week shipped 18 🔵 / 21 non-⚪ SP (86%) — still ≥50%, quota unaffected. G7 is the week's only unshipped group.
 
 ---
 
