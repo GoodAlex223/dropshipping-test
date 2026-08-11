@@ -252,7 +252,7 @@ describe("POST /api/checkout/create-order", () => {
     expect(res.status).toBe(400);
   });
 
-  it("fires the confirmation email non-blocking", async () => {
+  it("sends the confirmation email with the order payload", async () => {
     mockTx();
     await POST(
       createNextRequest({ url: "/api/checkout/create-order", method: "POST", body: validBody })

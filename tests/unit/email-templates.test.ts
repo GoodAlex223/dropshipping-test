@@ -318,4 +318,21 @@ describe("email.ts subjects", () => {
       expect.objectContaining({ subject: "Підтвердіть підписку на розсилку Mirox Shop" })
     );
   });
+
+  it("bounds a stalled Resend call instead of hanging the awaited response", async () => {
+    vi.useFakeTimers();
+    try {
+      sendMock.mockImplementation(() => new Promise(() => {}));
+      process.env.RESEND_API_KEY = "test-key";
+      vi.resetModules();
+      const { sendOrderConfirmationEmail } = await import("@/lib/email");
+      const resultPromise = sendOrderConfirmationEmail({ ...baseOrder });
+      await vi.advanceTimersByTimeAsync(10_000);
+      const result = await resultPromise;
+      expect(result.success).toBe(false);
+      expect(result.error).toMatch(/timed out/);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

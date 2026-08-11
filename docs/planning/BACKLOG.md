@@ -957,6 +957,26 @@ deliberately deferred in-branch.
   union type where a small shared interface would be cleaner. Final-review + task-review minors
   on PR #33, all triaged defer. (Low value, Low effort)
 
+### [2026-08-11] From: PR #34 review
+
+**Origin**: review of the order-email await hotfix — one residual risk the bounded timeout does
+not close, plus a dormant-route parity gap surfaced while verifying the fix.
+
+- 🟤 **Checkout duplicate-order guard (idempotency)** — the awaited send sits after the
+  `$transaction` that creates the order and decrements stock; on an ambiguous failure (timeout,
+  network) the client correctly keeps the cart and re-enables submit, so a user retry creates a
+  duplicate order. The 10s send bound (PR #34) shrinks the window but only idempotency closes it:
+  client-generated idempotency key on `create-order` (or order-number-based dedupe) so a retry
+  returns the existing order. Repo-wide grep for `idempoten` is empty today. (Med value, Med
+  effort) `[relates-to: G2 hardening bundle]`
+- 🟤 **`confirm-order` hardening parity with `create-order`** — the dormant Stripe path never
+  received PR #29's fixes: no `isActive` filter on the product lookup, no `.max(100)` quantity
+  cap, and the stock-decrement loop iterates raw `data.items` instead of the validated
+  `orderItemsData` (a dropped line throws Prisma P2025 and rolls back the just-created order).
+  Also missing: an await-regression race test for its email send (PR #34 fixed the code, tested
+  only create-order). Exploitation needs a `succeeded` Stripe intent, so dormancy shields it —
+  do this before TASK-048 revives the route. (Med value, Low effort) `[relates-to: TASK-048]`
+
 ---
 
 ## Technical Debt
