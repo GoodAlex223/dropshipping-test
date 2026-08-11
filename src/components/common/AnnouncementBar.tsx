@@ -1,10 +1,17 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import Link from "next/link";
 import { X } from "lucide-react";
 import { site } from "@/content/site";
 
-const DISMISSED_KEY = "mirox:announcement-dismissed";
+// Dismissal is id-scoped (G8): a new announcement (new id) resurfaces for
+// users who dismissed a previous one. Computed per call, not module scope —
+// the content module is mocked per-test, and a module-scope key would freeze
+// the first mock's id.
+function dismissedKey(): string {
+  return `mirox:announcement-dismissed:${site.announcement?.id ?? ""}`;
+}
 
 // `dismissed` is external mutable state: it lives in localStorage, which can
 // change from the dismiss button below, from devtools, or from another tab —
@@ -34,7 +41,7 @@ function subscribeDismissed(onChange: () => void) {
   // same-tab case the browser deliberately won't. It's one listener for the
   // lifetime of the one mount, so adding it costs nothing worth skipping.
   function onStorage(event: StorageEvent) {
-    if (event.key === DISMISSED_KEY) onChange();
+    if (event.key === dismissedKey()) onChange();
   }
   window.addEventListener("storage", onStorage);
 
@@ -45,7 +52,7 @@ function subscribeDismissed(onChange: () => void) {
 }
 
 function getDismissedSnapshot(): boolean {
-  return window.localStorage.getItem(DISMISSED_KEY) === "1";
+  return window.localStorage.getItem(dismissedKey()) === "1";
 }
 
 function getDismissedServerSnapshot(): boolean {
@@ -61,7 +68,7 @@ function getDismissedServerSnapshot(): boolean {
 }
 
 function dismiss() {
-  window.localStorage.setItem(DISMISSED_KEY, "1");
+  window.localStorage.setItem(dismissedKey(), "1");
   listeners.forEach((listener) => listener());
 }
 
@@ -81,16 +88,38 @@ export function AnnouncementBar() {
     getDismissedServerSnapshot
   );
 
-  if (!site.announcement || dismissed) return null;
+  const announcement = site.announcement;
+  if (!announcement || dismissed) return null;
+
+  const inner = announcement.href ? (
+    <Link href={announcement.href} className="underline-offset-4 hover:underline">
+      {announcement.text}
+    </Link>
+  ) : (
+    announcement.text
+  );
 
   return (
     <div className="bg-background text-foreground">
-      <div className="container flex items-center justify-center gap-4 py-2">
-        <p className="text-center text-xs tracking-wide">{site.announcement}</p>
+      <div className="container flex items-center gap-4 py-2">
+        {announcement.marquee ? (
+          <div className="min-w-0 flex-1 overflow-hidden">
+            <div className="animate-marquee">
+              <span className="pr-12 text-xs tracking-wide">{inner}</span>
+              {/* Visual-only copy for the seamless loop: aria-hidden and
+                  link-free so it adds no tab stop or duplicate accname. */}
+              <span className="marquee-duplicate pr-12 text-xs tracking-wide" aria-hidden="true">
+                {announcement.text}
+              </span>
+            </div>
+          </div>
+        ) : (
+          <p className="flex-1 text-center text-xs tracking-wide">{inner}</p>
+        )}
         <button
           type="button"
           onClick={dismiss}
-          aria-label="Dismiss announcement"
+          aria-label={site.announcementDismiss}
           className="text-muted-foreground hover:text-foreground -m-2 p-2 transition-colors"
         >
           <X className="h-4 w-4" />

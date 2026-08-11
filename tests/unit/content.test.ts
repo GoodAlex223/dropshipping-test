@@ -26,6 +26,12 @@ describe("site content", () => {
     expect(site.claims.olxSales).toBe("300+");
     expect(site.claims.instagramOrders).toBe("100+");
   });
+
+  it("points the launch announcement at the feedback form as a marquee", () => {
+    expect(site.announcement?.href).toBe("/feedback");
+    expect(site.announcement?.marquee).toBe(true);
+    expect(site.announcement?.id).toBeTruthy();
+  });
 });
 
 describe("home content", () => {
