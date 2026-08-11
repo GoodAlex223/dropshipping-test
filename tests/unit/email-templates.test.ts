@@ -144,6 +144,7 @@ import {
   type OrderEmailData,
 } from "@/lib/email-templates/order-confirmation";
 import { formatPrice } from "@/lib/format";
+import { generateFeedbackEmailHtml } from "@/lib/email-templates/feedback";
 
 // ---------------------------------------------------------------------------
 // email-templates/order-confirmation.ts
@@ -334,5 +335,44 @@ describe("email.ts subjects", () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// email-templates/feedback.ts
+// ---------------------------------------------------------------------------
+
+describe("generateFeedbackEmailHtml", () => {
+  it("renders name and email rows when provided", () => {
+    const html = generateFeedbackEmailHtml({
+      name: "Олена",
+      email: "olena@example.com",
+      message: "Кнопка кошика не працює",
+    });
+    expect(html).toContain("Новий відгук із сайту");
+    expect(html).toContain("Олена");
+    expect(html).toContain("olena@example.com");
+    expect(html).toContain("Кнопка кошика не працює");
+  });
+
+  it("renders the anonymous line when no contacts were left", () => {
+    const html = generateFeedbackEmailHtml({ message: "Анонімний відгук про сайт" });
+    expect(html).toContain("Відправник не залишив контактів.");
+    expect(html).not.toContain("Ім'я:");
+  });
+
+  it("escapes user-controlled strings", () => {
+    const html = generateFeedbackEmailHtml({
+      name: '<script>alert("x")</script>',
+      message: "Текст із <b>тегами</b> всередині",
+    });
+    expect(html).not.toContain('<script>alert("x")</script>');
+    expect(html).toContain("&lt;script&gt;");
+    expect(html).toContain("&lt;b&gt;тегами&lt;/b&gt;");
+  });
+
+  it("converts message newlines to <br> after escaping", () => {
+    const html = generateFeedbackEmailHtml({ message: "перший рядок\nдругий рядок" });
+    expect(html).toContain("перший рядок<br>другий рядок");
   });
 });
