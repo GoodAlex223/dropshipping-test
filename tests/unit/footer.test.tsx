@@ -47,6 +47,10 @@ describe("Footer", () => {
       "href",
       "/products?sortBy=createdAt&sortOrder=desc"
     );
+    expect(screen.getByRole("link", { name: "Зворотний зв'язок" })).toHaveAttribute(
+      "href",
+      "/feedback"
+    );
   });
 
   it("invites visitors to follow along on social", () => {

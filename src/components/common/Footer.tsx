@@ -11,6 +11,7 @@ const shopLinks = [
   { name: "Каталог", href: "/products" },
   { name: "Категорії", href: "/categories" },
   { name: "Новинки", href: "/products?sortBy=createdAt&sortOrder=desc" },
+  { name: "Зворотний зв'язок", href: "/feedback" },
 ];
 
 export function Footer() {

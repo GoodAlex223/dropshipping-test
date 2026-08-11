@@ -6,6 +6,7 @@ import { auth } from "@/content/auth";
 import { account, ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS } from "@/content/account";
 import { newsletter } from "@/content/newsletter";
 import { system } from "@/content/system";
+import { feedback } from "@/content/feedback";
 import { OrderStatus, PaymentStatus } from "@prisma/client";
 
 describe("site content", () => {
@@ -184,5 +185,11 @@ describe("site header content", () => {
   it("wraps search queries in Ukrainian guillemets", () => {
     expect(site.header.search.viewAll("test")).toContain("«test»");
     expect(site.header.search.noResults("test")).toContain("«test»");
+  });
+});
+
+describe("feedback content", () => {
+  it("maps both feedback API outcome codes to Ukrainian", () => {
+    expect(Object.keys(feedback.byCode).sort()).toEqual(["SEND_FAILED", "VALIDATION_ERROR"]);
   });
 });
