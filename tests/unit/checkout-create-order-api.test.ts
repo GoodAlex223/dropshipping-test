@@ -252,7 +252,7 @@ describe("POST /api/checkout/create-order", () => {
     expect(res.status).toBe(400);
   });
 
-  it("fires the confirmation email non-blocking", async () => {
+  it("sends the confirmation email with the order payload", async () => {
     mockTx();
     await POST(
       createNextRequest({ url: "/api/checkout/create-order", method: "POST", body: validBody })
@@ -282,6 +282,27 @@ describe("POST /api/checkout/create-order", () => {
     expect(sendOrderConfirmationEmail).toHaveBeenCalledWith(
       expect.objectContaining({ hasAccount: true })
     );
+  });
+
+  it("awaits the confirmation email before responding (unawaited sends die at serverless freeze)", async () => {
+    mockTx();
+    let resolveSend!: (value?: unknown) => void;
+    (sendOrderConfirmationEmail as unknown as ReturnType<typeof vi.fn>).mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveSend = resolve;
+        })
+    );
+    const responsePromise = POST(
+      createNextRequest({ url: "/api/checkout/create-order", method: "POST", body: validBody })
+    );
+    const raceWinner = await Promise.race([
+      responsePromise.then(() => "responded"),
+      new Promise((resolve) => setTimeout(() => resolve("still-pending"), 100)),
+    ]);
+    expect(raceWinner).toBe("still-pending");
+    resolveSend();
+    expect((await responsePromise).status).toBe(200);
   });
 
   it("returns 500 when the transaction fails", async () => {
