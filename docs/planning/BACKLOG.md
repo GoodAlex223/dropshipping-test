@@ -444,6 +444,7 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 - 🟤 **Automate the `docs/README.md` index-freshness check — this defect class has now recurred three consecutive times** — PR #16 (`04a2593`), PR #17 (`3207425`) and PR #19 (`8a98850`) each shipped with the sole review findings being stale index rows, despite `docs/README.md` stating the indexing rule in its own body. Three manual catches in a row is the signal to automate. Shape it like `tests/unit/no-bright-colors.test.ts` (a plain unit test, no new tooling). **Critical design note — a naive implementation is worse than nothing:** a first pass during PR #19 flagged 17 rows, and 16 were false positives. The check MUST understand two shapes before it can be trusted: (1) only tables whose column header is literally `Last Updated` hold dates — the `archive/plans/` tables carry a separate **Status** column (`COMPLETE`/`ACTIVE`) that is not a date at all; (2) specs under `superpowers/specs/` carry `**Date**:`, not `**Last Updated**:`, so "no stamp found" must mean _skip_, never _fail_. Compare a row's date only against a file that actually declares `**Last Updated**:`. Retiring this class is worth more than a fourth manual catch. (Med value, Low effort) `[relates-to: docs-hygiene entries from PR #16/#17]`
   **Update (2026-08-03, PR #27 — recurrence #7, now OVERDUE):** the class recurred in PR #23, #26 and twice in #27 — where the round that fixed the BACKLOG header re-created the drift in the index row (the "fix moved the drift" failure mode a check would have caught). PR #27's final review measured the naive full audit firing on ~20 rows, all of them the known false-positive classes above — confirming the guards are the load-bearing part of the design and providing that row set as a ready-made test fixture. Promote this entry instead of making an 8th manual catch.
   **Update (2026-08-08, PR #30 — recurrences #8/#9):** the class recurred twice more in PR #30 (`docs/README.md`'s own header, and the BACKLOG header + index-row pair); both halves were caught in one review pass and fixed together in one commit (`9aae7bc`), avoiding #27's "fix moved the drift" mode. Ninth manual catch. Promote.
+  **Promoted 2026-08-11** → WEEKLY [G11](WEEKLY.md) (week of 2026-08-10), the week's single 🟤 slot — ends the manual-catch streak at 9.
 
 ### [2026-07-18] From: TASK-034 post-merge deploy verification
 
@@ -814,14 +815,18 @@ by implementers/reviewers while executing the G4 plan's 15 tasks. All 🟤 Auto-
   lines); fix the parent-category rollup in the products API (parent slug should match
   descendants' products — see the entry below); consider a desktop «Категорії» nav entry (the
   user couldn't find the entry point during the gate). User-proposed at the G4 visual gate,
-  2026-08-09; next-week WEEKLY candidate (~5 SP). (High value, Med effort)
+  2026-08-09; next-week WEEKLY candidate (~5 SP). (High value, Med effort) **Scheduled
+  2026-08-11** → WEEKLY [G12](WEEKLY.md) 🏆 stretch (week of 2026-08-10); the rollup entry below
+  rides along as its member 3.
 - 🔵 **Parent-category «Всі» shows 0 products** — `/api/products`'s
   `where.category = { slug }` (`src/app/api/products/route.ts:70-71`) matches only the exact
   category, with no child rollup, while the `/categories` cards DO roll up counts — so a
   top-level page (e.g. `/categories/odyah`, `/categories/aksesuary`) claims N товарів on its
   own card but lists zero products when visited. Launch-visible.
   `[possible-dup-of: the categories→catalog redesign entry above — its rollup fix resolves this]`;
-  ship as a standalone fix if the redesign slips. (Med value, Low effort)
+  ship as a standalone fix if the redesign slips. (Med value, Low effort) **Scheduled
+  2026-08-11** into WEEKLY [G12](WEEKLY.md) as member 3 (🏆 stretch); the standalone escape hatch
+  stands if the stretch slips.
 
 ### [2026-08-09] From: G4 final review
 

@@ -19,7 +19,7 @@ _TASK-037 (Product page redesign) completed 2026-08-03 — PR [#27](https://gith
 #### [TASK-039] i18n foundation
 
 **Priority**: 🟠 High
-**Status**: 📋 Planned
+**Status**: 📅 Scheduled — WEEKLY [G9](WEEKLY.md), week of 2026-08-10
 **Effort**: L
 **Dependencies**: [TASK-033]
 
@@ -52,12 +52,12 @@ _TASK-037 (Product page redesign) completed 2026-08-03 — PR [#27](https://gith
 
 ## 🟠 Medium Priority
 
-_Unscheduled items carrying no TASK-NNN id — an id is assigned when one is promoted into a WEEKLY
-group. Added 2026-08-11 from manual testing._
+_Items added 2026-08-11 from manual testing; both promoted the same day into WEEKLY [G8](WEEKLY.md)
+(week of 2026-08-10) and assigned TASK ids per the promotion rule._
 
-- [ ] 🟠 **Build a site-wide feedback form** — A feedback form open to any visitor, guests included; needs a recipient/contact email address for submissions (фидбек форма для любого пользователя. Необходима почта для отправки/связи); affected: no route exists yet — natural host is the `/contact` page TASK-055 builds, plus a new `src/app/api/feedback/route.ts`, [src/lib/email.ts](../../src/lib/email.ts), and a new copy module under [src/content/](../../src/content/) [possible-dup-of: TASK-055 Content & legal pages — owns the `/contact` route this would live on]
+- [ ] 🟠 **[TASK-058] Build a site-wide feedback form** (📅 scheduled: WEEKLY G8, 2026-08-11) — A feedback form open to any visitor, guests included; needs a recipient/contact email address for submissions (фидбек форма для любого пользователя. Необходима почта для отправки/связи); affected: no route exists yet — natural host is the `/contact` page TASK-055 builds, plus a new `src/app/api/feedback/route.ts`, [src/lib/email.ts](../../src/lib/email.ts), and a new copy module under [src/content/](../../src/content/) [possible-dup-of: TASK-055 Content & legal pages — owns the `/contact` route this would live on]
   - **Not blocked by the deferred client round-trip.** The recipient can be an interim address of yours until TASK-056's "Contact details" AC supplies the real one. Worth knowing: outbound feedback mail **works today** despite the interim `EMAIL_FROM=onboarding@resend.dev`, because Resend's test sender delivers to the Resend account owner's own inbox — and for this form the owner **is** the recipient. That is the opposite of the order-confirmation case, where the customer is the recipient and receives nothing.
-- [ ] 🟠 **Add a launch-announcement marquee on the homepage linking to the feedback form** — A scrolling "running line" on the homepage announcing the new site's opening and asking visitors to report problems through the feedback form (бегущая строка на главной странице о открытии нового сайта и просьба сообщать о проблемах через фидбек форму); affected: [src/components/common/AnnouncementBar.tsx:~84](../../src/components/common/AnnouncementBar.tsx#L84), [src/content/site.ts:72](../../src/content/site.ts#L72) [possible-dup-of: "Top announcement banner (free shipping / promos)" — BACKLOG [2026-07-15] Client Improvement List #2] [possible-dup-of: TASK-056 AC "Announcement banner copy, once a real promotion exists"]
+- [ ] 🟠 **[TASK-059] Add a launch-announcement marquee on the homepage linking to the feedback form** (📅 scheduled: WEEKLY G8, 2026-08-11) — A scrolling "running line" on the homepage announcing the new site's opening and asking visitors to report problems through the feedback form (бегущая строка на главной странице о открытии нового сайта и просьба сообщать о проблемах через фидбек форму); affected: [src/components/common/AnnouncementBar.tsx:~84](../../src/components/common/AnnouncementBar.tsx#L84), [src/content/site.ts:72](../../src/content/site.ts#L72) [possible-dup-of: "Top announcement banner (free shipping / promos)" — BACKLOG [2026-07-15] Client Improvement List #2] [possible-dup-of: TASK-056 AC "Announcement banner copy, once a real promotion exists"]
   - **The bar already exists and renders** (built in TASK-035); it is gated off only because `site.announcement` is `null`. New work is therefore the scrolling animation, the link target, and the copy — not the component. Depends on the feedback-form item above (the marquee points at it). Two design constraints: the marquee needs a `prefers-reduced-motion` guard that rejoins the repo's reduced-motion reset, and `site.announcement` is typed `string | null`, so a linked/animated variant needs a richer shape than a bare string.
 
 ---

@@ -1,150 +1,113 @@
 # Weekly Plan
 
-**Week**: Monday August 3 – Friday August 7, 2026
-**Created**: 2026-08-04
-**Sources**: [MILESTONES.md](MILESTONES.md) · [ROADMAP.md](ROADMAP.md) · [GOALS.md](GOALS.md) · [BACKLOG.md](BACKLOG.md) · [TODO.md](TODO.md) · prior WEEKLY (2026-07-27 week, archived below) · [REVIEW-QUEUE.md](REVIEW-QUEUE.md) (created 2026-08-10 by G6's first run)
-**Cleanup Week?**: No — due by cadence (3 feature weeks since resumption, 🟤 pool ≫ 20 SP pending), but deferred by explicit user steer: this week finishes the rebrand and **next week (Aug 10–14) continues the visuals/translation launch push** (user, 2026-08-04 — "launch and show to users as fast as possible"). The OVERDUE docs-freshness linter competes for next week's single 🟤 slot; a full Cleanup Week is re-evaluated after the launch push.
-**Context**: Mirox program v1.3. User-directed theme (2026-08-04 brainstorm): **finish the redesign + Ukrainian translation of the storefront** — cart, checkout, auth, account, newsletter and error surfaces still carry pre-rebrand design and English copy (transactional emails as the stretch 🏆); the data side rides along as a user-gated prod re-seed plus the USD shipping constants decision inside the checkout group.
+**Week**: Monday August 10 – Friday August 14, 2026
+**Created**: 2026-08-11
+**Sources**: [MILESTONES.md](MILESTONES.md) · [ROADMAP.md](ROADMAP.md) · [GOALS.md](GOALS.md) · [BACKLOG.md](BACKLOG.md) · [TODO.md](TODO.md) · prior WEEKLY (2026-08-03 week, archived below) · [REVIEW-QUEUE.md](REVIEW-QUEUE.md) · git log (2 weeks)
+**Cleanup Week?**: No — **overdue by cadence** (4 feature weeks since resumption, 🟤 pool ≫ 20 SP pending) under a standing user deferral (2026-08-04, recorded twice: launch push takes precedence). Not silently skipped: the OVERDUE docs-freshness linter takes this week's single 🟤 slot (G11), and the post-launch-push week is proposed as the Cleanup Week — open question 1 in Notes.
+**Context**: Mirox program v1.3, launch-push continuation per the standing user steer (2026-08-04) and the close-out seed list (2026-08-11): **the TASK-039 i18n spine plus the user's launch feedback loop** (feedback form + homepage announcement marquee, manual-testing intake 2026-08-11), with the categories→catalog redesign as the 🏆 stretch. Planned Tuesday — Monday and Tuesday morning went to the previous week's spillover close-out (PRs #32/#33/#34).
 
 ---
 
 ## Parallel Work
 
-- 🟡 **P1 — Prod data re-seed (1 SP)**: ✅ **ran 2026-08-04, user-approved** — guarded `SEED_ALLOW_REMOTE=1` against the Neon direct endpoint, read-only preflight first. Verified in DB (both hoodies share `styleGroup: "hudi-mirox"`; kepka «Один розмір»; futbolka «Білий») and live (hudi PDP renders the white-sibling colorway link, kepka PDP shows «Один розмір», homepage 200). Prod PDPs now render the full swatch UI; the legacy fallback path is retired from prod.
-- **Client chases (zero-code, carry-forward)**: 9-item payments prerequisites checklist ([decision doc §5.3](../superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md)); `developers.novaposhta.ua` webhook question from an unblocked network (gates TASK-049); TASK-056 content asks (photography, logo vector, socials/claims, size charts, legal copy) — G1's audit sharpens this list; formal TASK-056 checklist assembly **was** scheduled Friday as G7 and is **deferred to the pre-launch week** (user, 2026-08-11 — see G7's deferral note), so this chase is paused, not merely unstarted.
+- **Client chases: ⏸️ paused by the G7/TASK-056 deferral (user, 2026-08-11)** — the whole client round-trip (photography, logo vector, socials/claims, size charts, legal copy, domain purchase, WhatsApp/bank details, NP API key) holds until the pre-launch week. The live consequence stands: prod `EMAIL_FROM=onboarding@resend.dev` delivers order emails only to the Resend owner's inbox, so real customers get no order email until the domain items close. Nothing is chased this week; the paused checklist lives in [TODO.md](TODO.md) TASK-056 + decision doc §5.3.
 
 ---
 
 ## Task Groups
 
-### G1. Cart and Drawer Restyle [batch]
+_Group IDs continue from last week (G1–G7 are permanently taken by DONE.md and memory references); this week is G8–G12._
 
-🔵 User · storefront/cart · **5 SP** · Tue
+### G8. Launch Feedback Loop [batch]
 
-> Opens with the definitive staleness audit, then converts the cart surfaces — design handoff exists (`Mirox Cart.dc.html`). Visual/copy only: one-click buy, upsell modal and the promo-code field stay in TASK-043 (v1.4).
+🔵 User · storefront/comms · **5 SP** · Tue–Wed
 
-- [x] Route-by-route staleness audit — screenshot + EN-string sweep of every customer route; produces the definitive scope list for G2/G4 and feeds content gaps to TASK-056 (1) — BACKLOG [2026-08-04] weekly-planning steer → [audit doc](audits/2026-08-04-storefront-staleness-audit.md)
-- [x] Cart page → `Mirox Cart.dc.html`: quantity steppers, sticky order summary, dashed-border empty state; Ukrainian copy via the content-config layer — [src/app/(shop)/cart/page.tsx](<../../src/app/(shop)/cart/page.tsx>) ("Shopping Cart" / "Continue Shopping" / "Proceed to Checkout" today) (3) — BACKLOG [2026-08-04] weekly-planning steer [HIGH]
-- [x] CartDrawer restyle + Ukrainian strings; update E2E cart specs — [src/components/shop/CartDrawer.tsx](../../src/components/shop/CartDrawer.tsx) (1) — BACKLOG [2026-08-04] weekly-planning steer
+> Both halves of the user's 2026-08-11 manual-testing ask, coupled by design (the marquee links to the form). Unblocked despite the TASK-056 deferral: the interim `onboarding@resend.dev` sender delivers to the Resend account owner's inbox, and for this form the owner **is** the recipient (the opposite of the order-email case). Ships through the extraction-ready `src/content/` layer; G9 externalizes it along with everything else (the designed trade, not drift).
 
-> ✅ Shipped 2026-08-04 — PR [#28](https://github.com/GoodAlex223/dropshipping-test/pull/28) merged `0eccaf7`; prod verified. G2 inherits two audit catches: checkout Order-Summary variant line (audit doc §G2 item 4) and the missing Ukraine country option.
+- [ ] **[TASK-058]** Site-wide feedback form — page/host decision in-plan (own `/feedback` route vs dialog; `/contact` belongs to TASK-055 and stays client-blocked) + new `src/app/api/feedback/route.ts` + Resend send via [src/lib/email.ts](../../src/lib/email.ts) + Zod schema + `src/content/` module + unit tests; interim recipient = owner address until TASK-056 supplies the real one (3) — TODO.md § Medium Priority [2026-08-11] manual testing [HIGH]
+- [ ] **[TASK-059]** Homepage launch-announcement marquee linking to the form — scrolling variant of the existing [AnnouncementBar](../../src/components/common/AnnouncementBar.tsx) (component renders today, gated off by `site.announcement = null`); needs a richer `site.announcement` shape than `string | null`, a `prefers-reduced-motion` guard that rejoins the repo's reduced-motion reset, and launch copy (2) — TODO.md § Medium Priority [2026-08-11] manual testing
 
-### G2. Checkout Restyle [batch]
+### G9. TASK-039 i18n Foundation [solo]
 
-🔵 User · storefront/checkout · **5 SP** · Wed
+🔵 User · i18n/content · **8 SP** · Wed–Thu (contiguous)
 
-> Visual + language only per `Mirox Checkout.dc.html`'s shell — the Stripe rails, step logic and order creation stay untouched (payment/delivery integration is TASK-048/049). Risk: Stripe Elements' dark theme is unverifiable locally (no keys — known BACKLOG note); the visual gate covers the rest.
-> **Scope change (client steer, 2026-08-06, ruled in-task)**: launch WITHOUT payment processing — checkout is now a guest-capable no-prepayment COD flow (new `create-order` API, NP methods, content-gated prepay block); Stripe path dormant. 5 SP → ~8 SP. Spec: [2026-08-06-g2-checkout-restyle-cod-design.md](../superpowers/specs/2026-08-06-g2-checkout-restyle-cod-design.md).
+> The launch-push spine named in the standing steer — the last big v1.3 engineering item. Library choice decided in-plan: next-intl is the default candidate, weighing its `useExtracted` agent workflow against the repo's deliberately extraction-ready `src/content/*.ts` layer (G6-surfaced design input, BACKLOG [2026-08-10]; same source advises against agent-translated catalogs). Urgency note: the monobank UA-site prerequisite still holds, but TASK-048 payments is client-gated and deferred — this is spine-by-steer, not payments-blocked.
 
-- [x] 3-step checkout restyle + Ukrainian copy (information/shipping/payment steps, PaymentForm labels) — [src/app/(shop)/checkout/page.tsx](<../../src/app/(shop)/checkout/page.tsx>) (3) — BACKLOG [2026-08-04] weekly-planning steer [HIGH]
-- [x] Shipping methods: replace English "Standard/Express/Overnight" (5.99/12.99/24.99 USD) with Nova-Poshta-style Ukrainian labels; in-task decision on interim numeric amounts (NP published rates 80/120/70 as numerics under the documented Stripe-USD-mismatch convention) — checkout page local list + `SHIPPING_METHODS` in [src/lib/stripe.ts](../../src/lib/stripe.ts) (1) — BACKLOG [2026-07-29] TASK-057 group (checkout pointer)
-- [x] Order confirmation page Ukrainian + Mirox alignment — `src/app/(shop)/checkout/confirmation/` (1) — BACKLOG [2026-08-04] weekly-planning steer
+- [ ] Locale infrastructure: UA default + RU toggle, library decision + wiring (3) — TODO.md TASK-039 [HIGH]
+- [ ] Externalize the hardcoded-Ukrainian customer strings — `src/content/*.ts` config layer + inline homepage/header/footer strings — into locale files (4) — TODO.md TASK-039 [HIGH]
+- [ ] Verify `formatPrice()` §7.4 compliance (decision-doc AC); rule in-plan whether the EN SEO/metadata layer (BACKLOG [2026-08-09] G4 final review) joins this scope or stays parked (1) — TODO.md TASK-039
 
-> ✅ Shipped 2026-08-07 (Thu, +1 day) — PR [#29](https://github.com/GoodAlex223/dropshipping-test/pull/29) merged `cf308f9`. Delivered the scope-change form: guest COD checkout (no payment processing), NP methods 80/120/70 грн, `create-order` API, UA confirmation page + cart-crumb stepper. Six user-posted review rounds (13 findings fixed incl. isActive gate, phantom decrement, foreign-variantId reject, coded UA errors, cart unavailable-status, quantity cap). Stripe path dormant, zero diff.
-
-### G3. Params Fix [solo]
-
-🟤 Auto · Next.js routing · **2 SP** · Wed
-
-> The only 🟤 group this week (≤1-group cap). Solo-2-SP exception: kept separate from G4 so every group stays single-source; it is one mechanical pattern across 4 files. `/account/orders/[id]` is also squarely inside this week's theme — a 500 page is the ultimate stale surface.
-
-- [x] Fix `use(params)` on Next 14.2.35 (plain object, not a Promise) in all 4 broken client routes — `/admin/orders/[id]`, `/admin/products/[id]`, `/admin/suppliers/[id]`, `/account/orders/[id]` — each currently 500s; add a regression check (2) — BACKLOG [2026-07-18] TASK-034 Task 12 [HIGH]
-
-> ✅ Shipped 2026-08-08 (Fri, +2 days — G2 spillover) — PR [#30](https://github.com/GoodAlex223/dropshipping-test/pull/30) merged `6f81f95`. All four routes now `useParams<{ id: string }>()!` and prop-less; the `!` is forced by the pages-compat types `next-env.d.ts` pulls in (adjudicated mid-task, reviewer finding overruled on reproduced tsc evidence). RTL regression file `dynamic-route-params.test.tsx` (red→green); browser-verified 200s under admin + customer logins. Unit 632 → **636**. Two review rounds: r1 docs-freshness recurrences #8/#9 + chat near-misses fixed; r2 clean on code, 2 BACKLOG-wording refinements.
-
-### G4. Peripheral Surfaces Sweep [batch]
-
-🔵 User · storefront/auth+account+system pages · **5 SP** · Thu
-
-> Tokens are already global, so this is mostly copy conversion + component alignment to the Mirox look; G1's audit fixes the exact file list.
-
-- [x] Auth: login/register forms → Ukrainian + Mirox alignment — `src/app/(auth)/login/`, `src/app/(auth)/register/` (2) — BACKLOG [2026-08-04] weekly-planning steer
-- [x] Account: layout ("My Account"), overview, orders list/detail ("Order History") → Ukrainian + restyle — `src/app/(shop)/account/**` (2) — BACKLOG [2026-08-04] weekly-planning steer
-- [x] Newsletter confirm/unsubscribe pages + root error/404 pages → Ukrainian — `src/app/newsletter/**`, [src/app/error.tsx](../../src/app/error.tsx) ("Something went wrong"), [src/app/not-found.tsx](../../src/app/not-found.tsx) ("Page not found") (1) — BACKLOG [2026-08-04] weekly-planning steer
-
-> ✅ Shipped 2026-08-09 (Sat, +2 days — queue spillover behind G2/G3) — PR [#31](https://github.com/GoodAlex223/dropshipping-test/pull/31) merged `eb630f4`; prod verified live (Vercel Git integration deploy, `/login` serving «Вхід»). Scope grew 5 → ~9 SP to the audit-definitive boundary (categories chrome, CookieConsent, Header residuals, the G3-unblocked `orders/[id]`, coded newsletter API) — the same in-task-growth pattern as G2. Visual gate signed off with one user revision (auto-fill account grid); gate review spawned the 🔵 categories→catalog redesign (next week's candidate) + the parent-category rollup bug. 636 → 672 unit tests.
-
-### G5. Transactional Emails [solo] 🏆
-
-🔵 User · email templates · **3 SP** · Fri (stretch)
-
-> The Weekly Challenge — see the 🏆 section below.
-
-- [x] Order-confirmation + newsletter-confirmation emails → Ukrainian, Mirox-consistent styling — [src/lib/email.ts](../../src/lib/email.ts) ("Order Confirmation" / "Thank you for your order" today), `src/lib/email-templates/` (2) — BACKLOG [2026-08-04] weekly-planning steer
-- [x] Route the brand through `BRAND_NAME` instead of `|| "Store"` fallbacks (email.ts, newsletter template, admin settings label) — closes the code side of the `NEXT_PUBLIC_STORE_NAME` entry (1) — BACKLOG [2026-07-18] post-merge deploy verification
-
-> ✅ Shipped 2026-08-10 (Sun — the stretch delivered despite the week's queue spillover) — PR [#33](https://github.com/GoodAlex223/dropshipping-test/pull/33) merged `1a4f030`. Both emails now Ukrainian dark-Mirox on a shared table-based shell (`content/emails.ts` + `email-templates/layout.ts`); `BRAND_NAME` routed at all three `|| "Store"` sites; escaping + guest-aware-CTA hardening; `WHATSAPP_HREF` null-gate (checkout + emails together). 672 → 699 unit tests. Visual gate signed off after 2 revision rounds (country line dropped, WhatsApp wired). Prod email config resolved with the user: both vars were ABSENT — key set, interim `onboarding@resend.dev` sender; real delivery chains behind the domain purchase (TASK-056). Spec: [2026-08-10-g5-transactional-emails-design.md](../superpowers/specs/2026-08-10-g5-transactional-emails-design.md).
-
-### G6. Weekly Reviews [batch]
+### G10. Weekly Reviews [batch]
 
 ⚪ Overhead · recurring reviews · **5 SP** · Thu–Fri
 
-> First-ever run of the standing batch — creates `REVIEW-QUEUE.md` (per-category Reviewed log + Next-up + Conventions). Exempt from the quota denominator; scheduled late-week per rule.
+> Run 2. Read [REVIEW-QUEUE.md](REVIEW-QUEUE.md) first — the run recipe (incl. the step-5 re-check pass), the standing launch-push lens (high adopt bar), Convention-4 cheap re-trigger checks on the six parks, and Convention 7's deferral of the three-scope lens here (re-trigger check only). Sequential in-session per Convention 8.
 
-- [x] Create REVIEW-QUEUE.md; Plugins: review two independent tops — best not-yet-reviewed from the official Claude plugin store AND best from the wider internet, each logged with `source:` (2) — `resend` → defer · `nextjs-marketplace` → pass
-- [x] Claude best-practices: top not-yet-reviewed candidate via web search (1) — CLAUDE.md trim + path-scoped `.claude/rules/` → **adopt** (the run's one)
-- [x] Non-Claude AI best-practices: same, for non-Claude models/tools (1) — pass (single-tool structural bias; bias-watch counter parked)
-- [x] Cross-project propagation (outbound): scan this week's DONE entries, merged PRs **#28–#31** plus Monday's #27 close-out, new memory files, config diffs → `propagate | pass | defer` rows; high bar, `propagate` files a TODO § 🔀 Spawned row (1) — 3 propagate / 1 defer / 1 pass (one `pass` corrected to `propagate` on the PR #32 review)
-      <!-- PR range corrected 2026-08-10: this line was written Tue Aug 4 (plan commit a4dab21, 02:16), when the week's only merge so far was Monday's PR #27 (cec8408, Aug 3 15:28 — TASK-037's spillover close-out). It therefore named the four then-most-recent PRs, #24–#27, of which only #27 belongs to this week. -->
+- [ ] Plugins: two independent tops — best not-yet-reviewed from the official Claude plugin store AND best from the wider internet, each row tagged `source:` (2)
+- [ ] Claude best-practices: top not-yet-reviewed candidate via date-aware web search (1)
+- [ ] Non-Claude AI best-practices: same, for non-Claude tools — carries the bias-watch counter (run 2 of the 2-more-runs condition) (1)
+- [ ] Cross-project propagation (outbound): scan window = shipped since run 1 — PR #33 close-out, the PR #34 hotfix arc, the G7 deferral, new memory files — `propagate | pass | defer` rows; a `propagate` files a TODO § 🔀 Spawned row (1)
 
-> ✅ Ran Mon 2026-08-10 (+3 days — queue spillover behind G2/G3/G4; displaced nothing, G6 is quota-exempt overhead and G5/G7 remain open) — PR [#32](https://github.com/GoodAlex223/dropshipping-test/pull/32) merged `8298dab`. First-ever run in this repo: created [REVIEW-QUEUE.md](REVIEW-QUEUE.md) as the durable cross-week state **and** the batch's methodology of record (no `docs/prompts/` here), with 10 seeded conventions (9 at run time, +1 from the PR #32 review). Verdicts **1 adopt / 1 defer / 2 pass** inbound, **3 propagate / 1 defer / 1 pass** outbound. Design: [2026-08-10-g6-weekly-reviews-design.md](../superpowers/specs/2026-08-10-g6-weekly-reviews-design.md).
+### G11. Docs-Freshness Linter [solo]
 
-### G7. Client Content Ask (TASK-056) [solo]
+🟤 Auto · docs tooling · **3 SP** · Fri
 
-🔵 User · client content round-trip · **2 SP** · Fri
+> The week's single 🟤 group — OVERDUE at 9 manual catches across PRs #16→#33. The design is pre-specified by the entry's own updates: the false-positive guards ARE the load-bearing part, and PR #27's ~20-row naive-audit set is the ready-made test fixture. Shape: a plain unit test à la `no-bright-colors.test.ts`, no new tooling.
 
-> Folded in at user request (2026-08-04, launch push): assemble and send the consolidated client ask now so the round-trip runs while engineering continues. Solo-2-SP exception: no domain-mate among this week's code groups (doc + client-communication task).
+- [ ] Build the doc-header ↔ `docs/README.md` index-row consistency check, bidirectional + README's own header: guards for spec files' `**Date**:` (no stamp = skip, never fail) and archive tables' Status column (parse by header name); scoping decision (a) specs get their own `Last Updated` line vs (b) exempt `superpowers/specs/**` resolved in-plan; optional adds if cheap — prettier fixed-point assertion, the [2026-02-10] git-timestamp staleness variant (3) — BACKLOG [2026-07-18] TASK-034 PR #19 reviews + [2026-08-01] PR #26 update [HIGH]
 
-- [ ] Assemble the consolidated TASK-056 ask from TODO's checklist + G1-audit findings (real photography incl. the 7 missing back-view shots, logo vector, real socials/claims, size charts + measurement photos, contact details, legal copy, free-shipping threshold, announcement copy) and hand it to the user for forwarding to the client (2) — TODO.md TASK-056 [HIGH]
+### G12. Categories-to-Catalog Redesign [batch] 🏆
 
-> ⏸️ **Deferred 2026-08-11 by user decision** — not dropped, not partially sent. Rationale (user): hold the client round-trip until the site is genuinely ready to operate in production with real data and real customers, rather than asking for assets against surfaces that don't exist yet. TASK-056 carries forward to the pre-launch week; it stays 🟠 High in [TODO.md](TODO.md).
->
-> **Recorded counter-consideration (Claude, 2026-08-11 — the decision stands, this is the cost being accepted):** three TASK-056 items have client-side lead times measured in weeks and gate readiness itself, so deferring the ask defers launch by roughly the same amount rather than resequencing it. (1) **The production domain** gates Resend DNS verification → order emails; the interim `EMAIL_FROM=onboarding@resend.dev` delivers **only to the Resend account owner's inbox**, so a real customer ordering today receives nothing (see the TODO.md TASK-056 warning). It also gates the real-domain deploy where the placeholder catalog is replaced, and all SEO. (2) **Legal copy / lawyer engagement** gates [TASK-055], whose public-offer / privacy / return pages are payment-gateway onboarding prerequisites ([decision doc §5.3](../superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md)). (3) **Product photography** — a shoot plus retouching; 7 of 8 SKUs still lack a second image. Engineering can proceed on every Tier-1/Tier-2 item without these, but cannot substitute for them.
+🔵 User · storefront/catalog · **5 SP** · Fri (stretch)
+
+> The Weekly Challenge — see the 🏆 section below. User-proposed at the G4 visual gate (2026-08-09). Subsumes the launch-visible parent-category «Всі»=0 rollup bug; if the stretch doesn't run, the rollup member's standalone-fix escape hatch moves to next week.
+
+- [ ] `/categories/[slug]` → thin 307 redirect to `/products?category=<slug>`; retire `category-client.tsx` (~436 lines); `/categories` index page keeps working (2) — BACKLOG [2026-08-09] G4 visual gate [HIGH]
+- [ ] DB-driven category facet in the catalog `FilterBar` (parent groups with children, auto-grows with new categories) + desktop «Категорії» nav entry decision (the gate found no entry point) (2) — BACKLOG [2026-08-09] G4 visual gate
+- [ ] Parent-category rollup fix in `/api/products` (parent slug matches descendants' products — closes «Всі» shows 0) (1) — BACKLOG [2026-08-09] G4 visual gate [HIGH]
 
 ---
 
 ## Daily Schedule
 
-### Monday — Spillover close-out (pre-plan, recorded)
+### Monday — Previous week's spillover (pre-plan, recorded)
 
-- **TASK-037 completion** — PR #27 merged `cec8408` + full completion workflow (DONE/TODO/WEEKLY/BACKLOG/docs-README sync, plan archived, CLAUDE.md propagation). No groups were scheduled; this week's plan was written Tuesday.
+- Previous week's G6 (Weekly Reviews run 1, PR #32) and G5 🏆 (transactional emails, PR #33) shipped — see the archive below. No groups were scheduled; this plan was written Tuesday.
 
-### Tuesday — Cart surfaces + this plan
+### Tuesday — Close-outs + this plan + feedback form
 
-- ✅ **[G1](#g1-cart-and-drawer-restyle-batch)** 🔵 — staleness audit first, then cart page + drawer. Shipped same day, PR [#28](https://github.com/GoodAlex223/dropshipping-test/pull/28).
+- Morning (recorded): PR #34 order-email-await hotfix merged `c137eb9` + G5 arc close-out `da03abc`; G7/TASK-056 deferral ruled and recorded `e11a7de`; manual-testing intake filed `508b2de`; this plan.
+- **[G8](#g8-launch-feedback-loop-batch)** 🔵 — part 1: TASK-058 feedback form.
 
-### Wednesday — Checkout + broken routes
+### Wednesday — Feedback loop lands + i18n opens
 
-- ✅ **[G2](#g2-checkout-restyle-batch)** 🔵 — the riskiest restyle, front-loaded. Shipped Thu 2026-08-07 (+1 day: client COD scope-change absorbed in-task), PR [#29](https://github.com/GoodAlex223/dropshipping-test/pull/29).
-- ✅ **[G3](#g3-params-fix-solo)** 🟤 — 4-route `use(params)` fix. Shipped Fri 2026-08-08 (+2 days: G2's COD scope-change spillover pushed the queue), PR [#30](https://github.com/GoodAlex223/dropshipping-test/pull/30).
+- **[G8](#g8-launch-feedback-loop-batch)** 🔵 — part 2: TASK-059 marquee, visual gate, PR.
+- **[G9](#g9-task-039-i18n-foundation-solo)** 🔵 — part 1: library decision + locale infra (the week's riskiest design call, front-loaded to the first full day).
 
-### Thursday — Peripheral sweep + reviews start
+### Thursday — i18n externalization + reviews start
 
-- ✅ **[G4](#g4-peripheral-surfaces-sweep-batch)** 🔵 — auth/account/newsletter/error pages. Shipped Sat 2026-08-09 (+2 days: G2/G3 queue spillover), PR [#31](https://github.com/GoodAlex223/dropshipping-test/pull/31).
-- ✅ **[G6](#g6-weekly-reviews-batch)** ⚪ — part 1 (queue creation + plugins slot). Ran Mon 2026-08-10 (+3 days, queue spillover) as a single session covering both parts.
+- **[G9](#g9-task-039-i18n-foundation-solo)** 🔵 — part 2: content-layer externalization + §7.4 verification.
+- **[G10](#g10-weekly-reviews-batch)** ⚪ — part 1: plugins + Claude best-practices slots.
 
-### Friday — Reviews close + stretch
+### Friday — Linter + reviews close + stretch
 
-- ✅ **[G6](#g6-weekly-reviews-batch)** ⚪ — part 2 (best-practices slots + propagation scan). Ran Mon 2026-08-10 alongside part 1.
-- ⏸️ **[G7](#g7-client-content-ask-task-056-solo)** 🔵 — consolidated client ask assembled + handed off. **Deferred 2026-08-11 by user decision** to the pre-launch week; see the group's deferral note.
-- ✅ **[G5](#g5-transactional-emails-solo-)** 🔵 🏆 — stretch: emails, if the core groups are green. Shipped Sun 2026-08-10 (+2 days — queue spillover), PR [#33](https://github.com/GoodAlex223/dropshipping-test/pull/33).
-- Week close-out: statuses → `✅ PR #N`, spillover check, next-week (launch-push continuation) seed list.
+- **[G11](#g11-docs-freshness-linter-solo)** 🟤 — the OVERDUE linter.
+- **[G10](#g10-weekly-reviews-batch)** ⚪ — part 2: non-Claude slot + propagation scan.
+- 🏆 **[G12](#g12-categories-to-catalog-redesign-batch-)** 🔵 — stretch, only if G8/G9 are green.
+- Week close-out: statuses → `✅ PR #N`, spillover check, next-week seed list (pre-launch-week candidates).
 
 ---
 
 ## Summary Table
 
-| ID  | Group                                  | Domain              | Source      | Tasks  | Total SP | Day     | Status        |
-| --- | -------------------------------------- | ------------------- | ----------- | ------ | -------- | ------- | ------------- |
-| G1  | Cart and Drawer Restyle `[batch]`      | storefront/cart     | 🔵 User     | 3      | 5        | Tue     | ✅ PR #28     |
-| G2  | Checkout Restyle `[batch]`             | storefront/checkout | 🔵 User     | 3      | 5        | Wed     | ✅ PR #29     |
-| G3  | Params Fix `[solo]`                    | Next.js routing     | 🟤 Auto     | 1      | 2        | Wed     | ✅ PR #30     |
-| G4  | Peripheral Surfaces Sweep `[batch]`    | auth/account/system | 🔵 User     | 3      | 5        | Thu     | ✅ PR #31     |
-| G5  | Transactional Emails `[solo]` 🏆       | email templates     | 🔵 User     | 2      | 3        | Fri     | ✅ PR #33     |
-| G6  | Weekly Reviews `[batch]`               | recurring reviews   | ⚪ Overhead | 4      | 5        | Thu–Fri | ✅ PR #32     |
-| G7  | Client Content Ask (TASK-056) `[solo]` | client content      | 🔵 User     | 1      | 2        | Fri     | ⏸️ Deferred   |
-| P1  | Prod data re-seed                      | ops/data            | 🟡 Ops      | 1      | 1        | Tue     | ✅ 2026-08-04 |
-|     | **Total**                              |                     |             | **18** | **28**   |         |               |
+| ID  | Group                                       | Domain             | Source      | Tasks  | Total SP | Day           | Status    |
+| --- | ------------------------------------------- | ------------------ | ----------- | ------ | -------- | ------------- | --------- |
+| G8  | Launch Feedback Loop `[batch]`              | storefront/comms   | 🔵 User     | 2      | 5        | Tue–Wed       | ☐ Planned |
+| G9  | TASK-039 i18n Foundation `[solo]`           | i18n/content       | 🔵 User     | 3      | 8        | Wed–Thu       | ☐ Planned |
+| G10 | Weekly Reviews `[batch]`                    | recurring reviews  | ⚪ Overhead | 4      | 5        | Thu–Fri       | ☐ Planned |
+| G11 | Docs-Freshness Linter `[solo]`              | docs tooling       | 🟤 Auto     | 1      | 3        | Fri           | ☐ Planned |
+| G12 | Categories-to-Catalog Redesign `[batch]` 🏆 | storefront/catalog | 🔵 User     | 3      | 5        | Fri (stretch) | ☐ Planned |
+|     | **Total**                                   |                    |             | **13** | **26**   |               |           |
 
 _Source legend: 🔵 User · 🟡 Ops · 🟤 Auto · ⚪ Overhead (exempt from the quota denominator). Status on completion: `✅ PR #N` (the number, never a bare ✅)._
 
@@ -152,42 +115,51 @@ _Source legend: 🔵 User · 🟡 Ops · 🟤 Auto · ⚪ Overhead (exempt from 
 
 ## Notes
 
-- _Brainstorm sanity-checks: week dates confirmed vs git/DONE (today Tue 2026-08-04; Mon Aug 3 was consumed by TASK-037's spillover close-out — `cec8408`, `3b208f9`); previous week's delivery ran through Mon 2026-08-03, **3 days past its Friday (Jul 31)** → archived below under its TRUE header with a spillover note, not re-dated; velocity ≈ 2–3 large (8-SP-class) tasks/week but with recurring weekend spillovers → this 4-effective-day week planned at 26 SP incl. 5 ⚪ overhead; Cleanup Week due by cadence but **deferred by user decision**, not skipped — and further deferred same day by the launch-push steer (see the Launch-push note below); source quotas satisfiable and met (below)._
-- **Discussion-phase decisions (2026-08-04, ruled same day)**: user chose the rebrand-completion theme over the recommended Cleanup Week. **Ruled + executed**: all 7 BACKLOG **reaps** approved and executed (tombstone rows in Rejected Ideas; user note recorded there — the DB catalog is deliberately placeholder data, built for visual integrity and tests, and will be replaced with real products when the site deploys to its real server/domain); **P1 prod re-seed** approved, ran and verified (see Parallel Work); **TASK-056** folded in as G7 (Fri). Still parked: **MILESTONES/GOALS refresh** and **📌 Process Rules section for BACKLOG.md** (cleanup work, post-launch-push); **hydration console errors** investigation (held).
-- **OVERDUE item not schedulable this week**: the docs-freshness linter (🟤, recurrence #7) loses the week's single 🟤 slot to G3 under the ≤1-group hard rule. Mitigation until it lands: every PR this week manually verifies `docs/README.md` index rows ↔ doc headers **in both directions plus neighbouring rows** at completion. With next week now also a launch-push week, its realistic home is next week's single 🟤 slot; the manual check stands until it lands.
-- **Launch push (user steer, 2026-08-04)**: the goal is to launch and show the site to users as fast as possible — next week continues visuals/language. Likely spine: **TASK-039 i18n** (it _is_ the remaining language work and the monobank payments prerequisite), plus whatever G1's staleness audit leaves over, plus TASK-055 pages if client copy arrives. The true launch long-poles are **client-gated**, not engineering: photography/logo/socials/size charts (TASK-056), legal-page copy (TASK-055 — gateway-onboarding prerequisite), and the §5.3 payments checklist (TASK-048). Chase these in parallel starting now; engineering speed cannot substitute for them.
-- **TASK-039 interaction**: this week deliberately adds more hardcoded-Ukrainian copy via the extraction-ready content-config layer (`src/content/`) — the established TASK-057 pattern. TASK-039's externalization scope grows by exactly these surfaces; that is the designed trade, not drift.
-- **TASK-043 interaction**: the cart _restyle_ is pulled forward into G1; TASK-043 (v1.4) retains one-click buy, the post-purchase upsell modal, and the promo-code field.
-- **Scope boundary**: admin surfaces are excluded from this sweep (customer-facing first); the admin visual pass + admin settings "$" labels stay BACKLOG'd. Showcase routes untouched.
-- **Dependencies/risks**: checkout E2E specs and cart specs will need updating with the restyles (known-fragile area — hydration-gate patterns apply); Stripe Elements dark theme remains runtime-unverifiable locally; the shipping-method numeric decision must respect the documented UAH-display / USD-test-charge convention (decision doc §7.4 context).
+- _Brainstorm sanity-checks: week dates confirmed vs git/DONE (today Tue 2026-08-11; Mon Aug 10 + Tue morning consumed by the previous week's spillover — PRs #32 `8298dab` / #33 `1a4f030` Mon, #34 `c137eb9` + close-outs Tue); **the previous week did NOT land inside its header** — Aug 3–7 delivery ran through 2026-08-11, +4 days past its Friday, archived below under its TRUE header with a spillover note; velocity 26 of 28 planned SP delivered, but only via the 4-day spill → this 3.5-effective-day week planned at 21 SP core + 5 SP explicit stretch; Cleanup Week OVERDUE by cadence but under a standing user deferral (2026-08-04, twice-recorded), not silently skipped; source quotas satisfiable (86% 🔵 of scheduled non-⚪)._
+- **Discussion Phase (self-conducted — unattended run, 2026-08-11)**: themes considered — **(A, chosen) i18n spine + launch feedback loop**, per the standing 2026-08-04 steer and the 2026-08-11 close-out seed list; (B) catalog-coherence-first (categories redesign core, i18n deferred) — rejected: the steer names i18n the spine, and the redesign fits as stretch; (C) pre-launch hardening bundle (deploy runbook, guest order tracking, confirmation ownership check) — rejected for now: their trigger is "before real customer traffic", which the TASK-056 deferral pushes to the pre-launch week; they seed that week instead. Reap deletions skipped per the unattended rule — candidates listed below for user ruling.
+- **Backlog reap candidates (nominated only, NOT executed — user rules on each)**:
+  1. **[TASK-013] Enhanced Features umbrella** · Post-MVP Features — every open sub-item has a program-spec successor (wishlist → TASK-041, advanced search → TASK-042, discount codes → TASK-046; product recommendations shipped as BoughtTogether in TASK-037).
+  2. **[TASK-015] Growth Features umbrella** · Post-MVP Features — same: i18n → TASK-039 (scheduled this week), analytics dashboard duplicates the [2026-02-01] entry, multi-currency/loyalty are spec v2.0 directions.
+  3. **"Extract hardcoded USD → `NEXT_PUBLIC_CURRENCY` env var"** · [2026-02-01] TASK-018 — superseded by the shipped `formatPrice()`/§7.4 UAH architecture; transaction currency is a TASK-048 decision, and an env-var currency switch contradicts the settled design.
+  4. **"Seed demo products with brand/barcode/MPN data to test feed"** · [2026-02-02] TASK-020 — its premise (the electronics demo catalog) was replaced wholesale by the deliberately-placeholder Mirox seed; realistic feed content explicitly waits for real products (TASK-054/056; user ruling 2026-08-04).
+  5. **"Manual Testing Plan"** · Deferred Tasks, 2026-01-22 (flag: possibly user-raised) — implicitly delivered: `docs/TESTING_CHECKLIST.md` is literally a "Manual Testing Checklist" of "critical user flows … before each release" (323 lines), plus the standing visual-fidelity gate and the user's live manual-testing rounds now feeding TODO/BACKLOG directly (the 2026-08-11 batch).
+- **Open questions for the user**: (1) confirm the post-launch-push week as the Cleanup Week (cadence overdue, 🟤 pool ≫ 20 SP); (2) rule on the 5 reap nominations above; (3) G12 is scheduled as stretch — say the word to promote it to core at the cost of likely spillover; (4) G9's library decision is ruled in-plan by default — flag now if you want a user gate before implementation instead.
+- **TASK-056 deferral consequences (standing)**: real customers receive no order email (interim sender → owner inbox only); client chases paused. The **pre-launch week** inherits: the TASK-056 round-trip, the 🔵 production-launch deploy runbook, 🔵 guest order tracking, the G2 confirmation-page ownership check ("before real customer traffic"), and the client-gated 🔵 delivery pickers / carrier decision (the Ukrposhta question — uncosted, needs the client's NP key).
+- **TASK-039 interactions**: G8 deliberately ships through `src/content/` first; G9 then externalizes those strings with the rest — the designed trade recorded last week. The EN SEO/metadata layer joins G9 only by in-plan ruling, else its BACKLOG entry stands. Any string changes must sweep every locator type across ALL E2E spec files (the PR #31 lesson), and specs that don't run locally run in CI.
+- **Dependencies/risks**: G9 is the design-heavy risk (library choice; `useExtracted` vs content-config); 8 SP in 2 days matches the 8-SP-class precedent but leaves no slack — G12 absorbs the variance as stretch. G8's marquee must rejoin the reduced-motion reset and needs a richer `site.announcement` type. G11's false-positive guards are load-bearing (a naive audit fires ~20 false rows). G10 runs sequential in-session (Convention 8 — fan-out gets OOM-killed in this devcontainer).
+- **Parked (carried)**: MILESTONES/GOALS refresh + 📌 Process Rules section for BACKLOG.md (Cleanup-Week fodder; MILESTONES/GOALS still show pre-Mirox January state); hydration console errors investigation (held since 2026-08-04).
 
 ### Quota Check
 
-- 🔵 User-Flagged SP: 20 / 23 (87%) — must be ≥50% ✅
-- 🟡 Operational SP: 1 / 23 (4%) — must be ≤25% ✅
-- 🟤 Auto-Generated SP: 2 / 23 (9%) — must be ≤25% AND ≤1 group ✅ (one group: G3)
-- Cleanup Week status: **due** (deferred by user steer; launch push takes precedence — re-evaluate after it)
-- Last Cleanup Week: never (Feb 2026 freeze week predates the cadence)
-- Compliance: ✅ all quotas met — deviation-free; the cadence deferral is recorded above with justification
-- _Denominator note_: Y = 28 total − 5 ⚪ (G6 Weekly Reviews) = 23.
-- _Delivery note (2026-08-11)_: quotas above describe the plan **as written**. As **delivered**, G7's 2 🔵 SP were deferred rather than executed, so the week shipped 18 🔵 / 21 non-⚪ SP (86%) — still ≥50%, quota unaffected. G7 is the week's only unshipped group.
+- 🔵 User-Flagged SP: 18 / 21 (86%) — must be ≥50% ✅
+- 🟡 Operational SP: 0 / 21 (0%) — must be ≤25% ✅
+- 🟤 Auto-Generated SP: 3 / 21 (14%) — must be ≤25% AND ≤1 group ✅ (one group: G11)
+- Cleanup Week status: **overdue** (cadence + 🟤 pool ≫ 20 SP; standing user deferral for the launch push — post-launch-push week proposed, open question 1)
+- Last Cleanup Week: never (the Feb 2026 freeze week predates the cadence)
+- Compliance: ✅ all quotas met — the cadence deviation is user-ruled and re-proposed above, not silent
+- _Denominator note_: Y = 26 total − 5 ⚪ (G10 Weekly Reviews) = 21. G12's stretch SP count in the denominator (planned work); if the stretch doesn't run, as-delivered quotas are recomputed at close-out per last week's precedent.
 
 ---
 
 ## Weekly Challenge 🏆
 
-**G5 — Transactional Emails (🔵)**: completes the user's "finish the rebrand" theme end-to-end — the inbox is the last customer-facing surface still branded "Store" in English — and opportunistically closes the standing `NEXT_PUBLIC_STORE_NAME` backlog item on the code side. Stretch because the four core groups (G1–G4, G6) come first in a 4-effective-day week.
+**G12 — Categories-to-Catalog Redesign (🔵)**: the default-source pick — user-proposed at the G4 gate, strategic catalog UX, and it retires a launch-visible bug (parent categories listing zero products). Stretch rather than core because G8 + G9 already fill the 3.5 effective days at the observed velocity; the rollup-fix member ships standalone next week if the stretch doesn't run.
 
 ---
 
 ## Previous Week Summary
 
-**Week of 2026-07-27 – 2026-08-02** (old header schema, Mon–Sun) · **Spillover: delivery ran through 2026-08-03** — TASK-037's merge + completion landed Monday, 3 days past the week's Friday (Jul 31), past the 2-day grace. Archived under its true header; the header was correct when written — delivery is what slipped.
+**Week of Monday August 3 – Friday August 7, 2026** · **Spillover: delivery ran through 2026-08-11** — G3/G4/G6/G5 and the G5 hotfix landed Aug 8–11, up to +4 days past the week's Friday (Aug 7), beyond the 2-day grace. Archived under its TRUE header; the header was correct when written — delivery is what slipped.
 
-- **TASK-057 Mirox design adoption** — ✅ PR #24 merged `f9ceb97` 2026-07-31 (+ follow-up PR #25 `acb0c30` same day for the PDP og:image tracing ENOENT). Dark `:root` flip, homepage/header/footer realignment, Mirox clothing seed, `formatPrice()` UAH, Cyrillic OG cards. Visual gate signed off v3; **user-approved prod re-seed ran 2026-07-31** — prod serves the Mirox catalog, verified live.
-- **TASK-036 Catalog redesign + filters** — ✅ PR #26 merged `919906b` Sat 2026-08-01 (+1 day). Five URL-driven filters, 4 sorts incl. «Популярні» via `getSalesRanking()`, card carousel/quick-view/quick-buy, mobile sheet-only filters, square pagination. Visual gate: 1 revision round; prod verified live.
-- **TASK-037 Product page redesign** — ✅ PR #27 merged `cec8408` Mon 2026-08-03 (+3 days, the spillover). PDP rebuilt to `Mirox Product.dc.html`: gallery, `styleGroup` colorways, ranked size chips, SizePicker, honest-sum BoughtTogether, RecentlyViewed, reviews restyle, cart-line naming fix. Unit tests 517 → 598. 3 PR review rounds (incl. the docs-freshness recurrence #7 → automation entry marked OVERDUE).
-- **Velocity**: 3 large (8-SP-class) tasks delivered across 8 calendar days — high, but only via weekend + Monday spillover; this informed the current week's 26-SP cap.
-- **Carried forward**: prod data re-seed (user-gated → P1), client content inventory (TASK-056), payments prerequisites checklist (§5.3), NP webhook network check.
+- **G1 Cart & Drawer Restyle** — ✅ PR #28 `0eccaf7` (Tue Aug 4, on schedule) + the definitive storefront staleness audit.
+- **G2 Checkout Restyle → guest COD checkout** — ✅ PR #29 `cf308f9` (Thu Aug 7, +1 day): client steer mid-week — launch WITHOUT payments; NP methods 80/120/70 грн, coded UA errors, Stripe dormant zero-diff. 6 review rounds / 13 findings.
+- **G3 Params Fix** — ✅ PR #30 `6f81f95` (Fri Aug 8, +2 days): 4 broken `[id]` client routes → `useParams<{ id: string }>()!` + RTL regression file.
+- **G4 Peripheral Surfaces Sweep** — ✅ PR #31 `eb630f4` (Sat Aug 9, +2 days): all EN rendered customer strings gone (SEO/metadata layer explicitly excepted); the gate spawned the categories→catalog redesign (→ this week's G12).
+- **G6 Weekly Reviews run 1** — ✅ PR #32 `8298dab` (Mon Aug 10, +3 days): created REVIEW-QUEUE.md; verdicts 1 adopt / 1 defer / 2 pass inbound, 3 propagate / 1 defer / 1 pass outbound.
+- **G5 Transactional Emails 🏆** — ✅ PR #33 `1a4f030` (Mon Aug 10, +3 days): both emails UA dark-Mirox on a shared shell; `BRAND_NAME` routed; prod email config resolved (key set, interim sender). **Post-merge live smoke (Aug 11) found the un-awaited send** → hotfix **PR #34 `c137eb9`** (Tue Aug 11): awaited + 10s-bounded sends, race regression test; the user manually verified the order email delivering live.
+- **G7 Client Content Ask (TASK-056)** — ⏸️ deferred (user, 2026-08-11) to the pre-launch week; counter-consideration recorded (domain/legal/photography lead times gate readiness itself). The week's only unshipped group.
+- **P1 prod re-seed** — ✅ 2026-08-04, user-approved, verified live.
+- **As delivered**: 26 of 28 planned SP; quotas held (18 🔵 / 21 non-⚪ = 86%). Unit tests 598 → **701 | 1 todo** across the week.
+- **Carried forward**: TASK-056 + paused client chases (pre-launch week); NP webhook question; §5.3 payments checklist; the pre-launch hardening set (deploy runbook, guest order tracking, confirmation ownership check, delivery pickers).
 
-_Full detail: [DONE.md](DONE.md) · daily logs in git history of this file (pre-2026-08-04 version)._
+_Full detail: [DONE.md](DONE.md) · daily logs in git history of this file (pre-2026-08-11 version)._
