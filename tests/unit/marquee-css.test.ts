@@ -9,11 +9,29 @@ import { join } from "node:path";
 const css = readFileSync(join(process.cwd(), "src/app/globals.css"), "utf8");
 const reduceIdx = css.indexOf("@media (prefers-reduced-motion: reduce)");
 const beforeReduce = css.slice(0, reduceIdx);
-const afterReduce = css.slice(reduceIdx);
+
+// Brace-balanced extraction of the media block's exact contents: a
+// slice-to-EOF would also match overrides that sit AFTER the block's
+// closing brace (unguarded), which is precisely the regression this
+// test exists to catch.
+function mediaBlockContent(source: string, atRuleIdx: number): string {
+  const open = source.indexOf("{", atRuleIdx);
+  let depth = 1;
+  for (let i = open + 1; i < source.length; i++) {
+    if (source[i] === "{") depth++;
+    else if (source[i] === "}") {
+      depth--;
+      if (depth === 0) return source.slice(open + 1, i);
+    }
+  }
+  throw new Error("Unbalanced braces after @media rule");
+}
+const reduceBlock = reduceIdx === -1 ? "" : mediaBlockContent(css, reduceIdx);
 
 describe("marquee CSS", () => {
   it("still has the reduced-motion block (guards the slices below from vacuity)", () => {
     expect(reduceIdx).toBeGreaterThan(-1);
+    expect(reduceBlock).toContain(".animate-fade-up");
   });
 
   it("defines the marquee animation before the reduced-motion reset", () => {
@@ -28,7 +46,7 @@ describe("marquee CSS", () => {
   });
 
   it("rejoins the reduced-motion reset", () => {
-    expect(afterReduce).toMatch(/\.animate-marquee\s*\{[^}]*animation:\s*none/);
-    expect(afterReduce).toMatch(/\.marquee-duplicate\s*\{[^}]*display:\s*none/);
+    expect(reduceBlock).toMatch(/\.animate-marquee\s*\{[^}]*animation:\s*none/);
+    expect(reduceBlock).toMatch(/\.marquee-duplicate\s*\{[^}]*display:\s*none/);
   });
 });
