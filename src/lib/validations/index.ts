@@ -178,7 +178,7 @@ export const feedbackSchema = z.object({
     .min(5, "Message must be at least 5 characters")
     .max(2000, "Message must be at most 2000 characters"),
   /** Honeypot — never rejected here; the route silently drops when filled. */
-  website: z.string().max(200).optional(),
+  website: z.string().optional(),
 });
 
 // Google Shopping feed validations

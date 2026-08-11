@@ -64,4 +64,12 @@ describe("feedbackSchema", () => {
     expect(result.success).toBe(true);
     if (result.success) expect(result.data.website).toBe("http://spam.example");
   });
+
+  it("never rejects the honeypot, even when a bot stuffs it", () => {
+    const result = feedbackSchema.safeParse({
+      message: "Нормальний текст",
+      website: "x".repeat(5000),
+    });
+    expect(result.success).toBe(true);
+  });
 });
