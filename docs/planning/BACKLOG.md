@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-08-10
+**Last Updated**: 2026-08-11
 
 ---
 
@@ -954,8 +954,10 @@ deliberately deferred in-branch.
   `ORD-` + base36, zero injection risk today — a defensive `escapeHtml` makes the escaping rule
   exceptionless); `tests/unit/email-templates.test.ts` accumulated mid-file imports from the
   TDD append flow (ESLint-clean, tidy on next touch); `emails.order.contacts` widens to a
-  union type where a small shared interface would be cleaner. Final-review + task-review minors
-  on PR #33, all triaged defer. (Low value, Low effort)
+  union type where a small shared interface would be cleaner. Also (PR #34 r2 hygiene note):
+  the stalled-send test's persistent `mockImplementation` survives `clearAllMocks()` — safe only
+  as the file's last test; switch to `mockImplementationOnce` before appending tests below it.
+  Final-review + task-review minors on PR #33, all triaged defer. (Low value, Low effort)
 
 ### [2026-08-11] From: PR #34 review
 
