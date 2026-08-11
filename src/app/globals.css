@@ -472,6 +472,30 @@
   .animate-fade-up {
     animation: mirox-fade-up var(--duration-slow) var(--ease-mirox) both;
   }
+  /* Marquee (G8 TASK-059): the track holds two copies of the content; each
+     copy carries its own trailing padding (pr-12 on the copy, NOT gap on the
+     track) so translateX(-50%) lands exactly on the second copy's start and
+     the loop is seamless. ALL track layout lives here rather than in
+     Tailwind utilities on the element, so the reduced-motion override below
+     wins by source order instead of fighting utility-class order. */
+  @keyframes mirox-marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  .animate-marquee {
+    display: flex;
+    width: max-content;
+    white-space: nowrap;
+    animation: mirox-marquee 30s linear infinite;
+  }
+  .animate-marquee:hover,
+  .animate-marquee:focus-within {
+    animation-play-state: paused;
+  }
   .hover-lift {
     transition:
       transform var(--duration-base) var(--ease-mirox),
@@ -507,6 +531,15 @@
       transform: none;
       box-shadow: none;
       transition: none;
+    }
+    .animate-marquee {
+      animation: none;
+      width: auto;
+      white-space: normal;
+      justify-content: center;
+    }
+    .marquee-duplicate {
+      display: none;
     }
   }
 }
