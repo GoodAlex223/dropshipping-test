@@ -81,24 +81,6 @@ These tasks from the advertising/promotion plan require a registered business, r
 
 ## Post-MVP Features (Moved from TODO)
 
-### [TASK-013] - Enhanced Features (Post-MVP)
-
-**Priority**: Low
-**Dependencies**: Deployment complete
-**Moved from TODO**: 2026-01-22
-
-**Description**: Additional features for future releases.
-
-**Sub-tasks**:
-
-- [x] Customer reviews and ratings → Completed as TASK-023
-- [ ] Wishlist functionality
-- [ ] Advanced search (Meilisearch)
-- [ ] Product recommendations
-- [ ] Discount codes and promotions
-
----
-
 ### [TASK-014] - Additional Integrations (Post-MVP)
 
 **Priority**: Low
@@ -113,35 +95,6 @@ These tasks from the advertising/promotion plan require a registered business, r
 - [ ] Multiple supplier API integrations
 - [ ] Automated inventory sync
 - [ ] Shipping rate calculators
-
----
-
-### [TASK-015] - Growth Features (Post-MVP)
-
-**Priority**: Low
-**Dependencies**: Enhanced Features
-**Moved from TODO**: 2026-01-22
-
-**Description**: Features for scaling the business.
-
-**Sub-tasks**:
-
-- [ ] Multi-currency support
-- [ ] Internationalization (i18n)
-- [ ] Customer loyalty program
-- [x] Email marketing integration → Completed as TASK-024
-- [ ] Analytics dashboard
-
----
-
-## Deferred Tasks (Moved from TODO)
-
-### Manual Testing Plan
-
-**Moved from TODO**: 2026-01-22
-**Reason**: Deprioritized in favor of marketing preparation tasks
-
-- [ ] Develop comprehensive manual testing plan for the website
 
 ---
 
@@ -191,7 +144,6 @@ Improvements to existing functionality.
 
 **Origin**: docs/archive/plans/2026-02-01_analytics-integration.md
 
-- [ ] Extract hardcoded `"USD"` currency to `NEXT_PUBLIC_CURRENCY` env var for multi-currency support
 - [ ] Add additional e-commerce events: `remove_from_cart`, `view_promotion`, `select_promotion`
 - [ ] Implement GA4 Measurement Protocol for server-side purchase validation
 - [ ] Build admin analytics dashboard showing conversion funnel from GTM data
@@ -200,7 +152,6 @@ Improvements to existing functionality.
 
 **Origin**: TASK-020 implementation on feat/task-020-google-shopping-feed branch
 
-- [ ] Seed demo products with brand/barcode/MPN data to test feed with realistic content
 - [ ] Validate feed output with Google Merchant Center feed validation tool
 - [ ] Add additional feed formats (Facebook Catalog, Pinterest) if needed — current architecture is easy to extend
 - [ ] Add `google_product_category` field mapping to Google's product taxonomy
@@ -1076,6 +1027,11 @@ Ideas considered but decided against (with reasoning).
 | Reconcile stale seed counts "16 cat/50+ products" vs 15/21 (was under [2026-07-14] resumption audit) | reaped: TASK-057 replaced the catalog wholesale (8 SKUs, 2+6 categories) and CLAUDE.md documents it — both sides of the comparison no longer exist                                                             | 2026-08-04 |
 | Replace site-level placeholder OG image (was under [2026-02-02] TASK-019)                            | reaped: root `opengraph-image.tsx` generated Mirox card shipped in TASK-035/PR #21, verified live                                                                                                              | 2026-08-04 |
 | Seed demo reviews (was under [2026-02-05] TASK-023)                                                  | reaped: `prisma/seed-data/reviews.ts` ships 8 reviews since TASK-022, Ukrainian set since TASK-057                                                                                                             | 2026-08-04 |
+| [TASK-013] Enhanced Features umbrella (was under Post-MVP Features)                                  | reaped → 🪦 section below: all open subs superseded by program tasks TASK-041/042/046; recommendations shipped as BoughtTogether (TASK-037)                                                                    | 2026-08-11 |
+| [TASK-015] Growth Features umbrella (was under Post-MVP Features)                                    | reaped → 🪦 section below: i18n → TASK-039 (WEEKLY G9); analytics dashboard duplicates the [2026-02-01] entry; multi-currency/loyalty = spec v2.0 directions                                                   | 2026-08-11 |
+| Extract hardcoded USD to `NEXT_PUBLIC_CURRENCY` env var (was under [2026-02-01] TASK-018)            | reaped → 🪦 section below: superseded by the shipped `formatPrice()`/§7.4 UAH architecture; transaction currency is a TASK-048 decision                                                                        | 2026-08-11 |
+| Seed demo products with brand/barcode/MPN for feed testing (was under [2026-02-02] TASK-020)         | reaped → 🪦 section below: electronics demo catalog replaced by the deliberately-placeholder Mirox seed; realistic feed content waits for real products (TASK-054/056)                                         | 2026-08-11 |
+| Manual Testing Plan (was the sole "Deferred Tasks" member; section removed with it)                  | reaped → 🪦 section below: implicitly delivered by `docs/TESTING_CHECKLIST.md` (323 lines) + the standing visual-fidelity gate + live user testing rounds                                                      | 2026-08-11 |
 
 ---
 
@@ -1101,6 +1057,82 @@ When adding new items:
 3. Estimate Value and Effort (High/Med/Low)
 4. Note the source (who suggested it)
 5. Add date if relevant
+
+---
+
+## 🪦 Reaped Entries (bodies preserved)
+
+Entries reaped from the live sections above — **moved here instead of deleted, by user preference
+(ruled 2026-08-11; this is now the standing reap convention for this repo)**. Each keeps its full
+original body under a struck-through title, with a one-line reason and a matching tombstone row in
+the Rejected Ideas table. Checkboxes below are historical — do not promote from this section.
+
+### ~~[TASK-013] - Enhanced Features (Post-MVP)~~ — reaped 2026-08-11
+
+**Reaped because**: every open sub-item has a Mirox-program successor — wishlist → TASK-041,
+advanced search → TASK-042, discount codes → TASK-046; product recommendations shipped as
+BoughtTogether (TASK-037). _(Was under: Post-MVP Features (Moved from TODO).)_
+
+**Priority**: Low
+**Dependencies**: Deployment complete
+**Moved from TODO**: 2026-01-22
+
+**Description**: Additional features for future releases.
+
+**Sub-tasks**:
+
+- [x] Customer reviews and ratings → Completed as TASK-023
+- [ ] Wishlist functionality
+- [ ] Advanced search (Meilisearch)
+- [ ] Product recommendations
+- [ ] Discount codes and promotions
+
+### ~~[TASK-015] - Growth Features (Post-MVP)~~ — reaped 2026-08-11
+
+**Reaped because**: i18n → TASK-039 (in build this week, WEEKLY G9); analytics dashboard
+duplicates the [2026-02-01] TASK-018 entry (still live above); multi-currency and loyalty are
+spec v2.0 directions. _(Was under: Post-MVP Features (Moved from TODO).)_
+
+**Priority**: Low
+**Dependencies**: Enhanced Features
+**Moved from TODO**: 2026-01-22
+
+**Description**: Features for scaling the business.
+
+**Sub-tasks**:
+
+- [ ] Multi-currency support
+- [ ] Internationalization (i18n)
+- [ ] Customer loyalty program
+- [x] Email marketing integration → Completed as TASK-024
+- [ ] Analytics dashboard
+
+### ~~Extract hardcoded `"USD"` currency to `NEXT_PUBLIC_CURRENCY` env var~~ — reaped 2026-08-11
+
+**Reaped because**: superseded by the shipped `formatPrice()`/§7.4 UAH architecture (TASK-057);
+transaction currency is a TASK-048 decision — an env-var currency switch contradicts the settled
+design. _(Was under: [2026-02-01] From: TASK-018 Analytics Integration.)_
+
+- [ ] Extract hardcoded `"USD"` currency to `NEXT_PUBLIC_CURRENCY` env var for multi-currency support
+
+### ~~Seed demo products with brand/barcode/MPN data to test feed~~ — reaped 2026-08-11
+
+**Reaped because**: its premise (the electronics demo catalog) was replaced wholesale by the
+deliberately-placeholder Mirox seed; realistic feed content waits for real products at the launch
+deploy (TASK-054/056; user ruling 2026-08-04). _(Was under: [2026-02-02] From: TASK-020 Google
+Shopping Feed Preparation.)_
+
+- [ ] Seed demo products with brand/barcode/MPN data to test feed with realistic content
+
+### ~~Manual Testing Plan~~ — reaped 2026-08-11
+
+**Reaped because**: implicitly delivered — `docs/TESTING_CHECKLIST.md` is a 323-line "Manual
+Testing Checklist" of critical user flows per release, the visual-fidelity gate is standing
+practice, and the user's live manual-testing rounds feed TODO/BACKLOG directly (the 2026-08-11
+batch). _(Was the sole member of the now-removed "Deferred Tasks (Moved from TODO)" section;
+originally deprioritized 2026-01-22 in favor of marketing preparation.)_
+
+- [ ] Develop comprehensive manual testing plan for the website
 
 ---
 
