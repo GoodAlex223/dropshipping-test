@@ -168,8 +168,10 @@ export async function POST(request: NextRequest) {
       return newOrder;
     });
 
-    // Send confirmation email (non-blocking)
-    sendOrderConfirmationEmail({
+    // Awaited deliberately: an unawaited fire-and-forget dies when the
+    // serverless function freezes after the response returns (same fix as
+    // create-order, 2026-08-10). Failure stays non-critical via the catch.
+    await sendOrderConfirmationEmail({
       orderNumber: order.orderNumber,
       email: data.email,
       items: orderItemsData.map((item) => ({

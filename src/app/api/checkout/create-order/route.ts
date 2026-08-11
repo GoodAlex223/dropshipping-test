@@ -163,7 +163,11 @@ export async function POST(request: NextRequest) {
       return newOrder;
     });
 
-    sendOrderConfirmationEmail({
+    // Awaited deliberately: an unawaited fire-and-forget dies when the
+    // serverless function freezes after the response returns — the send never
+    // executed in prod (found 2026-08-10, the first day a live RESEND_API_KEY
+    // existed there). Failure stays non-critical via the catch.
+    await sendOrderConfirmationEmail({
       orderNumber: order.orderNumber,
       email: data.email,
       items: orderItemsData.map((item) => ({
