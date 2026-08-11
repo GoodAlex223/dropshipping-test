@@ -435,7 +435,7 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 - 🟤 **`next-themes` is now an unused dependency** — still in `package.json` after the storefront excision (37894c8), deliberately left installed to avoid lockfile churn. Candidate for removal once nothing else in the tree needs it (showcase theming does not use it — confirmed local-wrapper-scoped, not `next-themes`-driven). (Low value, Low effort)
 - 🟤 **Supplier order status styling is still duplicated/bright** — `src/app/(admin)/admin/suppliers/[id]/page.tsx` keeps a local `STATUS_COLORS` for `SupplierOrder.status`. That field is a plain Prisma `String` with a lowercase, non-overlapping vocabulary (`pending/submitted/confirmed/shipped/delivered/cancelled/failed`), so it deliberately could not reuse `src/lib/order-status.ts` (case-sensitive, keyed to the uppercase `OrderStatus` enum). A parallel `supplier-order-status` module is the follow-up. (Med value, Low effort)
 - 🟤 **`.css` files are not covered by `lint-staged`/`format:check`** — verified directly: `package.json`'s `lint-staged` block only matches `*.{ts,tsx}`, `*.{js,jsx}`, `*.{json,md}`, and `format:check` runs `prettier --check "**/*.{ts,tsx,js,jsx,json,md}"` — neither globs `.css`. `globals.css` formatting and line-ending drift are invisible to both the pre-commit hook and CI. (Low value, Low effort)
-- 🟤 **Admin still carries bright payment-status chips** — admin inherits the Mirox tokens (colors, radius, motion vars are global) but was intentionally not restyled by TASK-034. Its **OrderStatus** chips are already monochrome — both admin orders pages were converted to the shared `getOrderStatusStyle()` in TASK-034. What remains bright is `PAYMENT_STATUS_COLORS` (`PaymentStatus`, admin-only, in both admin orders pages) plus the supplier-order status map tracked in the entry above. A future admin visual pass should adopt the monochrome policy already applied to the customer-facing surfaces. (Med value, Med effort)
+- 🟤 **Admin still carries bright payment-status chips** — admin inherits the Mirox tokens (colors, radius, motion vars are global) but was intentionally not restyled by TASK-034. Its **OrderStatus** chips are already monochrome — both admin orders pages were converted to the shared `getOrderStatusStyle()` in TASK-034. What remains bright is `PAYMENT_STATUS_COLORS` (`PaymentStatus`, admin-only, in both admin orders pages) plus the supplier-order status map tracked in the entry above. A future admin visual pass should adopt the monochrome policy already applied to the customer-facing surfaces. (Med value, Med effort) **Scheduled 2026-08-11** → WEEKLY [G13](WEEKLY.md) member 3 (the admin sweep is that pass).
 
 ### [2026-07-18] From: TASK-034 PR #19 review rounds
 
@@ -703,7 +703,8 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
   `v.name === "Size"/"Color"` (ProductCard, QuickViewDialog, PDP page + client, styleGroup
   colorway lookups). Needs: seed rename to «Розмір»/«Колір» + all call sites (or a
   variant-name constant) + user-gated prod re-seed. (Med value, Med effort)
-  `[relates-to: TASK-039]` [G2 gate comment ruled hold-off, 2026-08-07]
+  `[relates-to: TASK-039]` [G2 gate comment ruled hold-off, 2026-08-07] **Un-held + scheduled
+  2026-08-11** (user steer) → WEEKLY [G14](WEEKLY.md) member 1; prod re-seed = gated P2.
 - 🟤 **eslint flat-config `globalIgnores` misses `playwright-report/`** — when the E2E artifact
   dir exists locally, repo-wide lint drowns in thousands of phantom errors from generated JS
   (same failure class as the PR #24 vendor-JS lesson). Add the dir to `globalIgnores` in
@@ -1004,6 +1005,19 @@ items from the same batch (feedback form, launch-announcement marquee) were plac
   the picker, since the picker's data source depends on the answer. Both halves stay client-gated —
   the NP branch API needs the client's NP API key, and Ukrposhta would need its own credentials.
   (High value, Med effort) `[relates-to: TASK-049]`
+
+### [2026-08-11] From: Weekly planning steer (user-raised)
+
+- 🔵 **Finish ALL translations + close design-handoff gaps — "user-ready by end of next week"** —
+  user directive at the 2026-08-11 weekly-plan review: (1) the admin panel is still fully English
+  (deliberately excluded from G4's customer-first sweep) — translate + Mirox-align it; (2) the
+  «Size: M» variant labels — **un-holds** the [2026-08-07] 🟤 variant-name rename's G2-gate
+  hold-off ruling; (3) "maybe we have not finished redesigning of some pages (due to design
+  files)" — settled by auditing the 7 `docs/design/design_handoff_mirox/*.dc.html` files against
+  shipped pages (`Mirox Mobile.dc.html` was never tracked as built). Overload accepted by the user
+  ("yes, this week will be hard"). **Promoted same day** into [WEEKLY.md](WEEKLY.md) G13 (admin,
+  8 SP) + G14 (variant rename + gap audit, 5 SP) + gated 🟡 P2 (prod re-seed). Next week
+  (Aug 17–21) is the pre-launch week: client data ask + polish. (High value, L effort)
 
 ---
 
