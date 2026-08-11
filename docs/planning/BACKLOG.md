@@ -979,6 +979,27 @@ not close, plus a dormant-route parity gap surfaced while verifying the fix.
   only create-order). Exploitation needs a `succeeded` Stripe intent, so dormancy shields it —
   do this before TASK-048 revives the route. (Med value, Low effort) `[relates-to: TASK-048]`
 
+### [2026-08-11] From: manual testing
+
+**Origin**: user-raised during manual testing/review of the live site. 🔵 User-Flagged. Two sibling
+items from the same batch (feedback form, launch-announcement marquee) were placed in
+[TODO.md](TODO.md) § Medium Priority instead.
+
+- [ ] 🔵 **Replace free-text city/branch checkout fields with real carrier, city and branch dropdowns** — Add a delivery-carrier choice (Ukrposhta / Nova Poshta), then city selection and branch (відділення) selection as dropdown menus populated with real options rather than typed text (выбор города, вариант отправки(укр пошта, нова пошта), выбор города и выбор отделения как дропдаун меню с реальными вариантами); affected: [src/app/(shop)/checkout/page.tsx:~392-420](<../../src/app/(shop)/checkout/page.tsx#L392-L420>) (city and `line1` are plain free-text `<Input>`s), [src/lib/shipping.ts:7-11](../../src/lib/shipping.ts#L7-L11) (`DELIVERY_METHODS` hardcodes three Nova Poshta options) [possible-dup-of: "Nova Poshta branch drop-down selector" — [2026-08-07] From: G2 post-gate review]
+
+  **What is genuinely new here versus the [2026-08-07] entry it duplicates**: that entry covers the
+  city → warehouse picker for **Nova Poshta only**. **Ukrposhta as a second carrier has zero
+  mentions anywhere in this repo** — verified by grep across `src/`, `docs/planning/` and
+  `docs/superpowers/specs/`, including the [Ukraine payments & delivery decision
+  doc](../superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md), which evaluated
+  Nova Poshta and never assessed Ukrposhta. So this is not a gap in an existing plan but an
+  uncosted **carrier-strategy decision**: a second carrier means a second address/branch API, a
+  second rate table (the current 80/120/70 UAH numerics are NP published rates), and a second
+  fulfilment path for the supplier-forwarding workers. Decide the carrier question before designing
+  the picker, since the picker's data source depends on the answer. Both halves stay client-gated —
+  the NP branch API needs the client's NP API key, and Ukrposhta would need its own credentials.
+  (High value, Med effort) `[relates-to: TASK-049]`
+
 ---
 
 ## Technical Debt
