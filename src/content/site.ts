@@ -30,6 +30,9 @@ export interface SiteAnnouncement {
   text: string;
   /** Optional link target; wraps the announcement text in a Link when set. */
   href: string | null;
+  /** Optional distinct CTA label rendered as the underlined link after the plain text.
+   *  null + href set → the whole text becomes the link (pre-gate behavior). */
+  linkLabel: string | null;
   /** Scrolling marquee vs the static centered bar. */
   marquee: boolean;
 }
@@ -85,8 +88,9 @@ export const site = {
    */
   announcement: {
     id: "launch-2026-08",
-    text: "Ми відкрилися! Новий сайт Mirox уже працює. Помітили проблему або маєте пропозицію — розкажіть нам через форму зворотного зв'язку →",
+    text: "Ми відкрилися! Новий сайт Mirox уже працює. Помітили проблему або маєте пропозицію?",
     href: "/feedback",
+    linkLabel: "Розкажіть нам через форму зворотного зв'язку →",
     marquee: true,
   } as SiteAnnouncement | null,
 

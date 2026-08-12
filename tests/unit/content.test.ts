@@ -31,6 +31,7 @@ describe("site content", () => {
     expect(site.announcement?.href).toBe("/feedback");
     expect(site.announcement?.marquee).toBe(true);
     expect(site.announcement?.id).toBeTruthy();
+    expect(site.announcement?.linkLabel).toBeTruthy();
   });
 });
 

@@ -75,9 +75,11 @@ function dismiss() {
 /**
  * Top announcement bar (client brief list #2 item 13).
  *
- * Deliberately NOT sticky: the header below it is `sticky top-0`, so leaving
- * this unpinned lets it scroll away instead of permanently eating viewport on
- * mobile. Cookie consent is bottom-anchored, so the two never stack.
+ * Sticky WITH the header since the 2026-08-12 gate ruling: the shop layout
+ * wraps this bar and the Header in one `sticky top-0 z-50` container, so the
+ * launch announcement stays visible on scroll (mobile viewport cost accepted
+ * by the user, superseding the TASK-035-era not-sticky decision). Cookie
+ * consent is bottom-anchored, so the two never stack.
  *
  * The admin-managed version of this banner is TASK-047.
  */
@@ -91,30 +93,41 @@ export function AnnouncementBar() {
   const announcement = site.announcement;
   if (!announcement || dismissed) return null;
 
-  const inner = announcement.href ? (
-    <Link href={announcement.href} className="underline-offset-4 hover:underline">
-      {announcement.text}
-    </Link>
-  ) : (
-    announcement.text
-  );
+  const label = announcement.linkLabel;
+  const linkClass = "font-medium underline underline-offset-4 hover:no-underline";
+  const content =
+    announcement.href && label ? (
+      <>
+        {announcement.text}{" "}
+        <Link href={announcement.href} className={linkClass}>
+          {label}
+        </Link>
+      </>
+    ) : announcement.href ? (
+      <Link href={announcement.href} className="underline-offset-4 hover:underline">
+        {announcement.text}
+      </Link>
+    ) : (
+      announcement.text
+    );
 
   return (
     <div className="bg-background text-foreground">
-      <div className="container flex items-center gap-4 py-2">
+      <div className="flex w-full items-center gap-3 py-2 pr-3">
         {announcement.marquee ? (
           <div className="min-w-0 flex-1 overflow-hidden">
             <div className="animate-marquee">
-              <span className="pr-12 text-xs tracking-wide">{inner}</span>
+              <span className="pr-12 text-xs tracking-wide">{content}</span>
               {/* Visual-only copy for the seamless loop: aria-hidden and
                   link-free so it adds no tab stop or duplicate accname. */}
               <span className="marquee-duplicate pr-12 text-xs tracking-wide" aria-hidden="true">
                 {announcement.text}
+                {label ? <span className={`ml-1 ${linkClass}`}>{label}</span> : null}
               </span>
             </div>
           </div>
         ) : (
-          <p className="flex-1 text-center text-xs tracking-wide">{inner}</p>
+          <p className="flex-1 text-center text-xs tracking-wide">{content}</p>
         )}
         <button
           type="button"
