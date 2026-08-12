@@ -94,7 +94,8 @@ export function AnnouncementBar() {
   if (!announcement || dismissed) return null;
 
   const label = announcement.linkLabel;
-  const linkClass = "font-medium underline underline-offset-4";
+  const linkClass =
+    "bg-foreground text-background hover:bg-foreground/80 inline-block rounded-full px-3 py-0.5 font-semibold no-underline transition-colors";
   const content =
     announcement.href && label ? (
       <>
