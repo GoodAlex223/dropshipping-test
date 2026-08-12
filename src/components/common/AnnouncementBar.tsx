@@ -94,7 +94,8 @@ export function AnnouncementBar() {
   if (!announcement || dismissed) return null;
 
   const label = announcement.linkLabel;
-  const linkClass = "font-medium underline underline-offset-4 hover:no-underline";
+  const linkClass =
+    "font-medium underline-offset-4 hover:underline focus-visible:underline active:underline";
   const content =
     announcement.href && label ? (
       <>
@@ -112,7 +113,7 @@ export function AnnouncementBar() {
     );
 
   return (
-    <div className="bg-background text-foreground">
+    <div className="bg-background text-foreground border-border border-b">
       <div className="flex w-full items-center gap-3 py-2 pr-3">
         {announcement.marquee ? (
           <div className="min-w-0 flex-1 overflow-hidden">

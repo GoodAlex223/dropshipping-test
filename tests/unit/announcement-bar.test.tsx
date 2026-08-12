@@ -18,7 +18,7 @@ const LAUNCH: SiteAnnouncement = {
   id: "launch-2026-08",
   text: "Ми відкрилися! Розкажіть нам про проблеми",
   href: "/feedback",
-  linkLabel: "Розкажіть нам →",
+  linkLabel: "Розкажіть нам",
   marquee: true,
 };
 
@@ -40,7 +40,7 @@ describe("AnnouncementBar", () => {
 
   it("renders the text plain and the label as the link when linkLabel is set", () => {
     render(<AnnouncementBar />);
-    const link = screen.getByRole("link", { name: "Розкажіть нам →" });
+    const link = screen.getByRole("link", { name: "Розкажіть нам" });
     expect(link).toHaveAttribute("href", "/feedback");
     // The announcement text itself is NOT inside the link (the link's own
     // content is only the label — text and link are rendered as siblings
@@ -62,7 +62,7 @@ describe("AnnouncementBar", () => {
     expect(dupe!.getAttribute("aria-hidden")).toBe("true");
     // The copy is visual-only: a second link would add a hidden tab stop.
     expect(dupe!.querySelector("a")).toBeNull();
-    expect(dupe!.textContent).toContain("Розкажіть нам →");
+    expect(dupe!.textContent).toContain("Розкажіть нам");
   });
 
   it("renders the static centered variant without a duplicate when marquee is off", () => {

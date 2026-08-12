@@ -90,7 +90,7 @@ export const site = {
     id: "launch-2026-08",
     text: "Ми відкрилися! Новий сайт Mirox уже працює. Помітили проблему або маєте пропозицію?",
     href: "/feedback",
-    linkLabel: "Розкажіть нам через форму зворотного зв'язку →",
+    linkLabel: "Розкажіть нам через форму зворотного зв'язку",
     marquee: true,
   } as SiteAnnouncement | null,
 
