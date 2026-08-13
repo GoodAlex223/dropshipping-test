@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { X } from "lucide-react";
 import { site } from "@/content/site";
@@ -91,44 +91,115 @@ export function AnnouncementBar() {
   );
 
   const announcement = site.announcement;
-  if (!announcement || dismissed) return null;
 
-  const label = announcement.linkLabel;
   const linkClass =
     "bg-foreground text-background hover:bg-foreground/80 inline-block rounded-full px-3 py-0.5 font-semibold no-underline transition-colors";
-  const content =
-    announcement.href && label ? (
-      <>
-        {announcement.text}{" "}
-        <Link href={announcement.href} className={linkClass}>
-          {label}
+  const label = announcement?.linkLabel;
+
+  // Duplicate copies are real links so every visible pill is mouse-clickable
+  // (gate ruling 8) — but tabIndex -1 + the copy's aria-hidden keep exactly
+  // one tab stop and one accessible link.
+  function renderCopy(isDuplicate: boolean) {
+    if (!announcement) return null;
+    const tabIndex = isDuplicate ? -1 : undefined;
+    if (announcement.href && label) {
+      return (
+        <>
+          {announcement.text}{" "}
+          <Link href={announcement.href} tabIndex={tabIndex} className={linkClass}>
+            {label}
+          </Link>
+        </>
+      );
+    }
+    if (announcement.href) {
+      return (
+        <Link
+          href={announcement.href}
+          tabIndex={tabIndex}
+          className="underline-offset-4 hover:underline"
+        >
+          {announcement.text}
         </Link>
-      </>
-    ) : announcement.href ? (
-      <Link href={announcement.href} className="underline-offset-4 hover:underline">
-        {announcement.text}
-      </Link>
-    ) : (
-      announcement.text
-    );
+      );
+    }
+    return announcement.text;
+  }
+
+  // Gate ruling 9: two copies leave a right-edge void whenever one copy is
+  // narrower than the viewport. Measure and render enough copies to keep the
+  // stream continuous, shifting by exactly one copy width. useEffect (not
+  // useLayoutEffect): the bar never SSRs visible, and a one-frame 2-copy
+  // start at the left edge is imperceptible.
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+  const firstCopyRef = useRef<HTMLSpanElement | null>(null);
+  const [copies, setCopies] = useState(2);
+  const [shiftPx, setShiftPx] = useState<number | null>(null);
+
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    const first = firstCopyRef.current;
+    if (!viewport || !first) return;
+
+    function measure() {
+      if (!viewport || !first) return;
+      const copyWidth = first.getBoundingClientRect().width;
+      const viewWidth = viewport.getBoundingClientRect().width;
+      if (!copyWidth || !viewWidth) return; // jsdom / display:none — keep the 2-copy fallback
+      setCopies(Math.max(2, Math.ceil(viewWidth / copyWidth) + 1));
+      setShiftPx(copyWidth);
+    }
+
+    measure();
+    // jsdom has no ResizeObserver constructor (unlike every real browser) —
+    // guard construction, matching ProductGallery.tsx's established pattern,
+    // so unit tests get the static `measure()` call above (a no-op there,
+    // since jsdom layout is always zero) without crashing on mount.
+    let observer: ResizeObserver | undefined;
+    if (typeof ResizeObserver !== "undefined") {
+      observer = new ResizeObserver(measure);
+      observer.observe(viewport);
+    }
+    return () => observer?.disconnect();
+    // Re-measure only matters while the marquee variant is mounted; the
+    // effect re-runs on remount, which is the only way the variant changes.
+  }, []);
+
+  if (!announcement || dismissed) return null;
 
   return (
     <div className="bg-background text-foreground border-border border-b">
       <div className="flex w-full items-center gap-3 py-2 pr-3">
         {announcement.marquee ? (
-          <div className="min-w-0 flex-1 overflow-hidden">
-            <div className="animate-marquee">
-              <span className="pr-12 text-xs tracking-wide">{content}</span>
-              {/* Visual-only copy for the seamless loop: aria-hidden and
-                  link-free so it adds no tab stop or duplicate accname. */}
-              <span className="marquee-duplicate pr-12 text-xs tracking-wide" aria-hidden="true">
-                {announcement.text}
-                {label ? <span className={`ml-1 ${linkClass}`}>{label}</span> : null}
+          <div ref={viewportRef} className="min-w-0 flex-1 overflow-hidden">
+            <div
+              className="animate-marquee"
+              style={
+                shiftPx
+                  ? ({
+                      "--marquee-shift": `${shiftPx}px`,
+                      // Constant ~30 px/s regardless of copy width.
+                      animationDuration: `${Math.round(shiftPx / 30)}s`,
+                    } as React.CSSProperties)
+                  : undefined
+              }
+            >
+              <span ref={firstCopyRef} className="pr-12 text-xs tracking-wide">
+                {renderCopy(false)}
               </span>
+              {Array.from({ length: copies - 1 }, (_, i) => (
+                <span
+                  key={i}
+                  className="marquee-duplicate pr-12 text-xs tracking-wide"
+                  aria-hidden="true"
+                >
+                  {renderCopy(true)}
+                </span>
+              ))}
             </div>
           </div>
         ) : (
-          <p className="flex-1 text-center text-xs tracking-wide">{content}</p>
+          <p className="flex-1 text-center text-xs tracking-wide">{renderCopy(false)}</p>
         )}
         <button
           type="button"

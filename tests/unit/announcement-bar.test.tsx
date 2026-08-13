@@ -54,15 +54,22 @@ describe("AnnouncementBar", () => {
     expect(screen.getByRole("link", { name: LAUNCH.text })).toHaveAttribute("href", "/feedback");
   });
 
-  it("renders an aria-hidden, link-free duplicate for the marquee loop", () => {
+  it("renders aria-hidden duplicates that are clickable but out of the tab order", () => {
     const { container } = render(<AnnouncementBar />);
     expect(container.querySelector(".animate-marquee")).not.toBeNull();
-    const dupe = container.querySelector(".marquee-duplicate");
-    expect(dupe).not.toBeNull();
-    expect(dupe!.getAttribute("aria-hidden")).toBe("true");
-    // The copy is visual-only: a second link would add a hidden tab stop.
-    expect(dupe!.querySelector("a")).toBeNull();
-    expect(dupe!.textContent).toContain("Розкажіть нам");
+    const dupes = container.querySelectorAll(".marquee-duplicate");
+    expect(dupes.length).toBeGreaterThanOrEqual(1);
+    dupes.forEach((dupe) => {
+      expect(dupe.getAttribute("aria-hidden")).toBe("true");
+      const link = dupe.querySelector("a");
+      // Real link: every visible pill is mouse-clickable (gate ruling 8)…
+      expect(link).not.toBeNull();
+      expect(link!.getAttribute("href")).toBe("/feedback");
+      // …but out of the tab order, so copy 1 stays the only tab stop.
+      expect(link!.getAttribute("tabindex")).toBe("-1");
+    });
+    // Exactly one link in the accessibility tree (aria-hidden excluded).
+    expect(screen.getAllByRole("link", { name: LAUNCH.linkLabel! })).toHaveLength(1);
   });
 
   it("renders the static centered variant without a duplicate when marquee is off", () => {

@@ -483,7 +483,9 @@
       transform: translateX(0);
     }
     to {
-      transform: translateX(-50%);
+      /* Shift by exactly one measured copy width (set inline by the
+         component); the -50% fallback matches the unmeasured 2-copy state. */
+      transform: translateX(calc(-1 * var(--marquee-shift, 50%)));
     }
   }
   .animate-marquee {
