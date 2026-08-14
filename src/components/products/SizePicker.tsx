@@ -8,7 +8,7 @@ const DEFAULT_HEIGHT = 180;
 const DEFAULT_WEIGHT = 75;
 
 /**
- * «Підбір розміру» card (Mirox Product.dc.html): height/weight inputs → a
+ * "Size picker" card (Mirox Product.dc.html): height/weight inputs → a
  * recommended size via the placeholder formula in @/lib/size-recommendation.
  * Deliberately uncoupled from the buy panel — it recommends, never selects
  * (TASK-045 replaces the logic with real size charts).

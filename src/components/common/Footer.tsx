@@ -5,8 +5,8 @@ import { SocialLinks } from "@/components/common/SocialLinks";
 import { NewsletterSignup } from "./NewsletterSignup";
 import { site } from "@/content/site";
 
-// Only routes that actually exist. The mockup's info links («Доставка та
-// оплата», «Повернення», «Контакти») point at the TASK-055 pages and 404
+// Only routes that actually exist. The mockup's info links ("Shipping &
+// payment", "Returns", "Contacts") point at the TASK-055 pages and 404
 // today — they join when those pages ship. Same rule as TASK-035.
 // `key` (not the label) is the stable identity — `as const` narrows it to
 // the literal union next-intl's typed catalog keys require for

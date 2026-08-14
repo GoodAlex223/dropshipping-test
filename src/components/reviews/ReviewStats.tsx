@@ -1,7 +1,7 @@
 "use client";
 
 import { StarRating } from "./StarRating";
-import { pluralizeUk } from "@/lib/format";
+import { useTranslations } from "next-intl";
 
 interface RatingDistribution {
   rating: number;
@@ -15,6 +15,7 @@ interface ReviewStatsProps {
 }
 
 export function ReviewStats({ averageRating, totalReviews, ratingDistribution }: ReviewStatsProps) {
+  const t = useTranslations("reviews");
   if (totalReviews === 0) return null;
 
   return (
@@ -25,7 +26,7 @@ export function ReviewStats({ averageRating, totalReviews, ratingDistribution }:
         <div>
           <StarRating value={Math.round(averageRating)} size="md" />
           <p className="text-muted-foreground mt-1 text-sm">
-            {totalReviews} {pluralizeUk(totalReviews, "відгук", "відгуки", "відгуків")}
+            {t("stats.reviewCount", { count: totalReviews })}
           </p>
         </div>
       </div>

@@ -502,7 +502,7 @@ function FiltersSheet({
           </div>
 
           {/* R5: below md this is the ONLY place sort options live — the
-              inline "Сортування" row (bottom of the desktop bar) is hidden
+              inline "Sort" row (bottom of the desktop bar) is hidden
               below md via `hidden md:flex`. Same 4 options, same URL
               semantics (onChange({ sort: value })), white-active styling
               matching every other row in this sheet. */}
@@ -574,7 +574,7 @@ export function FilterBar({ filters, brands, onChange, onClearAll }: FilterBarPr
         <ColorPopover color={filters.color} onChange={onChange} />
         <AvailabilityPopover inStock={filters.inStock} onChange={onChange} />
 
-        {/* R5: sort lives only in the Фільтри sheet below md — this row
+        {/* R5: sort lives only in the Filters sheet below md — this row
             (and every trigger above it besides FiltersSheet) is hidden
             below md and only re-appears at md+. */}
         <div className="hidden shrink-0 items-center gap-1.5 md:ml-auto md:flex">

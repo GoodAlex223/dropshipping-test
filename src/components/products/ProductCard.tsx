@@ -67,8 +67,8 @@ interface ProductCardProps {
   showCategory?: boolean;
   /**
    * When provided, a hover overlay renders two quick-action buttons.
-   * `focusSizes: true` on «В кошик» tells the consumer to open the quick
-   * view already focused on size selection; `false` on «Швидкий перегляд»
+   * `focusSizes: true` on "Add to cart" tells the consumer to open the quick
+   * view already focused on size selection; `false` on "Quick view"
    * just opens it. Omitted entirely on server-rendered rails (homepage),
    * where there is no client-side quick view to open.
    */
@@ -362,10 +362,10 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
                 e.stopPropagation();
                 onQuickView({ focusSizes: true });
               }}
-              // Cart glyph, not the former "В кошик" text label (R3) — the
+              // Cart glyph, not the former "Add to cart" text label (R3) — the
               // exact icon Header.tsx uses top-right. aria-label keeps the
               // accessible name identical to before so existing
-              // getByRole("button", { name: "В кошик" }) queries still find
+              // getByRole("button", { name: "Add to cart" }) queries still find
               // it.
               className="pointer-events-none flex items-center justify-center rounded-[10px] bg-white px-3 py-2 text-black group-focus-within:pointer-events-auto group-hover:pointer-events-auto hover:bg-[#e5e5e5]"
             >

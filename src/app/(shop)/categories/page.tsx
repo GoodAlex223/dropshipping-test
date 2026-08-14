@@ -1,13 +1,13 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import Image from "next/image";
 import { Package } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { prisma } from "@/lib/db";
 import { getCategoriesListingMetadata } from "@/lib/seo";
-import { pluralizeUk } from "@/lib/format";
 
 export const metadata: Metadata = getCategoriesListingMetadata();
 
@@ -46,24 +46,22 @@ async function getCategories() {
 }
 
 export default async function CategoriesPage() {
-  const categories = await getCategories();
+  const [categories, t] = await Promise.all([getCategories(), getTranslations("categories")]);
 
   return (
     <div className="container py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Категорії</h1>
-        <p className="text-muted-foreground mt-2">Перегляньте наші товари за категоріями</p>
+        <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+        <p className="text-muted-foreground mt-2">{t("subtitle")}</p>
       </div>
 
       {/* Categories Grid */}
       {categories.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16">
           <Package className="text-muted-foreground h-16 w-16" />
-          <h2 className="mt-4 text-xl font-semibold">Категорій поки немає</h2>
-          <p className="text-muted-foreground mt-2">
-            Незабаром тут з&apos;являться категорії товарів.
-          </p>
+          <h2 className="mt-4 text-xl font-semibold">{t("empty.title")}</h2>
+          <p className="text-muted-foreground mt-2">{t("empty.description")}</p>
         </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -100,7 +98,7 @@ export default async function CategoriesPage() {
                       </p>
                     )}
                     <p className="text-primary mt-3 text-sm font-medium">
-                      {totalProducts} {pluralizeUk(totalProducts, "товар", "товари", "товарів")}
+                      {t("productCount", { count: totalProducts })}
                     </p>
 
                     {/* Subcategories */}
@@ -116,7 +114,7 @@ export default async function CategoriesPage() {
                         ))}
                         {category.children.length > 4 && (
                           <span className="bg-muted rounded-full px-3 py-1 text-xs font-medium">
-                            ще {category.children.length - 4}
+                            {t("moreCategories", { count: category.children.length - 4 })}
                           </span>
                         )}
                       </div>

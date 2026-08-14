@@ -43,7 +43,7 @@ export function recordRecentlyViewed(id: string): void {
 }
 
 /**
- * «Ви нещодавно переглянули» — pure client section (nothing server-rendered,
+ * "Recently viewed" — pure client section (nothing server-rendered,
  * so no hydration risk): records the current PDP into localStorage on mount,
  * then fetches the OTHER recorded products fresh from /api/products?ids=…
  * (isActive enforced server-side, so dead history self-heals). Any failure

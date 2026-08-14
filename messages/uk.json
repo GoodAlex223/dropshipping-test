@@ -687,6 +687,59 @@
       "notFoundTitle": "Товар не знайдено",
       "notFoundDescription": "Товару, який ви шукаєте, не існує, або його було видалено.",
       "backToCatalog": "До каталогу"
+    },
+    "share": {
+      "label": "Поділитися:",
+      "platformAria": "Поділитися: {platform}",
+      "copyAria": "Скопіювати посилання",
+      "nativeAria": "Поділитися",
+      "linkCopied": "Посилання скопійовано!",
+      "copyFailed": "Не вдалося скопіювати посилання"
     }
+  },
+  "reviews": {
+    "title": "Відгуки покупців",
+    "stats": {
+      "reviewCount": "{count, plural, one {# відгук} few {# відгуки} many {# відгуків} other {# відгуків}}"
+    },
+    "form": {
+      "heading": "Написати відгук",
+      "ratingLabel": "Оцінка *",
+      "selectRatingError": "Оберіть оцінку",
+      "commentLabel": "Коментар (необов’язково)",
+      "commentPlaceholder": "Поділіться враженнями про товар…",
+      "submit": "Надіслати відгук",
+      "submitting": "Надсилаємо…",
+      "submitSuccess": "Відгук надіслано!",
+      "submitError": "Не вдалося надіслати відгук"
+    },
+    "list": {
+      "filterLabel": "Фільтр:",
+      "filterAll": "Всі оцінки",
+      "filterFive": "5 зірок",
+      "filterFour": "4 зірки",
+      "filterThree": "3 зірки",
+      "filterTwo": "2 зірки",
+      "filterOne": "1 зірка",
+      "emptyFiltered": "Немає відгуків із такою оцінкою.",
+      "empty": "Відгуків поки немає.",
+      "loading": "Завантаження…",
+      "loadMore": "Показати ще"
+    },
+    "item": {
+      "anonymousFallback": "Покупець",
+      "verifiedBadge": "✓ Підтверджена покупка",
+      "storeReply": "Відповідь магазину"
+    }
+  },
+  "categories": {
+    "title": "Категорії",
+    "subtitle": "Перегляньте наші товари за категоріями",
+    "empty": {
+      "title": "Категорій поки немає",
+      "description": "Незабаром тут з'являться категорії товарів."
+    },
+    "productCount": "{count, plural, one {# товар} few {# товари} many {# товарів} other {# товарів}}",
+    "moreCategories": "ще {count}"
   }
 }

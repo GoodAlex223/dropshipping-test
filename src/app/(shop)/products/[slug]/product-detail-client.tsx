@@ -93,7 +93,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
       .filter((v): v is ProductVariant => Boolean(v));
   }, [product.variants]);
 
-  // «Підбір розміру» only makes sense for products carrying real S–XXL sizes;
+  // The size picker only makes sense for products carrying real S–XXL sizes;
   // one-size products (e.g. caps) have a Size variant outside SIZE_ORDER.
   const showSizePicker = sizes.some((v) => (SIZE_ORDER as readonly string[]).includes(v.value));
 
@@ -195,7 +195,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
 
   return (
     <div className="container py-6 lg:py-8" data-hydrated={hydrated ? "true" : undefined}>
-      {/* Breadcrumb — Головна / Каталог / {name} (catalog markup precedent) */}
+      {/* Breadcrumb — Home / Catalog / {name} (catalog markup precedent) */}
       <nav className="mb-4 text-[12.5px] text-[#737373]">
         <Link href="/" className="hover:text-white">
           {t("breadcrumbHome")}
@@ -350,7 +350,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
             </button>
           </div>
 
-          {/* «У вибране» and «Відкрити фото замірів» deliberately absent — spec §7 ledger #2/#3. */}
+          {/* "Wishlist" and "Open size-chart photo" deliberately absent — spec §7 ledger #2/#3. */}
           <div className="mt-4">
             <SocialShareButtons
               productId={product.id}
@@ -379,7 +379,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
         />
       </div>
 
-      {/* Опис — kept for SEO (spec §7 ledger #9) */}
+      {/* Description — kept for SEO (spec §7 ledger #9) */}
       {product.description && (
         <section aria-label={t("detail.description")} className="mt-16">
           <h2 className="mb-5 text-[28px] font-extrabold tracking-[-0.02em]">

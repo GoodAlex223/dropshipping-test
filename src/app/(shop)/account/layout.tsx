@@ -10,7 +10,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
   const t = useTranslations("account");
   const pathname = usePathname();
 
-  // «Адреси» and «Налаштування» are deliberately absent: /account/addresses
+  // "Addresses" and "Settings" are deliberately absent: /account/addresses
   // and /account/settings don't exist yet (404 today). Restore when the pages
   // are built — BACKLOG [2026-08-08] From: G4 brainstorm (Footer shopLinks
   // precedent for omitting links to unbuilt pages).

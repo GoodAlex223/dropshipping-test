@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
+import { renderWithIntl } from "../helpers/render-with-intl";
 import { ReviewItem } from "@/components/reviews/ReviewItem";
 import type { ReviewWithUser } from "@/types";
 
@@ -15,7 +16,7 @@ const review: ReviewWithUser = {
 
 describe("ReviewItem (Mirox restyle)", () => {
   it("renders avatar initial, verified badge, uk date", () => {
-    render(<ReviewItem review={review} />);
+    renderWithIntl(<ReviewItem review={review} />);
     expect(screen.getByText("О")).toBeInTheDocument(); // initial circle
     expect(screen.getByText("✓ Підтверджена покупка")).toBeInTheDocument();
     expect(screen.getByText("12.06.2026")).toBeInTheDocument();
@@ -23,13 +24,13 @@ describe("ReviewItem (Mirox restyle)", () => {
   });
 
   it("renders the admin reply block with uk label", () => {
-    render(<ReviewItem review={review} />);
+    renderWithIntl(<ReviewItem review={review} />);
     expect(screen.getByText(/Відповідь магазину/)).toBeInTheDocument();
     expect(screen.getByText("Дякуємо!")).toBeInTheDocument();
   });
 
   it("anonymous fallback is Ukrainian", () => {
-    render(<ReviewItem review={{ ...review, user: { ...review.user, name: null } }} />);
+    renderWithIntl(<ReviewItem review={{ ...review, user: { ...review.user, name: null } }} />);
     expect(screen.getByText("Покупець")).toBeInTheDocument();
   });
 });

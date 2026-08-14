@@ -13,7 +13,7 @@ import { loadManropeForOg } from "@/lib/og-fonts";
 // the image-mount panel is dark too — a white panel would box a dark photo
 // in a jarring bright rectangle.
 //
-// Product name and formatPrice()'s "грн" suffix are Ukrainian (Tasks 3/5),
+// Product name and formatPrice()'s currency suffix are Ukrainian (Tasks 3/5),
 // and Satori's bundled fallback font is Latin-only, so — same as the
 // site-wide src/app/opengraph-image.tsx — a Cyrillic-capable font is
 // fetched at render time (see src/lib/og-fonts.ts) with a safe fallback if

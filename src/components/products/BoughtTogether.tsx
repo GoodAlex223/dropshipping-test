@@ -44,7 +44,7 @@ function orderedSizeVariants(product: BundleCompanion) {
 }
 
 /**
- * «Купують разом» (Mirox Product.dc.html): current product + 2 top-selling
+ * "Bought together" (Mirox Product.dc.html): current product + 2 top-selling
  * companions. Deviations from the reference are deliberate and spec-approved
  * (§7): per-companion size chips (fulfillment needs a real variantId per
  * line) and a strikethrough only when constituent comparePrices genuinely
