@@ -142,6 +142,62 @@ a client claim and doesn't conflict with it.
 - Email subject: «Новий відгук із сайту» (store name resolved at render via
   `getStoreName()` where the template needs it).
 
+## Gate revisions (user rulings, 2026-08-12 visual gate)
+
+The live-gate review approved copy, scroll speed, click-through, dismissal, and the email
+template, and ruled three design changes:
+
+1. **The bar sticks with the header** — supersedes the component's original
+   "deliberately NOT sticky" decision (TASK-035 era). Mechanism: the shop layout wraps
+   `<AnnouncementBar /><Header />` in one `sticky top-0 z-50` wrapper; the `<header>`
+   element drops its own `sticky top-0 z-50`. The mobile-viewport cost is user-accepted.
+2. **Full horizontal length** — the marquee track spans the window width (the `container`
+   constraint is removed from the bar), dismiss ✕ stays at the right edge.
+3. **Visually distinct link** — `SiteAnnouncement` gains `linkLabel: string | null`. When
+   `href` + `linkLabel` are set, the text renders plain and the label renders as an
+   underlined link (the arrow lives in the label, so it no longer points at empty space).
+   `linkLabel: null` + `href` keeps the whole-text-link behavior. Launch copy splits into:
+   text «Ми відкрилися! Новий сайт Mirox уже працює. Помітили проблему або маєте
+   пропозицію?» + linkLabel «Розкажіть нам через форму зворотного зв'язку →».
+
+Round 2 (same gate, second pass) added two more rulings:
+
+4. **The bar sits BELOW the header** — order swapped inside the sticky wrapper
+   (`<Header /><AnnouncementBar />`); the bar gains its own `border-b` to separate from
+   page content.
+5. **CTA underline is a reaction, not a resting state** — no underline at rest
+   (`font-medium` carries the distinction); underline appears on hover, keyboard focus,
+   and click. The trailing arrow is removed from the label (it read as pointing at
+   nothing): linkLabel = «Розкажіть нам через форму зворотного зв'язку».
+
+Round 3 superseded ruling 5's underline half:
+
+6. **CTA underlined at rest** — the hover-only underline still read as "not underlined"
+   (the user reviews static screenshots, where hover can't show). Superseded by ruling 7.
+
+Round 4 superseded the underline treatment entirely:
+
+7. **CTA is an inverted pill button** — at 12px the typographic underline never read as a
+   link. Final state: the label renders as a monochrome pill (`bg-foreground
+text-background`, fully rounded, `font-semibold`, dims to 80% on hover) — the
+   hero-button visual language, unmistakably clickable at rest with a visible hover
+   reaction. Arrow stays removed; copy unchanged.
+
+Round 5 (pill approved) surfaced two functional rulings on wide screens:
+
+8. **Every visible copy is clickable** — the aria-hidden loop duplicate was link-free, so
+   when two copies fit on screen the second pill was dead. Duplicates become real links
+   with `tabIndex={-1}` + `aria-hidden` (mouse-clickable; still exactly one tab stop and
+   one accessible link).
+9. **Gap-free stream at any width** — two copies leave a right-edge void whenever one copy
+   is narrower than the viewport. The track measures itself (ResizeObserver) and renders
+   `ceil(viewport / copyWidth) + 1` copies (min 2), animating by the measured copy width
+   via a `--marquee-shift` custom property (keyframes fall back to the old −50% before
+   measurement), duration scaled to keep ~30 px/s.
+
+Gate screenshots are delivered as a private Artifact page from round 2 onward — chat-inline
+images didn't reach the user.
+
 ## Error handling summary
 
 | Failure                                    | Behavior                                        |
