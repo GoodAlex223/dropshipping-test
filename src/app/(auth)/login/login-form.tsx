@@ -6,14 +6,15 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { loginSchema, type LoginInput } from "@/lib/validations";
-import { auth } from "@/content/auth";
 
 function LoginFormInner() {
+  const t = useTranslations("auth.login");
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams?.get("callbackUrl") || "/";
@@ -40,7 +41,7 @@ function LoginFormInner() {
       });
 
       if (result?.error) {
-        setError(auth.login.errors.invalidCredentials);
+        setError(t("errors.invalidCredentials"));
         return;
       }
 
@@ -48,7 +49,7 @@ function LoginFormInner() {
       router.refresh();
     } catch (error) {
       console.error("[Login Error]", error);
-      setError(auth.login.errors.generic);
+      setError(t("errors.generic"));
     } finally {
       setIsLoading(false);
     }
@@ -57,8 +58,8 @@ function LoginFormInner() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">{auth.login.title}</CardTitle>
-        <CardDescription>{auth.login.description}</CardDescription>
+        <CardTitle className="text-2xl font-bold">{t("title")}</CardTitle>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -67,11 +68,11 @@ function LoginFormInner() {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="email">{auth.login.email.label}</Label>
+            <Label htmlFor="email">{t("email.label")}</Label>
             <Input
               id="email"
               type="email"
-              placeholder={auth.login.email.placeholder}
+              placeholder={t("email.placeholder")}
               {...register("email")}
               disabled={isLoading}
             />
@@ -79,11 +80,11 @@ function LoginFormInner() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">{auth.login.password.label}</Label>
+            <Label htmlFor="password">{t("password.label")}</Label>
             <Input
               id="password"
               type="password"
-              placeholder={auth.login.password.placeholder}
+              placeholder={t("password.placeholder")}
               {...register("password")}
               disabled={isLoading}
             />
@@ -93,14 +94,14 @@ function LoginFormInner() {
           </div>
 
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? auth.login.submitting : auth.login.submit}
+            {isLoading ? t("submitting") : t("submit")}
           </Button>
         </form>
 
         <div className="mt-4 text-center text-sm">
-          {auth.login.noAccount}{" "}
+          {t("noAccount")}{" "}
           <Link href="/register" className="text-primary underline-offset-4 hover:underline">
-            {auth.login.signUpLink}
+            {t("signUpLink")}
           </Link>
         </div>
       </CardContent>
@@ -109,11 +110,12 @@ function LoginFormInner() {
 }
 
 function LoginFormSkeleton() {
+  const t = useTranslations("auth.login");
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">{auth.login.title}</CardTitle>
-        <CardDescription>{auth.login.description}</CardDescription>
+        <CardTitle className="text-2xl font-bold">{t("title")}</CardTitle>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">

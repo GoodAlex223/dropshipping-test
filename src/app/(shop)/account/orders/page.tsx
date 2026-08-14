@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Package, ChevronLeft, ChevronRight, Eye, ShoppingBag } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,9 +17,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getOrderStatusStyle, getOrderStatusLabel } from "@/lib/order-status";
+import { getOrderStatusStyle } from "@/lib/order-status";
 import { formatPrice } from "@/lib/format";
-import { account } from "@/content/account";
 
 interface OrderItem {
   id: string;
@@ -60,6 +60,7 @@ const ORDER_FILTER_STATUSES = [
 ] as const;
 
 function OrdersPageContent() {
+  const t = useTranslations("account");
   const router = useRouter();
   const searchParams = useSearchParams();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -126,7 +127,7 @@ function OrdersPageContent() {
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">{account.orders.title}</h2>
+          <h2 className="text-xl font-semibold">{t("orders.title")}</h2>
           <Skeleton className="h-10 w-40" />
         </div>
         {[1, 2, 3].map((i) => (
@@ -139,16 +140,16 @@ function OrdersPageContent() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-xl font-semibold">{account.orders.title}</h2>
+        <h2 className="text-xl font-semibold">{t("orders.title")}</h2>
         <Select value={statusFilter} onValueChange={handleStatusChange}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder={account.orders.filter.placeholder} />
+            <SelectValue placeholder={t("orders.filter.placeholder")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">{account.orders.filter.all}</SelectItem>
+            <SelectItem value="all">{t("orders.filter.all")}</SelectItem>
             {ORDER_FILTER_STATUSES.map((s) => (
               <SelectItem key={s} value={s}>
-                {getOrderStatusLabel(s)}
+                {t(`orderStatus.${s}` as never)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -159,12 +160,12 @@ function OrdersPageContent() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <ShoppingBag className="text-muted-foreground h-16 w-16" />
-            <h3 className="mt-4 text-lg font-medium">{account.orders.empty.title}</h3>
+            <h3 className="mt-4 text-lg font-medium">{t("orders.empty.title")}</h3>
             <p className="text-muted-foreground mt-2 text-center text-sm">
-              {account.orders.empty.description}
+              {t("orders.empty.description")}
             </p>
             <Button className="mt-6" asChild>
-              <Link href="/products">{account.orders.empty.cta}</Link>
+              <Link href="/products">{t("orders.empty.cta")}</Link>
             </Button>
           </CardContent>
         </Card>
@@ -178,30 +179,26 @@ function OrdersPageContent() {
                   <div className="bg-muted/50 flex flex-wrap items-center justify-between gap-4 border-b p-4">
                     <div className="flex flex-wrap items-center gap-4">
                       <div>
-                        <p className="text-muted-foreground text-sm">
-                          {account.orders.card.placed}
-                        </p>
+                        <p className="text-muted-foreground text-sm">{t("orders.card.placed")}</p>
                         <p className="font-medium">{formatDate(order.createdAt)}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground text-sm">{account.orders.card.total}</p>
+                        <p className="text-muted-foreground text-sm">{t("orders.card.total")}</p>
                         <p className="font-medium">{formatPrice(order.total)}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground text-sm">
-                          {account.orders.card.number}
-                        </p>
+                        <p className="text-muted-foreground text-sm">{t("orders.card.number")}</p>
                         <p className="font-medium">{order.orderNumber}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
                       <Badge variant="secondary" className={getOrderStatusStyle(order.status)}>
-                        {getOrderStatusLabel(order.status)}
+                        {t(`orderStatus.${order.status}` as never)}
                       </Badge>
                       <Button variant="outline" size="sm" asChild>
                         <Link href={`/account/orders/${order.id}`}>
                           <Eye className="mr-2 h-4 w-4" />
-                          {account.orders.card.details}
+                          {t("orders.card.details")}
                         </Link>
                       </Button>
                     </div>
@@ -228,7 +225,7 @@ function OrdersPageContent() {
                           <div>
                             <p className="line-clamp-1 text-sm font-medium">{item.productName}</p>
                             <p className="text-muted-foreground text-sm">
-                              {account.orders.card.qty(item.quantity)}
+                              {t("orders.card.qty", { count: item.quantity })}
                             </p>
                           </div>
                         </div>
@@ -236,7 +233,7 @@ function OrdersPageContent() {
                       {order.items.length > 4 && (
                         <div className="flex items-center">
                           <span className="text-muted-foreground text-sm">
-                            {account.orders.card.more(order.items.length - 4)}
+                            {t("orders.card.more", { count: order.items.length - 4 })}
                           </span>
                         </div>
                       )}
@@ -257,10 +254,13 @@ function OrdersPageContent() {
                 disabled={pagination.page <= 1}
               >
                 <ChevronLeft className="h-4 w-4" />
-                {account.orders.pagination.prev}
+                {t("orders.pagination.prev")}
               </Button>
               <span className="text-muted-foreground text-sm">
-                {account.orders.pagination.pageOf(pagination.page, pagination.totalPages)}
+                {t("orders.pagination.pageOf", {
+                  page: pagination.page,
+                  total: pagination.totalPages,
+                })}
               </span>
               <Button
                 variant="outline"
@@ -268,7 +268,7 @@ function OrdersPageContent() {
                 onClick={() => handlePageChange(pagination.page + 1)}
                 disabled={pagination.page >= pagination.totalPages}
               >
-                {account.orders.pagination.next}
+                {t("orders.pagination.next")}
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
@@ -279,11 +279,14 @@ function OrdersPageContent() {
   );
 }
 
+// Non-async — useTranslations, not getTranslations (binding constraint; also
+// matches the Task 4 HomePage precedent for Suspense-fallback siblings).
 function OrdersPageLoading() {
+  const t = useTranslations("account");
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">{account.orders.title}</h2>
+        <h2 className="text-xl font-semibold">{t("orders.title")}</h2>
         <Skeleton className="h-10 w-40" />
       </div>
       {[1, 2, 3].map((i) => (

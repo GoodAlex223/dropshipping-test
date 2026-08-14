@@ -1,13 +1,14 @@
 export const dynamic = "force-dynamic";
+import { useTranslations } from "next-intl";
 import { StatusScreen } from "@/components/common/StatusScreen";
-import { system } from "@/content/system";
 
 export default function NotFound() {
+  const t = useTranslations("system.notFound");
   return (
     <StatusScreen
-      title={system.notFound.title}
-      description={system.notFound.description}
-      actions={[{ label: system.notFound.cta, href: "/" }]}
+      title={t("title")}
+      description={t("description")}
+      actions={[{ label: t("cta"), href: "/" }]}
     />
   );
 }

@@ -1,11 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { site } from "@/content/site";
 import { home } from "@/content/home";
-import { auth } from "@/content/auth";
-import { account, ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS } from "@/content/account";
-import { newsletter } from "@/content/newsletter";
-import { system } from "@/content/system";
-import { feedback } from "@/content/feedback";
+import { ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS } from "@/content/account";
 import { OrderStatus, PaymentStatus } from "@prisma/client";
 
 describe("site content", () => {
@@ -72,14 +68,14 @@ describe("home content", () => {
   });
 });
 
-describe("auth content", () => {
-  it("keeps submit CTAs uppercase per the shipped checkout convention", () => {
-    expect(auth.login.submit).toBe(auth.login.submit.toUpperCase());
-    expect(auth.register.submit).toBe(auth.register.submit.toUpperCase());
-  });
-});
+// "auth content" describe block removed (TASK-039 G9 Task 5) — src/content/auth.ts
+// deleted; the uppercase-CTA assertion moved to i18n-catalogs.test.ts (reads
+// messages/uk.json directly).
 
 describe("account content", () => {
+  // ORDER_STATUS_LABELS/PAYMENT_STATUS_LABELS are the two maps account.ts
+  // still exports post-trim (admin-only source until G13) — this describe
+  // block's coverage is unaffected by the Task 5 migration.
   it("labels every OrderStatus value in Ukrainian", () => {
     for (const s of Object.values(OrderStatus)) {
       expect(ORDER_STATUS_LABELS[s]).toBeTruthy();
@@ -93,61 +89,21 @@ describe("account content", () => {
     }
   });
 
-  it("pluralizes the more-items line", () => {
-    expect(account.orders.card.more(1)).toBe("+1 інший товар");
-    expect(account.orders.card.more(3)).toBe("+3 інші товари");
-    expect(account.orders.card.more(5)).toBe("+5 інших товарів");
-  });
-
-  it("maps cod and card payment methods", () => {
-    expect(account.orderDetail.payment.methodLabel("cod")).toBe("Оплата при отриманні");
-    expect(account.orderDetail.payment.methodLabel("card")).toBe("Карткою");
-  });
+  // The customer-copy `account.orders.card.more` plural and
+  // `account.orderDetail.payment.methodLabel` ternary both moved out of this
+  // module (TASK-039 G9 Task 5) — the plural now lives as an ICU pattern
+  // rendered via i18n-catalogs.test.ts's Probe; methodLabel's branching moved
+  // into the order-detail component, with its two atomic strings
+  // (methodCod/methodCard) asserted there too.
 });
 
-describe("newsletter content", () => {
-  it("covers every confirm code the API emits", () => {
-    for (const code of [
-      "CONFIRMED",
-      "ALREADY_CONFIRMED",
-      "LINK_EXPIRED",
-      "INVALID_TOKEN",
-      "TOKEN_REQUIRED",
-    ]) {
-      expect(newsletter.confirm.byCode[code]).toBeTruthy();
-    }
-  });
-
-  it("covers every unsubscribe code the API emits", () => {
-    for (const code of [
-      "UNSUBSCRIBED",
-      "ALREADY_UNSUBSCRIBED",
-      "SUBSCRIBER_NOT_FOUND",
-      "INVALID_UNSUBSCRIBE_LINK",
-      "VALIDATION_ERROR",
-    ]) {
-      expect(newsletter.unsubscribe.byCode[code]).toBeTruthy();
-    }
-  });
-
-  it("interpolates the unsubscribe prompt email", () => {
-    expect(newsletter.unsubscribe.idle.prompt("a@b.ua")).toContain("a@b.ua");
-  });
-});
-
-describe("system content", () => {
-  it("has the cookie banner button pair", () => {
-    expect(system.cookies.accept).toBe("Прийняти");
-    expect(system.cookies.decline).toBe("Відхилити");
-  });
-});
+// "newsletter content" / "system content" / "feedback content" describe
+// blocks removed (TASK-039 G9 Task 5) — src/content/{newsletter,system,
+// feedback}.ts deleted. byCode coverage moved to i18n-catalogs.test.ts's
+// "byCode coverage" block (1:1 per the plan); the unsubscribe-prompt
+// interpolation and cookie-banner-button-pair assertions moved to
+// i18n-catalogs.test.ts's "message catalogs" block.
 
 // "site header content" describe block removed (TASK-039 G9) — site.header
 // no longer exists on the trimmed content module; equivalent coverage lives
 // in i18n-catalogs.test.ts's guillemets/query-interpolation test.
-
-describe("feedback content", () => {
-  it("maps both feedback API outcome codes to Ukrainian", () => {
-    expect(Object.keys(feedback.byCode).sort()).toEqual(["SEND_FAILED", "VALIDATION_ERROR"]);
-  });
-});

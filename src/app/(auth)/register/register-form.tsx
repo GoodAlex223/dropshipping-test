@@ -6,14 +6,15 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { registerSchema, type RegisterInput } from "@/lib/validations";
-import { auth } from "@/content/auth";
 
 export default function RegisterForm() {
+  const t = useTranslations("auth.register");
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -42,9 +43,11 @@ export default function RegisterForm() {
       const result = await response.json();
 
       if (!response.ok) {
-        setError(
-          (result.code && auth.register.errors.byCode[result.code]) || auth.register.errors.generic
-        );
+        // Guarded dynamic key (next-intl v4.13.6 t.has, verified available —
+        // TASK-039 Task 5): unknown/absent codes fall back to errors.generic.
+        const code = result.code as string | undefined;
+        const key = code ? `errors.byCode.${code}` : "";
+        setError(key && t.has(key as never) ? t(key as never) : t("errors.generic"));
         return;
       }
 
@@ -65,7 +68,7 @@ export default function RegisterForm() {
       router.refresh();
     } catch (error) {
       console.error("[Register Error]", error);
-      setError(auth.register.errors.generic);
+      setError(t("errors.generic"));
     } finally {
       setIsLoading(false);
     }
@@ -75,8 +78,8 @@ export default function RegisterForm() {
     <div className="flex min-h-screen items-center justify-center px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">{auth.register.title}</CardTitle>
-          <CardDescription>{auth.register.description}</CardDescription>
+          <CardTitle className="text-2xl font-bold">{t("title")}</CardTitle>
+          <CardDescription>{t("description")}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -87,11 +90,11 @@ export default function RegisterForm() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="name">{auth.register.name.label}</Label>
+              <Label htmlFor="name">{t("name.label")}</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder={auth.register.name.placeholder}
+                placeholder={t("name.placeholder")}
                 {...register("name")}
                 disabled={isLoading}
               />
@@ -99,11 +102,11 @@ export default function RegisterForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">{auth.register.email.label}</Label>
+              <Label htmlFor="email">{t("email.label")}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder={auth.register.email.placeholder}
+                placeholder={t("email.placeholder")}
                 {...register("email")}
                 disabled={isLoading}
               />
@@ -111,11 +114,11 @@ export default function RegisterForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">{auth.register.password.label}</Label>
+              <Label htmlFor="password">{t("password.label")}</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder={auth.register.password.placeholder}
+                placeholder={t("password.placeholder")}
                 {...register("password")}
                 disabled={isLoading}
               />
@@ -125,11 +128,11 @@ export default function RegisterForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">{auth.register.confirmPassword.label}</Label>
+              <Label htmlFor="confirmPassword">{t("confirmPassword.label")}</Label>
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder={auth.register.confirmPassword.placeholder}
+                placeholder={t("confirmPassword.placeholder")}
                 {...register("confirmPassword")}
                 disabled={isLoading}
               />
@@ -139,14 +142,14 @@ export default function RegisterForm() {
             </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? auth.register.submitting : auth.register.submit}
+              {isLoading ? t("submitting") : t("submit")}
             </Button>
           </form>
 
           <div className="mt-4 text-center text-sm">
-            {auth.register.hasAccount}{" "}
+            {t("hasAccount")}{" "}
             <Link href="/login" className="text-primary underline-offset-4 hover:underline">
-              {auth.register.signInLink}
+              {t("signInLink")}
             </Link>
           </div>
         </CardContent>

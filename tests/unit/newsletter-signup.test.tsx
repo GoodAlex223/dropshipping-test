@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { screen, fireEvent, waitFor } from "@testing-library/react";
+import { renderWithIntl } from "../helpers/render-with-intl";
 
 vi.mock("sonner", () => ({
   toast: {
@@ -36,7 +37,7 @@ afterEach(() => {
 describe("NewsletterSignup form", () => {
   it("maps ALREADY_SUBSCRIBED code to newsletter content", async () => {
     stubFetch({ ok: false, body: { code: "ALREADY_SUBSCRIBED" } });
-    render(<NewsletterSignup />);
+    renderWithIntl(<NewsletterSignup />);
 
     const input = screen.getByPlaceholderText("Ваш email");
     fireEvent.change(input, { target: { value: "test@example.com" } });
@@ -49,7 +50,7 @@ describe("NewsletterSignup form", () => {
 
   it("falls back to generic copy for unknown error code", async () => {
     stubFetch({ ok: false, body: { code: "SOMETHING_NEW" } });
-    render(<NewsletterSignup />);
+    renderWithIntl(<NewsletterSignup />);
 
     const input = screen.getByPlaceholderText("Ваш email");
     fireEvent.change(input, { target: { value: "test@example.com" } });
@@ -62,7 +63,7 @@ describe("NewsletterSignup form", () => {
 
   it("falls back to generic copy on fetch rejection", async () => {
     stubFetchReject(new Error("Network error"));
-    render(<NewsletterSignup />);
+    renderWithIntl(<NewsletterSignup />);
 
     const input = screen.getByPlaceholderText("Ваш email");
     fireEvent.change(input, { target: { value: "test@example.com" } });
@@ -75,7 +76,7 @@ describe("NewsletterSignup form", () => {
 
   it("shows success box on ok response and does not show error toast", async () => {
     stubFetch({ ok: true, body: { message: "Check your email" } });
-    render(<NewsletterSignup />);
+    renderWithIntl(<NewsletterSignup />);
 
     const input = screen.getByPlaceholderText("Ваш email");
     fireEvent.change(input, { target: { value: "test@example.com" } });

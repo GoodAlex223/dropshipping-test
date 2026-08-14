@@ -40,6 +40,13 @@ function Probe({
   return createElement("span", null, t(msgKey, values));
 }
 
+/** Exercises the t.has guarded-dynamic-key mechanism (Task 5's six byCode
+ * spots) against the real catalog — not just presence of the JSON key. */
+function HasProbe({ namespace, msgKey }: { namespace: string; msgKey: string }) {
+  const t = useTranslations(namespace);
+  return createElement("span", null, String(t.has(msgKey as never)));
+}
+
 describe("message catalogs", () => {
   it("ru contains no orphan keys (every ru key path exists in uk — uk is the schema)", () => {
     const ukKeys = new Set(leaves(uk as Tree).map(([k]) => k));
@@ -105,5 +112,155 @@ describe("message catalogs", () => {
       })
     );
     expect(screen.getByText("Нічого не знайдено за запитом «test»")).toBeInTheDocument();
+  });
+
+  // Task 5 moved-string-assertions: the underlying content modules that used
+  // to carry these values (auth.ts/system.ts) are deleted; the strings now
+  // live only in the catalog, so the assertions move here verbatim.
+  it("keeps auth submit CTAs uppercase per the shipped checkout convention", () => {
+    expect(uk.auth.login.submit).toBe(uk.auth.login.submit.toUpperCase());
+    expect(uk.auth.register.submit).toBe(uk.auth.register.submit.toUpperCase());
+  });
+
+  it("has the cookie banner button pair", () => {
+    expect(uk.system.cookies.accept).toBe("Прийняти");
+    expect(uk.system.cookies.decline).toBe("Відхилити");
+  });
+
+  it("provides the account order-detail payment method labels (methodLabel ternary moved to the component, values stay here)", () => {
+    expect(uk.account.orderDetail.payment.methodCod).toBe("Оплата при отриманні");
+    expect(uk.account.orderDetail.payment.methodCard).toBe("Карткою");
+  });
+
+  it("renders the account orders 'more items' ICU plural across one/few/many, exactly (brief-mandated +2 case included)", () => {
+    renderWithIntl(
+      createElement(Probe, {
+        namespace: "account",
+        msgKey: "orders.card.more",
+        values: { count: 1 },
+      })
+    );
+    expect(screen.getByText("+1 інший товар")).toBeInTheDocument();
+
+    renderWithIntl(
+      createElement(Probe, {
+        namespace: "account",
+        msgKey: "orders.card.more",
+        values: { count: 2 },
+      })
+    );
+    expect(screen.getByText("+2 інші товари")).toBeInTheDocument();
+
+    renderWithIntl(
+      createElement(Probe, {
+        namespace: "account",
+        msgKey: "orders.card.more",
+        values: { count: 5 },
+      })
+    );
+    expect(screen.getByText("+5 інших товарів")).toBeInTheDocument();
+  });
+
+  it("interpolates the unsubscribe prompt email exactly", () => {
+    renderWithIntl(
+      createElement(Probe, {
+        namespace: "newsletter.unsubscribe",
+        msgKey: "idle.prompt",
+        values: { email: "a@b.ua" },
+      })
+    );
+    expect(
+      screen.getByText("Ви впевнені, що хочете відписати a@b.ua від нашої розсилки?")
+    ).toBeInTheDocument();
+  });
+});
+
+describe("byCode coverage (replaces content.test.ts's byCode blocks 1:1 — TASK-039 Task 5)", () => {
+  it("newsletter.confirm covers every code /api/newsletter/confirm emits", () => {
+    const byCode = uk.newsletter.confirm.byCode as Record<
+      string,
+      { title: string; description: string }
+    >;
+    for (const code of [
+      "CONFIRMED",
+      "ALREADY_CONFIRMED",
+      "LINK_EXPIRED",
+      "INVALID_TOKEN",
+      "TOKEN_REQUIRED",
+    ]) {
+      expect(byCode[code]?.title).toBeTruthy();
+      expect(byCode[code]?.description).toBeTruthy();
+    }
+  });
+
+  it("newsletter.unsubscribe covers every code /api/newsletter/unsubscribe emits", () => {
+    const byCode = uk.newsletter.unsubscribe.byCode as Record<
+      string,
+      { title: string; description: string }
+    >;
+    for (const code of [
+      "UNSUBSCRIBED",
+      "ALREADY_UNSUBSCRIBED",
+      "SUBSCRIBER_NOT_FOUND",
+      "INVALID_UNSUBSCRIBE_LINK",
+      "VALIDATION_ERROR",
+    ]) {
+      expect(byCode[code]?.title).toBeTruthy();
+      expect(byCode[code]?.description).toBeTruthy();
+    }
+  });
+
+  it("newsletter.signup covers the ALREADY_SUBSCRIBED code /api/newsletter/subscribe emits", () => {
+    const byCode = uk.newsletter.signup.byCode as Record<string, string>;
+    expect(byCode.ALREADY_SUBSCRIBED).toBeTruthy();
+  });
+
+  it("auth.register covers the EMAIL_EXISTS code /api/auth/register emits", () => {
+    const byCode = uk.auth.register.errors.byCode as Record<string, string>;
+    expect(byCode.EMAIL_EXISTS).toBeTruthy();
+  });
+
+  it("feedback covers every code /api/feedback emits", () => {
+    const byCode = uk.feedback.byCode as Record<string, string>;
+    for (const code of ["VALIDATION_ERROR", "SEND_FAILED"]) {
+      expect(byCode[code]).toBeTruthy();
+    }
+  });
+
+  it("checkout.errors covers every code /api/checkout/create-order emits", () => {
+    const errors = uk.checkout.errors as Record<string, string>;
+    for (const code of [
+      "PRODUCT_UNAVAILABLE",
+      "INVALID_VARIANT",
+      "INVALID_SHIPPING_METHOD",
+      "INVALID_ORDER_DATA",
+    ]) {
+      expect(errors[code]).toBeTruthy();
+    }
+  });
+
+  // Guarded-lookup mechanism check (not just catalog presence): confirms
+  // t.has() — the mechanism all six byCode consumer spots use — actually
+  // resolves true for a real code and false for an absent one, against the
+  // live catalog through a real NextIntlClientProvider render.
+  it("t.has resolves true for a real byCode key", () => {
+    renderWithIntl(
+      createElement(HasProbe, { namespace: "checkout", msgKey: "errors.PRODUCT_UNAVAILABLE" })
+    );
+    expect(screen.getByText("true")).toBeInTheDocument();
+  });
+
+  it("t.has resolves false for a code with no catalog entry", () => {
+    renderWithIntl(
+      createElement(HasProbe, { namespace: "checkout", msgKey: "errors.TOTALLY_UNKNOWN_CODE" })
+    );
+    expect(screen.getByText("false")).toBeInTheDocument();
+  });
+
+  it("t.has resolves the object-shaped byCode entries at the .title leaf, not the parent path (newsletter confirm/unsubscribe pattern)", () => {
+    renderWithIntl(
+      createElement(HasProbe, { namespace: "newsletter.confirm", msgKey: "byCode.CONFIRMED.title" })
+    );
+    expect(screen.getByText("true")).toBeInTheDocument();
   });
 });

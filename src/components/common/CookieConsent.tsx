@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import Script from "next/script";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import { system } from "@/content/system";
 
 type ConsentStatus = "pending" | "accepted" | "declined";
 
@@ -29,6 +29,7 @@ export const useConsentStore = create<ConsentStore>()(
 const GTM_ID_PATTERN = /^GTM-[A-Z0-9]{1,10}$/;
 
 export function CookieConsent() {
+  const t = useTranslations("system.cookies");
   const { status, accept, decline } = useConsentStore();
   const [mounted, setMounted] = useState(false);
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
@@ -71,13 +72,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       {status === "pending" && (
         <div className="bg-background fixed inset-x-0 bottom-0 z-50 border-t p-4 shadow-lg">
           <div className="container mx-auto flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-muted-foreground text-sm">{system.cookies.message}</p>
+            <p className="text-muted-foreground text-sm">{t("message")}</p>
             <div className="flex shrink-0 gap-2">
               <Button variant="outline" size="sm" onClick={decline}>
-                {system.cookies.decline}
+                {t("decline")}
               </Button>
               <Button size="sm" onClick={accept}>
-                {system.cookies.accept}
+                {t("accept")}
               </Button>
             </div>
           </div>

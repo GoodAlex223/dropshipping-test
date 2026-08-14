@@ -2,8 +2,8 @@
 
 import { useEffect } from "react";
 import { XCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { StatusScreen } from "@/components/common/StatusScreen";
-import { system } from "@/content/system";
 
 export default function Error({
   error,
@@ -12,6 +12,8 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations("system.error");
+
   useEffect(() => {
     console.error("[App Error]", error);
   }, [error]);
@@ -20,13 +22,13 @@ export default function Error({
     <StatusScreen
       icon={XCircle}
       tone="error"
-      title={system.error.title}
-      description={system.error.description}
-      meta={error.digest ? system.error.errorId(error.digest) : undefined}
+      title={t("title")}
+      description={t("description")}
+      meta={error.digest ? t("errorId", { digest: error.digest }) : undefined}
       actions={[
-        { label: system.error.retry, onClick: () => reset() },
+        { label: t("retry"), onClick: () => reset() },
         {
-          label: system.error.home,
+          label: t("home"),
           onClick: () => (window.location.href = "/"),
           variant: "outline",
         },

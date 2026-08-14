@@ -3,16 +3,18 @@
 import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, XCircle, Loader2, Mail } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { StatusScreen } from "@/components/common/StatusScreen";
-import { newsletter, type NewsletterOutcomeCopy } from "@/content/newsletter";
 
 type UnsubscribeState =
   | { status: "idle" }
   | { status: "loading" }
-  | { status: "success"; copy: NewsletterOutcomeCopy }
-  | { status: "error"; copy: NewsletterOutcomeCopy };
+  | { status: "success"; code: string }
+  | { status: "error"; code: string };
 
 function UnsubscribeContent() {
+  const t = useTranslations("newsletter.unsubscribe");
+  const tActions = useTranslations("newsletter.actions");
   const searchParams = useSearchParams();
   const email = searchParams?.get("email") ?? null;
   const token = searchParams?.get("token") ?? null;
@@ -21,7 +23,7 @@ function UnsubscribeContent() {
 
   async function handleUnsubscribe() {
     if (!email || !token) {
-      setState({ status: "error", copy: newsletter.unsubscribe.invalidLink });
+      setState({ status: "error", code: "" });
       return;
     }
 
@@ -35,14 +37,10 @@ function UnsubscribeContent() {
 
       const data = await response.json().catch(() => ({}));
       // API prose is EN log text; `code` drives the Ukrainian copy.
-      const copy =
-        (data.code && newsletter.unsubscribe.byCode[data.code]) ||
-        (response.ok
-          ? newsletter.unsubscribe.byCode.UNSUBSCRIBED
-          : newsletter.unsubscribe.fallback);
-      setState({ status: response.ok ? "success" : "error", copy });
+      const code = (data.code as string | undefined) || (response.ok ? "UNSUBSCRIBED" : "");
+      setState({ status: response.ok ? "success" : "error", code });
     } catch {
-      setState({ status: "error", copy: newsletter.unsubscribe.fallback });
+      setState({ status: "error", code: "" });
     }
   }
 
@@ -51,9 +49,9 @@ function UnsubscribeContent() {
       <StatusScreen
         icon={XCircle}
         tone="error"
-        title={newsletter.unsubscribe.invalidLink.title}
-        description={newsletter.unsubscribe.invalidLink.description}
-        actions={[{ label: newsletter.actions.goHome, href: "/", variant: "outline" }]}
+        title={t("invalidLink.title")}
+        description={t("invalidLink.description")}
+        actions={[{ label: tActions("goHome"), href: "/", variant: "outline" }]}
       />
     );
   }
@@ -62,11 +60,11 @@ function UnsubscribeContent() {
     return (
       <StatusScreen
         icon={Mail}
-        title={newsletter.unsubscribe.idle.title}
-        description={newsletter.unsubscribe.idle.prompt(email)}
+        title={t("idle.title")}
+        description={t("idle.prompt", { email })}
         actions={[
           {
-            label: newsletter.unsubscribe.idle.confirm,
+            label: t("idle.confirm"),
             onClick: handleUnsubscribe,
             variant: "destructive",
           },
@@ -80,33 +78,38 @@ function UnsubscribeContent() {
       <StatusScreen
         icon={Loader2}
         iconClassName="animate-spin"
-        title={newsletter.unsubscribe.processing.title}
-        description={newsletter.unsubscribe.processing.description}
+        title={t("processing.title")}
+        description={t("processing.description")}
       />
     );
   }
 
+  // Guarded dynamic key (next-intl v4.13.6 t.has, verified available —
+  // TASK-039 Task 5): mirrors newsletter/confirm/page.tsx — each byCode entry
+  // is an object ({title, description}), so the guard checks the STRING LEAF
+  // (.title), never the parent object path (t.has() returns true for object
+  // paths too, which would be a false pass). `as never` is the deliberate
+  // escape hatch for next-intl's generically-typed key union.
+  const leaf = state.code ? `byCode.${state.code}.title` : "";
+  const base = leaf && t.has(leaf as never) ? `byCode.${state.code}` : "fallback";
   const icon = state.status === "success" ? CheckCircle2 : XCircle;
   return (
     <StatusScreen
       icon={icon}
       tone={state.status}
-      title={state.copy.title}
-      description={state.copy.description}
-      actions={[{ label: newsletter.actions.goHome, href: "/", variant: "outline" }]}
+      title={t(`${base}.title` as never)}
+      description={t(`${base}.description` as never)}
+      actions={[{ label: tActions("goHome"), href: "/", variant: "outline" }]}
     />
   );
 }
 
 export default function NewsletterUnsubscribePage() {
+  const t = useTranslations("newsletter.unsubscribe");
   return (
     <Suspense
       fallback={
-        <StatusScreen
-          icon={Loader2}
-          iconClassName="animate-spin"
-          title={newsletter.unsubscribe.processing.title}
-        />
+        <StatusScreen icon={Loader2} iconClassName="animate-spin" title={t("processing.title")} />
       }
     >
       <UnsubscribeContent />
