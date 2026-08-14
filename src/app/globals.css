@@ -472,12 +472,15 @@
   .animate-fade-up {
     animation: mirox-fade-up var(--duration-slow) var(--ease-mirox) both;
   }
-  /* Marquee (G8 TASK-059): the track holds two copies of the content; each
-     copy carries its own trailing padding (pr-12 on the copy, NOT gap on the
-     track) so translateX(-50%) lands exactly on the second copy's start and
-     the loop is seamless. ALL track layout lives here rather than in
-     Tailwind utilities on the element, so the reduced-motion override below
-     wins by source order instead of fighting utility-class order. */
+  /* Marquee (G8 TASK-059): the track holds two OR MORE copies of the content
+     (AnnouncementBar measures how many the viewport needs; the unmeasured
+     fallback assumes exactly two). Each copy carries its own trailing padding
+     (pr-12 on the copy, NOT gap on the track) so shifting by one copy width
+     (--marquee-shift, set inline from the measurement; -50% fallback) lands
+     exactly on the next copy's start and the loop is seamless. ALL track
+     layout lives here rather than in Tailwind utilities on the element, so
+     the reduced-motion override below wins by source order instead of
+     fighting utility-class order. */
   @keyframes mirox-marquee {
     from {
       transform: translateX(0);
