@@ -1023,3 +1023,5 @@ Record every count/output in the progress log. Any failure → systematic-debugg
 _Append entries here per task: date, task, what happened, counts, deviations, decisions. The G4 lesson applies: never pre-fill execution records — every entry is written AFTER the work it records._
 
 - 2026-08-14 — Plan written from the approved spec (4 rulings recorded there). Not yet executed.
+
+- 2026-08-14 — T1 infra complete (808ddd7..c344aec; review: 1 Important — missing prod-build proof — closed by controller-run `npm run build`, green; next-intl resolved ^4.13.6, accepted). T2 toggle complete (..d321183; 1 fix round — plan's own E2E block used page-wide `.first()` across the sheet portal, fixed by dialog/header scoping, 3/3 projects passing). T3 verifier+cart complete pending review (..f5d079d; plan's teeth-proof recipe was vacuous for uncommitted edits — sound commit→verify→reset proof substituted; 2 comment-fragment allowlist entries pending review).
