@@ -24,6 +24,19 @@ export interface BenefitItem {
   description: string;
 }
 
+export interface SiteAnnouncement {
+  /** Dismissal-key suffix — bump to resurface for users who dismissed a prior announcement. */
+  id: string;
+  text: string;
+  /** Optional link target; wraps the announcement text in a Link when set. */
+  href: string | null;
+  /** Optional distinct CTA label rendered as the underlined link after the plain text.
+   *  null + href set → the whole text becomes the link (pre-gate behavior). */
+  linkLabel: string | null;
+  /** Scrolling marquee vs the static centered bar. */
+  marquee: boolean;
+}
+
 export const site = {
   name: BRAND_NAME,
   tagline: BRAND_TAGLINE,
@@ -68,8 +81,21 @@ export const site = {
    * copy once a threshold is both implemented in code and confirmed with the
    * client; tracked by the client content inventory task (docs/planning/
    * TODO.md Spawned section).
+   *
+   * The launch announcement below is NOT a client promo claim — it announces
+   * our own feedback form (G8 TASK-059), so it doesn't conflict with the
+   * retraction rule above. Promo copy still needs client confirmation.
    */
-  announcement: null as string | null,
+  announcement: {
+    id: "launch-2026-08",
+    text: "Ми відкрилися! Новий сайт Mirox уже працює. Помітили проблему або маєте пропозицію?",
+    href: "/feedback",
+    linkLabel: "Розкажіть нам через форму зворотного зв'язку",
+    marquee: true,
+  } as SiteAnnouncement | null,
+
+  /** Accessible label for the announcement dismiss control. */
+  announcementDismiss: "Приховати оголошення",
 
   /** CLIENT-SUPPLIED placeholder handles — data lives in brand.ts since G5. */
   socials: SOCIALS,

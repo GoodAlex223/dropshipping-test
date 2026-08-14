@@ -61,6 +61,15 @@ export const emails = {
     safetyText: "Просто проігноруйте цей лист. Посилання дійсне 24 години.",
     unsubscribe: "Відписатися",
   },
+  feedback: {
+    subject: () => `Новий відгук із сайту — ${getStoreName()}`,
+    title: "Новий відгук",
+    heading: "Новий відгук із сайту",
+    nameLabel: "Ім'я",
+    emailLabel: "Email",
+    /** Rendered when the visitor left neither name nor email. */
+    anonymous: "Відправник не залишив контактів.",
+  },
   footer: {
     rights: "Всі права захищені.",
   },

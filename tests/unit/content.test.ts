@@ -6,6 +6,7 @@ import { auth } from "@/content/auth";
 import { account, ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS } from "@/content/account";
 import { newsletter } from "@/content/newsletter";
 import { system } from "@/content/system";
+import { feedback } from "@/content/feedback";
 import { OrderStatus, PaymentStatus } from "@prisma/client";
 
 describe("site content", () => {
@@ -24,6 +25,13 @@ describe("site content", () => {
   it("carries the client's own claim figures", () => {
     expect(site.claims.olxSales).toBe("300+");
     expect(site.claims.instagramOrders).toBe("100+");
+  });
+
+  it("points the launch announcement at the feedback form as a marquee", () => {
+    expect(site.announcement?.href).toBe("/feedback");
+    expect(site.announcement?.marquee).toBe(true);
+    expect(site.announcement?.id).toBeTruthy();
+    expect(site.announcement?.linkLabel).toBeTruthy();
   });
 });
 
@@ -184,5 +192,11 @@ describe("site header content", () => {
   it("wraps search queries in Ukrainian guillemets", () => {
     expect(site.header.search.viewAll("test")).toContain("«test»");
     expect(site.header.search.noResults("test")).toContain("«test»");
+  });
+});
+
+describe("feedback content", () => {
+  it("maps both feedback API outcome codes to Ukrainian", () => {
+    expect(Object.keys(feedback.byCode).sort()).toEqual(["SEND_FAILED", "VALIDATION_ERROR"]);
   });
 });

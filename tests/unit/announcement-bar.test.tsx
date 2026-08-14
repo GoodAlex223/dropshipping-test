@@ -1,7 +1,11 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import type { SiteAnnouncement } from "@/content/site";
 
-const mockSite = { announcement: "Free delivery on orders over 1000 UAH" as string | null };
+const mockSite = {
+  announcement: null as SiteAnnouncement | null,
+  announcementDismiss: "Приховати оголошення",
+};
 vi.mock("@/content/site", () => ({
   get site() {
     return mockSite;
@@ -10,9 +14,17 @@ vi.mock("@/content/site", () => ({
 
 import { AnnouncementBar } from "@/components/common/AnnouncementBar";
 
+const LAUNCH: SiteAnnouncement = {
+  id: "launch-2026-08",
+  text: "Ми відкрилися! Розкажіть нам про проблеми",
+  href: "/feedback",
+  linkLabel: "Розкажіть нам",
+  marquee: true,
+};
+
 beforeEach(() => {
   window.localStorage.clear();
-  mockSite.announcement = "Free delivery on orders over 1000 UAH";
+  mockSite.announcement = { ...LAUNCH };
 });
 
 afterEach(() => {
@@ -20,40 +32,78 @@ afterEach(() => {
 });
 
 describe("AnnouncementBar", () => {
-  it("renders the configured announcement", () => {
-    render(<AnnouncementBar />);
-    expect(screen.getByText("Free delivery on orders over 1000 UAH")).toBeInTheDocument();
-  });
-
   it("renders nothing when no announcement is configured", () => {
     mockSite.announcement = null;
     const { container } = render(<AnnouncementBar />);
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("stays hidden once dismissed", () => {
-    // Non-vacuous only because AnnouncementBar now reads the real snapshot
-    // (useSyncExternalStore's getSnapshot, not a hardcoded initial state) on
-    // this very first render pass under RTL's non-hydrating render() — see
-    // the "proves the localStorage read is live" test below, which breaks
-    // this exact read and confirms this assertion actually fails.
-    window.localStorage.setItem("mirox:announcement-dismissed", "1");
+  it("renders the text plain and the label as the link when linkLabel is set", () => {
+    render(<AnnouncementBar />);
+    const link = screen.getByRole("link", { name: "Розкажіть нам" });
+    expect(link).toHaveAttribute("href", "/feedback");
+    // The announcement text itself is NOT inside the link (the link's own
+    // content is only the label — text and link are rendered as siblings
+    // under a shared wrapper, not text-inside-anchor).
+    expect(link.textContent).not.toContain(LAUNCH.text);
+  });
+
+  it("falls back to linking the whole text when linkLabel is null", () => {
+    mockSite.announcement = { ...LAUNCH, linkLabel: null };
+    render(<AnnouncementBar />);
+    expect(screen.getByRole("link", { name: LAUNCH.text })).toHaveAttribute("href", "/feedback");
+  });
+
+  it("renders aria-hidden duplicates that are clickable but out of the tab order", () => {
+    const { container } = render(<AnnouncementBar />);
+    expect(container.querySelector(".animate-marquee")).not.toBeNull();
+    const dupes = container.querySelectorAll(".marquee-duplicate");
+    expect(dupes.length).toBeGreaterThanOrEqual(1);
+    dupes.forEach((dupe) => {
+      expect(dupe.getAttribute("aria-hidden")).toBe("true");
+      const link = dupe.querySelector("a");
+      // Real link: every visible pill is mouse-clickable (gate ruling 8)…
+      expect(link).not.toBeNull();
+      expect(link!.getAttribute("href")).toBe("/feedback");
+      // …but out of the tab order, so copy 1 stays the only tab stop.
+      expect(link!.getAttribute("tabindex")).toBe("-1");
+    });
+    // Exactly one link in the accessibility tree (aria-hidden excluded).
+    expect(screen.getAllByRole("link", { name: LAUNCH.linkLabel! })).toHaveLength(1);
+  });
+
+  it("renders the static centered variant without a duplicate when marquee is off", () => {
+    mockSite.announcement = { ...LAUNCH, marquee: false };
+    const { container } = render(<AnnouncementBar />);
+    expect(container.querySelector(".animate-marquee")).toBeNull();
+    expect(container.querySelector(".marquee-duplicate")).toBeNull();
+    expect(screen.getByText(LAUNCH.text)).toBeInTheDocument();
+  });
+
+  it("stays hidden when the id-scoped dismissal key is set", () => {
+    // Non-vacuous only because AnnouncementBar reads the real snapshot
+    // (useSyncExternalStore's getSnapshot) on this very first render pass
+    // under RTL's non-hydrating render().
+    window.localStorage.setItem("mirox:announcement-dismissed:launch-2026-08", "1");
     const { container } = render(<AnnouncementBar />);
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("exposes an accessible dismiss control", () => {
+  it("ignores a different announcement's dismissal (id scoping)", () => {
+    window.localStorage.setItem("mirox:announcement-dismissed:old-promo", "1");
     render(<AnnouncementBar />);
-    expect(screen.getByRole("button", { name: /dismiss/i })).toBeInTheDocument();
+    // The link's accessible name is the linkLabel (not the full text) now
+    // that LAUNCH carries a linkLabel — see the "renders the text plain..."
+    // case above for that split.
+    expect(screen.getByRole("link", { name: LAUNCH.linkLabel! })).toBeInTheDocument();
   });
 
-  it("dismisses on click and persists the choice to localStorage", () => {
+  it("dismisses via the UA-labelled control and persists under the id-scoped key", () => {
     render(<AnnouncementBar />);
 
-    fireEvent.click(screen.getByRole("button", { name: /dismiss/i }));
+    fireEvent.click(screen.getByRole("button", { name: "Приховати оголошення" }));
 
-    expect(screen.queryByRole("button", { name: /dismiss/i })).not.toBeInTheDocument();
-    expect(screen.queryByText("Free delivery on orders over 1000 UAH")).not.toBeInTheDocument();
-    expect(window.localStorage.getItem("mirox:announcement-dismissed")).toBe("1");
+    expect(screen.queryByText(LAUNCH.text)).not.toBeInTheDocument();
+    expect(window.localStorage.getItem("mirox:announcement-dismissed:launch-2026-08")).toBe("1");
   });
 });

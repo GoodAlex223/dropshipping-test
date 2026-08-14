@@ -79,7 +79,7 @@ src/
 │   │   ├── newsletter/     # Newsletter subscriber management (list, search, filter, export, delete)
 │   │   └── reviews/        # Review management (list, reply, hide/show, delete)
 │   ├── (auth)/             # Login & register pages
-│   ├── (shop)/             # Customer storefront (home, products, cart, checkout, account)
+│   ├── (shop)/             # Customer storefront (home, products, cart, checkout, account, feedback)
 │   ├── newsletter/         # Newsletter confirmation and unsubscribe pages
 │   │   ├── confirm/        # Email confirmation landing page
 │   │   └── unsubscribe/    # Unsubscribe landing page
@@ -92,6 +92,7 @@ src/
 │   │   ├── cart/            # Cart validation
 │   │   ├── categories/     # Public category endpoints
 │   │   ├── checkout/       # Payment & order creation
+│   │   ├── feedback/       # Public feedback form endpoint (guest POST, coded outcomes, honeypot drop)
 │   │   ├── health/         # Health check
 │   │   ├── newsletter/     # Public newsletter API (subscribe, confirm, unsubscribe)
 │   │   ├── orders/         # Customer order endpoints
@@ -123,6 +124,7 @@ src/
 │   ├── cart.ts             # Cart + CartDrawer copy (summary/empty/clear/stock strings, itemsCount plural via pluralizeUk)
 │   ├── checkout.ts         # Checkout + confirmation copy (steps, COD/prepay block config, manager contacts — cardNumber/whatsapp are CLIENT-SUPPLIED-pending)
 │   ├── emails.ts           # Transactional email copy (subjects + bodies, UA); imports only brand.ts — lucide-free by contract (bundled into API routes)
+│   ├── feedback.ts         # /feedback page + form copy; byCode maps feedback API outcome codes to Ukrainian
 │   ├── home.ts             # Homepage copy (hero, benefits, whyChooseUs, rails, testimonials)
 │   ├── newsletter.ts       # Newsletter pages + footer-signup copy; byCode maps translate API outcome codes to Ukrainian
 │   ├── site.ts             # Site-wide config (announcement, socials, client claims, footer benefits, header chrome strings — site.header, G4)
@@ -152,7 +154,8 @@ src/
 │   ├── email-templates/    # HTML email templates
 │   │   ├── layout.ts       # Shared dark Mirox table-based shell (lang=uk, EMAIL_COLORS, renderEmailShell/renderPanel/renderButton)
 │   │   ├── order-confirmation.ts     # Order confirmation template (OrderEmailData, guest-aware CTA)
-│   │   └── newsletter-confirmation.ts  # Double opt-in confirmation email
+│   │   ├── newsletter-confirmation.ts  # Double opt-in confirmation email
+│   │   └── feedback.ts     # Feedback notification (conditional contact rows, escaped message; sent to FEEDBACK_EMAIL with Reply-To = submitter)
 │   └── validations/        # Zod schemas for all entities
 │       ├── index.ts        # Product, category, order, user, review, newsletter schemas
 │       └── google-shopping.ts  # Google Shopping feed item schema
@@ -302,8 +305,8 @@ prisma/
 - **Cross-field validation pattern**: Use Zod `.refine()` for validations requiring multiple fields; comparePrice must exceed price if provided; validation message targets specific field via `path` option; enforced on both server (API routes) and client (form validation)
 - **API error handling pattern**: API routes use `try/catch` with `apiError()` helper for consistent error responses; no `console.error()` calls in API routes (removed during TASK-029 cleanup); catch blocks with unused error variables use bare `catch` syntax without error parameter (ESLint recommended pattern from TASK-031); structured error responses via `NextResponse.json()` with appropriate status codes
 - **Bare catch syntax**: When catch block doesn't use error variable, use bare `catch` without parameter (e.g., `} catch {` instead of `} catch (error) {`); pattern enforced by ESLint and applied across API routes, client components, server pages, and utilities during TASK-031 code quality sweep
-- **Coded API outcomes**: newsletter routes (`api/newsletter/{subscribe,confirm,unsubscribe}`) and the register 409 (`api/auth/register`) return a machine `code` alongside English prose; clients map `code` → Ukrainian via `src/content/` (G2 `create-order` convention, extended in G4 to the newsletter confirm/unsubscribe pages and the footer signup toast)
-- **Transactional email pattern** (G5): all emails (order confirmation, newsletter double opt-in) render on the shared dark Mirox table-based shell (`src/lib/email-templates/layout.ts` — `renderEmailShell`/`renderPanel`/`renderButton`, `lang="uk"`, bgcolor attrs for Outlook); UA copy sourced from `src/content/emails.ts`, never inlined; brand name resolved at render time via `getStoreName()` (`env NEXT_PUBLIC_STORE_NAME || BRAND_NAME`) — a module-scope const would freeze the env value at import and break env-dependent tests; every interpolated free-text user/DB string passes through `escapeHtml` (item names, variant info, address fields, subscriber email); order CTA is guest-aware (`OrderEmailData.hasAccount`) — guest COD orders have no `/account/orders` to link to, so the button renders only for signed-in customers (G2 confirmation-page ruling); tax row renders only when `tax > 0` (COD is always 0); contact links pull from `brand.ts` `SOCIALS`/`WHATSAPP_HREF`, so WhatsApp stays hidden until the client supplies a real number; **route sends are `await`ed** — an unawaited fire-and-forget dies when the serverless function freezes after responding, so prod never sent (regression-tested by the create-order race test)
+- **Coded API outcomes**: newsletter routes (`api/newsletter/{subscribe,confirm,unsubscribe}`), the register 409 (`api/auth/register`), and `api/feedback` (`FEEDBACK_SENT`/`VALIDATION_ERROR`/`SEND_FAILED`, G8) return a machine `code` alongside English prose; clients map `code` → Ukrainian via `src/content/` (G2 `create-order` convention, extended in G4 to the newsletter confirm/unsubscribe pages and the footer signup toast, and in G8 to the `/feedback` form via `content/feedback.ts`)
+- **Transactional email pattern** (G5): all emails (order confirmation, newsletter double opt-in, feedback notification — the last added in G8) render on the shared dark Mirox table-based shell (`src/lib/email-templates/layout.ts` — `renderEmailShell`/`renderPanel`/`renderButton`, `lang="uk"`, bgcolor attrs for Outlook); UA copy sourced from `src/content/emails.ts`, never inlined; brand name resolved at render time via `getStoreName()` (`env NEXT_PUBLIC_STORE_NAME || BRAND_NAME`) — a module-scope const would freeze the env value at import and break env-dependent tests; every interpolated free-text user/DB string passes through `escapeHtml` (item names, variant info, address fields, subscriber email); order CTA is guest-aware (`OrderEmailData.hasAccount`) — guest COD orders have no `/account/orders` to link to, so the button renders only for signed-in customers (G2 confirmation-page ruling); tax row renders only when `tax > 0` (COD is always 0); contact links pull from `brand.ts` `SOCIALS`/`WHATSAPP_HREF`, so WhatsApp stays hidden until the client supplies a real number; **route sends are `await`ed** — an unawaited fire-and-forget dies when the serverless function freezes after responding, so prod never sent (regression-tested by the create-order race test)
 
 <!-- END AUTO-MANAGED -->
 

@@ -67,16 +67,15 @@ test.describe("Homepage", () => {
   });
 
   test("announcement bar dismisses and stays dismissed when configured", async ({ page }) => {
-    const dismiss = page.getByRole("button", { name: /dismiss announcement/i });
+    const dismiss = page.getByRole("button", { name: "Приховати оголошення" });
 
-    // `site.announcement` (src/content/site.ts) is a client-supplied value and
-    // ships `null` by default today — the bar renders nothing in that state,
-    // so there is no dismiss button to find. This test accommodates BOTH
-    // states rather than assuming either: it waits briefly for the button
-    // (covering the post-hydration reveal via useSyncExternalStore), and if
-    // it never shows up, asserts the bar is genuinely absent and stops there.
-    // If a real announcement is configured later, this same test starts
-    // exercising the full dismiss-and-persist flow without needing an edit.
+    // `site.announcement` (src/content/site.ts) went LIVE site-wide in G8
+    // TASK-059 (the launch marquee) — it's no longer `null` by default, so
+    // the dismiss button is expected to appear. This test still accommodates
+    // BOTH states rather than assuming either: it waits briefly for the
+    // button (covering the post-hydration reveal via useSyncExternalStore),
+    // and if it never shows up (e.g. a future config sets `announcement` back
+    // to null), asserts the bar is genuinely absent and stops there.
     // (This is not the WebKit pre-hydration race from TASK-038a — that was a
     // real button arriving late; here, with announcement === null, the
     // button never arrives at all.)

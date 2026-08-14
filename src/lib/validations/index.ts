@@ -162,6 +162,25 @@ export const updateSubscriberStatusSchema = z.object({
   status: z.enum(["ACTIVE", "UNSUBSCRIBED"]),
 });
 
+// Feedback validations (G8 TASK-058)
+const emptyToUndefined = (value: unknown) =>
+  typeof value === "string" && value.trim() === "" ? undefined : value;
+
+export const feedbackSchema = z.object({
+  name: z.preprocess(emptyToUndefined, z.string().trim().max(100, "Name is too long").optional()),
+  email: z.preprocess(
+    emptyToUndefined,
+    z.string().trim().email("Invalid email address").max(254, "Email is too long").optional()
+  ),
+  message: z
+    .string()
+    .trim()
+    .min(5, "Message must be at least 5 characters")
+    .max(2000, "Message must be at most 2000 characters"),
+  /** Honeypot — never rejected here; the route silently drops when filled. */
+  website: z.string().optional(),
+});
+
 // Google Shopping feed validations
 export {
   googleShoppingItemSchema,
@@ -188,3 +207,4 @@ export type AdminReviewVisibilityInput = z.infer<typeof adminReviewVisibilitySch
 export type SubscribeNewsletterInput = z.infer<typeof subscribeNewsletterSchema>;
 export type UnsubscribeNewsletterInput = z.infer<typeof unsubscribeNewsletterSchema>;
 export type UpdateSubscriberStatusInput = z.infer<typeof updateSubscriberStatusSchema>;
+export type FeedbackInput = z.infer<typeof feedbackSchema>;
