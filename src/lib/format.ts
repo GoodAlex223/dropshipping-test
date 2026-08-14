@@ -18,7 +18,8 @@ export function formatPrice(value: number | string): string {
 
 /**
  * Ukrainian cardinal pluralization: 1 відгук / 2-4 відгуки / 5+ відгуків
- * (with the 11-14 exception). Hardcoded-UA interim until TASK-039 i18n.
+ * (with the 11-14 exception). Kept for category-client.tsx (retired by G12);
+ * catalog strings use ICU plurals.
  */
 export function pluralizeUk(n: number, one: string, few: string, many: string): string {
   const abs = Math.abs(Math.trunc(n));
