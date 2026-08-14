@@ -59,6 +59,18 @@ describe("FeedbackForm", () => {
     expect(screen.getByRole("button", { name: "Надіслати" })).toBeInTheDocument();
   });
 
+  it("toasts the validation copy instead of silently ignoring a whitespace-only message", async () => {
+    render(<FeedbackForm />);
+
+    fireEvent.change(screen.getByLabelText("Повідомлення"), { target: { value: "     " } });
+    fireEvent.click(screen.getByRole("button", { name: "Надіслати" }));
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith("Перевірте заповнені поля — щось не так.")
+    );
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("falls back to the generic Ukrainian error when fetch rejects", async () => {
     fetchMock.mockRejectedValue(new Error("offline"));
     render(<FeedbackForm />);

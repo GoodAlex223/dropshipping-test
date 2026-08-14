@@ -18,7 +18,12 @@ export function FeedbackForm() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!message.trim()) return;
+    // minLength counts raw characters, so a whitespace-only message passes
+    // browser validation and lands here — never fail silently (PR #35 review).
+    if (!message.trim()) {
+      toast.error(feedback.byCode.VALIDATION_ERROR);
+      return;
+    }
 
     setIsLoading(true);
     try {
