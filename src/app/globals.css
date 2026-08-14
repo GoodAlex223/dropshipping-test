@@ -527,24 +527,33 @@
   .grain {
     background-image: url("/grain.svg");
   }
-  @media (prefers-reduced-motion: reduce) {
-    .animate-fade-up {
-      animation: none;
-    }
-    .hover-lift,
-    .hover-lift:hover {
-      transform: none;
-      box-shadow: none;
-      transition: none;
-    }
-    .animate-marquee {
-      animation: none;
-      width: auto;
-      white-space: normal;
-      justify-content: center;
-    }
-    .marquee-duplicate {
-      display: none;
-    }
+}
+
+/* Reduced-motion reset — deliberately OUTSIDE @layer utilities. Tailwind v4's
+   production optimizer silently DROPS a bare @media block nested inside
+   @layer utilities (dev keeps it, so the omission is invisible until a prod
+   build is inspected — the fade-up/hover-lift resets below never reached
+   production CSS between TASK-034 and this fix). Un-layered rules also beat
+   layered ones in the cascade, which is exactly the precedence a reset
+   needs. Verify presence in the COMPILED output of `next build`, not the
+   dev server. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up {
+    animation: none;
+  }
+  .hover-lift,
+  .hover-lift:hover {
+    transform: none;
+    box-shadow: none;
+    transition: none;
+  }
+  .animate-marquee {
+    animation: none;
+    width: auto;
+    white-space: normal;
+    justify-content: center;
+  }
+  .marquee-duplicate {
+    display: none;
   }
 }
