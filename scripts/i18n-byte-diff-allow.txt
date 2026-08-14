@@ -10,3 +10,23 @@
 # split the quote across the wrapped comment lines.
 Розраховується при
 оформленні
+
+# TASK-039 Task 5 (checkout/auth/account/... extraction, commit 8d04973):
+# src/content/checkout.ts carried two doc-comments illustrating COMPOSED
+# render output, not live catalog strings themselves — both the comments and
+# the fields they annotated are deleted by this extraction:
+#   - `/** The live total is appended in the page: «ПІДТВЕРДИТИ ЗАМОВЛЕННЯ —
+#     1 960 грн». */` above `payment.submit` — "ПІДТВЕРДИТИ ЗАМОВЛЕННЯ" itself
+#     IS the live catalog value (checkout.payment.submit, extracted and
+#     verified) and matches automatically; "грн" is the currency suffix that
+#     formatPrice() appends at render time (src/lib/format.ts, never
+#     catalog-sourced — see CLAUDE.md's formatPrice() convention), so it has
+#     no catalog key of its own.
+#   - `/** «1 шт» — quantity unit used in the variant line «Чорний · L ·
+#     1 шт». */` above `summary.qty` — "шт" IS live (part of the extracted
+#     ICU pattern "{count} шт", matches automatically); "Чорний" is an
+#     illustrative example PRODUCT VARIANT COLOR name (DB/cart-store data,
+#     e.g. item.color — never sourced from content/checkout.ts), not a
+#     content-layer string.
+грн
+Чорний
