@@ -30,3 +30,37 @@
 #     content-layer string.
 грн
 Чорний
+
+# TASK-039 Task 7 (reviews/categories/share sweep, commit e10336a): completing
+# the full-sweep AC required rewording 10 pre-existing dev/JSDoc comments
+# (left in place, untouched, by Tasks 3-6 since their quoted words happened to
+# coincidentally already be live catalog values) to English — these 9
+# fragments were never live catalog strings to begin with, so they have no
+# home in messages/uk.json:
+#   - "Адреси" / "Налаштування" (src/app/(shop)/account/layout.tsx) — future
+#     page names (Addresses/Settings) for /account/addresses and
+#     /account/settings, which don't exist yet (404 today, per the comment
+#     itself, BACKLOG'd). Not catalog-worthy: the pages/nav links don't exist.
+#   - "У вибране" / "Відкрити фото замірів" (product-detail-client.tsx) —
+#     future feature labels (Wishlist / Open size-chart photo) explicitly not
+#     built yet, per spec §7 ledger #2/#3.
+#   - "Доставка та" / "оплата», «Повернення», «Контакти" (Footer.tsx) —
+#     TASK-055 future footer link labels quoting the ORIGINAL MOCKUP copy;
+#     those pages aren't built yet (404 today), so no catalog key exists.
+#   - "тис." / "млн" (SocialLinks.tsx) — illustrative abbreviation examples
+#     in a comment about NOT-YET-IMPLEMENTED locale-aware follower-count
+#     formatting (formatFollowers still hardcodes "en-US" — TASK-039 doesn't
+#     wire this up, only removes the comment's Cyrillic).
+#   - "Один розмір" (src/lib/product-display.ts) — an illustrative example of
+#     a DB Size-variant value in a comment, not a catalog string (same class
+#     as Task 5's «Чорний» precedent above: DB/variant data, never
+#     content-layer copy).
+Адреси
+Налаштування
+У вибране
+Відкрити фото замірів
+Доставка та
+оплата», «Повернення», «Контакти
+тис.
+млн
+Один розмір
