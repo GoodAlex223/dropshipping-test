@@ -362,11 +362,11 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
                 e.stopPropagation();
                 onQuickView({ focusSizes: true });
               }}
-              // Cart glyph, not the former "Add to cart" text label (R3) — the
-              // exact icon Header.tsx uses top-right. aria-label keeps the
-              // accessible name identical to before so existing
-              // getByRole("button", { name: "Add to cart" }) queries still find
-              // it.
+              // Cart glyph, not the former text label (R3) — the exact icon
+              // Header.tsx uses top-right. aria-label keeps the accessible
+              // name identical to before (t("card.addToCartAria")'s current
+              // Ukrainian value) so the existing test's getByRole locator by
+              // that name still finds it.
               className="pointer-events-none flex items-center justify-center rounded-[10px] bg-white px-3 py-2 text-black group-focus-within:pointer-events-auto group-hover:pointer-events-auto hover:bg-[#e5e5e5]"
             >
               <ShoppingCart className="h-4 w-4" />

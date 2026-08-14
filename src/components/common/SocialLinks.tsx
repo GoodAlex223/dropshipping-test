@@ -18,7 +18,8 @@ const ICONS: Record<SocialLink["platform"], LucideIcon> = {
  * Uses Intl.NumberFormat with compact notation for consistent rounding. For
  * example, 999,950 rounds to 1M, not "1000K". This approach is forward-
  * compatible with TASK-039's i18n implementation, which will pass locale
- * dynamically to produce the Ukrainian/Russian compact-notation suffixes.
+ * dynamically to produce Ukrainian ("тис.") or Russian ("млн")
+ * compact-notation suffixes.
  */
 function formatFollowers(count: number): string {
   if (count < 1_000) {
