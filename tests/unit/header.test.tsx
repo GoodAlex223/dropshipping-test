@@ -1,5 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
+import { renderWithIntl } from "../helpers/render-with-intl";
 
 vi.mock("next-auth/react", () => ({
   useSession: () => ({ data: null, status: "unauthenticated" }),
@@ -25,12 +26,12 @@ beforeEach(() => {
 
 describe("Header", () => {
   it("renders the client logo image, not the code-drawn wordmark", () => {
-    render(<Header />);
+    renderWithIntl(<Header />);
     expect(screen.getAllByAltText("Mirox Shop").length).toBeGreaterThan(0);
   });
 
   it("renders the three resolvable Ukrainian nav links (and none to unbuilt pages)", () => {
-    render(<Header />);
+    renderWithIntl(<Header />);
     expect(screen.getByRole("link", { name: "Каталог" })).toHaveAttribute("href", "/products");
     expect(screen.getByRole("link", { name: "Новинки" })).toHaveAttribute(
       "href",
@@ -46,7 +47,7 @@ describe("Header", () => {
   });
 
   it("labels the search trigger for a11y and E2E", () => {
-    render(<Header />);
+    renderWithIntl(<Header />);
     expect(screen.getByRole("button", { name: "Пошук (Ctrl+K)" })).toBeInTheDocument();
   });
 });

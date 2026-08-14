@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { LocaleSwitcher } from "@/components/common/LocaleSwitcher";
 import { site } from "@/content/site";
 import { formatPrice } from "@/lib/format";
 import { useCartStore } from "@/stores/cart.store";
@@ -235,6 +236,8 @@ export function Header() {
               )}
             </nav>
 
+            <LocaleSwitcher className="mt-4 px-3" />
+
             <Separator className="my-4" />
 
             {/* Mobile user section */}
@@ -325,6 +328,8 @@ export function Header() {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          <LocaleSwitcher className="hidden md:flex" />
+
           {/* Search Button */}
           <Button
             variant="ghost"
