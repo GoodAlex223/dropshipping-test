@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Package } from "lucide-react";
 import { ProductCard, QuickViewDialog } from "@/components/products";
 import { trackViewItemList, trackSelectItem, type GA4Item } from "@/lib/analytics";
@@ -77,6 +78,7 @@ function getPageNumbers(current: number, total: number): (number | "ellipsis")[]
 }
 
 function ProductsContentInner() {
+  const t = useTranslations("products");
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -224,11 +226,11 @@ function ProductsContentInner() {
       {/* Header */}
       <div className="mb-2.5 text-[12.5px] text-[#737373]">
         <Link href="/" className="hover:text-white">
-          Головна
+          {t("breadcrumbHome")}
         </Link>{" "}
-        / <span className="text-[#a3a3a3]">Каталог</span>
+        / <span className="text-[#a3a3a3]">{t("catalogName")}</span>
       </div>
-      <h1 className="mb-7 text-[40px] font-extrabold tracking-[-0.02em]">Каталог</h1>
+      <h1 className="mb-7 text-[40px] font-extrabold tracking-[-0.02em]">{t("catalogName")}</h1>
 
       <FilterBar
         filters={filters}
@@ -257,16 +259,14 @@ function ProductsContentInner() {
       ) : products.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <Package className="h-12 w-12 text-[#525252]" />
-          <h2 className="mt-4 text-lg font-bold">Нічого не знайдено</h2>
-          <p className="mt-2 text-sm text-[#a3a3a3]">
-            Спробуйте змінити фільтри або пошуковий запит.
-          </p>
+          <h2 className="mt-4 text-lg font-bold">{t("list.empty.title")}</h2>
+          <p className="mt-2 text-sm text-[#a3a3a3]">{t("list.empty.description")}</p>
           <button
             type="button"
             onClick={clearFilters}
             className="mt-6 rounded-[10px] border border-[#333] px-5 py-2.5 text-[13px] font-bold"
           >
-            Скинути фільтри
+            {t("list.empty.clearFilters")}
           </button>
         </div>
       ) : (
@@ -306,7 +306,7 @@ function ProductsContentInner() {
           {pagination.hasPrev && (
             <button
               type="button"
-              aria-label="Попередня сторінка"
+              aria-label={t("list.pagination.prev")}
               onClick={() => handlePageChange(pagination.page - 1)}
               className="flex h-9 w-9 items-center justify-center rounded-[9px] border border-[#262626] transition-colors hover:border-[#666] hover:text-white"
             >
@@ -342,7 +342,7 @@ function ProductsContentInner() {
           {pagination.hasNext && (
             <button
               type="button"
-              aria-label="Наступна сторінка"
+              aria-label={t("list.pagination.next")}
               onClick={() => handlePageChange(pagination.page + 1)}
               className="flex h-9 w-9 items-center justify-center rounded-[9px] border border-[#262626] transition-colors hover:border-[#666] hover:text-white"
             >

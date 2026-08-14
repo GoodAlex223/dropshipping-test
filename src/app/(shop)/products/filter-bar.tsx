@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { SlidersHorizontal, X } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -37,11 +38,11 @@ const PRICE_STEP = 10;
 /** Fixed per the design spec — not sourced from the API (only Size varies by product). */
 const COLORS = ["Чорний", "Білий"] as const;
 
-const SORT_OPTIONS: { value: CatalogSort; label: string }[] = [
-  { value: "new", label: "Новинки" },
-  { value: "popular", label: "Популярні" },
-  { value: "price-asc", label: "Ціна ↑" },
-  { value: "price-desc", label: "Ціна ↓" },
+const SORT_OPTIONS: { value: CatalogSort }[] = [
+  { value: "new" },
+  { value: "popular" },
+  { value: "price-asc" },
+  { value: "price-desc" },
 ];
 
 /** Shared "white when active" pill styling for dropdown-trigger chips. Inactive
@@ -68,6 +69,7 @@ function PriceRange({
   maxPrice: number | null;
   onApply: (min: number | null, max: number | null) => void;
 }) {
+  const t = useTranslations("products");
   const [range, setRange] = useState<[number, number]>([minPrice ?? 0, maxPrice ?? PRICE_MAX]);
 
   return (
@@ -90,7 +92,7 @@ function PriceRange({
         }
         className="w-full rounded-[10px] bg-white px-4 py-2.5 text-[13px] font-bold text-black hover:bg-[#e5e5e5]"
       >
-        Застосувати
+        {t("filters.apply")}
       </button>
     </div>
   );
@@ -105,6 +107,7 @@ function PricePopover({
   maxPrice: number | null;
   onChange: FilterBarProps["onChange"];
 }) {
+  const t = useTranslations("products");
   const [open, setOpen] = useState(false);
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -116,7 +119,7 @@ function PricePopover({
             chipClasses(minPrice !== null || maxPrice !== null)
           )}
         >
-          Ціна ▾
+          {t("filters.priceTrigger")}
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-64 border-[#262626] bg-[#0d0d0d] text-white">
@@ -145,18 +148,19 @@ function BrandPopover({
   brands: string[];
   onChange: FilterBarProps["onChange"];
 }) {
+  const t = useTranslations("products");
   const [open, setOpen] = useState(false);
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button type="button" className={cn("hidden md:inline-flex", chipClasses(brand !== null))}>
-          Бренд ▾
+          {t("filters.brandTrigger")}
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-56 border-[#262626] bg-[#0d0d0d] p-2 text-white">
         <div className="flex flex-col gap-1">
           {brands.length === 0 && (
-            <p className="px-3 py-2 text-[13px] text-[#737373]">Немає брендів</p>
+            <p className="px-3 py-2 text-[13px] text-[#737373]">{t("filters.noBrands")}</p>
           )}
           {brands.map((b) => {
             const isActive = brand === b;
@@ -193,12 +197,13 @@ function ColorPopover({
   color: string | null;
   onChange: FilterBarProps["onChange"];
 }) {
+  const t = useTranslations("products");
   const [open, setOpen] = useState(false);
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button type="button" className={cn("hidden md:inline-flex", chipClasses(color !== null))}>
-          Колір ▾
+          {t("filters.colorTrigger")}
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-48 border-[#262626] bg-[#0d0d0d] p-2 text-white">
@@ -239,12 +244,13 @@ function AvailabilityPopover({
   inStock: boolean;
   onChange: FilterBarProps["onChange"];
 }) {
+  const t = useTranslations("products");
   const [open, setOpen] = useState(false);
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button type="button" className={cn("hidden md:inline-flex", chipClasses(inStock))}>
-          Наявність ▾
+          {t("filters.availabilityTrigger")}
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-48 border-[#262626] bg-[#0d0d0d] p-2 text-white">
@@ -263,7 +269,7 @@ function AvailabilityPopover({
                 : cn("border-transparent text-[#a3a3a3]", INACTIVE_ROW_HOVER)
             )}
           >
-            Всі товари
+            {t("filters.allProducts")}
           </button>
           <button
             type="button"
@@ -279,7 +285,7 @@ function AvailabilityPopover({
                 : cn("border-transparent text-[#a3a3a3]", INACTIVE_ROW_HOVER)
             )}
           >
-            В наявності
+            {t("filters.inStock")}
           </button>
         </div>
       </PopoverContent>
@@ -294,9 +300,10 @@ function SizeGroup({
   size: string | null;
   onChange: FilterBarProps["onChange"];
 }) {
+  const t = useTranslations("products");
   return (
     <div className="hidden shrink-0 items-center gap-1.5 rounded-[10px] border border-[#262626] px-2 py-[5px] md:flex">
-      <span className="px-1.5 text-[13px] font-semibold text-[#a3a3a3]">Розмір:</span>
+      <span className="px-1.5 text-[13px] font-semibold text-[#a3a3a3]">{t("variant.size")}</span>
       {SIZE_ORDER.map((s) => {
         const isActive = size === s;
         return (
@@ -331,6 +338,7 @@ function FiltersSheet({
   onChange: FilterBarProps["onChange"];
   onClearAll: FilterBarProps["onClearAll"];
 }) {
+  const t = useTranslations("products");
   const [open, setOpen] = useState(false);
 
   return (
@@ -341,7 +349,7 @@ function FiltersSheet({
           className="inline-flex shrink-0 items-center gap-2 rounded-[10px] border border-[#333] px-4 py-2.5 text-[13px] font-bold transition-colors hover:border-[#666]"
         >
           <SlidersHorizontal className="h-[15px] w-[15px]" />
-          Фільтри
+          {t("filters.title")}
         </button>
       </SheetTrigger>
       <SheetContent
@@ -349,11 +357,13 @@ function FiltersSheet({
         className="w-[300px] overflow-y-auto border-[#262626] bg-black text-white"
       >
         <SheetHeader>
-          <SheetTitle className="text-white">Фільтри</SheetTitle>
+          <SheetTitle className="text-white">{t("filters.title")}</SheetTitle>
         </SheetHeader>
         <div className="mt-4 flex flex-col gap-6 px-4 pb-8">
           <div>
-            <p className="mb-2 text-[13px] font-semibold text-[#a3a3a3]">Ціна</p>
+            <p className="mb-2 text-[13px] font-semibold text-[#a3a3a3]">
+              {t("filters.priceHeading")}
+            </p>
             <PriceRange
               minPrice={filters.minPrice}
               maxPrice={filters.maxPrice}
@@ -373,9 +383,13 @@ function FiltersSheet({
           </div>
 
           <div>
-            <p className="mb-2 text-[13px] font-semibold text-[#a3a3a3]">Бренд</p>
+            <p className="mb-2 text-[13px] font-semibold text-[#a3a3a3]">
+              {t("filters.brandHeading")}
+            </p>
             <div className="flex flex-col gap-1">
-              {brands.length === 0 && <p className="text-[13px] text-[#737373]">Немає брендів</p>}
+              {brands.length === 0 && (
+                <p className="text-[13px] text-[#737373]">{t("filters.noBrands")}</p>
+              )}
               {brands.map((b) => {
                 const isActive = filters.brand === b;
                 return (
@@ -399,7 +413,9 @@ function FiltersSheet({
           </div>
 
           <div>
-            <p className="mb-2 text-[13px] font-semibold text-[#a3a3a3]">Розмір</p>
+            <p className="mb-2 text-[13px] font-semibold text-[#a3a3a3]">
+              {t("variant.sizeLabel")}
+            </p>
             <div className="flex flex-wrap gap-2">
               {SIZE_ORDER.map((s) => {
                 const isActive = filters.size === s;
@@ -424,7 +440,9 @@ function FiltersSheet({
           </div>
 
           <div>
-            <p className="mb-2 text-[13px] font-semibold text-[#a3a3a3]">Колір</p>
+            <p className="mb-2 text-[13px] font-semibold text-[#a3a3a3]">
+              {t("variant.colorLabel")}
+            </p>
             <div className="flex flex-col gap-1">
               {COLORS.map((c) => {
                 const isActive = filters.color === c;
@@ -450,7 +468,9 @@ function FiltersSheet({
           </div>
 
           <div>
-            <p className="mb-2 text-[13px] font-semibold text-[#a3a3a3]">Наявність</p>
+            <p className="mb-2 text-[13px] font-semibold text-[#a3a3a3]">
+              {t("filters.availabilityHeading")}
+            </p>
             <div className="flex flex-col gap-1">
               <button
                 type="button"
@@ -463,7 +483,7 @@ function FiltersSheet({
                     : cn("border-[#262626] text-[#a3a3a3]", INACTIVE_ROW_HOVER)
                 )}
               >
-                Всі товари
+                {t("filters.allProducts")}
               </button>
               <button
                 type="button"
@@ -476,7 +496,7 @@ function FiltersSheet({
                     : cn("border-[#262626] text-[#a3a3a3]", INACTIVE_ROW_HOVER)
                 )}
               >
-                В наявності
+                {t("filters.inStock")}
               </button>
             </div>
           </div>
@@ -487,10 +507,20 @@ function FiltersSheet({
               semantics (onChange({ sort: value })), white-active styling
               matching every other row in this sheet. */}
           <div>
-            <p className="mb-2 text-[13px] font-semibold text-[#a3a3a3]">Сортування</p>
+            <p className="mb-2 text-[13px] font-semibold text-[#a3a3a3]">
+              {t("filters.sortHeading")}
+            </p>
             <div className="flex flex-col gap-1">
               {SORT_OPTIONS.map((opt) => {
                 const isActive = filters.sort === opt.value;
+                const label =
+                  opt.value === "new"
+                    ? t("sort.new")
+                    : opt.value === "popular"
+                      ? t("sort.popular")
+                      : opt.value === "price-asc"
+                        ? t("sort.priceAsc")
+                        : t("sort.priceDesc");
                 return (
                   <button
                     key={opt.value}
@@ -504,7 +534,7 @@ function FiltersSheet({
                         : cn("border-[#262626] text-[#a3a3a3]", INACTIVE_ROW_HOVER)
                     )}
                   >
-                    {opt.label}
+                    {label}
                   </button>
                 );
               })}
@@ -519,7 +549,7 @@ function FiltersSheet({
             }}
             className="rounded-[10px] border border-[#333] px-4 py-2.5 text-[13px] font-bold text-[#a3a3a3] transition-colors hover:border-[#666] hover:text-white"
           >
-            Скинути все
+            {t("filters.clearAll")}
           </button>
         </div>
       </SheetContent>
@@ -528,6 +558,7 @@ function FiltersSheet({
 }
 
 export function FilterBar({ filters, brands, onChange, onClearAll }: FilterBarProps) {
+  const t = useTranslations("products");
   return (
     <div className="mb-8">
       <div className="flex flex-nowrap items-center gap-2.5 overflow-x-auto pb-1 md:flex-wrap md:overflow-visible md:pb-0">
@@ -548,10 +579,18 @@ export function FilterBar({ filters, brands, onChange, onClearAll }: FilterBarPr
             below md and only re-appears at md+. */}
         <div className="hidden shrink-0 items-center gap-1.5 md:ml-auto md:flex">
           <span className="text-[13px] font-semibold whitespace-nowrap text-[#737373]">
-            Сортування:
+            {t("sort.heading")}
           </span>
           {SORT_OPTIONS.map((opt) => {
             const isActive = filters.sort === opt.value;
+            const label =
+              opt.value === "new"
+                ? t("sort.new")
+                : opt.value === "popular"
+                  ? t("sort.popular")
+                  : opt.value === "price-asc"
+                    ? t("sort.priceAsc")
+                    : t("sort.priceDesc");
             return (
               <button
                 key={opt.value}
@@ -565,7 +604,7 @@ export function FilterBar({ filters, brands, onChange, onClearAll }: FilterBarPr
                     : cn("border-[#333] text-[#a3a3a3]", INACTIVE_ROW_HOVER)
                 )}
               >
-                {opt.label}
+                {label}
               </button>
             );
           })}
@@ -576,10 +615,10 @@ export function FilterBar({ filters, brands, onChange, onClearAll }: FilterBarPr
         <div className="mt-3 flex flex-wrap items-center gap-2">
           {filters.search && (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-[#262626] py-1.5 pr-2 pl-3 text-[12.5px] font-medium text-[#a3a3a3]">
-              Пошук: {filters.search}
+              {t("filters.searchPill", { query: filters.search })}
               <button
                 type="button"
-                aria-label="Скинути пошук"
+                aria-label={t("filters.clearSearch")}
                 onClick={() => onChange({ search: null })}
                 className="rounded-full p-0.5 hover:text-white"
               >
@@ -589,10 +628,10 @@ export function FilterBar({ filters, brands, onChange, onClearAll }: FilterBarPr
           )}
           {filters.category && (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-[#262626] py-1.5 pr-2 pl-3 text-[12.5px] font-medium text-[#a3a3a3]">
-              Категорія: {filters.category}
+              {t("filters.categoryPill", { category: filters.category })}
               <button
                 type="button"
-                aria-label="Скинути категорію"
+                aria-label={t("filters.clearCategory")}
                 onClick={() => onChange({ category: null })}
                 className="rounded-full p-0.5 hover:text-white"
               >

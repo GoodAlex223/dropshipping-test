@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ProductCard } from "./ProductCard";
 
 const STORAGE_KEY = "mirox:recently-viewed";
@@ -49,6 +50,7 @@ export function recordRecentlyViewed(id: string): void {
  * renders nothing — the section is never load-bearing.
  */
 export function RecentlyViewed({ currentProductId }: { currentProductId: string }) {
+  const t = useTranslations("products");
   const [products, setProducts] = useState<RecentProduct[]>([]);
 
   useEffect(() => {
@@ -76,9 +78,9 @@ export function RecentlyViewed({ currentProductId }: { currentProductId: string 
   if (products.length === 0) return null;
 
   return (
-    <section aria-label="Ви нещодавно переглянули" className="mt-16">
+    <section aria-label={t("recentlyViewed.title")} className="mt-16">
       <h2 className="mb-7 text-[28px] font-extrabold tracking-[-0.02em]">
-        Ви нещодавно переглянули
+        {t("recentlyViewed.title")}
       </h2>
       <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
         {products.map((product) => (

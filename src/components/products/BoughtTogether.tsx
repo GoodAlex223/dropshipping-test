@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Plus } from "lucide-react";
 import { useCartStore } from "@/stores/cart.store";
 import { trackAddToCart } from "@/lib/analytics";
@@ -50,6 +51,7 @@ function orderedSizeVariants(product: BundleCompanion) {
  * exceed the sum — checkout recomputes prices, so no invented bundle discount.
  */
 export function BoughtTogether({ current, companions, preferredSizeValue }: BoughtTogetherProps) {
+  const t = useTranslations("products");
   const addItem = useCartStore((state) => state.addItem);
   const openCart = useCartStore((state) => state.openCart);
 
@@ -123,7 +125,7 @@ export function BoughtTogether({ current, companions, preferredSizeValue }: Boug
 
   return (
     <div className="bg-card border-border rounded-[20px] border p-6 sm:p-8">
-      <h2 className="mb-6 text-[22px] font-extrabold">Купують разом</h2>
+      <h2 className="mb-6 text-[22px] font-extrabold">{t("boughtTogether.title")}</h2>
       {/* <sm: horizontal snap carousel (152px cards, next card peeks to signal
           swipe — gate revision 2026-08-03); sm+: the original 3-up flex row. */}
       <div className="mb-6 flex snap-x snap-mandatory items-start gap-3 overflow-x-auto pb-2 [scrollbar-width:none] sm:snap-none sm:overflow-x-visible sm:pb-0 [&::-webkit-scrollbar]:hidden">
@@ -147,14 +149,14 @@ export function BoughtTogether({ current, companions, preferredSizeValue }: Boug
               {index === 0
                 ? variant && (
                     <div className="text-muted-foreground text-xs font-semibold">
-                      Розмір: <span className="text-foreground">{variant.value}</span>
+                      {t("variant.size")} <span className="text-foreground">{variant.value}</span>
                     </div>
                   )
                 : product.sizeVariants.length > 0 && (
                     <div
                       className="flex flex-wrap gap-1"
                       role="group"
-                      aria-label={`Розмір: ${product.name}`}
+                      aria-label={t("variant.sizeGroupAria", { name: product.name })}
                     >
                       {orderedSizeVariants(product).map((v) => {
                         const active = selections[product.id] === v.id;
@@ -187,7 +189,7 @@ export function BoughtTogether({ current, companions, preferredSizeValue }: Boug
       </div>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="text-muted-foreground text-[13.5px]">
-          Загальна ціна:{" "}
+          {t("boughtTogether.totalLabel")}{" "}
           {totals.showStrike && (
             <span className="line-through">{formatPrice(totals.compareTotal)}</span>
           )}{" "}
@@ -204,7 +206,7 @@ export function BoughtTogether({ current, companions, preferredSizeValue }: Boug
           disabled={!allResolved}
           className="rounded-[10px] bg-white px-6 py-3.5 text-[13px] font-extrabold tracking-[0.05em] text-black transition-colors hover:bg-[#e5e5e5] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          ДОДАТИ КОМПЛЕКТ У КОШИК
+          {t("boughtTogether.addBundle")}
         </button>
       </div>
     </div>

@@ -1,6 +1,21 @@
-import { render, screen, fireEvent, within } from "@testing-library/react";
+import { screen, fireEvent, within } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
+import { NextIntlClientProvider } from "next-intl";
+import type { ReactElement } from "react";
+import { renderWithIntl } from "../helpers/render-with-intl";
+import uk from "../../messages/uk.json";
 import { FilterBar, type CatalogFilters } from "@/app/(shop)/products/filter-bar";
+
+/** Wraps an element for a `rerender()` call — see quick-view-dialog.test.tsx
+ *  for the full rationale (Task 4 finding: renderWithIntl's provider
+ *  wrapping only applies to the initial render). */
+function wrapIntl(ui: ReactElement) {
+  return (
+    <NextIntlClientProvider locale="uk" messages={uk} timeZone="Europe/Kyiv">
+      {ui}
+    </NextIntlClientProvider>
+  );
+}
 
 // jsdom has no ResizeObserver; opening the Фільтри sheet (R5 tests below)
 // mounts the sheet's PriceRange section, which uses Radix Slider —
@@ -30,25 +45,29 @@ const filters: CatalogFilters = {
 describe("FilterBar", () => {
   it("toggles a size chip on and off", () => {
     const onChange = vi.fn();
-    const { rerender } = render(
+    const { rerender } = renderWithIntl(
       <FilterBar filters={filters} brands={[]} onChange={onChange} onClearAll={vi.fn()} />
     );
     fireEvent.click(screen.getByRole("button", { name: "M" }));
     expect(onChange).toHaveBeenCalledWith({ size: "M" });
     rerender(
-      <FilterBar
-        filters={{ ...filters, size: "M" }}
-        brands={[]}
-        onChange={onChange}
-        onClearAll={vi.fn()}
-      />
+      wrapIntl(
+        <FilterBar
+          filters={{ ...filters, size: "M" }}
+          brands={[]}
+          onChange={onChange}
+          onClearAll={vi.fn()}
+        />
+      )
     );
     fireEvent.click(screen.getByRole("button", { name: "M" }));
     expect(onChange).toHaveBeenLastCalledWith({ size: null });
   });
 
   it("renders all five size chips S–XXL", () => {
-    render(<FilterBar filters={filters} brands={[]} onChange={vi.fn()} onClearAll={vi.fn()} />);
+    renderWithIntl(
+      <FilterBar filters={filters} brands={[]} onChange={vi.fn()} onClearAll={vi.fn()} />
+    );
     for (const s of ["S", "M", "L", "XL", "XXL"]) {
       expect(screen.getByRole("button", { name: s })).toBeInTheDocument();
     }
@@ -56,7 +75,9 @@ describe("FilterBar", () => {
 
   it("emits sort selection from the sort buttons", () => {
     const onChange = vi.fn();
-    render(<FilterBar filters={filters} brands={[]} onChange={onChange} onClearAll={vi.fn()} />);
+    renderWithIntl(
+      <FilterBar filters={filters} brands={[]} onChange={onChange} onClearAll={vi.fn()} />
+    );
     fireEvent.click(screen.getByRole("button", { name: "Ціна ↑" }));
     expect(onChange).toHaveBeenCalledWith({ sort: "price-asc" });
     fireEvent.click(screen.getByRole("button", { name: "Популярні" }));
@@ -64,7 +85,7 @@ describe("FilterBar", () => {
   });
 
   it("marks the active sort button with aria-pressed", () => {
-    render(
+    renderWithIntl(
       <FilterBar
         filters={{ ...filters, sort: "popular" }}
         brands={[]}
@@ -84,7 +105,7 @@ describe("FilterBar", () => {
 
   it("shows a removable chip for an active search", () => {
     const onChange = vi.fn();
-    render(
+    renderWithIntl(
       <FilterBar
         filters={{ ...filters, search: "худі" }}
         brands={[]}
@@ -103,7 +124,7 @@ describe("FilterBar — R5 mobile: filters + sort live only in the sheet", () =>
     // visibility — it locks in the `hidden ... md:*` class contract the
     // mobile-only-sheet behavior depends on. See the E2E isMobile branch in
     // tests/e2e/products.spec.ts for the real behavioral proof.
-    render(
+    renderWithIntl(
       <FilterBar filters={filters} brands={["Mirox"]} onChange={vi.fn()} onClearAll={vi.fn()} />
     );
 
@@ -131,7 +152,7 @@ describe("FilterBar — R5 mobile: filters + sort live only in the sheet", () =>
 
   it("opens the Фільтри sheet with a Сортування section offering the same 4 URL-equivalent options", () => {
     const onChange = vi.fn();
-    render(
+    renderWithIntl(
       <FilterBar
         filters={{ ...filters, sort: "popular" }}
         brands={[]}
@@ -158,7 +179,9 @@ describe("FilterBar — R5 mobile: filters + sort live only in the sheet", () =>
 
   it("opens the Фільтри sheet with a Розмір size chip that emits the same size param", () => {
     const onChange = vi.fn();
-    render(<FilterBar filters={filters} brands={[]} onChange={onChange} onClearAll={vi.fn()} />);
+    renderWithIntl(
+      <FilterBar filters={filters} brands={[]} onChange={onChange} onClearAll={vi.fn()} />
+    );
 
     fireEvent.click(screen.getByRole("button", { name: /Фільтри/ }));
     const dialog = screen.getByRole("dialog");

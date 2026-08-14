@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
+import { renderWithIntl } from "../helpers/render-with-intl";
 import {
   RecentlyViewed,
   readRecentlyViewed,
@@ -35,7 +36,7 @@ describe("recently-viewed storage", () => {
 describe("<RecentlyViewed />", () => {
   it("records the current product and renders nothing with no other history", () => {
     global.fetch = vi.fn();
-    const { container } = render(<RecentlyViewed currentProductId="cur" />);
+    const { container } = renderWithIntl(<RecentlyViewed currentProductId="cur" />);
     expect(readRecentlyViewed()).toEqual(["cur"]);
     expect(container).toBeEmptyDOMElement();
     expect(global.fetch).not.toHaveBeenCalled();
@@ -60,7 +61,7 @@ describe("<RecentlyViewed />", () => {
         ],
       }),
     });
-    render(<RecentlyViewed currentProductId="cur" />);
+    renderWithIntl(<RecentlyViewed currentProductId="cur" />);
     await waitFor(() =>
       expect(screen.getByRole("heading", { name: "Ви нещодавно переглянули" })).toBeInTheDocument()
     );
@@ -71,7 +72,7 @@ describe("<RecentlyViewed />", () => {
   it("renders nothing when the fetch fails", async () => {
     recordRecentlyViewed("other1");
     global.fetch = vi.fn().mockRejectedValue(new Error("network"));
-    const { container } = render(<RecentlyViewed currentProductId="cur" />);
+    const { container } = renderWithIntl(<RecentlyViewed currentProductId="cur" />);
     await waitFor(() => expect(global.fetch).toHaveBeenCalled());
     expect(container).toBeEmptyDOMElement();
   });

@@ -576,5 +576,117 @@
     "np-office": "Нова Пошта — відділення",
     "np-courier": "Нова Пошта — кур'єр",
     "np-postomat": "Нова Пошта — поштомат"
+  },
+  "products": {
+    "catalogName": "Каталог",
+    "breadcrumbHome": "Головна",
+    "list": {
+      "empty": {
+        "title": "Нічого не знайдено",
+        "description": "Спробуйте змінити фільтри або пошуковий запит.",
+        "clearFilters": "Скинути фільтри"
+      },
+      "pagination": {
+        "prev": "Попередня сторінка",
+        "next": "Наступна сторінка"
+      }
+    },
+    "filters": {
+      "title": "Фільтри",
+      "apply": "Застосувати",
+      "priceTrigger": "Ціна ▾",
+      "priceHeading": "Ціна",
+      "brandTrigger": "Бренд ▾",
+      "brandHeading": "Бренд",
+      "noBrands": "Немає брендів",
+      "availabilityTrigger": "Наявність ▾",
+      "availabilityHeading": "Наявність",
+      "allProducts": "Всі товари",
+      "inStock": "В наявності",
+      "colorTrigger": "Колір ▾",
+      "clearAll": "Скинути все",
+      "sortHeading": "Сортування",
+      "searchPill": "Пошук: {query}",
+      "clearSearch": "Скинути пошук",
+      "categoryPill": "Категорія: {category}",
+      "clearCategory": "Скинути категорію"
+    },
+    "sort": {
+      "heading": "Сортування:",
+      "new": "Новинки",
+      "popular": "Популярні",
+      "priceAsc": "Ціна ↑",
+      "priceDesc": "Ціна ↓"
+    },
+    "variant": {
+      "size": "Розмір:",
+      "sizeLabel": "Розмір",
+      "sizeGroupAria": "Розмір: {name}",
+      "color": "Колір:",
+      "colorLabel": "Колір",
+      "colorAria": "Колір: {value}",
+      "colorAriaSelected": "Колір: {value} (обраний)",
+      "colorAriaSibling": "Колір: {value} — {name}"
+    },
+    "card": {
+      "prevPhoto": "Попереднє фото",
+      "nextPhoto": "Наступне фото",
+      "quickView": "Швидкий перегляд",
+      "addToCartAria": "В кошик"
+    },
+    "badges": {
+      "new": "НОВИНКА",
+      "sale": "-{percent}%",
+      "outOfStock": "Немає в наявності"
+    },
+    "sizePicker": {
+      "title": "Підбір розміру",
+      "subtitle": "Вкажіть свій зріст і вагу, ми підберемо ідеальний розмір",
+      "heightLabel": "Зріст (см)",
+      "weightLabel": "Вага (кг)",
+      "resultLabel": "Ваш розмір:",
+      "recommendationsLabel": "Рекомендації:",
+      "recommendations": {
+        "fit": "Вільна посадка",
+        "comfort": "Комфорт у русі",
+        "idealChoice": "Ідеальний вибір"
+      }
+    },
+    "quickView": {
+      "prevPhoto": "Попереднє фото",
+      "nextPhoto": "Наступне фото",
+      "addToCart": "ДОДАТИ В КОШИК",
+      "viewDetails": "Детальніше →"
+    },
+    "gallery": {
+      "photosAria": "Фотографії: {name}",
+      "slideAlt": "{name} — фото {index}",
+      "goToPhoto": "Перейти до фото {index}",
+      "photoOf": "Фото {index} із {total}",
+      "thumbnailAlt": "{name} — мініатюра {index}"
+    },
+    "boughtTogether": {
+      "title": "Купують разом",
+      "totalLabel": "Загальна ціна:",
+      "addBundle": "ДОДАТИ КОМПЛЕКТ У КОШИК"
+    },
+    "recentlyViewed": {
+      "title": "Ви нещодавно переглянули"
+    },
+    "detail": {
+      "reviewCount": "{count, plural, one {# відгук} few {# відгуки} many {# відгуків} other {# відгуків}}",
+      "outOfStock": "Немає в наявності",
+      "lowStock": "Залишилось {count} шт",
+      "inStock": "● В наявності",
+      "shippingNote": "Доставка Новою Поштою",
+      "addedToCart": "ДОДАНО В КОШИК",
+      "addToCart": "ДОДАТИ В КОШИК",
+      "buyNow": "КУПИТИ ЗАРАЗ",
+      "description": "Опис",
+      "relatedProducts": "Схожі товари",
+      "notFoundTitle": "Товар не знайдено",
+      "notFoundDescription": "Товару, який ви шукаєте, не існує, або його було видалено.",
+      "backToCatalog": "До каталогу"
+    }
   }
 }

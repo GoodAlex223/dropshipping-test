@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { IMAGE_SIZES } from "@/lib/image-utils";
 import { cn } from "@/lib/utils";
 import { ProductImage } from "./ProductImage";
@@ -24,6 +25,7 @@ interface ProductGalleryProps {
  * the dots and visible slide stay aligned when crossing lg boundary.
  */
 export function ProductGallery({ images, productName }: ProductGalleryProps) {
+  const t = useTranslations("products");
   const [activeIndex, setActiveIndex] = useState(0);
   const trackRef = useRef<HTMLDivElement>(null);
   // Set by scrollToSlide: this activeIndex change rides its own smooth scroll,
@@ -110,7 +112,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
           ref={trackRef}
           onScroll={handleTrackScroll}
           className="flex snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          aria-label={`Фотографії: ${productName}`}
+          aria-label={t("gallery.photosAria", { name: productName })}
         >
           {images.map((image, index) => (
             <div
@@ -119,7 +121,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             >
               <ProductImage
                 src={image.url}
-                alt={image.alt || `${productName} — фото ${index + 1}`}
+                alt={image.alt || t("gallery.slideAlt", { name: productName, index: index + 1 })}
                 sizes="100vw"
               />
             </div>
@@ -131,7 +133,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
               <button
                 key={index}
                 type="button"
-                aria-label={`Перейти до фото ${index + 1}`}
+                aria-label={t("gallery.goToPhoto", { index: index + 1 })}
                 onClick={() => scrollToSlide(index)}
                 className={cn(
                   "h-1 rounded-full transition-all",
@@ -151,7 +153,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             <button
               key={`${image.url}-${index}`}
               type="button"
-              aria-label={`Фото ${index + 1} із ${images.length}`}
+              aria-label={t("gallery.photoOf", { index: index + 1, total: images.length })}
               aria-current={index === activeIndex ? "true" : "false"}
               onClick={() => setActiveIndex(index)}
               className={cn(
@@ -163,7 +165,9 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             >
               <ProductImage
                 src={image.url}
-                alt={image.alt || `${productName} — мініатюра ${index + 1}`}
+                alt={
+                  image.alt || t("gallery.thumbnailAlt", { name: productName, index: index + 1 })
+                }
                 sizes={IMAGE_SIZES.thumbnail}
               />
             </button>

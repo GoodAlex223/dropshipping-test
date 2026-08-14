@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/db";
 import { getProductMetadata, getProductJsonLd, getBreadcrumbJsonLd, siteConfig } from "@/lib/seo";
 import { safeSection } from "@/lib/safe-section";
@@ -336,7 +337,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ProductDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  const product = await getProduct(slug);
+  const [product, t] = await Promise.all([getProduct(slug), getTranslations("products")]);
 
   if (!product) {
     return <ProductNotFound />;
@@ -364,8 +365,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
   });
 
   const breadcrumbJsonLd = getBreadcrumbJsonLd([
-    { name: "Головна", url: siteConfig.url },
-    { name: "Каталог", url: `${siteConfig.url}/products` },
+    { name: t("breadcrumbHome"), url: siteConfig.url },
+    { name: t("catalogName"), url: `${siteConfig.url}/products` },
     { name: product.name, url: `${siteConfig.url}/products/${product.slug}` },
   ]);
 

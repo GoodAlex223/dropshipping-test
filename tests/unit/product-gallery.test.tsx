@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent } from "@testing-library/react";
+import { renderWithIntl } from "../helpers/render-with-intl";
 import { ProductGallery } from "@/components/products/ProductGallery";
 
 const images = [
@@ -23,14 +24,14 @@ beforeEach(() => {
 
 describe("ProductGallery", () => {
   it("renders a thumb per image and marks the first active", () => {
-    render(<ProductGallery images={images} productName="Худі Mirox Basic" />);
+    renderWithIntl(<ProductGallery images={images} productName="Худі Mirox Basic" />);
     const thumbs = screen.getAllByRole("button", { name: /Фото \d із \d/ });
     expect(thumbs).toHaveLength(3);
     expect(thumbs[0]).toHaveAttribute("aria-current", "true");
   });
 
   it("thumb click switches the active image", () => {
-    render(<ProductGallery images={images} productName="Худі Mirox Basic" />);
+    renderWithIntl(<ProductGallery images={images} productName="Худі Mirox Basic" />);
     const thumbs = screen.getAllByRole("button", { name: /Фото \d із \d/ });
     fireEvent.click(thumbs[2]);
     expect(thumbs[2]).toHaveAttribute("aria-current", "true");
@@ -38,18 +39,18 @@ describe("ProductGallery", () => {
   });
 
   it("renders mobile dots for multi-image products", () => {
-    render(<ProductGallery images={images} productName="Худі Mirox Basic" />);
+    renderWithIntl(<ProductGallery images={images} productName="Худі Mirox Basic" />);
     expect(screen.getAllByRole("button", { name: /Перейти до фото \d/ })).toHaveLength(3);
   });
 
   it("zero images → single branded fallback, no thumbs or dots", () => {
-    render(<ProductGallery images={[]} productName="Худі Mirox Basic" />);
+    renderWithIntl(<ProductGallery images={[]} productName="Худі Mirox Basic" />);
     expect(screen.queryAllByRole("button")).toHaveLength(0);
     expect(screen.getAllByTestId("product-image-fallback").length).toBeGreaterThan(0);
   });
 
   it("desktop thumb click syncs the hidden mobile track scroll position", () => {
-    render(<ProductGallery images={images} productName="Худі Mirox Basic" />);
+    renderWithIntl(<ProductGallery images={images} productName="Худі Mirox Basic" />);
     const track = screen.getByLabelText(/Фотографії/);
 
     // Stub clientWidth and scrollTo
@@ -67,7 +68,7 @@ describe("ProductGallery", () => {
   });
 
   it("mobile dot click smooth-scrolls without an instant snap from the sync effect (PR #27)", () => {
-    render(<ProductGallery images={images} productName="Худі Mirox Basic" />);
+    renderWithIntl(<ProductGallery images={images} productName="Худі Mirox Basic" />);
     const track = screen.getByLabelText(/Фотографії/);
     Object.defineProperty(track, "clientWidth", { value: 390, writable: true });
     track.scrollTo = vi.fn();
