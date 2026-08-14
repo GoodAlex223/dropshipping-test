@@ -21,6 +21,8 @@ export const dynamic = "force-dynamic";
 
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Playfair_Display, Lora, Manrope } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale } from "next-intl/server";
 import { Providers } from "@/components/providers";
 import { getDefaultMetadata, getOrganizationJsonLd, getWebsiteJsonLd } from "@/lib/seo";
 import { PRECONNECT_DOMAINS, DNS_PREFETCH_DOMAINS } from "@/components/common/ResourceHints";
@@ -82,17 +84,18 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
   const organizationJsonLd = getOrganizationJsonLd();
   const websiteJsonLd = getWebsiteJsonLd();
 
   return (
     <html
-      lang="en"
+      lang={locale}
       suppressHydrationWarning
       className={`${inter.variable} ${jetbrainsMono.variable} ${playfair.variable} ${lora.variable} ${manrope.variable}`}
     >
@@ -122,7 +125,9 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} ${playfair.variable} ${lora.variable} ${manrope.variable} antialiased`}
       >
-        <Providers>{children}</Providers>
+        <NextIntlClientProvider>
+          <Providers>{children}</Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
