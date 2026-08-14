@@ -91,6 +91,7 @@ export function AnnouncementBar() {
   );
 
   const announcement = site.announcement;
+  const marqueeVisible = !dismissed && site.announcement?.marquee === true;
 
   const linkClass =
     "bg-foreground text-background hover:bg-foreground/80 inline-block rounded-full px-3 py-0.5 font-semibold no-underline transition-colors";
@@ -137,6 +138,15 @@ export function AnnouncementBar() {
   const [shiftPx, setShiftPx] = useState<number | null>(null);
 
   useEffect(() => {
+    // getDismissedServerSnapshot() always answers "dismissed" for the first
+    // (hydration) commit, so the bar renders null on that pass and only
+    // mounts its refs on the corrective re-render once
+    // useSyncExternalStore reconciles against the real localStorage value.
+    // A `[]`-deps effect fires once, right after that FIRST (null) commit —
+    // it finds no refs, bails, and never runs again, so the marquee never
+    // gets measured. Depending on `marqueeVisible` makes the effect re-run
+    // when the bar actually mounts.
+    if (!marqueeVisible) return;
     const viewport = viewportRef.current;
     const first = firstCopyRef.current;
     if (!viewport || !first) return;
@@ -161,9 +171,7 @@ export function AnnouncementBar() {
       observer.observe(viewport);
     }
     return () => observer?.disconnect();
-    // Re-measure only matters while the marquee variant is mounted; the
-    // effect re-runs on remount, which is the only way the variant changes.
-  }, []);
+  }, [marqueeVisible]);
 
   if (!announcement || dismissed) return null;
 
