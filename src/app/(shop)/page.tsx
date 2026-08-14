@@ -8,7 +8,11 @@ import { BenefitStrip } from "@/components/common";
 import { Hero, ProductRail, Testimonials, WhyChooseUs } from "@/components/home";
 import { home } from "@/content/home";
 
-export const metadata: Metadata = getHomeMetadata();
+// Task 8: getHomeMetadata is now async (reads brand.description/metaSuffix
+// from the request-scoped i18n catalog).
+export async function generateMetadata(): Promise<Metadata> {
+  return getHomeMetadata();
+}
 
 // Kept as force-dynamic, NOT switched to `revalidate = 300` ISR. Verified
 // against a real `npm run build`: the root layout (src/app/layout.tsx) declares

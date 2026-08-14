@@ -9,7 +9,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { prisma } from "@/lib/db";
 import { getCategoriesListingMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = getCategoriesListingMetadata();
+// Task 8: getCategoriesListingMetadata is now async (reads the "seo" i18n namespace).
+export async function generateMetadata(): Promise<Metadata> {
+  return getCategoriesListingMetadata();
+}
 
 async function getCategories() {
   const categories = await prisma.category.findMany({

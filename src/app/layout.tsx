@@ -72,7 +72,12 @@ const lora = Lora({
   preload: false,
 });
 
-export const metadata: Metadata = getDefaultMetadata();
+// Task 8: getDefaultMetadata is now async (reads the request-scoped i18n
+// catalog for brand.description), so the static `metadata` export becomes
+// Next's generateMetadata() convention.
+export async function generateMetadata(): Promise<Metadata> {
+  return getDefaultMetadata();
+}
 
 export const viewport: Viewport = {
   themeColor: [

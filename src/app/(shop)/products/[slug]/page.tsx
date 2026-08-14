@@ -322,7 +322,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  return getProductMetadata({
+  // Task 8: getProductMetadata is now async (its last-resort description
+  // fallback reads the i18n catalog's brand.description).
+  return await getProductMetadata({
     name: product.name,
     slug: product.slug,
     description: product.description,

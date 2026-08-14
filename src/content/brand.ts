@@ -11,10 +11,10 @@ export const BRAND_NAME = "Mirox Shop";
  * Long form. TASK-039 G9 copied this value into the i18n catalog as
  * `brand.tagline` (Footer.tsx's copyright line reads it via t() now) — but
  * the CONSTANT itself is deliberately kept here, not deleted, because
- * src/app/opengraph-image.tsx (Satori/ImageResponse — an SEO-layer route
- * outside this task's scope, deferred to Task 8 alongside BRAND_DESCRIPTION/
- * BRAND_META_SUFFIX below) imports it directly and must keep compiling.
- * Same precedent, same reason, one file this plan's pre-flight scan missed.
+ * src/app/opengraph-image.tsx (Satori/ImageResponse — an SEO-layer route)
+ * imports it directly and must keep compiling. Same reason BRAND_META_SUFFIX
+ * survives below (Task 8 resolved both pre-flight-missed imports the same
+ * way: keep the constant, duplicate the value into the catalog).
  */
 export const BRAND_TAGLINE = "Сучасний одяг для тих, хто цінує якість і мінімалізм.";
 
@@ -22,13 +22,30 @@ export const BRAND_TAGLINE = "Сучасний одяг для тих, хто ц
 // (home.ts's hero.subtitle field) is gone; the same sentence now lives in
 // the catalog twice by design (matching this constant's original
 // relationship to BRAND_TAGLINE above): home.hero.subtitle (consumed by
-// Hero.tsx) and brand.heroSubtitle (reserved, unconsumed until Task 8's SEO
-// layer wants it — mirrors BRAND_DESCRIPTION/BRAND_META_SUFFIX's deferral).
+// Hero.tsx) and brand.heroSubtitle (reserved — Task 8's SEO layer used the
+// longer brand.description/brand.metaSuffix pair below instead, so
+// heroSubtitle stays unconsumed pending a future use).
 
+/**
+ * Value duplicated byte-identically into the i18n catalog as `brand.metaSuffix`
+ * (Task 8) for src/lib/seo.ts's getHomeMetadata, which needs it translated
+ * per-locale. The CONSTANT survives here — unlike BRAND_DESCRIPTION below,
+ * which was deleted — because src/app/opengraph-image.tsx (the site-wide OG
+ * image route) imports it directly. That route is prerendered once at
+ * `next build` time (no request in flight), so it cannot call the
+ * request-scoped `getTranslations` seo.ts now uses; reading the surviving
+ * constant is the only option, same precedent as BRAND_TAGLINE above.
+ */
 export const BRAND_META_SUFFIX = "Сучасний одяг";
 
-export const BRAND_DESCRIPTION =
-  "Mirox Shop — сучасний одяг для тих, хто цінує якість і мінімалізм. Перевіряємо кожну річ перед відправкою, швидка доставка по всій Україні.";
+// BRAND_DESCRIPTION removed (TASK-039 Task 8) — its value now lives only in
+// the i18n catalog as `brand.description`. Its two consumers (siteConfig's
+// `description` field in src/lib/seo.ts, used by getDefaultMetadata,
+// getHomeMetadata and getProductMetadata's last-resort fallback) all became
+// async and now read `brand.description` via getTranslations directly, so
+// nothing imports this constant anymore — same disposal as
+// BRAND_HERO_SUBTITLE above, unlike BRAND_META_SUFFIX, which still has a
+// surviving importer.
 
 /** Social link data. Icon components stay in the UI layer (SocialLinks.tsx). */
 export interface SocialLink {
