@@ -30,6 +30,29 @@ describe("formatPrice", () => {
   });
 });
 
+describe("formatPrice — §7.4 compliance axes (TASK-039 AC 3)", () => {
+  it("groups thousands with NBSP U+00A0 (never comma or plain space)", () => {
+    expect(formatPrice(1290)).toBe("1 290 грн");
+    expect(formatPrice(1234567)).toBe("1 234 567 грн");
+    expect(formatPrice(1290)).not.toMatch(/[,]| /);
+  });
+  it("does not group 3-digit amounts, groups from 4 digits", () => {
+    expect(formatPrice(999)).toBe("999 грн");
+    expect(formatPrice(1000)).toBe("1 000 грн");
+  });
+  it("uses comma decimals with exactly two kopiyka digits when fractional", () => {
+    expect(formatPrice(1290.5)).toBe("1 290,50 грн");
+    expect(formatPrice(0.05)).toBe("0,05 грн");
+  });
+  it("renders whole amounts without ,00 — documented ruling 1 (spec §5)", () => {
+    expect(formatPrice(1290)).not.toContain(",");
+  });
+  it("places «грн» after the amount joined by NBSP, no trailing period (ДСТУ 3582:2013)", () => {
+    expect(formatPrice(5)).toBe("5 грн");
+    expect(formatPrice(5).endsWith(".")).toBe(false);
+  });
+});
+
 describe("pluralizeUk", () => {
   const forms = ["відгук", "відгуки", "відгуків"] as const;
   it.each([
