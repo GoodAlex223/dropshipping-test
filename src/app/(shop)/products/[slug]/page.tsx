@@ -314,11 +314,15 @@ async function getProductForMetadata(slug: string) {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = await getProductForMetadata(slug);
+  // Fix round 1 (post-Task-8 review): "Product Not Found" was hardcoded
+  // English here — same fixed-set class as categories/[slug]/page.tsx's
+  // "Category Not Found" that Task 8 already converted, just missed one
+  // file over. Mirrors that fix exactly: Promise.all + seo.productNotFound.
+  const [product, t] = await Promise.all([getProductForMetadata(slug), getTranslations("seo")]);
 
   if (!product) {
     return {
-      title: "Product Not Found",
+      title: t("productNotFound"),
     };
   }
 

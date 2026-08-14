@@ -767,6 +767,7 @@
       }
     },
     "categoryNotFound": "Категорію не знайдено",
+    "productNotFound": "Товар не знайдено",
     "breadcrumb": {
       "home": "Головна",
       "categories": "Категорії"

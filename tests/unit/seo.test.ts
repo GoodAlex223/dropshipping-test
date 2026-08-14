@@ -38,6 +38,7 @@ vi.mock("next-intl/server", () => ({
   },
 }));
 
+import { getTranslations } from "next-intl/server";
 import {
   siteConfig,
   getDefaultMetadata,
@@ -621,6 +622,20 @@ describe("SEO Utilities", () => {
       jsonLd.itemListElement.forEach((item: { "@type": string }) => {
         expect(item["@type"]).toBe("ListItem");
       });
+    });
+  });
+
+  describe("seo.productNotFound (fix round 1, post-Task-8 review)", () => {
+    // Unlike the other seo.* keys above, this one isn't read by any seo.ts
+    // export — src/app/(shop)/products/[slug]/page.tsx's generateMetadata
+    // calls getTranslations("seo") directly for its not-found branch (the
+    // same pattern categories/[slug]/page.tsx already used for
+    // "categoryNotFound", which this task originally missed one file over).
+    // This pins the catalog value through the exact same mock the rest of
+    // this file uses, since there's no seo.ts helper to exercise it through.
+    it("resolves to the catalog value via getTranslations('seo')", async () => {
+      const t = await getTranslations("seo");
+      expect(t("productNotFound")).toBe(uk.seo.productNotFound);
     });
   });
 });
