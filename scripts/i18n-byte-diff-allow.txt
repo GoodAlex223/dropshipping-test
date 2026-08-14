@@ -1,1 +1,12 @@
 # one deliberately-rewritten fragment per line
+
+# TASK-039 Task 3 (cart extraction, commit 3e5f8ae): src/content/cart.ts's
+# summary.shippingValue carried a doc-comment quoting the RETIRED G1-era copy
+# it replaced in G2 ("«Розраховується при оформленні»" -> "За тарифами Нової
+# Пошти"). The comment (and the whole file) is deleted by this extraction;
+# the quoted phrase was never a live string and has no catalog key of its
+# own — the CURRENT live value (shippingValue) is extracted and verified
+# separately. Two fragments because the multi-line-comment fallback regex
+# split the quote across the wrapped comment lines.
+Розраховується при
+оформленні
