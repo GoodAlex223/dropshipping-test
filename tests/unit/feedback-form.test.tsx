@@ -28,6 +28,7 @@ describe("FeedbackForm", () => {
     fireEvent.click(screen.getByRole("button", { name: "Надіслати" }));
 
     await waitFor(() => expect(screen.getByText("Дякуємо!")).toBeInTheDocument());
+    expect(screen.getByRole("status")).toHaveTextContent("Дякуємо!");
     const [url, init] = fetchMock.mock.calls[0];
     expect(url).toBe("/api/feedback");
     expect(JSON.parse(init.body).message).toBe("Кнопка кошика не працює");

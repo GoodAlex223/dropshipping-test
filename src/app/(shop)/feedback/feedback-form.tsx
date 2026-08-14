@@ -46,7 +46,10 @@ export function FeedbackForm() {
 
   if (isSuccess) {
     return (
-      <div className="border-border bg-muted flex items-start gap-3 rounded-md border p-4">
+      <div
+        role="status"
+        className="border-border bg-muted flex items-start gap-3 rounded-md border p-4"
+      >
         <CheckCircle2 className="text-foreground h-5 w-5 flex-shrink-0" />
         <div>
           <p className="text-foreground font-semibold">{feedback.success.title}</p>
