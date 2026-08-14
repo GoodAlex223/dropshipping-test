@@ -1,5 +1,53 @@
 {
   "common": {
     "localeSwitcher": "Мова"
+  },
+  "cart": {
+    "title": "Кошик",
+    "itemsCount": "{count, plural, one {# товар} few {# товари} many {# товарів} other {# товарів}}",
+    "continueShopping": "Продовжити покупки",
+    "remove": "Видалити",
+    "variant": {
+      "color": "Колір:",
+      "size": "Розмір:"
+    },
+    "quantity": {
+      "increase": "Збільшити кількість",
+      "decrease": "Зменшити кількість"
+    },
+    "empty": {
+      "title": "Кошик порожній",
+      "cta": "Перейти в каталог"
+    },
+    "summary": {
+      "title": "Разом",
+      "itemsLabel": "Товари",
+      "shippingLabel": "Доставка",
+      "shippingValue": "За тарифами Нової Пошти",
+      "totalLabel": "До сплати",
+      "checkoutCta": "ОФОРМИТИ ЗАМОВЛЕННЯ",
+      "validating": "Перевірка…",
+      "securePayment": "Безпечна оплата",
+      "stockIssues": {
+        "title": "Деякі товари недоступні в потрібній кількості",
+        "description": "Оновіть кількість або видаліть недоступні товари перед оформленням."
+      }
+    },
+    "stock": {
+      "outOfStock": "Немає в наявності",
+      "onlyN": "Доступно лише {count}",
+      "unavailable": "Товар більше недоступний"
+    },
+    "clear": {
+      "action": "Очистити кошик",
+      "dialogTitle": "Очистити кошик?",
+      "dialogDescription": "Усі товари буде видалено з кошика. Цю дію не можна скасувати.",
+      "confirm": "Очистити",
+      "cancel": "Скасувати"
+    },
+    "drawer": {
+      "title": "Кошик",
+      "viewCart": "Переглянути кошик"
+    }
   }
 }

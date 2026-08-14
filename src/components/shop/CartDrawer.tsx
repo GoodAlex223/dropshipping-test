@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ShoppingBag, X, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -12,10 +13,10 @@ import { Separator } from "@/components/ui/separator";
 import { useCartStore } from "@/stores/cart.store";
 import { formatPrice } from "@/lib/format";
 import { trackViewCart } from "@/lib/analytics";
-import { cart } from "@/content/cart";
 
 export function CartDrawer() {
   const router = useRouter();
+  const t = useTranslations("cart");
   const { items, isOpen, closeCart, updateQuantity, removeItem, getTotalPrice, getTotalItems } =
     useCartStore();
   const [mounted, setMounted] = useState(false);
@@ -62,20 +63,20 @@ export function CartDrawer() {
         <SheetHeader className="space-y-0">
           <SheetTitle className="flex items-center gap-2">
             <ShoppingBag className="h-5 w-5" />
-            {cart.drawer.title} ({totalItems})
+            {t("drawer.title")} ({totalItems})
           </SheetTitle>
         </SheetHeader>
 
         {items.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center">
             <div className="border-border mx-1 my-auto rounded-2xl border border-dashed p-10 text-center">
-              <p className="text-foreground text-base font-bold">{cart.empty.title}</p>
+              <p className="text-foreground text-base font-bold">{t("empty.title")}</p>
               <Link
                 href="/products"
                 onClick={closeCart}
                 className="text-foreground mt-2 inline-block text-sm font-bold underline underline-offset-4"
               >
-                {cart.empty.cta}
+                {t("empty.cta")}
               </Link>
             </div>
           </div>
@@ -85,8 +86,8 @@ export function CartDrawer() {
               <div className="space-y-4 py-4">
                 {items.map((item) => {
                   const variantLine = [
-                    item.color && `${cart.variant.color} ${item.color}`,
-                    item.size && `${cart.variant.size} ${item.size}`,
+                    item.color && `${t("variant.color")} ${item.color}`,
+                    item.size && `${t("variant.size")} ${item.size}`,
                   ]
                     .filter(Boolean)
                     .join(" · ");
@@ -122,7 +123,7 @@ export function CartDrawer() {
                           </div>
                           <button
                             type="button"
-                            aria-label={cart.remove}
+                            aria-label={t("remove")}
                             className="text-muted-foreground hover:text-foreground -mr-2 h-8 w-8 shrink-0 transition-colors"
                             onClick={() => removeItem(item.productId, item.variantId)}
                           >
@@ -133,7 +134,7 @@ export function CartDrawer() {
                           <div className="border-border-strong flex items-center overflow-hidden rounded-[10px] border">
                             <button
                               type="button"
-                              aria-label={cart.quantity.decrease}
+                              aria-label={t("quantity.decrease")}
                               className="text-foreground hover:bg-muted h-7 w-7 text-sm transition-colors"
                               onClick={() =>
                                 updateQuantity(item.productId, item.quantity - 1, item.variantId)
@@ -146,7 +147,7 @@ export function CartDrawer() {
                             </span>
                             <button
                               type="button"
-                              aria-label={cart.quantity.increase}
+                              aria-label={t("quantity.increase")}
                               className="text-foreground hover:bg-muted h-7 w-7 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
                               onClick={() =>
                                 updateQuantity(item.productId, item.quantity + 1, item.variantId)
@@ -172,21 +173,21 @@ export function CartDrawer() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-3 text-sm">
                   <span className="text-muted-foreground shrink-0">
-                    {cart.summary.itemsLabel} ({totalItems})
+                    {t("summary.itemsLabel")} ({totalItems})
                   </span>
                   <span className="font-bold">{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex items-start justify-between gap-3 text-sm">
                   <span className="text-muted-foreground shrink-0">
-                    {cart.summary.shippingLabel}
+                    {t("summary.shippingLabel")}
                   </span>
                   <span className="text-muted-foreground min-w-0 text-right text-[13px]">
-                    {cart.summary.shippingValue}
+                    {t("summary.shippingValue")}
                   </span>
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between gap-3 font-bold">
-                  <span>{cart.summary.totalLabel}</span>
+                  <span>{t("summary.totalLabel")}</span>
                   <span>{formatPrice(subtotal)}</span>
                 </div>
               </div>
@@ -196,11 +197,11 @@ export function CartDrawer() {
                   onClick={handleCheckout}
                   className="flex w-full items-center justify-center rounded-[10px] bg-white p-4 text-[13.5px] font-extrabold tracking-[0.06em] text-black transition-colors hover:bg-[#e5e5e5]"
                 >
-                  {cart.summary.checkoutCta}
+                  {t("summary.checkoutCta")}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </button>
                 <Button variant="outline" onClick={handleViewCart} className="w-full">
-                  {cart.drawer.viewCart}
+                  {t("drawer.viewCart")}
                 </Button>
               </div>
             </div>

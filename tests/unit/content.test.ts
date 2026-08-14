@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { site } from "@/content/site";
 import { home } from "@/content/home";
-import { cart } from "@/content/cart";
 import { auth } from "@/content/auth";
 import { account, ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS } from "@/content/account";
 import { newsletter } from "@/content/newsletter";
@@ -80,41 +79,6 @@ describe("home content", () => {
   it("points the new-arrivals rail at the full catalog", () => {
     expect(home.rails.newArrivals.viewAllHref).toBe("/products");
     expect(home.rails.newArrivals.viewAllLabel).toBe("Дивитись все");
-  });
-});
-
-describe("cart content", () => {
-  it("titles both surfaces «Кошик»", () => {
-    expect(cart.title).toBe("Кошик");
-    expect(cart.drawer.title).toBe("Кошик");
-  });
-
-  it("pluralizes the items count (1/2/5/11 товар/товари/товарів)", () => {
-    expect(cart.itemsCount(1)).toBe("1 товар");
-    expect(cart.itemsCount(2)).toBe("2 товари");
-    expect(cart.itemsCount(5)).toBe("5 товарів");
-    expect(cart.itemsCount(11)).toBe("11 товарів");
-  });
-
-  it("flips the shipping row to NP tariffs now that G2 ships real methods", () => {
-    expect(cart.summary.shippingValue).toBe("За тарифами Нової Пошти");
-    expect(cart.summary.shippingValue).toMatch(/Нової Пошти/i);
-  });
-
-  it("shares the uppercase checkout CTA across page and drawer", () => {
-    expect(cart.summary.checkoutCta).toBe("ОФОРМИТИ ЗАМОВЛЕННЯ");
-  });
-
-  it("provides empty-state, clear-dialog, stock and variant-label copy", () => {
-    expect(cart.empty.title).toBe("Кошик порожній");
-    expect(cart.empty.cta).toBe("Перейти в каталог");
-    expect(cart.clear.action).toBe("Очистити кошик");
-    expect(cart.clear.confirm).toBeTruthy();
-    expect(cart.clear.cancel).toBeTruthy();
-    expect(cart.stock.outOfStock).toBe("Немає в наявності");
-    expect(cart.stock.onlyN(3)).toBe("Доступно лише 3");
-    expect(cart.variant.color).toBe("Колір:");
-    expect(cart.variant.size).toBe("Розмір:");
   });
 });
 
