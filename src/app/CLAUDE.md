@@ -38,6 +38,7 @@ app/
 │   ├── cart/              # Cart page
 │   ├── categories/        # Category listing + detail (with [slug])
 │   ├── checkout/          # Checkout + confirmation page
+│   ├── feedback/          # /feedback page + co-located client form (guest-capable, G8)
 │   └── products/          # Product listing + detail
 │       └── [slug]/        # Product detail page, client component, opengraph-image.tsx
 ├── newsletter/            # Newsletter public pages
@@ -57,6 +58,7 @@ app/
 │   ├── cart/validate/     # Cart validation
 │   ├── categories/        # Public category API
 │   ├── checkout/          # create-order (guest COD, live) + dormant payment-intent/confirm-order (Stripe, since G2)
+│   ├── feedback/          # Public feedback POST (coded outcomes, honeypot silent drop, awaited FEEDBACK_EMAIL send — failed send = 500, G8)
 │   ├── health/            # Health check endpoint
 │   ├── newsletter/        # Public newsletter endpoints
 │   │   ├── subscribe/route.ts    # POST (create subscriber, send confirmation)
@@ -99,7 +101,7 @@ app/
 - **Feed validation**: Use strict Zod schemas (e.g., `google-shopping.ts`) to validate feed items before XML serialization; enforce title/description length limits, price format, GTIN format, and enum values
 - **Performance optimizations**: Root layout includes resource hints (preconnect/dns-prefetch) in `<head>`; Web Vitals reporter integrated via providers; deferred theme font loading with `preload: false` and `display: swap`; shop pages (home, product detail, category) use blur placeholders for images
 - **Query param validation**: API routes parse numeric filters with `parseInt(value, 10)` which returns NaN for invalid input; validate with `!isNaN(num) && num >= min && num <= max`; spread validated value conditionally into Prisma query (`...(valid ? { field: num } : {})`); pattern avoids throwing on malformed user input (e.g., rating filter in `/api/products/[slug]/reviews`)
-- **Coded newsletter outcomes**: `api/newsletter/{subscribe,confirm,unsubscribe}` attach a machine `code` to every response (`apiError()`'s third arg on error paths, a `code` key inside the `apiSuccess()` payload on success paths — e.g. `ALREADY_SUBSCRIBED`, `LINK_EXPIRED`, `CONFIRMED`); `error`/`message` prose stays English for logs/consumers, while the `newsletter/confirm` and `newsletter/unsubscribe` pages map `code` → Ukrainian via `src/content/newsletter.ts` (G4, extends the G2 `create-order` coded-outcome convention)
+- **Coded newsletter outcomes**: `api/newsletter/{subscribe,confirm,unsubscribe}` attach a machine `code` to every response (`apiError()`'s third arg on error paths, a `code` key inside the `apiSuccess()` payload on success paths — e.g. `ALREADY_SUBSCRIBED`, `LINK_EXPIRED`, `CONFIRMED`); `error`/`message` prose stays English for logs/consumers, while the `newsletter/confirm` and `newsletter/unsubscribe` pages map `code` → Ukrainian via `src/content/newsletter.ts` (G4, extends the G2 `create-order` coded-outcome convention; G8 extends it again to `api/feedback` — `FEEDBACK_SENT`/`VALIDATION_ERROR`/`SEND_FAILED` mapped via `src/content/feedback.ts`)
 - **Account + newsletter pages render UA via content modules**: `(shop)/account/**` and `newsletter/{confirm,unsubscribe}` source all copy from `src/content/{account,newsletter}.ts` — no inline literals (G4). The account layout nav intentionally omits «Адреси»/«Налаштування»: `/account/addresses` and `/account/settings` don't exist yet, so the links (and their overview cards) were dropped rather than left dead; restoring them is BACKLOG'd until those pages are built
 
 <!-- END AUTO-MANAGED -->

@@ -970,6 +970,30 @@ items from the same batch (feedback form, launch-announcement marquee) were plac
   8 SP) + G14 (variant rename + gap audit, 5 SP) + gated 🟡 P2 (prod re-seed). Next week
   (Aug 17–21) is the pre-launch week: client data ask + polish. (High value, L effort)
 
+### [2026-08-14] From: G8 close-out (PR #35/#36 reviews + deployment verification)
+
+**Origin**: the G8 launch-feedback-loop reviews (final whole-branch + two PR review rounds) and
+the post-merge production-CSS incident. The polish batch itself went to TODO.md (actionable);
+these are the standing improvements.
+
+- 🟤 **Per-IP rate limiting for public POST endpoints** — `api/feedback` and
+  `api/newsletter/subscribe` share the gap: no rate limiting exists repo-wide, so both accept
+  unbounded anonymous POSTs (feedback's failure domain is the owner inbox; newsletter's is
+  Resend sends + subscriber-row churn). Honeypot-only was the accepted G8 launch stance; close
+  it before traffic scales. Options: middleware token bucket on Redis, or Vercel WAF rate
+  rules. (Med value, Med effort) `[relates-to: G2 hardening bundle]`
+- 🟤 **Wide-viewport marquee E2E guard** — the hydration-gated ResizeObserver measurement path
+  (`e172413`) is structurally untestable in jsdom (non-hydrating render) and currently has NO
+  automated guard; a CI prod-build E2E asserting ≥3 `.marquee-duplicate` copies at a ~2560px
+  viewport is the durable check. (Med value, Low effort) `[relates-to: TASK-040 CI extensions]`
+- 🟤 **Deploy runbook: served-asset staleness check** — PR #35's READY production deployment
+  served byte-identical stale CSS across TWO deploys (fresh HTML render, `x-vercel-cache: MISS`,
+  old chunk hash — Vercel's restored build cache short-circuited CSS compilation; a changed
+  `globals.css` did NOT bust it; only a cache-off redeploy did). Add to the production-launch
+  deploy runbook: after any CSS/JS-affecting deploy, verify the served chunk hash CHANGED vs the
+  previous deploy, and keep `VERCEL_FORCE_NO_BUILD_CACHE=1` / dashboard cache-off redeploy as
+  the standard remedy. (High value, Low effort) `[relates-to: 🔵 production-launch deploy runbook, 2026-08-10]`
+
 ---
 
 ## Technical Debt

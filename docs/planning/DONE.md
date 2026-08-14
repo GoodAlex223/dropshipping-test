@@ -8,6 +8,29 @@ Completed tasks with implementation details and learnings.
 
 ## 2026-08 (August)
 
+### [2026-08-14] G8 - Launch Feedback Loop: /feedback Form + Announcement Marquee (WEEKLY batch)
+
+**Plan**: [docs/archive/plans/2026-08-11_g8-launch-feedback-loop.md](../archive/plans/2026-08-11_g8-launch-feedback-loop.md) (8 planned tasks + user-ruled Task 9 gate revisions)
+**Spec**: [2026-08-11-launch-feedback-loop-design.md](../superpowers/specs/2026-08-11-launch-feedback-loop-design.md) (incl. § Gate revisions — 9 user rulings across 6 visual-gate rounds, superseded treatments recorded)
+**PRs**: [#35](https://github.com/GoodAlex223/dropshipping-test/pull/35) — merged `a4114e6` (2026-08-14, all 6 checks green); **prod-CSS hotfix [#36](https://github.com/GoodAlex223/dropshipping-test/pull/36) — merged `92236d4` same day** (see Key changes). Production live-verified end-to-end after a user cache-off redeploy.
+**SDD ledger**: removed post-completion; the spec's Gate-revisions section + this entry are the surviving record
+
+**Summary**: Both halves of the user's 2026-08-11 manual-testing ask, coupled by design. TASK-058: guest-capable `/feedback` page (name/email optional, message required, honeypot; UA copy via new `src/content/feedback.ts`; `role="status"` success box; footer «Зворотний зв'язок» link; sitemap entry) → `POST /api/feedback` with coded outcomes (`FEEDBACK_SENT`/`VALIDATION_ERROR`/`SEND_FAILED`; filled honeypot = silent fake-201; failed send = 500 — the email IS the deliverable, deliberately stricter than the newsletter route) → awaited `sendFeedbackEmail()` on the shared dark shell with `Reply-To` = submitter and call-time `FEEDBACK_EMAIL` (loud 500 when unset; interim owner address in Vercel prod, TASK-056 rider swaps it). TASK-059: `site.announcement` grew `string | null` → `SiteAnnouncement` (`id`/`text`/`href`/`linkLabel`/`marquee`) with id-scoped dismissal; site-wide marquee under the header (shared sticky wrapper), full-width, white-pill CTA, hover-pause; ResizeObserver-measured `ceil(viewport/copy)+1` copies animate by a measured `--marquee-shift` for a gap-free stream, duplicates aria-hidden + `tabIndex={-1}` yet mouse-clickable (one tab stop, every visible pill works).
+
+**Key changes**:
+
+- 24 commits across 2 PRs; unit tests 701 → **743** (+42: schema, email template, send function w/ resetModules env pattern, API route, form component, marquee-CSS source guard, AnnouncementBar) — plus e2e `home.spec.ts` updated for the live announcement (sweep caught the stale EN aria-label locator proactively)
+- SDD: 8 planned tasks + controller-authored Task 9; haiku transcription implementers + sonnet reviews, fable final review (0 Critical/0 Important; 11 deferred minors triaged, 1 promoted + fixed pre-push). Reviews fixed 2 plan-inherited defects (honeypot `.max(200)` could reject → never-reject; CSS guard test lacked enclosure teeth → brace-balanced)
+- Visual gate: **6 rounds, 9 user rulings** — sticky full-width bar (supersedes the TASK-035-era not-sticky decision), below-header placement, CTA text→underline→pill progression, arrow removed, duplicates clickable, measured gap-free stream. Round-1 chat-inline screenshots never reached the user → gate rounds 2+ shipped as a private Artifact page (user-endorsed, now standing practice)
+- Live-gate catches that no test could see: a `[]`-deps measurement effect fired during the hydration null-render and never re-ran (fixed `e172413`, `[marqueeVisible]` dep) — jsdom can't hydrate, so a wide-viewport E2E is BACKLOG'd; three stale-`.next` dev-server incidents (fresh starts serving old CSS/JS)
+- **Post-merge deployment verification found production broken twice over**: (1) Vercel's restored build cache served byte-identical stale CSS across TWO deploys (fresh render, `x-vercel-cache: MISS`, old chunk hash — source changes did NOT bust it; only the user's dashboard cache-off redeploy rebuilt honestly); (2) pre-existing since TASK-034: **Tailwind v4's production optimizer silently drops a bare `@media` block nested inside `@layer utilities`** — dev keeps it, so the custom reduced-motion reset had NEVER reached production CSS. Hotfix PR #36 moved the reset un-layered (survives prod build + wins the cascade); prod now serves the full reset for the first time
+- PR reviews: round 1 — 2 sub-threshold doc-accuracy remarks posted at author's request (**16th threshold recurrence**), both real, both fixed (CLAUDE.md G8 propagation done in-branch per #31/#33/#34 precedent, overruling the close-out deferral; stale two-copy marquee comment); re-review "no issues", itself pushed a residual fix (`0aa6a3d`) and re-raised the whitespace-message silent no-op → fixed `df0b01e` (the only review-list gap reachable through the normal UI)
+- Interim-recipient design validated live: with `FEEDBACK_EMAIL` unset the route 500s loudly (observed); with it set, a real submission delivered to the owner inbox with correct Reply-To (user-verified)
+
+**Learnings**: "verified compiled CSS" must mean the output of `next build`, never the dev server — Tailwind v4 prod-only drops and two independent stale-cache layers (local `.next`, Vercel build cache) each made dev-verified CSS a false positive; a READY production deployment with a fresh render can still serve stale assets — verify the served chunk hash changed; hydration-gated components need mount-visibility deps on measurement effects, and only a real browser proves them; gate visuals must reach the user (Artifact page), and static screenshots can't show hover — say so and route interaction checks to the live server.
+
+---
+
 ### [2026-08-10] G5 - Transactional Emails: Ukrainian Dark-Mirox Templates (WEEKLY solo, 🏆)
 
 **Plan**: [docs/archive/plans/2026-08-10_g5-transactional-emails.md](../archive/plans/2026-08-10_g5-transactional-emails.md) (8 tasks; the Task-8 journal carries the prod email-config verification, and the Superseded-notes section the two gate rulings)

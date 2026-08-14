@@ -27,7 +27,8 @@ components/
 │   ├── PaymentForm.tsx    # Stripe Elements payment form (dormant since G2 — unreferenced by the live COD checkout)
 │   └── index.ts
 ├── common/
-│   ├── Header.tsx         # Site header with nav, cart, auth; chrome strings from src/content/site.ts (site.header, G4)
+│   ├── AnnouncementBar.tsx  # Launch marquee (G8): SiteAnnouncement shape, id-scoped dismissal, measured N-copy gap-free stream, pill CTA; sticky with Header via the shop layout wrapper; reduced-motion reset lives UN-layered in globals.css (PR #36)
+│   ├── Header.tsx         # Site header with nav, cart, auth; chrome strings from src/content/site.ts (site.header, G4) — sticky classes moved to the shop layout's shared wrapper (G8)
 │   ├── Footer.tsx         # Site footer with NewsletterSignup component
 │   ├── NewsletterSignup.tsx  # Newsletter subscription form (email input, success state); copy from src/content/newsletter.ts (signup.byCode/fallback, G4)
 │   ├── CookieConsent.tsx  # GDPR cookie consent banner + GTM loader (Zustand persisted); copy from src/content/system.ts (cookies, G4)

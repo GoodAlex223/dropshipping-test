@@ -24,9 +24,11 @@ _Group IDs continue from last week (G1–G7 are permanently taken by DONE.md and
 🔵 User · storefront/comms · **5 SP** · Tue–Wed
 
 > Both halves of the user's 2026-08-11 manual-testing ask, coupled by design (the marquee links to the form). Unblocked despite the TASK-056 deferral: the interim `onboarding@resend.dev` sender delivers to the Resend account owner's inbox, and for this form the owner **is** the recipient (the opposite of the order-email case). Ships through the extraction-ready `src/content/` layer; G9 externalizes it along with everything else (the designed trade, not drift).
+>
+> **✅ Shipped 2026-08-14** — PR [#35](https://github.com/GoodAlex223/dropshipping-test/pull/35) `a4114e6` (+2 days: 6 visual-gate rounds / 9 user rulings) + prod-CSS hotfix PR [#36](https://github.com/GoodAlex223/dropshipping-test/pull/36) `92236d4`; production live-verified after a cache-off redeploy. Details: [DONE.md](DONE.md).
 
-- [ ] **[TASK-058]** Site-wide feedback form — page/host decision in-plan (own `/feedback` route vs dialog; `/contact` belongs to TASK-055 and stays client-blocked) + new `src/app/api/feedback/route.ts` + Resend send via [src/lib/email.ts](../../src/lib/email.ts) + Zod schema + `src/content/` module + unit tests; interim recipient = owner address until TASK-056 supplies the real one (3) — TODO.md § Medium Priority [2026-08-11] manual testing [HIGH]
-- [ ] **[TASK-059]** Homepage launch-announcement marquee linking to the form — scrolling variant of the existing [AnnouncementBar](../../src/components/common/AnnouncementBar.tsx) (component renders today, gated off by `site.announcement = null`); needs a richer `site.announcement` shape than `string | null`, a `prefers-reduced-motion` guard that rejoins the repo's reduced-motion reset, and launch copy (2) — TODO.md § Medium Priority [2026-08-11] manual testing
+- [x] **[TASK-058]** Site-wide feedback form — page/host decision in-plan (own `/feedback` route vs dialog; `/contact` belongs to TASK-055 and stays client-blocked) + new `src/app/api/feedback/route.ts` + Resend send via [src/lib/email.ts](../../src/lib/email.ts) + Zod schema + `src/content/` module + unit tests; interim recipient = owner address until TASK-056 supplies the real one (3) — TODO.md § Medium Priority [2026-08-11] manual testing [HIGH]
+- [x] **[TASK-059]** Homepage launch-announcement marquee linking to the form — scrolling variant of the existing [AnnouncementBar](../../src/components/common/AnnouncementBar.tsx) (component renders today, gated off by `site.announcement = null`); needs a richer `site.announcement` shape than `string | null`, a `prefers-reduced-motion` guard that rejoins the repo's reduced-motion reset, and launch copy (2) — TODO.md § Medium Priority [2026-08-11] manual testing
 
 ### G9. TASK-039 i18n Foundation [solo]
 
@@ -97,11 +99,11 @@ _Group IDs continue from last week (G1–G7 are permanently taken by DONE.md and
 ### Tuesday — Close-outs + this plan + feedback form
 
 - Morning (recorded): PR #34 order-email-await hotfix merged `c137eb9` + G5 arc close-out `da03abc`; G7/TASK-056 deferral ruled and recorded `e11a7de`; manual-testing intake filed `508b2de`; this plan (+ same-day user review: scope expansion → G13/G14).
-- **[G8](#g8-launch-feedback-loop-batch)** 🔵 — part 1: TASK-058 feedback form.
+- ✅ **[G8](#g8-launch-feedback-loop-batch)** 🔵 — part 1: TASK-058 feedback form.
 
 ### Wednesday — Feedback loop lands + i18n opens
 
-- **[G8](#g8-launch-feedback-loop-batch)** 🔵 — part 2: TASK-059 marquee, visual gate, PR.
+- ✅ **[G8](#g8-launch-feedback-loop-batch)** 🔵 — part 2: TASK-059 marquee, visual gate, PR (gate ran 6 rounds → shipped Thu 2026-08-14, +2 days; hotfix PR #36 same day).
 - **[G9](#g9-task-039-i18n-foundation-solo)** 🔵 — part 1: library decision + locale infra (the week's riskiest design call, front-loaded to the first full day).
 
 ### Thursday — i18n externalization + rebrand residuals
@@ -124,7 +126,7 @@ _Group IDs continue from last week (G1–G7 are permanently taken by DONE.md and
 
 | ID  | Group                                               | Domain             | Source      | Tasks  | Total SP | Day           | Status    |
 | --- | --------------------------------------------------- | ------------------ | ----------- | ------ | -------- | ------------- | --------- |
-| G8  | Launch Feedback Loop `[batch]`                      | storefront/comms   | 🔵 User     | 2      | 5        | Tue–Wed       | ☐ Planned |
+| G8  | Launch Feedback Loop `[batch]`                      | storefront/comms   | 🔵 User     | 2      | 5        | Tue–Wed       | ✅ PR #35 |
 | G9  | TASK-039 i18n Foundation `[solo]`                   | i18n/content       | 🔵 User     | 3      | 8        | Wed–Thu       | ☐ Planned |
 | G10 | Weekly Reviews `[batch]`                            | recurring reviews  | ⚪ Overhead | 4      | 5        | Thu–Fri       | ☐ Planned |
 | G11 | Docs-Freshness Linter `[solo]`                      | docs tooling       | 🟤 Auto     | 1      | 3        | Fri           | ☐ Planned |
