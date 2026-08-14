@@ -1,5 +1,5 @@
+import { useTranslations } from "next-intl";
 import { FadeIn } from "@/components/common/FadeIn";
-import { home } from "@/content/home";
 import { site } from "@/content/site";
 
 /**
@@ -10,16 +10,34 @@ import { site } from "@/content/site";
  *
  * 2-column layout per Mirox Home.dc.html:141-167: left column is
  * title/intro/stats, right column is the brand-voice item grid.
+ *
+ * All copy (title/intro/items/stat labels) lives in the catalog under
+ * home.whyChooseUs.* since TASK-039 G9 — this component no longer imports
+ * @/content/home at all, only site.claims (still config: which figures are
+ * real vs unset).
  */
 export function WhyChooseUs() {
-  const { title, intro, items } = home.whyChooseUs;
+  const t = useTranslations("home.whyChooseUs");
+  const title = t("title");
+  const intro = t("intro");
+  // Manually unrolled (not .map()'d over a range): a .map() callback's index
+  // is typed `number`, which can't narrow to the literal "0".."5" the
+  // catalog's typed keys require — six literal t() calls keep typo
+  // protection (same reasoning as Footer.tsx's benefitItems).
+  const items = [
+    t("items.0"),
+    t("items.1"),
+    t("items.2"),
+    t("items.3"),
+    t("items.4"),
+    t("items.5"),
+  ];
   const { olxSales, instagramOrders, customerRating } = site.claims;
 
   const stats = [
-    // TASK-039: externalize these labels once i18n lands.
-    olxSales && { value: olxSales, label: "успішних покупок на OLX" },
-    instagramOrders && { value: instagramOrders, label: "замовлень через Instagram" },
-    customerRating && { value: customerRating, label: "середня оцінка покупців" },
+    olxSales && { value: olxSales, label: t("stats.olxSales") },
+    instagramOrders && { value: instagramOrders, label: t("stats.instagramOrders") },
+    customerRating && { value: customerRating, label: t("stats.customerRating") },
   ].filter((s): s is { value: string; label: string } => Boolean(s));
 
   return (

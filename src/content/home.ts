@@ -1,32 +1,39 @@
 import { Truck, ShieldCheck, Headphones, CreditCard } from "lucide-react";
 import type { BenefitItem } from "./site";
-import { BRAND_HERO_SUBTITLE } from "./brand";
 
+// alt moved to the catalog (TASK-039 G9) as home.hero.imageAlt — a single
+// fixed description independent of which photo is configured (the design
+// handoff's photography swap keeps the same path/scene, TASK-056).
 export interface HeroImage {
   src: string;
-  alt: string;
 }
 
 /**
  * Homepage copy. Single extraction point for TASK-039 i18n — these are plain
  * typed objects with no logic, the shape any i18n library can consume.
+ *
+ * Text content (headline, subtitle, CTA labels, whyChooseUs, testimonials
+ * title, rail title/viewAllLabel) has moved to the `home` namespace in
+ * messages/uk.json (TASK-039 G9) — this module now keeps only the
+ * NON-translatable config: null-gates, hrefs, icons, and the image path.
  */
 export const home = {
   hero: {
     // Removed 2026-07-28 — multi-brand store, user decision. Field kept
     // (config-gated) so a future single-brand campaign can set a string here
     // without a Hero code change; Hero renders the eyebrow row only when set.
+    // Deliberately untranslated: this is campaign copy, not catalog content —
+    // when set, Hero renders it verbatim regardless of active locale.
     eyebrow: null as string | null,
-    // Client brief specified three lines; user chose the mockup's 2-line
-    // wrap instead on 2026-07-28 ("СТИЛЬ. ЯКІСТЬ." / "ВПЕВНЕНІСТЬ.").
-    headline: ["СТИЛЬ. ЯКІСТЬ.", "ВПЕВНЕНІСТЬ."],
-    subtitle: BRAND_HERO_SUBTITLE,
-    primaryCta: { label: "ПЕРЕЙТИ В КАТАЛОГ", href: "/products" },
+    // headline (was: client brief's three lines, wrapped to the mockup's two
+    // on 2026-07-28 — "СТИЛЬ. ЯКІСТЬ." / "ВПЕВНЕНІСТЬ.") and subtitle (was
+    // BRAND_HERO_SUBTITLE) now live as home.hero.headline1/headline2/subtitle
+    // in the catalog; Hero.tsx renders them via t().
+    primaryCta: { href: "/products" },
     secondaryCta: {
-      label: "ПЕРЕГЛЯНУТИ НОВИНКИ",
       // `sort=new` (final-review Fix 4) — the current catalog sort param,
-      // matching Header.tsx's "Новинки" nav link (retargeted in 36e1737);
-      // the legacy sortBy/sortOrder pair still works (products-content.tsx
+      // matching Header.tsx's nav "new" link (retargeted in 36e1737); the
+      // legacy sortBy/sortOrder pair still works (products-content.tsx
       // forwards it if present) but this CTA should point at the current one.
       href: "/products?sort=new",
     },
@@ -34,7 +41,6 @@ export const home = {
     // replaces the file (same path) via TASK-056 — content stays untouched.
     image: {
       src: "/images/hero-model-2.png",
-      alt: "Модель у чорному худі Mirox",
     } as HeroImage | null,
   },
 
@@ -42,33 +48,29 @@ export const home = {
   // «Обмін розміру» removed (no such service — client, 26.07.2026);
   // «Оплата при отриманні» confirmed by the client (26.07.2026), payment
   // method itself ships in TASK-049 — the benefit states the offer, честно.
+  // title/description moved to the catalog (TASK-039 G9) as
+  // `home.benefits.0..3.title/description`, addressed by index — order here
+  // must stay in sync (delivery, quality, support, COD), since Hero's page
+  // composer zips these icons with catalog text positionally.
   benefits: [
-    { icon: Truck, title: "Швидка доставка", description: "По всій Україні" },
-    { icon: ShieldCheck, title: "Преміум якість", description: "Тільки найкращі матеріали" },
-    { icon: Headphones, title: "Підтримка 24/7", description: "Ми завжди на зв'язку" },
-    { icon: CreditCard, title: "Оплата при отриманні", description: "Без передоплати" },
+    { icon: Truck },
+    { icon: ShieldCheck },
+    { icon: Headphones },
+    { icon: CreditCard },
   ] as BenefitItem[],
 
-  whyChooseUs: {
-    title: "Чому обирають нас",
-    intro: "Перевіряємо кожну річ перед відправкою і завжди на зв'язку.",
-    items: [
-      "Швидка доставка по Україні",
-      "Перевірка кожної речі",
-      "Підтримка без вихідних",
-      "Тільки якісний одяг",
-      "Безпечна оплата",
-      "Нам довіряють постійні клієнти",
-    ],
-  },
+  // whyChooseUs (title/intro/items) fully moved to the catalog (TASK-039 G9)
+  // — WhyChooseUs.tsx no longer imports this module at all, only site.claims
+  // (still config: which figures are real vs unset) plus useTranslations.
 
   rails: {
     newArrivals: {
-      title: "Новинки",
       viewAllHref: "/products",
-      viewAllLabel: "Дивитись все",
+      // title/viewAllLabel moved to the catalog as
+      // home.rails.newArrivals.title/viewAllLabel.
     },
   },
 
-  testimonials: { title: "Відгуки покупців" },
+  // testimonials (title) fully moved to the catalog (TASK-039 G9) as
+  // home.testimonials.title.
 };

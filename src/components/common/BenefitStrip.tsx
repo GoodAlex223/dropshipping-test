@@ -1,8 +1,19 @@
+import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { BenefitItem } from "@/content/site";
+
+// Locally defined, NOT imported from @/content/site's (now icon-only)
+// BenefitItem: this component still renders title/description, but those
+// strings live in the i18n catalog since TASK-039 G9 — callers (Footer.tsx,
+// the homepage) zip site.ts/home.ts's icon-only config with translated text
+// before passing props here, so this component itself stays i18n-agnostic.
+interface BenefitStripItem {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+}
 
 interface BenefitStripProps {
-  items: BenefitItem[];
+  items: BenefitStripItem[];
   className?: string;
 }
 

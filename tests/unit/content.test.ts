@@ -30,14 +30,13 @@ describe("site content", () => {
     expect(site.announcement?.href).toBe("/feedback");
     expect(site.announcement?.marquee).toBe(true);
     expect(site.announcement?.id).toBeTruthy();
-    expect(site.announcement?.linkLabel).toBeTruthy();
+    // text/linkLabel moved to the catalog (TASK-039 G9) — covered by
+    // i18n-catalogs.test.ts's apostrophe-render test instead.
   });
 });
 
 describe("home content", () => {
-  it("wraps the slogan into the mockup's two lines (client brief's three-line split was not used)", () => {
-    expect(home.hero.headline).toEqual(["СТИЛЬ. ЯКІСТЬ.", "ВПЕВНЕНІСТЬ."]);
-  });
+  // headline pair moved to i18n-catalogs.test.ts (string content, catalog-sourced).
 
   it("has no eyebrow — removed 2026-07-28 for the multi-brand store, kept config-gated", () => {
     expect(home.hero.eyebrow).toBeNull();
@@ -55,22 +54,13 @@ describe("home content", () => {
 
   it("provides exactly four benefit cards", () => {
     expect(home.benefits).toHaveLength(4);
+    expect(site.footerBenefits).toHaveLength(4);
   });
 
-  it("never advertises retracted services (free delivery threshold, size exchange)", () => {
-    const allBenefitText = [...home.benefits, ...site.footerBenefits]
-      .map((b) => `${b.title} ${b.description}`)
-      .join(" ")
-      .toLowerCase();
-    expect(allBenefitText).not.toMatch(
-      /обмін розміру|безкоштовна доставка|free delivery|size exchange/
-    );
-  });
-
-  it("provides the six always-true why-choose-us claims, plus a non-empty intro", () => {
-    expect(home.whyChooseUs.items).toHaveLength(6);
-    expect(home.whyChooseUs.intro.length).toBeGreaterThan(0);
-  });
+  // Retraction regex + whyChooseUs count/intro moved to i18n-catalogs.test.ts
+  // (string content, catalog-sourced — home.whyChooseUs no longer exists on
+  // this trimmed module, and home.benefits/site.footerBenefits no longer
+  // carry title/description to scan).
 
   it("exposes only the new-arrivals rail (featured/bestsellers removed)", () => {
     expect(Object.keys(home.rails)).toEqual(["newArrivals"]);
@@ -78,7 +68,7 @@ describe("home content", () => {
 
   it("points the new-arrivals rail at the full catalog", () => {
     expect(home.rails.newArrivals.viewAllHref).toBe("/products");
-    expect(home.rails.newArrivals.viewAllLabel).toBe("Дивитись все");
+    // viewAllLabel moved to the catalog as home.rails.newArrivals.viewAllLabel.
   });
 });
 
@@ -152,12 +142,9 @@ describe("system content", () => {
   });
 });
 
-describe("site header content", () => {
-  it("wraps search queries in Ukrainian guillemets", () => {
-    expect(site.header.search.viewAll("test")).toContain("«test»");
-    expect(site.header.search.noResults("test")).toContain("«test»");
-  });
-});
+// "site header content" describe block removed (TASK-039 G9) — site.header
+// no longer exists on the trimmed content module; equivalent coverage lives
+// in i18n-catalogs.test.ts's guillemets/query-interpolation test.
 
 describe("feedback content", () => {
   it("maps both feedback API outcome codes to Ukrainian", () => {

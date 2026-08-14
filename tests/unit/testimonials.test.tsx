@@ -1,11 +1,11 @@
-import { render, screen, within } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { screen, within } from "@testing-library/react";
+import { describe, it, expect } from "vitest";
 import type { Testimonial } from "@/lib/review-queries";
+import { renderWithIntl } from "../helpers/render-with-intl";
 
-vi.mock("@/content/home", () => ({
-  home: { testimonials: { title: "What our customers say" } },
-}));
-
+// No @/content/home mock: the section title is catalog-sourced since
+// TASK-039 G9 (home.testimonials.title), and Testimonials.tsx no longer
+// imports @/content/home at all — renderWithIntl supplies the real catalog.
 import { Testimonials } from "@/components/home/Testimonials";
 
 const testimonials: Testimonial[] = [
@@ -31,7 +31,7 @@ const testimonials: Testimonial[] = [
 
 describe("Testimonials", () => {
   it("renders a card per testimonial, each with its own author, product link, and star count", () => {
-    const { container } = render(<Testimonials testimonials={testimonials} />);
+    const { container } = renderWithIntl(<Testimonials testimonials={testimonials} />);
 
     // Fixture has two testimonials with distinct ratings/authors — a fixture
     // of one can't tell "renders one card per testimonial" apart from
@@ -65,12 +65,12 @@ describe("Testimonials", () => {
   });
 
   it("renders nothing when no reviews qualify", () => {
-    const { container } = render(<Testimonials testimonials={[]} />);
+    const { container } = renderWithIntl(<Testimonials testimonials={[]} />);
     expect(container).toBeEmptyDOMElement();
   });
 
   it("renders an initial avatar and a uk-UA date for each testimonial", () => {
-    render(<Testimonials testimonials={testimonials} />);
+    renderWithIntl(<Testimonials testimonials={testimonials} />);
     expect(screen.getByText(testimonials[0].authorName[0])).toBeInTheDocument(); // «O» for Oleksandr
     expect(
       screen.getByText(new Date(testimonials[0].createdAt).toLocaleDateString("uk-UA"))

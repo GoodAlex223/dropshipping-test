@@ -7,13 +7,23 @@
 
 export const BRAND_NAME = "Mirox Shop";
 
-/** Long form — hero subtitle, footer. */
+/**
+ * Long form. TASK-039 G9 copied this value into the i18n catalog as
+ * `brand.tagline` (Footer.tsx's copyright line reads it via t() now) — but
+ * the CONSTANT itself is deliberately kept here, not deleted, because
+ * src/app/opengraph-image.tsx (Satori/ImageResponse — an SEO-layer route
+ * outside this task's scope, deferred to Task 8 alongside BRAND_DESCRIPTION/
+ * BRAND_META_SUFFIX below) imports it directly and must keep compiling.
+ * Same precedent, same reason, one file this plan's pre-flight scan missed.
+ */
 export const BRAND_TAGLINE = "Сучасний одяг для тих, хто цінує якість і мінімалізм.";
 
-// BRAND_HERO_SUBTITLE is the same sentence as BRAND_TAGLINE, just prefixed
-// with the brand name for the hero's context — keep both in sync.
-export const BRAND_HERO_SUBTITLE =
-  "Mirox Shop — сучасний одяг для тих, хто цінує якість і мінімалізм.";
+// BRAND_HERO_SUBTITLE removed (TASK-039 G9) — its one and only consumer
+// (home.ts's hero.subtitle field) is gone; the same sentence now lives in
+// the catalog twice by design (matching this constant's original
+// relationship to BRAND_TAGLINE above): home.hero.subtitle (consumed by
+// Hero.tsx) and brand.heroSubtitle (reserved, unconsumed until Task 8's SEO
+// layer wants it — mirrors BRAND_DESCRIPTION/BRAND_META_SUFFIX's deferral).
 
 export const BRAND_META_SUFFIX = "Сучасний одяг";
 
