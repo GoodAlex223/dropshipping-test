@@ -56,6 +56,23 @@ describe("message catalogs", () => {
     expect(orphans).toEqual([]);
   });
 
+  it("ru covers every uk key (full draft — Task 9 flips this to hard)", () => {
+    const ruKeys = new Set(leaves(ru as Tree).map(([k]) => k));
+    const missing = leaves(uk as Tree)
+      .map(([k]) => k)
+      .filter((k) => !ruKeys.has(k));
+    expect(missing).toEqual([]);
+  });
+
+  it("ru reuses every ICU argument its uk counterpart declares", () => {
+    const args = (s: string) => [...s.matchAll(/\{(\w+)[,}]/g)].map((m) => m[1]).sort();
+    const ruMap = new Map(leaves(ru as Tree));
+    for (const [key, ukVal] of leaves(uk as Tree)) {
+      const ruVal = ruMap.get(key);
+      if (ruVal) expect(args(ruVal), key).toEqual(args(ukVal));
+    }
+  });
+
   it("never advertises retracted services in any locale (G8/site.ts retraction rulings)", () => {
     const all = [...leaves(uk as Tree), ...leaves(ru as Tree)]
       .map(([, v]) => v)

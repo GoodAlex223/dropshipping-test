@@ -19,6 +19,7 @@ async function OrderConfirmation({ orderNumber }: { orderNumber: string }) {
   // Scoped to the top-level `checkout` namespace (matches checkout/page.tsx)
   // since this page needs both confirmation.* and summary.qty.
   const t = await getTranslations("checkout");
+  const tShipping = await getTranslations("shipping");
   const session = await auth();
   const order = await prisma.order.findUnique({
     where: { orderNumber },
@@ -155,7 +156,13 @@ async function OrderConfirmation({ orderNumber }: { orderNumber: string }) {
             <div className="border-border mt-6 border-t pt-4">
               <h3 className="mb-2 font-bold">{t("confirmation.methodHeading")}</h3>
               <p className="text-muted-foreground text-sm">
-                {getShippingMethodLabel(order.shippingMethod)}
+                {/* Locale-aware first: catalog covers current np-* ids in
+                    both locales. Legacy/unknown ids (pre-G2 Stripe-era
+                    orders) fall back to the locale-unaware source of truth —
+                    see the DELIBERATE DUPLICATION note in lib/shipping.ts. */}
+                {tShipping.has(order.shippingMethod as never)
+                  ? tShipping(order.shippingMethod as never)
+                  : getShippingMethodLabel(order.shippingMethod)}
               </p>
             </div>
           )}
