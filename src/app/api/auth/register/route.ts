@@ -32,7 +32,8 @@ export async function POST(request: Request) {
     });
 
     if (existingUser) {
-      // Client maps `code` to Ukrainian (src/content/auth.ts); `error` stays log text.
+      // Client maps `code` to locale copy (auth.register.errors.byCode in
+      // messages/{uk,ru}.json); `error` stays log text.
       return NextResponse.json(
         { error: "Email already registered", code: "EMAIL_EXISTS" },
         { status: 409 }

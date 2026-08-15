@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     const result = unsubscribeNewsletterSchema.safeParse(body);
 
     // `error`/`message` strings are for logs/API consumers; clients map
-    // `code` to Ukrainian copy (src/content/newsletter.ts).
+    // `code` to locale copy (newsletter.unsubscribe.byCode in messages/{uk,ru}.json).
     if (!result.success) {
       return apiError(result.error.issues[0].message, 400, "VALIDATION_ERROR");
     }

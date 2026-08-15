@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
     const result = feedbackSchema.safeParse(body);
 
     // `error`/`message` prose stays English for logs/API consumers; the
-    // /feedback page maps `code` to Ukrainian (src/content/feedback.ts).
+    // /feedback page maps `code` to locale copy (feedback.byCode in messages/{uk,ru}.json).
     if (!result.success) {
       return apiError(result.error.issues[0].message, 400, "VALIDATION_ERROR");
     }
