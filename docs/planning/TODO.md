@@ -16,22 +16,7 @@ _G1 (Cart & drawer restyle, WEEKLY batch) completed 2026-08-04 — PR [#28](http
 
 _TASK-037 (Product page redesign) completed 2026-08-03 — PR [#27](https://github.com/GoodAlex223/dropshipping-test/pull/27) merged `cec8408`; see [DONE.md](DONE.md). All ACs met with two spec-ratified deviations: AC-5's fake struck-through bundle price shipped as an **honest sum** (checkout recomputes prices server-side; real bundle discount → TASK-046/047, BACKLOG'd), and «Відкрити фото замірів» omitted until measurement photos arrive (restore note on the size-charts item below). Visual gate signed off after one revision round; 3 PR review rounds all resolved._
 
-#### [TASK-039] i18n foundation
-
-**Priority**: 🟠 High
-**Status**: 📅 Scheduled — WEEKLY [G9](WEEKLY.md), week of 2026-08-10
-**Effort**: L
-**Dependencies**: [TASK-033]
-
-**Description** (scope shifted by TASK-057, 2026-07-27 — spec §4): Scope shifts: externalize the _now-hardcoded Ukrainian strings_ into locale files + locale infra with UA default / RU toggle. `formatPrice()` lands early via TASK-057; §7.4-compliance verification remains TASK-039's AC. The monobank payments-prerequisite escalation is unchanged. Library choice (e.g., next-intl) decided in plan.
-
-**⚠️ Dependency escalated by [TASK-038b]**: this is no longer only a language-law item. **monobank will not approve internet acquiring without a Ukrainian-language version of the site** ([decision doc §4.2](../superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md)) — so if the Plata-by-mono branch is chosen, TASK-039 becomes a **hard prerequisite for payments (TASK-048)**, not a parallel track. UAH formatting is specified in decision doc §7.4 (uk-UA: non-breaking-space thousands, comma decimal, `₴`/`грн` **after** the amount, ДСТУ 3582:2013) — use `Intl.NumberFormat('uk-UA', …)`, not hand-rolled formatting.
-
-**Acceptance Criteria**:
-
-- [ ] Locale infrastructure with UA default, RU toggle
-- [ ] Customer-facing storefront strings — hardcoded Ukrainian since TASK-057 (`src/content/*.ts` config layer + inline component strings on homepage/header/footer) — externalized into locale files
-- [ ] `formatPrice()` (landed via TASK-057, `src/lib/format.ts`) verified compliant with decision doc §7.4
+_TASK-039 (G9, i18n foundation) completed 2026-08-15 — PR [#37](https://github.com/GoodAlex223/dropshipping-test/pull/37) merged `2c93da7` (2 visual-gate rounds, 4 PR-review rounds, all findings fixed); see [DONE.md](DONE.md). All three ACs shipped: next-intl cookie mode (UA default, RU toggle), full-sweep byte-verified extraction into `messages/{uk,ru}.json`, §7.4 axis tests green. The monobank UA-site prerequisite is now satisfied for whenever TASK-048 unblocks. Residue: RU catalog is a DRAFT pending client sign-off (TASK-056 rider below); admin stays EN/raw-enum until G13; the `[2026-08-15]` BACKLOG intake groups carry the gate/review spawn._
 
 #### [TASK-040] CI extensions
 
@@ -133,6 +118,8 @@ verify that out-of-tree work landed. Kept separate from the in-tree spawned task
 **⚠️ Live consequence of the deferral — real customers currently receive no order email.** `EMAIL_FROM` in Vercel prod is the interim `onboarding@resend.dev`, which Resend delivers **only to the Resend account owner's own inbox**; a real customer placing a COD order today gets a confirmation page and nothing else. The order-confirmation code path itself is correct and verified live (G5 + the PR #34 await hotfix) — the gap is purely the sending domain, i.e. the "Production domain purchase/choice" and "Transactional-email sending config" items below. This must be closed before the store takes real orders, whenever the round-trip is finally run.
 
 **G8 rider (2026-08-14)**: when the email items above close, also swap **`FEEDBACK_EMAIL`** (Vercel prod env) from the interim owner address to the client's real feedback recipient — the `/feedback` form (PR #35) sends its notifications there, and today the owner deliberately IS the recipient.
+
+**G9 rider (2026-08-15)**: two i18n items join the round-trip. (1) **RU catalog sign-off** — `messages/ru.json` (474 keys, agent-translated 2026-08-14) ships as a DRAFT behind the live UA|RU toggle (PR #37); the client reviews the nuance-flagged list in `messages/README.md` (undeclined «Нова Пошта», grammatical-gender resolutions, ё policy, marketing-register strings — hero, tagline, marquee, testimonials). A missing/rejected key silently falls back to UA, so partial acceptance is safe. (2) **RU product copy decision** — DB content (names/descriptions/variants) stays UA in RU mode by spec ruling; ask whether the client wants dual-language product data and will maintain it (BACKLOG `[2026-08-15]` entry has the design sketch — build only on opt-in).
 
 **Description**: Single consolidated ask covering everything the client still owes for the Mirox rebrand to leave placeholder/retracted state, spawned by TASK-035's final review so these don't dribble out piecemeal across TASK-036/037/039. This task is the checklist and the client round-trip, not implementation.
 

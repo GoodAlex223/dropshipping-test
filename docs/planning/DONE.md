@@ -2,11 +2,30 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-08-11
+**Last Updated**: 2026-08-15
 
 ---
 
 ## 2026-08 (August)
+
+### [2026-08-15] G9 - TASK-039 i18n Foundation: UA Default + RU Toggle (next-intl cookie mode)
+
+**Plan**: [docs/archive/plans/2026-08-14_task-039-i18n-foundation.md](../archive/plans/2026-08-14_task-039-i18n-foundation.md) (11 SDD tasks; the execution record carries both visual-gate rounds and all four PR-review rounds)
+**Spec**: [2026-08-14-task-039-i18n-foundation-design.md](../superpowers/specs/2026-08-14-task-039-i18n-foundation-design.md) (4 user rulings: full-sweep phased extraction, agent RU draft + user gate review, SEO fixed set joins, next-intl cookie mode — no URL routing)
+**PR**: [#37](https://github.com/GoodAlex223/dropshipping-test/pull/37) — merged `2c93da7` (2026-08-15; 32 branch commits; all 6 checks green on every push)
+**SDD ledger**: removed post-completion; the plan's execution record + this entry survive
+
+**Summary**: The v1.3 i18n spine. UA stays the default and SEO-canonical locale; RU is a pure cookie-preference toggle (`NEXT_LOCALE`, same URLs in both locales — deliberately a toggle, not a routing migration). next-intl v4.13.6 wired via `src/i18n/{config,request,merge,actions}.ts`: the request config resolves the cookie server-side (`resolveLocale()` never trusts the wire value) and deep-merges `messages/ru.json` over `messages/uk.json`, so a missing/malformed RU key silently falls back to UA. Every customer-facing string (18 namespaces) extracted **byte-identically** into `messages/uk.json`, enforced by the new `scripts/i18n-byte-diff.mjs` verifier (removed Cyrillic fragments must survive verbatim in the catalog; provenance-annotated allowlist for comment-only rewrites). Full 474-key agent-translated RU catalog ships as **DRAFT** — client sign-off rides TASK-056, nuance flags in `messages/README.md`. SEO fixed set UA-ified (6 async `getTranslations` metadata helpers; `<html lang>` fixed from a hardcoded `"en"`); §7.4 axis tests green with deliberately locale-invariant prices. `LocaleSwitcher` (UA|RU) in the header and mobile sheet via a `setLocale` server action.
+
+**Key changes**:
+
+- Unit tests 743 → **773 | 1 todo** net (catalog guards added — RU full-coverage HARD, ICU-arg parity, teen-plural/apostrophe render probes, byCode coverage vs route code lists, Prisma-enum→label drift net; 4 retired label tests and 1 dynamic per-file scan test left with the deleted module); locale-toggle E2E green across 3 projects; `renderWithIntl` helper renders component tests against the real `uk.json`
+- `src/content/` reduced to config-only: `cart/auth/system/feedback/newsletter.ts` deleted in-plan; `account.ts` deleted in review round 2 (its label maps proved **consumer-less** — admin renders raw enum values until G13, now recorded accurately in both CLAUDE.md files); `brand/site/home/checkout.ts` trimmed; byCode coded-outcome maps moved to catalog namespaces behind `t.has(key as never)` guards
+- Visual gate (2 rounds, user-confirmed in English per global rule 1): round 2 fixed both findings — mobile sheet unscrollable (pre-existing on `main`, aggravated by the added switcher row; `overflow-y-auto` at the usage site) and account order dates now follow the active locale via `useFormatter` (Europe/Kyiv display); user's four scope questions answered → three 🔵 BACKLOG entries + the metadata already-localizes-for-humans verification
+- PR reviews (4 rounds, every finding fixed): dynamic status-key `t.has` guards with raw-status fallback + the Prisma-enum drift net (reviewer mutation-tested it); comment-truth fixes (SocialLinks scope-cut claim, 5 dead content-module pointers); the consumer-less module deletion with CLAUDE.md corrections (incl. the adjacent "hardcoded-UA"→English fix); propagation residue in the drift-net's own header; the SheetOverlay/`aria-describedby` deferral filed as a real 🔵 BACKLOG entry after round 4 caught it existing only in the PR thread
+- Crawlers (cookieless) always see UA — SEO/language-law posture unchanged; human tab titles follow the toggle through the same catalog («Увійти | Mirox Shop» ↔ «Войти | Mirox Shop»)
+
+**Learnings**: the propagation-check failure mode fired twice inside one PR — a correction sweeps every surface except the doc written earliest (round-1's test header survived round-2's deletion); a "recorded, not fixed" review verdict requires the record to exist somewhere that survives the PR at the moment of the claim (PR threads die at merge); measure Radix sheet geometry only after session-dependent content attaches (the first scroll measurement raced `useSession` and false-failed); suite-count deltas must reconcile to named tests — the unexplained −1 was `no-bright-colors`' dynamically-generated per-file test for the deleted module.
 
 ### [2026-08-14] G8 - Launch Feedback Loop: /feedback Form + Announcement Marquee (WEEKLY batch)
 

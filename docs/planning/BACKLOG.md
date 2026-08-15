@@ -792,6 +792,11 @@ Auto-Generated finding — recorded so G4's "converted to Ukrainian" scope isn't
   whole seo.ts metadata layer is EN by pre-existing convention. G4 deliberately did not own
   metadata (rendered strings only) — recording the exception so "G4 = no EN left" never
   propagates unqualified; natural home is TASK-039 i18n. (Low-Med value, Low effort)
+  **Shipped 2026-08-15** → PR #37 (TASK-039 T8, in-plan ruling: the fixed set joined G9): auth
+  titles, «Категорію не знайдено»/«Товар не знайдено», breadcrumbs and the rest of the
+  user-visible set are UA via async `getTranslations` helpers. Machine-metadata residue
+  (og:locale, availableLanguage, unreachable EN fallback, alternates.languages) continues as
+  the 🟤 entry in the [2026-08-15] G9 close-out group below.
 
 ### [2026-08-09] From: G4 completion
 
@@ -1013,6 +1018,49 @@ deferral's missing recording was re-raised by PR #37 review round 4. 🔵 User-F
   upgrade retires the ref half on its own. (Low value, Low effort)
   `[possible-dup-of: 🟤 Textarea drops refs — react-hook-form cannot focus admin product fields, 2026-08-08]`
   [PR #37 review round 4 re-raise, 2026-08-15]
+
+### [2026-08-15] From: G9 close-out (PR #37 gate Q&A + final-review triage)
+
+**Origin**: the G9 visual gate's scope questions (user, answered in-chat with recommendations)
+and the final whole-branch review's deferred minors (agents). First three 🔵 User-Flagged; the
+rest 🟤 Auto-Generated.
+
+- 🔵 **DB-content localization decision — RU product copy** — product/category names,
+  descriptions and variant values have no locale dimension (G9 spec scope ruling: DB data stays
+  UA in RU mode). If wanted: `ProductTranslation`/`CategoryTranslation` tables (locale →
+  name/description, RU falling back to UA like the catalog merge) + a second-language tab in
+  the admin forms. Doubles the client's per-product content workload — put the question to the
+  client in the TASK-056 round-trip (rider recorded there) and build only on opt-in.
+  (Med value, High effort) [G9 gate Q2, 2026-08-15]
+- 🔵 **Transactional-email localization** — emails are deliberately UA-only (G5 shell,
+  `lang="uk"`). Honest design: persist the customer's locale on Order/Subscriber at creation
+  (the checkout/subscribe handlers can read `NEXT_LOCALE`; background workers have no request
+  context), add an email namespace to the catalogs, thread locale through the shared shell.
+  Note: prod cannot email real customers until TASK-056's sending domain lands anyway, so
+  nothing is lost by deferring. (Med value, Med effort) [G9 gate Q3, 2026-08-15]
+- 🔵 **Zod validation-message localization** — schema messages render UA on forms in RU mode
+  (ruled out of G9). Right mechanism is the repo's byCode pattern: schemas emit stable codes,
+  clients map code → catalog string (`t.has` guard); server-side `getTranslations` covers
+  API-returned messages. Natural G13-era companion. (Low-Med value, Med effort)
+  [G9 gate Q5, 2026-08-15]
+- 🟤 **Machine-metadata EN corners** — `og:locale: "en_US"`, JSON-LD
+  `availableLanguage: "English"`, `getCategoryMetadata`'s unreachable EN fallback, and no
+  `alternates.languages`. The non-user-visible residue of the [2026-08-09] G4-final-review
+  entry above after PR #37 shipped its user-visible half. (Low value, Low effort)
+  [G9 T8 + final review, 2026-08-15]
+- 🟤 **G13 duplicate-value sync test** — if G13's `admin.*` namespace duplicates
+  `account.orderStatus`/`paymentStatus` label values rather than reusing the keys, add a sync
+  test asserting the duplicates stay byte-identical; moot if G13 reuses `account.*` keys
+  directly. (Low value, Low effort) [G9 final review, 2026-08-15]
+- 🟤 **`seo.breadcrumb` vs `products.breadcrumbHome` consolidation** — two catalog keys carry
+  the same «Головна» concept in different namespaces; consolidate to one home.
+  (Low value, Low effort) [G9 final review, 2026-08-15]
+- 🟤 **AnnouncementBar root-hook polish** — uses root `useTranslations()` with a
+  factually-wrong justifying comment; should be `useTranslations("site")` + corrected comment.
+  (Low value, Low effort) [G9 T4 review minor, 2026-08-15]
+- 🟤 **Root CLAUDE.md tests-tree staleness** — the Architecture tree lists 1 of 6 E2E specs and
+  8 of 59 unit files (pre-existing, noted by G9 T11); refresh or generalize the listing so it
+  stops implying completeness. (Low value, Low effort) [G9 T11, 2026-08-15]
 
 ---
 

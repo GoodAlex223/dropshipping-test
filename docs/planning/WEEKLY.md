@@ -35,10 +35,12 @@ _Group IDs continue from last week (G1–G7 are permanently taken by DONE.md and
 🔵 User · i18n/content · **8 SP** · Wed–Thu (contiguous)
 
 > The launch-push spine named in the standing steer — the last big v1.3 engineering item. Library choice decided in-plan: next-intl is the default candidate, weighing its `useExtracted` agent workflow against the repo's deliberately extraction-ready `src/content/*.ts` layer (G6-surfaced design input, BACKLOG [2026-08-10]; same source advises against agent-translated catalogs). Urgency note: the monobank UA-site prerequisite still holds, but TASK-048 payments is client-gated and deferred — this is spine-by-steer, not payments-blocked.
+>
+> **✅ Shipped 2026-08-15** — PR [#37](https://github.com/GoodAlex223/dropshipping-test/pull/37) merged `2c93da7` (+1 day: ran Thu–Fri after G8's slip; 2 visual-gate rounds, 4 PR-review rounds, every finding fixed). next-intl cookie mode, UA default + RU toggle; 474-key RU catalog is a DRAFT pending client sign-off (TASK-056 rider). The agent-translated-catalog risk the G6 note warned about was mitigated by the byte-diff verifier + the user gate's nuance-flag review. Details: [DONE.md](DONE.md).
 
-- [ ] Locale infrastructure: UA default + RU toggle, library decision + wiring (3) — TODO.md TASK-039 [HIGH]
-- [ ] Externalize the hardcoded-Ukrainian customer strings — `src/content/*.ts` config layer + inline homepage/header/footer strings — into locale files (4) — TODO.md TASK-039 [HIGH]
-- [ ] Verify `formatPrice()` §7.4 compliance (decision-doc AC); rule in-plan whether the EN SEO/metadata layer (BACKLOG [2026-08-09] G4 final review) joins this scope or stays parked (1) — TODO.md TASK-039
+- [x] Locale infrastructure: UA default + RU toggle, library decision + wiring (3) — TODO.md TASK-039 [HIGH]
+- [x] Externalize the hardcoded-Ukrainian customer strings — `src/content/*.ts` config layer + inline homepage/header/footer strings — into locale files (4) — TODO.md TASK-039 [HIGH]
+- [x] Verify `formatPrice()` §7.4 compliance (decision-doc AC); rule in-plan whether the EN SEO/metadata layer (BACKLOG [2026-08-09] G4 final review) joins this scope or stays parked (1) — TODO.md TASK-039 _(ruled: joined — the user-visible fixed set shipped UA in T8)_
 
 ### G10. Weekly Reviews [batch]
 
@@ -104,11 +106,11 @@ _Group IDs continue from last week (G1–G7 are permanently taken by DONE.md and
 ### Wednesday — Feedback loop lands + i18n opens
 
 - ✅ **[G8](#g8-launch-feedback-loop-batch)** 🔵 — part 2: TASK-059 marquee, visual gate, PR (gate ran 6 rounds → shipped Thu 2026-08-14, +2 days; hotfix PR #36 same day).
-- **[G9](#g9-task-039-i18n-foundation-solo)** 🔵 — part 1: library decision + locale infra (the week's riskiest design call, front-loaded to the first full day).
+- ✅ **[G9](#g9-task-039-i18n-foundation-solo)** 🔵 — part 1: library decision + locale infra (the week's riskiest design call, front-loaded to the first full day). (Ran Thu 2026-08-14 after G8's +2-day slip.)
 
 ### Thursday — i18n externalization + rebrand residuals
 
-- **[G9](#g9-task-039-i18n-foundation-solo)** 🔵 — part 2: content-layer externalization + §7.4 verification.
+- ✅ **[G9](#g9-task-039-i18n-foundation-solo)** 🔵 — part 2: content-layer externalization + §7.4 verification. (Shipped Fri 2026-08-15, PR #37.)
 - **[G14](#g14-rebrand-residuals-variant-names--design-gap-audit-batch)** 🔵 — variant rename + design-gap audit.
 - **[G10](#g10-weekly-reviews-batch)** ⚪ — part 1: plugins + Claude best-practices slots (defers first if the day jams).
 
@@ -124,17 +126,17 @@ _Group IDs continue from last week (G1–G7 are permanently taken by DONE.md and
 
 ## Summary Table
 
-| ID  | Group                                               | Domain             | Source      | Tasks  | Total SP | Day           | Status    |
-| --- | --------------------------------------------------- | ------------------ | ----------- | ------ | -------- | ------------- | --------- |
-| G8  | Launch Feedback Loop `[batch]`                      | storefront/comms   | 🔵 User     | 2      | 5        | Tue–Wed       | ✅ PR #35 |
-| G9  | TASK-039 i18n Foundation `[solo]`                   | i18n/content       | 🔵 User     | 3      | 8        | Wed–Thu       | ☐ Planned |
-| G10 | Weekly Reviews `[batch]`                            | recurring reviews  | ⚪ Overhead | 4      | 5        | Thu–Fri       | ☐ Planned |
-| G11 | Docs-Freshness Linter `[solo]`                      | docs tooling       | 🟤 Auto     | 1      | 3        | Fri           | ☐ Planned |
-| G12 | Categories-to-Catalog Redesign `[batch]` 🏆         | storefront/catalog | 🔵 User     | 3      | 5        | Fri (stretch) | ☐ Planned |
-| G13 | Admin Translation & Alignment `[solo]`              | admin panel        | 🔵 User     | 3      | 8        | Fri→spill     | ☐ Planned |
-| G14 | Rebrand Residuals: Variants + Design Gaps `[batch]` | storefront/data    | 🔵 User     | 2      | 5        | Thu           | ☐ Planned |
-| P2  | Prod re-seed after variant rename (user-gated)      | ops/data           | 🟡 Ops      | 1      | 1        | on G14 done   | ☐ Gated   |
-|     | **Total**                                           |                    |             | **19** | **40**   |               |           |
+| ID  | Group                                               | Domain             | Source      | Tasks  | Total SP | Day           | Status                                                                |
+| --- | --------------------------------------------------- | ------------------ | ----------- | ------ | -------- | ------------- | --------------------------------------------------------------------- |
+| G8  | Launch Feedback Loop `[batch]`                      | storefront/comms   | 🔵 User     | 2      | 5        | Tue–Wed       | ✅ PR #35                                                             |
+| G9  | TASK-039 i18n Foundation `[solo]`                   | i18n/content       | 🔵 User     | 3      | 8        | Wed–Thu       | ✅ PR [#37](https://github.com/GoodAlex223/dropshipping-test/pull/37) |
+| G10 | Weekly Reviews `[batch]`                            | recurring reviews  | ⚪ Overhead | 4      | 5        | Thu–Fri       | ☐ Planned                                                             |
+| G11 | Docs-Freshness Linter `[solo]`                      | docs tooling       | 🟤 Auto     | 1      | 3        | Fri           | ☐ Planned                                                             |
+| G12 | Categories-to-Catalog Redesign `[batch]` 🏆         | storefront/catalog | 🔵 User     | 3      | 5        | Fri (stretch) | ☐ Planned                                                             |
+| G13 | Admin Translation & Alignment `[solo]`              | admin panel        | 🔵 User     | 3      | 8        | Fri→spill     | ☐ Planned                                                             |
+| G14 | Rebrand Residuals: Variants + Design Gaps `[batch]` | storefront/data    | 🔵 User     | 2      | 5        | Thu           | ☐ Planned                                                             |
+| P2  | Prod re-seed after variant rename (user-gated)      | ops/data           | 🟡 Ops      | 1      | 1        | on G14 done   | ☐ Gated                                                               |
+|     | **Total**                                           |                    |             | **19** | **40**   |               |                                                                       |
 
 _Source legend: 🔵 User · 🟡 Ops · 🟤 Auto · ⚪ Overhead (exempt from the quota denominator). Status on completion: `✅ PR #N` (the number, never a bare ✅)._
 
