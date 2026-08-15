@@ -495,6 +495,20 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 
   Complementary option raised in the same review: lower/reword the code-review skill's severity rubric so doc-drift findings (which top out ~75 vs the 80 gate) clear on their own — this covers the drift a linter structurally cannot see, e.g. PR #26 finding 1's stale in-code JSDoc. See the `code-review-threshold-understates-doc-findings` memory. (Med value, Low effort) `[possible-dup-of: "Automated doc freshness check" in the [2026-02-10] From: TASK-030 group]` — related but not identical: that item compares a doc's `Last Updated` header against **git file timestamps** (finds stale docs); this one compares the header against the **`docs/README.md` index row** (finds two-places-disagree drift). Same likely host script, different checks — build together, but neither subsumes the other. The same group's "Link checker in CI" is a third candidate for that script.
 
+  **Design input added 2026-08-15 (G10 run 2, slot 3 — evidence, not a new entry).** GitHub's
+  [`spec-kit`](https://github.com/github/spec-kit) (128.9k stars, MIT, 30+ agent integrations)
+  splits this problem into **two** checks that are worth keeping distinct when scoping the script,
+  because this repo performs both by hand: `/speckit.analyze` is _"Cross-artifact consistency &
+  coverage analysis"_ — doc-vs-doc, which is exactly the header↔index-row check above — while
+  `/speckit.converge` _"assesses the codebase against spec/plan/tasks and appends remaining work as
+  new tasks"_ — **spec-vs-code**, a direction this entry does not currently cover. The second is
+  not hypothetical here: G14's design-gap audit (2026-08-15) was a manual `converge` run, comparing
+  7 `.dc.html` handoff files against shipped pages and filing the deltas as 🟤 rows. Treat
+  spec-vs-code as a **later, separate** check — the entry's own false-positive warning applies
+  doubly to it — but scope the host script so it can host both rather than hard-wiring it to
+  header↔row pairs. The toolchain itself was **passed**, not adopted: its pipeline duplicates the
+  superpowers spec→plan→TDD flow already in use here.
+
 - 🟤 **`/api/products` passes unvalidated `parseFloat()` output into the Prisma `price` filter** — `src/app/api/products/route.ts:69-74` does `if (minPrice) { where.price = { ..., gte: parseFloat(minPrice) } }` (same shape for `maxPrice`/`lte`). The truthiness guard rejects an empty string but not a non-numeric one, so `?minPrice=abc` yields `parseFloat("abc")` → `NaN`, which reaches a Prisma `Decimal @db.Decimal(10, 2)` comparison. **Verified**: the code path, that the lines are byte-identical to `main` (pre-existing — predates TASK-036, which is why PR #26's review correctly ruled it out of scope), and that root `CLAUDE.md`'s documented "Query param validation pattern" prescribes the opposite (`!isNaN(num) && num >= min && num <= max`, then conditional spread). **Not verified**: the observable runtime behaviour of `NaN` in a Prisma Decimal `gte` — it may throw `PrismaClientValidationError` (500) or be coerced; confirm before choosing between "ignore the param" and "400 Bad Request". PR #26 added the analogous guard on the _client_ side only (`parseNumericParam` in `products-content.tsx`, commit `a7faf75`), so the API is reachable unguarded by any direct caller or crawler. (Low value, Low effort) `[possible-dup-of: "Fix getPagination() NaN propagation" — BACKLOG.md:292, under [2026-02-10] From: TASK-029 → Origin: feat/task-028-test-coverage branch]` — same NaN-propagation class in the same file, but a distinct defect: that one is `parseInt` → `Math.max(1, NaN)` → `NaN` page/limit in `getPagination()`; this one is `parseFloat` → `NaN` in the price `where`. Worth fixing in one pass, but neither entry covers the other.
 
 ### [2026-08-01] From: TASK-037 product page redesign (plan extraction)
