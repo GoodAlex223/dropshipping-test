@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-08-11
+**Last Updated**: 2026-08-15
 
 ---
 
