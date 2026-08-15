@@ -2,7 +2,7 @@
 
 Central index for all project documentation.
 
-**Last Updated**: 2026-08-14
+**Last Updated**: 2026-08-15
 
 ---
 
@@ -66,6 +66,7 @@ Central index for all project documentation.
 | [superpowers/specs/2026-08-10-g5-transactional-emails-design.md](superpowers/specs/2026-08-10-g5-transactional-emails-design.md)               | G5 design: transactional emails → Ukrainian dark-Mirox on a shared table-based shell — `content/emails.ts` copy module, `BRAND_NAME` routing, escaping/guest-CTA hardening, prod email-config check; gate-ruling superseded notes (country line, WhatsApp) | 2026-08-10   |
 | [superpowers/specs/2026-08-10-g6-weekly-reviews-design.md](superpowers/specs/2026-08-10-g6-weekly-reviews-design.md)                           | G6 design: first Weekly Reviews run in this repo — REVIEW-QUEUE.md as durable state + methodology of record, four slots, verdict routing, six ruled decisions                                                                                              | 2026-08-10   |
 | [superpowers/specs/2026-08-11-launch-feedback-loop-design.md](superpowers/specs/2026-08-11-launch-feedback-loop-design.md)                     | G8 design: launch feedback loop — `/feedback` page + coded-outcome API + `FEEDBACK_EMAIL` Resend send (TASK-058), `SiteAnnouncement` marquee with reduced-motion reset rejoin (TASK-059)                                                                   | 2026-08-11   |
+| [superpowers/specs/2026-08-14-task-039-i18n-foundation-design.md](superpowers/specs/2026-08-14-task-039-i18n-foundation-design.md)             | G9/TASK-039 design: i18n foundation — next-intl cookie mode (UA default, RU toggle), full-sweep byte-identical extraction, agent RU draft + user gate review, SEO fixed-set ruling, §7.4 verification approach                                             | 2026-08-14   |
 | [superpowers/specs/2026-08-14-task-039-i18n-foundation-design.md](superpowers/specs/2026-08-14-task-039-i18n-foundation-design.md)             | G9 design: TASK-039 i18n foundation — next-intl cookie mode (UA default / RU toggle), full-sweep byte-identical string externalization to `messages/` catalogs, DRAFT RU catalog, SEO fixed-set UA-ification, `formatPrice` §7.4 verification rulings      | 2026-08-14   |
 | [design/design_handoff_mirox/README.md](design/design_handoff_mirox/README.md)                                                                 | **Design handoff** — 7 HTML screen prototypes (Home/Catalog/Product/Cart/Checkout/Contacts/Mobile) + design spec, reconstructed from the client mockup and client-approved                                                                                 | 2026-07-27   |
 | [reference/client-brief.md](reference/client-brief.md)                                                                                         | **Client brief (verbatim)** — Mirox Shop requirement lists #1 and #2, RU + EN                                                                                                                                                                              | 2026-07-19   |
