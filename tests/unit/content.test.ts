@@ -1,8 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { site } from "@/content/site";
 import { home } from "@/content/home";
-import { ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS } from "@/content/account";
-import { OrderStatus, PaymentStatus } from "@prisma/client";
 
 describe("site content", () => {
   it("exposes the Mirox brand name", () => {
@@ -72,30 +70,15 @@ describe("home content", () => {
 // deleted; the uppercase-CTA assertion moved to i18n-catalogs.test.ts (reads
 // messages/uk.json directly).
 
-describe("account content", () => {
-  // ORDER_STATUS_LABELS/PAYMENT_STATUS_LABELS are the two maps account.ts
-  // still exports post-trim (admin-only source until G13) — this describe
-  // block's coverage is unaffected by the Task 5 migration.
-  it("labels every OrderStatus value in Ukrainian", () => {
-    for (const s of Object.values(OrderStatus)) {
-      expect(ORDER_STATUS_LABELS[s]).toBeTruthy();
-      expect(ORDER_STATUS_LABELS[s]).not.toMatch(/^[A-Za-z ]+$/);
-    }
-  });
-
-  it("labels every PaymentStatus value in Ukrainian", () => {
-    for (const s of Object.values(PaymentStatus)) {
-      expect(PAYMENT_STATUS_LABELS[s]).toBeTruthy();
-    }
-  });
-
-  // The customer-copy `account.orders.card.more` plural and
-  // `account.orderDetail.payment.methodLabel` ternary both moved out of this
-  // module (TASK-039 G9 Task 5) — the plural now lives as an ICU pattern
-  // rendered via i18n-catalogs.test.ts's Probe; methodLabel's branching moved
-  // into the order-detail component, with its two atomic strings
-  // (methodCod/methodCard) asserted there too.
-});
+// "account content" describe block removed (PR #37 review round 2) —
+// src/content/account.ts deleted: its two label maps had no production
+// consumers (admin renders raw enum values until G13; the account pages
+// read the catalog). The Prisma-enum label coverage lives in
+// i18n-catalogs.test.ts's drift net against messages/uk.json. The
+// customer-copy `account.orders.card.more` plural and
+// `account.orderDetail.payment.methodLabel` ternary moved out back in
+// Task 5 — ICU pattern via i18n-catalogs.test.ts's Probe, and the
+// order-detail component's methodCod/methodCard strings respectively.
 
 // "newsletter content" / "system content" / "feedback content" describe
 // blocks removed (TASK-039 G9 Task 5) — src/content/{newsletter,system,
