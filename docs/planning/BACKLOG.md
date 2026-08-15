@@ -1062,6 +1062,33 @@ rest 🟤 Auto-Generated.
   8 of 59 unit files (pre-existing, noted by G9 T11); refresh or generalize the listing so it
   stops implying completeness. (Low value, Low effort) [G9 T11, 2026-08-15]
 
+### [2026-08-15] From: G14 design-gap audit
+
+**Origin**: the user's 2026-08-11 steer ("maybe we have not finished redesigning of some pages")
+was settled by auditing all 7 `docs/design/design_handoff_mirox/*.dc.html` files against the
+shipped pages (desktop 1440 + mobile 390, incl. the never-tracked `Mirox Mobile.dc.html`).
+Specific findings audit-surfaced → 🟤. Full findings table in the G14 plan
+(`docs/planning/plans/2026-08-15_g14-rebrand-residuals.md`) and the audit Artifact. Every other
+mockup↔shipped delta checked out as already ruled and tracked (eyebrow removal 2026-07-28,
+no-dead-links nav/footer truncation → TASK-055, «У вибране» → TASK-041, «Відкрити фото
+замірів» → TASK-056, 1-click + промокод → TASK-043, single name field → G2 spec §2). The
+audit's one small fix (light blur shimmer → dark) shipped in-branch.
+
+- 🟤 **Mobile «Новинки» rail: horizontal scroll per `Mirox Mobile.dc.html`** — the mobile
+  mockup specifies a horizontal-scroll rail of ~160px cards for the homepage «Новинки»;
+  shipped `ProductRail.tsx` stacks full-width cards in a 1-col grid below `sm:` (a long
+  scroll past 4 tall cards). Confined to ProductRail's responsive classes but changes mobile
+  interaction and deserves its own visual-gate round — pre-launch-week candidate. The
+  mockup's mobile-PDP contextual header (back arrow + product name) is a related flourish;
+  assess it in the same pass. (Med value, Low-Med effort) [G14 audit, 2026-08-15]
+- 🟤 **Checkout distraction-free header per `Mirox Checkout.dc.html`** — the mockup gives
+  checkout a simplified header (logo + «Захищене оформлення» only, no nav/search/cart/
+  announcement); shipped `/checkout` keeps the full storefront chrome incl. the G8 marquee
+  (the «Захищене оформлення» note lives in the summary sidebar instead). No G2 ruling
+  recorded on this delta (checked spec + plan). Standard conversion practice, but needs a
+  checkout-scoped layout and a decision on how far to strip (keep the Кошик stepper link as
+  escape hatch?). (Med value, Med effort) [G14 audit, 2026-08-15]
+
 ---
 
 ## Technical Debt
