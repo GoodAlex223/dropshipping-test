@@ -5,12 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
-import { newsletter } from "@/content/newsletter";
+import { useTranslations } from "next-intl";
 
-// TASK-039: externalize — success-path strings below stay inline until the
-// i18n library lands; error-path copy already lives in src/content/newsletter.ts
-// (G4 code mapping).
 export function NewsletterSignup() {
+  const t = useTranslations("newsletter.signup");
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -31,17 +29,19 @@ export function NewsletterSignup() {
 
       if (!response.ok) {
         // data.error is EN API/log text — map the machine code instead.
-        toast.error(
-          (data.code && newsletter.signup.byCode[data.code]) || newsletter.signup.fallback
-        );
+        // Guarded dynamic key (next-intl v4.13.6 t.has, verified available —
+        // TASK-039 Task 5): unknown/absent codes fall back to fallback.
+        const code = data.code as string | undefined;
+        const key = code ? `byCode.${code}` : "";
+        toast.error(key && t.has(key as never) ? t(key as never) : t("fallback"));
         return;
       }
 
       setIsSuccess(true);
       setEmail("");
-      toast.success("Перевірте пошту, щоб підтвердити підписку");
+      toast.success(t("successToast"));
     } catch {
-      toast.error(newsletter.signup.fallback);
+      toast.error(t("fallback"));
     } finally {
       setIsLoading(false);
     }
@@ -51,7 +51,7 @@ export function NewsletterSignup() {
     return (
       <div className="border-border bg-muted flex items-start gap-2 rounded-md border p-3">
         <CheckCircle2 className="text-foreground h-5 w-5 flex-shrink-0" />
-        <p className="text-foreground text-sm">Перевірте пошту, щоб підтвердити підписку!</p>
+        <p className="text-foreground text-sm">{t("successMessage")}</p>
       </div>
     );
   }
@@ -60,7 +60,7 @@ export function NewsletterSignup() {
     <form onSubmit={handleSubmit} className="space-y-2">
       <Input
         type="email"
-        placeholder="Ваш email"
+        placeholder={t("emailPlaceholder")}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         disabled={isLoading}
@@ -69,11 +69,9 @@ export function NewsletterSignup() {
       />
       <Button type="submit" disabled={isLoading} className="w-full" size="sm">
         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        {isLoading ? "Підписуємось..." : "Підписатися"}
+        {isLoading ? t("submitting") : t("submit")}
       </Button>
-      <p className="text-muted-foreground text-xs">
-        Ми поважаємо вашу приватність. Відписатися можна будь-коли.
-      </p>
+      <p className="text-muted-foreground text-xs">{t("privacyNote")}</p>
     </form>
   );
 }

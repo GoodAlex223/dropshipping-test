@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { ShoppingCart, Menu, Search, User, LogOut, Settings, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { site } from "@/content/site";
+import { LocaleSwitcher } from "@/components/common/LocaleSwitcher";
 import { formatPrice } from "@/lib/format";
 import { useCartStore } from "@/stores/cart.store";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -39,14 +40,19 @@ interface Category {
   slug: string;
 }
 
+// `key` (not the label) is the stable identity — `as const` narrows it to
+// the literal union next-intl's typed catalog keys require for
+// `t(\`nav.${item.key}\`)` below (a plain `string` key fails typecheck
+// against the strict message-key union; a widened `.map()` index would too).
 const navigation = [
-  { name: "Каталог", href: "/products" },
-  { name: "Новинки", href: "/products?sort=new" },
-  { name: "Бестселери", href: "/products?sort=popular" },
-];
+  { key: "catalog", href: "/products" },
+  { key: "new", href: "/products?sort=new" },
+  { key: "bestsellers", href: "/products?sort=popular" },
+] as const;
 
 export function Header() {
   const router = useRouter();
+  const t = useTranslations("header");
   const { data: session, status } = useSession();
   const { getTotalItems, openCart } = useCartStore();
   const totalItems = getTotalItems();
@@ -183,23 +189,23 @@ export function Header() {
           <SheetTrigger asChild className="md:hidden">
             <Button variant="ghost" size="icon">
               <Menu className="h-5 w-5" />
-              <span className="sr-only">{site.header.toggleMenu}</span>
+              <span className="sr-only">{t("toggleMenu")}</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-[300px] sm:w-[350px]">
+          <SheetContent side="left" className="w-[300px] overflow-y-auto sm:w-[350px]">
             <SheetHeader className="text-left">
-              <SheetTitle>{site.header.menu}</SheetTitle>
+              <SheetTitle>{t("menu")}</SheetTitle>
             </SheetHeader>
 
             <nav className="mt-6 flex flex-col gap-2">
               {navigation.map((item) => (
                 <Link
-                  key={item.name}
+                  key={item.key}
                   href={item.href}
                   onClick={closeMobileMenu}
                   className="hover:bg-muted flex items-center rounded-lg px-3 py-2 text-lg font-medium transition-colors"
                 >
-                  {item.name}
+                  {t(`nav.${item.key}`)}
                 </Link>
               ))}
               <Link
@@ -207,7 +213,7 @@ export function Header() {
                 onClick={closeMobileMenu}
                 className="hover:bg-muted flex items-center rounded-lg px-3 py-2 text-lg font-medium transition-colors"
               >
-                {site.header.categories}
+                {t("categories")}
               </Link>
               {categories.length > 0 && (
                 <div className="ml-4 flex flex-col gap-1">
@@ -230,10 +236,12 @@ export function Header() {
                   className="text-primary hover:bg-muted flex items-center rounded-lg px-3 py-2 text-lg font-medium transition-colors"
                 >
                   <Settings className="mr-2 h-5 w-5" />
-                  {site.header.adminPanel}
+                  {t("adminPanel")}
                 </Link>
               )}
             </nav>
+
+            <LocaleSwitcher className="mt-4 px-3" />
 
             <Separator className="my-4" />
 
@@ -256,7 +264,7 @@ export function Header() {
                   className="hover:bg-muted flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors"
                 >
                   <User className="mr-2 h-4 w-4" />
-                  {site.header.account}
+                  {t("account")}
                 </Link>
                 <Link
                   href="/account/orders"
@@ -264,24 +272,24 @@ export function Header() {
                   className="hover:bg-muted flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors"
                 >
                   <ShoppingCart className="mr-2 h-4 w-4" />
-                  {site.header.orders}
+                  {t("orders")}
                 </Link>
                 <button
                   onClick={handleSignOut}
                   className="hover:bg-muted text-destructive flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
-                  {site.header.signOut}
+                  {t("signOut")}
                 </button>
               </div>
             ) : (
               <div className="space-y-2 px-3">
                 <Link href="/login" onClick={closeMobileMenu}>
-                  <Button className="w-full">{site.header.signIn}</Button>
+                  <Button className="w-full">{t("signIn")}</Button>
                 </Link>
                 <Link href="/register" onClick={closeMobileMenu}>
                   <Button variant="outline" className="w-full">
-                    {site.header.createAccount}
+                    {t("createAccount")}
                   </Button>
                 </Link>
               </div>
@@ -305,11 +313,11 @@ export function Header() {
         <nav className="hidden items-center gap-6 md:flex">
           {navigation.map((item) => (
             <Link
-              key={item.name}
+              key={item.key}
               href={item.href}
               className="text-muted-foreground hover:text-foreground text-sm font-semibold transition-colors"
             >
-              {item.name}
+              {t(`nav.${item.key}`)}
             </Link>
           ))}
 
@@ -318,19 +326,21 @@ export function Header() {
               href="/admin"
               className="text-muted-foreground hover:text-foreground text-sm font-semibold transition-colors"
             >
-              {site.header.adminPanel}
+              {t("adminPanel")}
             </Link>
           )}
         </nav>
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          <LocaleSwitcher className="hidden md:flex" />
+
           {/* Search Button */}
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setSearchOpen(true)}
-            aria-label={site.header.search.srOpen}
+            aria-label={t("search.srOpen")}
           >
             <Search className="h-5 w-5" />
           </Button>
@@ -339,13 +349,13 @@ export function Header() {
           <Dialog open={searchOpen} onOpenChange={setSearchOpen}>
             <DialogContent className="p-0 sm:max-w-[500px]">
               <DialogHeader className="sr-only">
-                <DialogTitle>{site.header.search.dialogTitle}</DialogTitle>
+                <DialogTitle>{t("search.dialogTitle")}</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSearchSubmit}>
                 <div className="flex items-center border-b px-3">
                   <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
                   <Input
-                    placeholder={site.header.search.placeholder}
+                    placeholder={t("search.placeholder")}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="placeholder:text-muted-foreground flex h-12 w-full border-0 bg-transparent py-3 text-sm outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
@@ -391,7 +401,7 @@ export function Header() {
                     className="text-muted-foreground hover:bg-muted flex w-full items-center gap-2 rounded-md p-2 text-sm"
                   >
                     <Search className="h-4 w-4" />
-                    {site.header.search.viewAll(searchQuery)}
+                    {t("search.viewAll", { query: searchQuery })}
                   </button>
                 </div>
               )}
@@ -399,14 +409,14 @@ export function Header() {
               {/* No Results */}
               {searchQuery.length >= 2 && !isSearching && searchResults.length === 0 && (
                 <div className="text-muted-foreground p-4 text-center text-sm">
-                  {site.header.search.noResults(searchQuery)}
+                  {t("search.noResults", { query: searchQuery })}
                 </div>
               )}
 
               {/* Empty State */}
               {searchQuery.length < 2 && (
                 <div className="text-muted-foreground p-4 text-center text-sm">
-                  {site.header.search.minChars}
+                  {t("search.minChars")}
                 </div>
               )}
             </DialogContent>
@@ -442,13 +452,13 @@ export function Header() {
                 <DropdownMenuItem asChild>
                   <Link href="/account" className="cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
-                    {site.header.account}
+                    {t("account")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/account/orders" className="cursor-pointer">
                     <ShoppingCart className="mr-2 h-4 w-4" />
-                    {site.header.orders}
+                    {t("orders")}
                   </Link>
                 </DropdownMenuItem>
                 {isAdmin && (
@@ -457,7 +467,7 @@ export function Header() {
                     <DropdownMenuItem asChild>
                       <Link href="/admin" className="cursor-pointer">
                         <Settings className="mr-2 h-4 w-4" />
-                        {site.header.adminPanel}
+                        {t("adminPanel")}
                       </Link>
                     </DropdownMenuItem>
                   </>
@@ -468,14 +478,14 @@ export function Header() {
                   className="text-destructive cursor-pointer"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
-                  {site.header.signOut}
+                  {t("signOut")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <Link href="/login">
               <Button variant="ghost" size="sm">
-                {site.header.signIn}
+                {t("signIn")}
               </Button>
             </Link>
           )}
@@ -487,7 +497,7 @@ export function Header() {
                 {totalItems > 99 ? "99+" : totalItems}
               </span>
             )}
-            <span className="sr-only">{site.header.cart}</span>
+            <span className="sr-only">{t("cart")}</span>
           </Button>
         </div>
       </div>

@@ -1,4 +1,44 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import uk from "../../messages/uk.json";
+
+// seo.ts's now-async helpers (Task 8) read request-scoped `getTranslations`
+// from next-intl/server. Vitest has no request scope (next-intl v4.13.6's
+// server entry point expects the "react-server" condition, which is absent
+// under vitest) — mock it with a real lookup into messages/uk.json so
+// assertions verify actual catalog values instead of a hand-duplicated
+// fixture that could drift. Supports namespace scoping (getTranslations("seo")
+// vs getTranslations("brand")) and {param} interpolation (auth descriptions
+// need {name}), which the brief's illustrative one-line mock doesn't cover.
+function getPath(obj: unknown, path: string): unknown {
+  return path
+    .split(".")
+    .reduce<unknown>(
+      (acc, part) =>
+        acc && typeof acc === "object" && part in (acc as Record<string, unknown>)
+          ? (acc as Record<string, unknown>)[part]
+          : undefined,
+      obj
+    );
+}
+
+vi.mock("next-intl/server", () => ({
+  getTranslations: async (namespace?: string) => {
+    const scope = namespace ? getPath(uk, namespace) : uk;
+    return (key: string, params?: Record<string, string>) => {
+      const raw = getPath(scope, key);
+      if (typeof raw !== "string") {
+        throw new Error(
+          `seo.test.ts fixture: missing "${namespace ? namespace + "." : ""}${key}" in messages/uk.json`
+        );
+      }
+      return params
+        ? Object.entries(params).reduce((s, [k, v]) => s.replaceAll(`{${k}}`, v), raw)
+        : raw;
+    };
+  },
+}));
+
+import { getTranslations } from "next-intl/server";
 import {
   siteConfig,
   getDefaultMetadata,
@@ -18,7 +58,9 @@ describe("SEO Utilities", () => {
   describe("siteConfig", () => {
     it("should have required properties", () => {
       expect(siteConfig).toHaveProperty("name");
-      expect(siteConfig).toHaveProperty("description");
+      // No `description` property (Task 8): the value is now request-scoped
+      // (messages/uk.json brand.description via getTranslations), not a
+      // static field — see getDefaultMetadata/getHomeMetadata/getProductMetadata.
       expect(siteConfig).toHaveProperty("url");
       expect(siteConfig).toHaveProperty("ogImage");
       expect(siteConfig).toHaveProperty("locale");
@@ -26,8 +68,8 @@ describe("SEO Utilities", () => {
   });
 
   describe("getDefaultMetadata", () => {
-    it("should return valid metadata object", () => {
-      const metadata = getDefaultMetadata();
+    it("should return valid metadata object", async () => {
+      const metadata = await getDefaultMetadata();
 
       expect(metadata).toHaveProperty("metadataBase");
       expect(metadata).toHaveProperty("title");
@@ -37,8 +79,13 @@ describe("SEO Utilities", () => {
       expect(metadata).toHaveProperty("robots");
     });
 
-    it("should include OpenGraph configuration", () => {
-      const metadata = getDefaultMetadata();
+    it("should use the catalog brand description (Task 8: was BRAND_DESCRIPTION)", async () => {
+      const metadata = await getDefaultMetadata();
+      expect(metadata.description).toBe(uk.brand.description);
+    });
+
+    it("should include OpenGraph configuration", async () => {
+      const metadata = await getDefaultMetadata();
 
       expect(metadata.openGraph).toHaveProperty("type", "website");
       expect(metadata.openGraph).toHaveProperty("siteName", siteConfig.name);
@@ -50,8 +97,8 @@ describe("SEO Utilities", () => {
       expect(metadata.openGraph).not.toHaveProperty("images");
     });
 
-    it("should include Twitter card configuration without pinning an image", () => {
-      const metadata = getDefaultMetadata();
+    it("should include Twitter card configuration without pinning an image", async () => {
+      const metadata = await getDefaultMetadata();
 
       expect(metadata.twitter).toHaveProperty("card", "summary_large_image");
       // No real Twitter/X handle exists for the brand (site.ts socials list
@@ -76,8 +123,8 @@ describe("SEO Utilities", () => {
       category: { name: "Electronics", slug: "electronics" },
     };
 
-    it("should generate product-specific metadata", () => {
-      const metadata = getProductMetadata(mockProduct);
+    it("should generate product-specific metadata", async () => {
+      const metadata = await getProductMetadata(mockProduct);
 
       expect(metadata.title).toBe("Test Product");
       expect(metadata.description).toBe("Short description");
@@ -85,44 +132,44 @@ describe("SEO Utilities", () => {
       expect(metadata.twitter).toBeDefined();
     });
 
-    it("should not set OG images (handled by opengraph-image.tsx convention)", () => {
-      const metadata = getProductMetadata(mockProduct);
+    it("should not set OG images (handled by opengraph-image.tsx convention)", async () => {
+      const metadata = await getProductMetadata(mockProduct);
 
       // OG images are generated dynamically by opengraph-image.tsx (file convention),
       // so getProductMetadata should not set images directly.
       expect(metadata.openGraph?.images).toBeUndefined();
     });
 
-    it("should use shortDesc as description when available", () => {
-      const metadata = getProductMetadata(mockProduct);
+    it("should use shortDesc as description when available", async () => {
+      const metadata = await getProductMetadata(mockProduct);
       expect(metadata.description).toBe("Short description");
     });
 
-    it("should fallback to truncated description when no shortDesc", () => {
+    it("should fallback to truncated description when no shortDesc", async () => {
       const productWithoutShortDesc = {
         ...mockProduct,
         shortDesc: null,
       };
-      const metadata = getProductMetadata(productWithoutShortDesc);
+      const metadata = await getProductMetadata(productWithoutShortDesc);
       expect(metadata.description).toBe("A test product description");
     });
 
-    it("should fallback to siteConfig description when no shortDesc or description", () => {
+    it("should fallback to the catalog brand description when no shortDesc or description (Task 8: was siteConfig.description)", async () => {
       const productWithoutDescriptions = {
         ...mockProduct,
         shortDesc: null,
         description: null,
       };
-      const metadata = getProductMetadata(productWithoutDescriptions);
-      expect(metadata.description).toBe(siteConfig.description);
+      const metadata = await getProductMetadata(productWithoutDescriptions);
+      expect(metadata.description).toBe(uk.brand.description);
     });
 
-    it("should not set OG images even without product images", () => {
+    it("should not set OG images even without product images", async () => {
       const productWithoutImages = {
         ...mockProduct,
         images: undefined,
       };
-      const metadata = getProductMetadata(productWithoutImages);
+      const metadata = await getProductMetadata(productWithoutImages);
       // OG images handled by opengraph-image.tsx file convention
       expect(metadata.openGraph?.images).toBeUndefined();
     });
@@ -272,16 +319,27 @@ describe("SEO Utilities", () => {
   });
 
   describe("getHomeMetadata", () => {
-    it("should return absolute title with store name", () => {
-      const metadata = getHomeMetadata();
+    it("should return absolute title with store name", async () => {
+      const metadata = await getHomeMetadata();
 
       expect(metadata.title).toEqual({
         absolute: expect.stringContaining(siteConfig.name),
       });
     });
 
-    it("should include canonical URL", () => {
-      const metadata = getHomeMetadata();
+    it("should append the catalog meta suffix to the title (Task 8: was BRAND_META_SUFFIX)", async () => {
+      const metadata = await getHomeMetadata();
+      const title = (metadata.title as { absolute: string }).absolute;
+      expect(title).toBe(`${siteConfig.name} — ${uk.brand.metaSuffix}`);
+    });
+
+    it("should use the catalog brand description (Task 8: was BRAND_DESCRIPTION)", async () => {
+      const metadata = await getHomeMetadata();
+      expect(metadata.description).toBe(uk.brand.description);
+    });
+
+    it("should include canonical URL", async () => {
+      const metadata = await getHomeMetadata();
       expect(metadata.alternates?.canonical).toBe(siteConfig.url);
     });
   });
@@ -316,7 +374,7 @@ describe("SEO Utilities", () => {
     it("falls back to the Mirox brand name when NEXT_PUBLIC_STORE_NAME is unset, never the generic 'Store'", async () => {
       vi.resetModules();
       const freshSeo = await import("@/lib/seo");
-      const metadata = freshSeo.getHomeMetadata();
+      const metadata = await freshSeo.getHomeMetadata();
       const title = (metadata.title as { absolute: string }).absolute;
       expect(title).toContain("Mirox Shop");
       expect(title).not.toContain("Store |");
@@ -324,53 +382,85 @@ describe("SEO Utilities", () => {
   });
 
   describe("getProductsListingMetadata", () => {
-    it("should return All Products title", () => {
-      const metadata = getProductsListingMetadata();
-      expect(metadata.title).toBe("All Products");
+    it("should return the catalog title (Task 8: was 'All Products')", async () => {
+      const metadata = await getProductsListingMetadata();
+      expect(metadata.title).toBe(uk.seo.productsListing.title);
     });
 
-    it("should include canonical URL with /products path", () => {
-      const metadata = getProductsListingMetadata();
+    it("should use the catalog description", async () => {
+      const metadata = await getProductsListingMetadata();
+      expect(metadata.description).toBe(uk.seo.productsListing.description);
+    });
+
+    it("should include canonical URL with /products path", async () => {
+      const metadata = await getProductsListingMetadata();
       expect(metadata.alternates?.canonical).toBe(`${siteConfig.url}/products`);
     });
 
-    it("should include OpenGraph data", () => {
-      const metadata = getProductsListingMetadata();
+    it("should include OpenGraph data", async () => {
+      const metadata = await getProductsListingMetadata();
       expect(metadata.openGraph?.url).toBe(`${siteConfig.url}/products`);
+      expect(metadata.openGraph?.title).toBe(
+        `${uk.seo.productsListing.title} | ${siteConfig.name}`
+      );
+      expect(metadata.openGraph?.description).toBe(uk.seo.productsListing.ogDescription);
     });
   });
 
   describe("getCategoriesListingMetadata", () => {
-    it("should return Shop by Category title", () => {
-      const metadata = getCategoriesListingMetadata();
-      expect(metadata.title).toBe("Shop by Category");
+    it("should return the catalog title (Task 8: was 'Shop by Category')", async () => {
+      const metadata = await getCategoriesListingMetadata();
+      expect(metadata.title).toBe(uk.seo.categoriesListing.title);
     });
 
-    it("should include canonical URL with /categories path", () => {
-      const metadata = getCategoriesListingMetadata();
+    it("should use the catalog description", async () => {
+      const metadata = await getCategoriesListingMetadata();
+      expect(metadata.description).toBe(uk.seo.categoriesListing.description);
+    });
+
+    it("should include canonical URL with /categories path", async () => {
+      const metadata = await getCategoriesListingMetadata();
       expect(metadata.alternates?.canonical).toBe(`${siteConfig.url}/categories`);
+    });
+
+    it("should include OpenGraph data (Task 8: was the independently-EN 'Categories')", async () => {
+      const metadata = await getCategoriesListingMetadata();
+      expect(metadata.openGraph?.title).toBe(
+        `${uk.seo.categoriesListing.ogTitle} | ${siteConfig.name}`
+      );
+      expect(metadata.openGraph?.description).toBe(uk.seo.categoriesListing.ogDescription);
     });
   });
 
   describe("getAuthMetadata", () => {
-    it("should return Sign In title for login", () => {
-      const metadata = getAuthMetadata("login");
-      expect(metadata.title).toBe("Sign In");
+    it("should return the catalog title for login (Task 8: was 'Sign In')", async () => {
+      const metadata = await getAuthMetadata("login");
+      expect(metadata.title).toBe(uk.seo.auth.login.title);
     });
 
-    it("should return Create Account title for register", () => {
-      const metadata = getAuthMetadata("register");
-      expect(metadata.title).toBe("Create Account");
+    it("should return the catalog title for register (Task 8: was 'Create Account')", async () => {
+      const metadata = await getAuthMetadata("register");
+      expect(metadata.title).toBe(uk.seo.auth.register.title);
     });
 
-    it("should disable indexing for auth pages", () => {
-      const metadata = getAuthMetadata("login");
+    it("should disable indexing for auth pages", async () => {
+      const metadata = await getAuthMetadata("login");
       expect(metadata.robots).toEqual({ index: false, follow: false });
     });
 
-    it("should include description mentioning store name", () => {
-      const metadata = getAuthMetadata("login");
+    it("should include description mentioning store name", async () => {
+      const metadata = await getAuthMetadata("login");
       expect(metadata.description).toContain(siteConfig.name);
+    });
+
+    it("should interpolate {name} into the catalog description template", async () => {
+      const metadata = await getAuthMetadata("register");
+      expect(metadata.description).toBe(
+        uk.seo.auth.register.description.replace("{name}", siteConfig.name)
+      );
+      // Guards against a silently-broken mock/interpolation leaving the raw
+      // ICU placeholder in production copy.
+      expect(metadata.description).not.toContain("{name}");
     });
   });
 
@@ -532,6 +622,20 @@ describe("SEO Utilities", () => {
       jsonLd.itemListElement.forEach((item: { "@type": string }) => {
         expect(item["@type"]).toBe("ListItem");
       });
+    });
+  });
+
+  describe("seo.productNotFound (fix round 1, post-Task-8 review)", () => {
+    // Unlike the other seo.* keys above, this one isn't read by any seo.ts
+    // export — src/app/(shop)/products/[slug]/page.tsx's generateMetadata
+    // calls getTranslations("seo") directly for its not-found branch (the
+    // same pattern categories/[slug]/page.tsx already used for
+    // "categoryNotFound", which this task originally missed one file over).
+    // This pins the catalog value through the exact same mock the rest of
+    // this file uses, since there's no seo.ts helper to exercise it through.
+    it("resolves to the catalog value via getTranslations('seo')", async () => {
+      const t = await getTranslations("seo");
+      expect(t("productNotFound")).toBe(uk.seo.productNotFound);
     });
   });
 });

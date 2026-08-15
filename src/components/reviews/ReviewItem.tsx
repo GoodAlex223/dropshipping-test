@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { StarRating } from "./StarRating";
 import { Store } from "lucide-react";
 import type { ReviewWithUser } from "@/types";
@@ -10,11 +11,12 @@ function formatDate(dateString: string) {
 
 /**
  * Review card per Mirox Product.dc.html: dark elevated card, initial-circle
- * avatar, name + «✓ Підтверджена покупка» (true by construction — eligibility
+ * avatar, name + a verified-purchase badge (true by construction — eligibility
  * requires a DELIVERED order containing the product), stars, dd.MM.yyyy date.
  */
 export function ReviewItem({ review }: { review: ReviewWithUser }) {
-  const displayName = review.user.name || "Покупець";
+  const t = useTranslations("reviews");
+  const displayName = review.user.name || t("item.anonymousFallback");
   const initial = displayName.charAt(0).toUpperCase();
 
   return (
@@ -29,7 +31,7 @@ export function ReviewItem({ review }: { review: ReviewWithUser }) {
           <div className="flex flex-wrap items-baseline gap-x-1.5 text-[14.5px] font-bold">
             <span className="max-w-full truncate">{displayName}</span>
             <span className="text-available text-[11px] font-bold whitespace-nowrap">
-              ✓ Підтверджена покупка
+              {t("item.verifiedBadge")}
             </span>
           </div>
           <StarRating value={review.rating} size="sm" />
@@ -49,7 +51,7 @@ export function ReviewItem({ review }: { review: ReviewWithUser }) {
         <div className="bg-background border-border mt-3.5 rounded-xl border p-3.5">
           <div className="text-muted-foreground mb-1 flex items-center gap-1.5 text-xs font-semibold">
             <Store className="h-3 w-3" />
-            Відповідь магазину
+            {t("item.storeReply")}
             {review.adminRepliedAt && (
               <span className="font-normal"> &middot; {formatDate(review.adminRepliedAt)}</span>
             )}

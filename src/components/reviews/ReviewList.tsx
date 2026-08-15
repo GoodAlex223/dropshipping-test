@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { ReviewItem } from "./ReviewItem";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +21,7 @@ interface ReviewListProps {
 }
 
 export function ReviewList({ productSlug, initialReviews, totalReviews }: ReviewListProps) {
+  const t = useTranslations("reviews");
   const [reviews, setReviews] = useState<ReviewWithUser[]>(initialReviews);
   const [ratingFilter, setRatingFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
@@ -72,18 +74,18 @@ export function ReviewList({ productSlug, initialReviews, totalReviews }: Review
       {/* Filter */}
       {totalReviews > 0 && (
         <div className="mb-4 flex items-center gap-2">
-          <span className="text-sm font-medium">Фільтр:</span>
+          <span className="text-sm font-medium">{t("list.filterLabel")}</span>
           <Select value={ratingFilter} onValueChange={handleFilterChange}>
             <SelectTrigger className="w-[140px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Всі оцінки</SelectItem>
-              <SelectItem value="5">5 зірок</SelectItem>
-              <SelectItem value="4">4 зірки</SelectItem>
-              <SelectItem value="3">3 зірки</SelectItem>
-              <SelectItem value="2">2 зірки</SelectItem>
-              <SelectItem value="1">1 зірка</SelectItem>
+              <SelectItem value="all">{t("list.filterAll")}</SelectItem>
+              <SelectItem value="5">{t("list.filterFive")}</SelectItem>
+              <SelectItem value="4">{t("list.filterFour")}</SelectItem>
+              <SelectItem value="3">{t("list.filterThree")}</SelectItem>
+              <SelectItem value="2">{t("list.filterTwo")}</SelectItem>
+              <SelectItem value="1">{t("list.filterOne")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -92,7 +94,7 @@ export function ReviewList({ productSlug, initialReviews, totalReviews }: Review
       {/* Reviews */}
       {reviews.length === 0 ? (
         <p className="text-muted-foreground py-8 text-center text-sm">
-          {ratingFilter !== "all" ? "Немає відгуків із такою оцінкою." : "Відгуків поки немає."}
+          {ratingFilter !== "all" ? t("list.emptyFiltered") : t("list.empty")}
         </p>
       ) : (
         <div className="space-y-4">
@@ -107,7 +109,7 @@ export function ReviewList({ productSlug, initialReviews, totalReviews }: Review
         <div className="mt-4 flex justify-center">
           <Button variant="outline" onClick={handleLoadMore} disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isLoading ? "Завантаження…" : "Показати ще"}
+            {isLoading ? t("list.loading") : t("list.loadMore")}
           </Button>
         </div>
       )}

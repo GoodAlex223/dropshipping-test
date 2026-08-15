@@ -25,7 +25,7 @@ interface StatusScreenProps {
   tone?: StatusTone;
   title: string;
   description?: string;
-  /** Small line under the description, e.g. «Код помилки: …». */
+  /** Small line under the description, e.g. a rendered error-digest line. */
   meta?: string;
   actions?: StatusAction[];
 }

@@ -2,8 +2,8 @@
 
 import { useEffect } from "react";
 import { XCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { StatusScreen } from "@/components/common/StatusScreen";
-import { auth } from "@/content/auth";
 
 export default function AuthError({
   error,
@@ -12,6 +12,8 @@ export default function AuthError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations("auth.error");
+
   useEffect(() => {
     console.error("[Auth Error]", error);
   }, [error]);
@@ -20,12 +22,12 @@ export default function AuthError({
     <StatusScreen
       icon={XCircle}
       tone="error"
-      title={auth.error.title}
-      description={auth.error.description}
-      meta={error.digest ? auth.error.errorId(error.digest) : undefined}
+      title={t("title")}
+      description={t("description")}
+      meta={error.digest ? t("errorId", { digest: error.digest }) : undefined}
       actions={[
-        { label: auth.error.retry, onClick: () => reset() },
-        { label: auth.error.backToLogin, href: "/login", variant: "outline" },
+        { label: t("retry"), onClick: () => reset() },
+        { label: t("backToLogin"), href: "/login", variant: "outline" },
       ]}
     />
   );

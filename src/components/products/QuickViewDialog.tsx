@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useCartStore } from "@/stores/cart.store";
@@ -35,6 +36,7 @@ interface QuickViewDialogProps {
 }
 
 export function QuickViewDialog({ product, focusSizes, onOpenChange }: QuickViewDialogProps) {
+  const t = useTranslations("products");
   const [selectedSizeId, setSelectedSizeId] = useState<string | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isCarouselPaused, setIsCarouselPaused] = useState(false);
@@ -180,7 +182,7 @@ export function QuickViewDialog({ product, focusSizes, onOpenChange }: QuickView
               <>
                 <button
                   type="button"
-                  aria-label="Попереднє фото"
+                  aria-label={t("quickView.prevPhoto")}
                   onClick={() => stepImage(-1)}
                   onMouseEnter={() => setIsCarouselPaused(true)}
                   onMouseLeave={() => setIsCarouselPaused(false)}
@@ -190,7 +192,7 @@ export function QuickViewDialog({ product, focusSizes, onOpenChange }: QuickView
                 </button>
                 <button
                   type="button"
-                  aria-label="Наступне фото"
+                  aria-label={t("quickView.nextPhoto")}
                   onClick={() => stepImage(1)}
                   onMouseEnter={() => setIsCarouselPaused(true)}
                   onMouseLeave={() => setIsCarouselPaused(false)}
@@ -222,7 +224,7 @@ export function QuickViewDialog({ product, focusSizes, onOpenChange }: QuickView
                   <span
                     key={value}
                     role="img"
-                    aria-label={`Колір: ${value}`}
+                    aria-label={t("variant.colorAria", { value })}
                     title={value}
                     className={cn("h-4 w-4 rounded-full border", COLOR_SWATCH_CLASSES[value])}
                   />
@@ -232,7 +234,7 @@ export function QuickViewDialog({ product, focusSizes, onOpenChange }: QuickView
 
             {sizes.length > 0 && (
               <div ref={sizeGroupRef} tabIndex={-1} className="outline-none">
-                <p className="mb-1.5 text-xs font-semibold">Розмір</p>
+                <p className="mb-1.5 text-xs font-semibold">{t("variant.sizeLabel")}</p>
                 <div className="flex flex-wrap gap-2">
                   {sizes.map((variant) => {
                     const isActive = variant.id === selectedSizeId;
@@ -262,14 +264,14 @@ export function QuickViewDialog({ product, focusSizes, onOpenChange }: QuickView
               onClick={handleAddToCart}
               className="mt-2 rounded-[10px] bg-white px-4 py-3 text-[13px] font-extrabold text-black hover:bg-[#e5e5e5] disabled:cursor-not-allowed disabled:opacity-40"
             >
-              ДОДАТИ В КОШИК
+              {t("quickView.addToCart")}
             </button>
 
             <Link
               href={`/products/${product.slug}`}
               className="text-muted-foreground mt-1 text-sm underline-offset-4 hover:underline"
             >
-              Детальніше →
+              {t("quickView.viewDetails")}
             </Link>
           </div>
         </div>

@@ -1,10 +1,10 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 // Imported directly rather than via the reviews barrel: the barrel also pulls
 // in ReviewForm/ReviewList/ReviewSection and their dependencies, which a unit
 // test rendering this component would otherwise have to load.
 import { StarRating } from "@/components/reviews/StarRating";
 import { FadeIn } from "@/components/common/FadeIn";
-import { home } from "@/content/home";
 import type { Testimonial } from "@/lib/review-queries";
 
 interface TestimonialsProps {
@@ -13,13 +13,14 @@ interface TestimonialsProps {
 
 /** Real reviews only. Omitted entirely when none qualify — a new store's state. */
 export function Testimonials({ testimonials }: TestimonialsProps) {
+  const t = useTranslations("home");
   if (testimonials.length === 0) return null;
 
   return (
     <section className="border-border container border-t py-16 lg:py-[72px]">
       <FadeIn>
         <h2 className="font-heading text-2xl font-extrabold tracking-tight sm:text-[32px]">
-          {home.testimonials.title}
+          {t("testimonials.title")}
         </h2>
 
         <div className="mt-8 grid gap-5 md:grid-cols-2">

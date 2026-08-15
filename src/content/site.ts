@@ -1,5 +1,5 @@
 import { Truck, CreditCard, ShieldCheck, Headphones, type LucideIcon } from "lucide-react";
-import { BRAND_NAME, BRAND_TAGLINE, SOCIALS } from "./brand";
+import { BRAND_NAME, SOCIALS } from "./brand";
 
 /**
  * Site-wide content, consumed by the homepage and the Footer.
@@ -18,51 +18,36 @@ export interface ClientClaims {
   customerRating: string | null;
 }
 
+// title/description moved to the i18n catalog (TASK-039 G9) — see
+// `home.benefits.*` / `footer.benefits.*` in messages/uk.json, addressed by
+// index. This type keeps only the field that never had a translatable value.
 export interface BenefitItem {
   icon: LucideIcon;
-  title: string;
-  description: string;
 }
 
+// text/linkLabel moved to the i18n catalog (TASK-039 G9) — see
+// `site.announcement.text` / `site.announcement.linkLabel` in
+// messages/uk.json. AnnouncementBar reads copy via `t()` and gating (whether
+// to render at all, and which layout) via this config shape.
 export interface SiteAnnouncement {
   /** Dismissal-key suffix — bump to resurface for users who dismissed a prior announcement. */
   id: string;
-  text: string;
   /** Optional link target; wraps the announcement text in a Link when set. */
   href: string | null;
-  /** Optional distinct CTA label rendered as the underlined link after the plain text.
-   *  null + href set → the whole text becomes the link (pre-gate behavior). */
-  linkLabel: string | null;
   /** Scrolling marquee vs the static centered bar. */
   marquee: boolean;
 }
 
 export const site = {
   name: BRAND_NAME,
-  tagline: BRAND_TAGLINE,
+  // tagline field removed (TASK-039 G9) — consumers read t("brand.tagline").
+  // site.name stays BRAND_NAME: the brand's own identifier isn't a
+  // translatable string.
 
-  /** Header chrome strings (G4). Nav item labels stay in Header.tsx's
-   *  `navigation` array (pre-existing UA); these are the residuals. */
-  header: {
-    menu: "Меню",
-    toggleMenu: "Відкрити меню",
-    categories: "Категорії",
-    adminPanel: "Адмін-панель",
-    account: "Акаунт",
-    orders: "Замовлення",
-    signIn: "Увійти",
-    signOut: "Вийти",
-    createAccount: "Створити акаунт",
-    cart: "Кошик",
-    search: {
-      srOpen: "Пошук (Ctrl+K)",
-      dialogTitle: "Пошук товарів",
-      placeholder: "Пошук товарів…",
-      viewAll: (q: string) => `Всі результати для «${q}»`,
-      noResults: (q: string) => `Нічого не знайдено за запитом «${q}»`,
-      minChars: "Введіть щонайменше 2 символи для пошуку…",
-    },
-  },
+  // header block removed (TASK-039 G9) — every field (incl. search.* and the
+  // nav labels formerly in Header.tsx's own `navigation` array) now lives
+  // under the `header` namespace in messages/uk.json; Header.tsx reads it via
+  // useTranslations("header").
 
   /**
    * RETRACTED, not merely unconfirmed — was "Free delivery on orders over
@@ -88,14 +73,12 @@ export const site = {
    */
   announcement: {
     id: "launch-2026-08",
-    text: "Ми відкрилися! Новий сайт Mirox уже працює. Помітили проблему або маєте пропозицію?",
     href: "/feedback",
-    linkLabel: "Розкажіть нам через форму зворотного зв'язку",
     marquee: true,
   } as SiteAnnouncement | null,
 
-  /** Accessible label for the announcement dismiss control. */
-  announcementDismiss: "Приховати оголошення",
+  // announcementDismiss field removed (TASK-039 G9) — moved to the catalog
+  // as site.announcementDismiss (a fixed a11y label, not config).
 
   /** CLIENT-SUPPLIED placeholder handles — data lives in brand.ts since G5. */
   socials: SOCIALS,
@@ -129,11 +112,17 @@ export const site = {
    *
    * Tracked by the client content inventory task (docs/planning/TODO.md
    * Spawned section).
+   *
+   * title/description moved to the catalog (TASK-039 G9) as
+   * `footer.benefits.0..3.title/description`, addressed by index — order
+   * here must stay in sync with that catalog order (delivery, COD, secure
+   * payment, support), since Footer.tsx zips these icons with catalog text
+   * positionally.
    */
   footerBenefits: [
-    { icon: Truck, title: "Швидка доставка", description: "Розрахунок при оформленні" },
-    { icon: CreditCard, title: "Оплата при отриманні", description: "Без передоплати" },
-    { icon: ShieldCheck, title: "Безпечна оплата", description: "Захищений checkout" },
-    { icon: Headphones, title: "Підтримка 24/7", description: "Ми завжди на зв'язку" },
+    { icon: Truck },
+    { icon: CreditCard },
+    { icon: ShieldCheck },
+    { icon: Headphones },
   ] as BenefitItem[],
 };

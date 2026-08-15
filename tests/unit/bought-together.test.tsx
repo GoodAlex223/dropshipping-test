@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent } from "@testing-library/react";
+import { renderWithIntl } from "../helpers/render-with-intl";
 import { BoughtTogether } from "@/components/products/BoughtTogether";
 import { useCartStore } from "@/stores/cart.store";
 import type { BundleCompanion } from "@/types";
@@ -35,7 +36,7 @@ beforeEach(() => {
 
 describe("BoughtTogether", () => {
   it("renders nothing with fewer than 2 companions", () => {
-    const { container } = render(
+    const { container } = renderWithIntl(
       <BoughtTogether
         current={current}
         companions={[companion({ id: "a" })]}
@@ -46,7 +47,7 @@ describe("BoughtTogether", () => {
   });
 
   it("preselects companions to the preferred size and adds 3 sized lines", () => {
-    render(
+    renderWithIntl(
       <BoughtTogether
         current={current}
         companions={[companion({ id: "a" }), companion({ id: "b" })]}
@@ -63,7 +64,7 @@ describe("BoughtTogether", () => {
   });
 
   it("shows the struck sum only when comparePrices make it genuinely higher", () => {
-    render(
+    renderWithIntl(
       <BoughtTogether
         current={current}
         companions={[companion({ id: "a", comparePrice: "690" }), companion({ id: "b" })]}
@@ -81,7 +82,7 @@ describe("BoughtTogether", () => {
       ...current,
       sizeVariants: [{ id: "cur-s", value: "S", stock: 0, price: null }],
     };
-    render(
+    renderWithIntl(
       <BoughtTogether
         current={currentOOS}
         companions={[companion({ id: "a" }), companion({ id: "b" })]}
@@ -95,7 +96,7 @@ describe("BoughtTogether", () => {
   });
 
   it("disables button when a sizeless companion has zero stock", () => {
-    render(
+    renderWithIntl(
       <BoughtTogether
         current={current}
         companions={[
@@ -112,7 +113,7 @@ describe("BoughtTogether", () => {
   });
 
   it("adds product-level lines for sizeless companions with stock > 0", () => {
-    render(
+    renderWithIntl(
       <BoughtTogether
         current={current}
         companions={[

@@ -109,7 +109,7 @@ src/
 │   ├── admin/              # Admin panel components (sidebar, forms, dialogs)
 │   ├── analytics/          # Analytics tracking components (PurchaseTracker, WebVitalsReporter)
 │   ├── checkout/           # Payment form components
-│   ├── common/             # Header, Footer, AnnouncementBar, BenefitStrip, SocialLinks, FadeIn, Logo, NewsletterSignup, CookieConsent, ResourceHints
+│   ├── common/             # Header, Footer, AnnouncementBar, BenefitStrip, SocialLinks, FadeIn, Logo, NewsletterSignup, CookieConsent, ResourceHints, LocaleSwitcher (TASK-039 UA|RU header toggle)
 │   ├── home/               # Homepage sections: Hero, ProductRail, WhyChooseUs, Testimonials
 │   ├── products/           # ProductCard (carousel, badges, quick actions), ProductImage, ProductGallery (PDP thumb rail / mobile swipe+dots), QuickViewDialog, SizePicker, BoughtTogether, RecentlyViewed, SocialShareButtons
 │   ├── reviews/            # Review components (ReviewSection, ReviewForm, ReviewList, ReviewItem, ReviewStats, StarRating)
@@ -117,19 +117,14 @@ src/
 │   ├── showcase/           # Multi-theme showcase components (bold/, luxury/, organic/)
 │   ├── ui/                 # shadcn/ui primitives (button, card, dialog, etc.)
 │   └── providers.tsx       # Context providers wrapper (auth, toast, cookie consent, web vitals)
-├── content/                # Typed content-config layer (Ukrainian copy, extraction-ready for TASK-039 i18n)
-│   ├── account.ts          # Account area copy + ORDER_STATUS_LABELS/PAYMENT_STATUS_LABELS (customer label maps)
-│   ├── auth.ts             # Auth surfaces copy (login, register, auth error boundary)
-│   ├── brand.ts            # Brand name/tagline constants — deliberately import-free (consumed by seo.ts); also carries SOCIALS (relocated from site.ts, G5) and WHATSAPP_HREF (CLIENT-SUPPLIED-pending, null-gated)
-│   ├── cart.ts             # Cart + CartDrawer copy (summary/empty/clear/stock strings, itemsCount plural via pluralizeUk)
-│   ├── checkout.ts         # Checkout + confirmation copy (steps, COD/prepay block config, manager contacts — cardNumber/whatsapp are CLIENT-SUPPLIED-pending)
-│   ├── emails.ts           # Transactional email copy (subjects + bodies, UA); imports only brand.ts — lucide-free by contract (bundled into API routes)
-│   ├── feedback.ts         # /feedback page + form copy; byCode maps feedback API outcome codes to Ukrainian
-│   ├── home.ts             # Homepage copy (hero, benefits, whyChooseUs, rails, testimonials)
-│   ├── newsletter.ts       # Newsletter pages + footer-signup copy; byCode maps translate API outcome codes to Ukrainian
-│   ├── site.ts             # Site-wide config (announcement, socials, client claims, footer benefits, header chrome strings — site.header, G4)
-│   └── system.ts           # System pages copy (404, root error boundary, cookie consent banner)
+├── content/                # Typed content-CONFIG layer only (TASK-039 G9 externalized all display copy to messages/*.json; cart.ts/auth.ts/feedback.ts/newsletter.ts/system.ts deleted outright — their copy lives in the catalog now — and account.ts followed in PR #37 review round 2 (its two label maps proved consumer-less); the rest trimmed to non-translatable config)
+│   ├── brand.ts            # BRAND_NAME/BRAND_TAGLINE/BRAND_META_SUFFIX — deliberately import-free (consumed by seo.ts); tagline/metaSuffix are byte-duplicated into the catalog for build-time consumers (opengraph-image.tsx) that can't call request-scoped getTranslations; also carries SOCIALS (relocated from site.ts, G5) and WHATSAPP_HREF (CLIENT-SUPPLIED-pending, null-gated)
+│   ├── checkout.ts         # Non-translatable checkout config only: prepay card details (CLIENT-SUPPLIED-pending) + manager contact links; all copy now in messages/uk.json's checkout namespace
+│   ├── emails.ts           # Transactional email copy (subjects + bodies, UA); untouched by TASK-039 by design; imports only brand.ts — lucide-free by contract (bundled into API routes)
+│   ├── home.ts             # Non-translatable homepage config only: hero eyebrow/CTA hrefs/image path, benefit icons, rail hrefs; all copy now in messages/uk.json's home namespace
+│   └── site.ts             # Site-wide config only: announcement id/href/marquee gate, socials, client claims, footer benefit icons; all copy now in messages/uk.json's site/header/footer namespaces
 ├── hooks/                  # Custom React hooks (use-debounce, use-toast)
+├── i18n/                   # next-intl cookie-mode wiring (TASK-039): config.ts (LOCALES/DEFAULT_LOCALE/NEXT_LOCALE cookie/resolveLocale), merge.ts (RU-over-UK deepMerge), request.ts (getRequestConfig), actions.ts (setLocale server action)
 ├── lib/                    # Core utilities
 │   ├── auth.ts             # NextAuth v5 config (JWT + Prisma adapter)
 │   ├── db.ts               # Prisma client (Neon adapter for prod)
@@ -139,7 +134,7 @@ src/
 │   ├── shipping.ts         # Nova Poshta delivery methods (np-office/np-courier/np-postomat, UAH) + legacy label lookup
 │   ├── email.ts            # Resend wiring only — subjects from content/emails.ts, HTML from email-templates/
 │   ├── format.ts           # formatPrice() — the only sanctioned UAH price formatter (uk-UA, Intl.NumberFormat)
-│   ├── order-status.ts     # OrderStatus/PaymentStatus label + style lookup; labels live in content/account.ts since G4 (re-exported here so consumers keep one import)
+│   ├── order-status.ts     # OrderStatus badge style lookup only (monochrome policy); customer label copy lives in the messages catalog (account.orderStatus/paymentStatus) — the admin panel renders raw enum values until G13
 │   ├── newsletter.ts       # Newsletter utilities (token generation, URL builders, HMAC unsubscribe)
 │   ├── og-fonts.ts         # Fetches Cyrillic-subset Manrope TTFs for next/og (Satori) OG image routes; fails safe to []
 │   ├── queue.ts            # BullMQ queue setup
@@ -184,6 +179,10 @@ tests/
 ├── helpers/                # Test utilities
 │   └── api-test-utils.ts   # NextRequest/params builders for API route testing
 └── global-setup.ts         # E2E test infrastructure validation (database connectivity, seed data check)
+messages/                   # next-intl message catalogs (TASK-039)
+├── uk.json                 # Source of truth / schema — every UI string; byte-verified against the pre-i18n literals by scripts/i18n-byte-diff.mjs
+├── ru.json                 # DRAFT, agent-translated 2026-08-14, pending client sign-off (TASK-056 rider) — deep-merges over uk.json at request time; a missing/malformed key silently falls back to the UA value
+└── README.md               # Catalog conventions (namespaces, ICU plural branches, byCode keys) + the RU draft's nuance-flagged review list (Нова Пошта non-declension, claims copy, grammatical-gender resolution, ё spelling)
 prisma/
 ├── schema.prisma           # Database schema (PostgreSQL)
 ├── migrations/             # Prisma migrations
@@ -305,8 +304,9 @@ prisma/
 - **Cross-field validation pattern**: Use Zod `.refine()` for validations requiring multiple fields; comparePrice must exceed price if provided; validation message targets specific field via `path` option; enforced on both server (API routes) and client (form validation)
 - **API error handling pattern**: API routes use `try/catch` with `apiError()` helper for consistent error responses; no `console.error()` calls in API routes (removed during TASK-029 cleanup); catch blocks with unused error variables use bare `catch` syntax without error parameter (ESLint recommended pattern from TASK-031); structured error responses via `NextResponse.json()` with appropriate status codes
 - **Bare catch syntax**: When catch block doesn't use error variable, use bare `catch` without parameter (e.g., `} catch {` instead of `} catch (error) {`); pattern enforced by ESLint and applied across API routes, client components, server pages, and utilities during TASK-031 code quality sweep
-- **Coded API outcomes**: newsletter routes (`api/newsletter/{subscribe,confirm,unsubscribe}`), the register 409 (`api/auth/register`), and `api/feedback` (`FEEDBACK_SENT`/`VALIDATION_ERROR`/`SEND_FAILED`, G8) return a machine `code` alongside English prose; clients map `code` → Ukrainian via `src/content/` (G2 `create-order` convention, extended in G4 to the newsletter confirm/unsubscribe pages and the footer signup toast, and in G8 to the `/feedback` form via `content/feedback.ts`)
+- **Coded API outcomes**: newsletter routes (`api/newsletter/{subscribe,confirm,unsubscribe}`), the register 409 (`api/auth/register`), and `api/feedback` (`FEEDBACK_SENT`/`VALIDATION_ERROR`/`SEND_FAILED`, G8) return a machine `code` alongside English prose; clients map `code` → locale copy via each namespace's own `byCode` object in `messages/{uk,ru}.json` (`newsletter.confirm.byCode`, `newsletter.unsubscribe.byCode`, `newsletter.signup.byCode`, `feedback.byCode`), guarded by next-intl's `t.has(key as never)` before rendering a dynamic key, with a namespace `fallback` string when the code has no catalog entry (TASK-039 G9 superseded the G2 `create-order`/G4/G8-era `src/content/{newsletter,feedback}.ts` byCode maps — both files deleted)
 - **Transactional email pattern** (G5): all emails (order confirmation, newsletter double opt-in, feedback notification — the last added in G8) render on the shared dark Mirox table-based shell (`src/lib/email-templates/layout.ts` — `renderEmailShell`/`renderPanel`/`renderButton`, `lang="uk"`, bgcolor attrs for Outlook); UA copy sourced from `src/content/emails.ts`, never inlined; brand name resolved at render time via `getStoreName()` (`env NEXT_PUBLIC_STORE_NAME || BRAND_NAME`) — a module-scope const would freeze the env value at import and break env-dependent tests; every interpolated free-text user/DB string passes through `escapeHtml` (item names, variant info, address fields, subscriber email); order CTA is guest-aware (`OrderEmailData.hasAccount`) — guest COD orders have no `/account/orders` to link to, so the button renders only for signed-in customers (G2 confirmation-page ruling); tax row renders only when `tax > 0` (COD is always 0); contact links pull from `brand.ts` `SOCIALS`/`WHATSAPP_HREF`, so WhatsApp stays hidden until the client supplies a real number; **route sends are `await`ed** — an unawaited fire-and-forget dies when the serverless function freezes after responding, so prod never sent (regression-tested by the create-order race test)
+- **Cookie-mode i18n via next-intl** (TASK-039): UA is the default and SEO-canonical locale; RU is a pure client-preference toggle stored in a `NEXT_LOCALE` cookie (`src/i18n/config.ts` — `LOCALES`, `DEFAULT_LOCALE`, `resolveLocale()` never trusts the wire value). No URL routing — every route keeps the same path in both locales, deliberately (a toggle, not a routing migration). `src/i18n/request.ts` (`getRequestConfig`) resolves the cookie server-side and deep-merges `messages/ru.json` over `messages/uk.json` (`src/i18n/merge.ts`'s `deepMerge`), so a missing or shape-mismatched RU key silently falls back to the UA value — partial RU coverage never breaks the UI. `LocaleSwitcher` (`src/components/common/LocaleSwitcher.tsx`, mounted in Header) calls the `setLocale` server action (`src/i18n/actions.ts`), which sets the cookie and lets router-cache invalidation re-render the tree in the new locale. **Component rule**: non-async components/functions call `useTranslations(namespace)`; async functions (SEO metadata helpers, any Server Component that awaits before rendering) call `await getTranslations(namespace)` instead — `src/lib/seo.ts`'s 6 metadata helpers (`getDefaultMetadata`, `getProductMetadata`, `getHomeMetadata`, `getProductsListingMetadata`, `getCategoriesListingMetadata`, `getAuthMetadata`) and the root `src/app/layout.tsx`'s `generateMetadata()` are all async and use `getTranslations` (`getCategoryMetadata` stays sync — category names come from the DB, not the catalog). **byCode guard pattern**: `t.has(key as never) ? t(key as never) : t("fallback")` before rendering a dynamic coded-outcome key (next-intl v4.13.6) — see the Coded API outcomes pattern above. **Verification**: `scripts/i18n-byte-diff.mjs` diffs `src/**/*.{ts,tsx}` against `main`, extracts every Cyrillic string-literal fragment on a removed line, and fails if it isn't present verbatim in `messages/uk.json` — catches transcription corruption (the «цінує»→«цінює» class); deliberate rewrites (e.g. UA dev comments translated to English) are allowlisted one fragment per line in `scripts/i18n-byte-diff-allow.txt`. **Tests**: `tests/helpers/render-with-intl.tsx`'s `renderWithIntl()` wraps RTL renders in `NextIntlClientProvider` with the real `uk.json` messages, so component tests assert against actual catalog strings, not mocks. **Reserved namespace**: `admin.*` is not yet populated — the admin panel is not catalog-driven yet (hardcoded chrome: English UI copy except three literal «грн» input suffixes in `ProductForm.tsx`, and status badges render raw enum values like `PENDING`/`PAID`); G13 migrates the admin UI onto `admin.*`, sourcing status labels from the catalog. The former `content/account.ts` label duplicate was deleted in PR #37 review round 2 — it had no production consumers.
 
 <!-- END AUTO-MANAGED -->
 

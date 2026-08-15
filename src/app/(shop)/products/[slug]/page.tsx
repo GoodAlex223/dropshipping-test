@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/db";
 import { getProductMetadata, getProductJsonLd, getBreadcrumbJsonLd, siteConfig } from "@/lib/seo";
 import { safeSection } from "@/lib/safe-section";
@@ -313,15 +314,21 @@ async function getProductForMetadata(slug: string) {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = await getProductForMetadata(slug);
+  // Fix round 1 (post-Task-8 review): "Product Not Found" was hardcoded
+  // English here — same fixed-set class as categories/[slug]/page.tsx's
+  // "Category Not Found" that Task 8 already converted, just missed one
+  // file over. Mirrors that fix exactly: Promise.all + seo.productNotFound.
+  const [product, t] = await Promise.all([getProductForMetadata(slug), getTranslations("seo")]);
 
   if (!product) {
     return {
-      title: "Product Not Found",
+      title: t("productNotFound"),
     };
   }
 
-  return getProductMetadata({
+  // Task 8: getProductMetadata is now async (its last-resort description
+  // fallback reads the i18n catalog's brand.description).
+  return await getProductMetadata({
     name: product.name,
     slug: product.slug,
     description: product.description,
@@ -336,7 +343,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ProductDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  const product = await getProduct(slug);
+  const [product, t] = await Promise.all([getProduct(slug), getTranslations("products")]);
 
   if (!product) {
     return <ProductNotFound />;
@@ -364,8 +371,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
   });
 
   const breadcrumbJsonLd = getBreadcrumbJsonLd([
-    { name: "Головна", url: siteConfig.url },
-    { name: "Каталог", url: `${siteConfig.url}/products` },
+    { name: t("breadcrumbHome"), url: siteConfig.url },
+    { name: t("catalogName"), url: `${siteConfig.url}/products` },
     { name: product.name, url: `${siteConfig.url}/products/${product.slug}` },
   ]);
 

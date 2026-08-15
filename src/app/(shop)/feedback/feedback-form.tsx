@@ -6,9 +6,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
-import { feedback } from "@/content/feedback";
+import { useTranslations } from "next-intl";
 
 export function FeedbackForm() {
+  const t = useTranslations("feedback");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -21,7 +22,7 @@ export function FeedbackForm() {
     // minLength counts raw characters, so a whitespace-only message passes
     // browser validation and lands here — never fail silently (PR #35 review).
     if (!message.trim()) {
-      toast.error(feedback.byCode.VALIDATION_ERROR);
+      toast.error(t("byCode.VALIDATION_ERROR"));
       return;
     }
 
@@ -37,13 +38,17 @@ export function FeedbackForm() {
 
       if (!response.ok) {
         // data.error is EN API/log text — map the machine code instead.
-        toast.error((data.code && feedback.byCode[data.code]) || feedback.fallback);
+        // Guarded dynamic key (next-intl v4.13.6 t.has, verified available —
+        // TASK-039 Task 5): unknown/absent codes fall back to fallback.
+        const code = data.code as string | undefined;
+        const key = code ? `byCode.${code}` : "";
+        toast.error(key && t.has(key as never) ? t(key as never) : t("fallback"));
         return;
       }
 
       setIsSuccess(true);
     } catch {
-      toast.error(feedback.fallback);
+      toast.error(t("fallback"));
     } finally {
       setIsLoading(false);
     }
@@ -57,8 +62,8 @@ export function FeedbackForm() {
       >
         <CheckCircle2 className="text-foreground h-5 w-5 flex-shrink-0" />
         <div>
-          <p className="text-foreground font-semibold">{feedback.success.title}</p>
-          <p className="text-muted-foreground mt-1 text-sm">{feedback.success.description}</p>
+          <p className="text-foreground font-semibold">{t("success.title")}</p>
+          <p className="text-muted-foreground mt-1 text-sm">{t("success.description")}</p>
         </div>
       </div>
     );
@@ -69,36 +74,36 @@ export function FeedbackForm() {
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
           <label htmlFor="feedback-name" className="text-sm font-medium">
-            {feedback.form.nameLabel}
+            {t("form.nameLabel")}
           </label>
           <Input
             id="feedback-name"
             value={name}
             maxLength={100}
-            placeholder={feedback.form.namePlaceholder}
+            placeholder={t("form.namePlaceholder")}
             onChange={(e) => setName(e.target.value)}
             disabled={isLoading}
           />
         </div>
         <div className="space-y-1.5">
           <label htmlFor="feedback-email" className="text-sm font-medium">
-            {feedback.form.emailLabel}
+            {t("form.emailLabel")}
           </label>
           <Input
             id="feedback-email"
             type="email"
             value={email}
             maxLength={254}
-            placeholder={feedback.form.emailPlaceholder}
+            placeholder={t("form.emailPlaceholder")}
             onChange={(e) => setEmail(e.target.value)}
             disabled={isLoading}
           />
-          <p className="text-muted-foreground text-xs">{feedback.form.emailHint}</p>
+          <p className="text-muted-foreground text-xs">{t("form.emailHint")}</p>
         </div>
       </div>
       <div className="space-y-1.5">
         <label htmlFor="feedback-message" className="text-sm font-medium">
-          {feedback.form.messageLabel}
+          {t("form.messageLabel")}
         </label>
         <Textarea
           id="feedback-message"
@@ -107,7 +112,7 @@ export function FeedbackForm() {
           minLength={5}
           maxLength={2000}
           rows={6}
-          placeholder={feedback.form.messagePlaceholder}
+          placeholder={t("form.messagePlaceholder")}
           onChange={(e) => setMessage(e.target.value)}
           disabled={isLoading}
         />
@@ -130,7 +135,7 @@ export function FeedbackForm() {
       </div>
       <Button type="submit" disabled={isLoading}>
         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        {isLoading ? feedback.form.submitting : feedback.form.submit}
+        {isLoading ? t("form.submitting") : t("form.submit")}
       </Button>
     </form>
   );

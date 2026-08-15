@@ -3,6 +3,16 @@
  * 2026-08-06-g2-checkout-restyle-cod-design.md §3). UAH numerics — with
  * Stripe out of the checkout path these are the real order amounts.
  * Interim NP published rates until TASK-049 (live NP integration).
+ *
+ * DELIBERATE DUPLICATION (TASK-039 i18n G9 Task 5, per the implementation
+ * plan): each method's `name` is byte-duplicated into messages/uk.json's
+ * `shipping.<id>` catalog keys, which the live checkout selection UI reads
+ * instead of this array (so the string translates). This module — the
+ * `.name`/`.description` fields, `getShippingMethodLabel()` — stays the
+ * source of truth for email templates and any non-request/legacy code (e.g.
+ * the confirmation page's historical-order display, which must also resolve
+ * pre-G2 Stripe-era ids via LEGACY_METHOD_LABELS below). Renaming a method's
+ * `name` here requires updating the matching `shipping.<id>` catalog key too.
  */
 export const DELIVERY_METHODS = [
   { id: "np-office", name: "Нова Пошта — відділення", description: "1-3 дні", price: 80 },

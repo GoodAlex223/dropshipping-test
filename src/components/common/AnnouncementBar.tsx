@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
 import { site } from "@/content/site";
 
@@ -89,13 +90,22 @@ export function AnnouncementBar() {
     getDismissedSnapshot,
     getDismissedServerSnapshot
   );
+  // Root translator (no namespace): this component reads two different
+  // catalog subtrees (site.announcement.* and the flat site.announcementDismiss
+  // sibling), so a single namespace scope doesn't fit both.
+  const t = useTranslations();
 
   const announcement = site.announcement;
   const marqueeVisible = !dismissed && site.announcement?.marquee === true;
 
   const linkClass =
     "bg-foreground text-background hover:bg-foreground/80 inline-block rounded-full px-3 py-0.5 font-semibold no-underline transition-colors";
-  const label = announcement?.linkLabel;
+  // text/linkLabel are now fixed catalog strings (TASK-039 G9), not optional
+  // config — the SiteAnnouncement type no longer has a way to express "href
+  // set but no distinct label", so that third render mode (whole-text-as-
+  // link, no separate pill) is no longer reachable and has been dropped.
+  const text = t("site.announcement.text");
+  const linkLabel = t("site.announcement.linkLabel");
 
   // Duplicate copies are real links so every visible pill is mouse-clickable
   // (gate ruling 8) — but tabIndex -1 + the copy's aria-hidden keep exactly
@@ -103,28 +113,17 @@ export function AnnouncementBar() {
   function renderCopy(isDuplicate: boolean) {
     if (!announcement) return null;
     const tabIndex = isDuplicate ? -1 : undefined;
-    if (announcement.href && label) {
+    if (announcement.href) {
       return (
         <>
-          {announcement.text}{" "}
+          {text}{" "}
           <Link href={announcement.href} tabIndex={tabIndex} className={linkClass}>
-            {label}
+            {linkLabel}
           </Link>
         </>
       );
     }
-    if (announcement.href) {
-      return (
-        <Link
-          href={announcement.href}
-          tabIndex={tabIndex}
-          className="underline-offset-4 hover:underline"
-        >
-          {announcement.text}
-        </Link>
-      );
-    }
-    return announcement.text;
+    return text;
   }
 
   // Gate ruling 9: two copies leave a right-edge void whenever one copy is
@@ -212,7 +211,7 @@ export function AnnouncementBar() {
         <button
           type="button"
           onClick={dismiss}
-          aria-label={site.announcementDismiss}
+          aria-label={t("site.announcementDismiss")}
           className="text-muted-foreground hover:text-foreground -m-2 p-2 transition-colors"
         >
           <X className="h-4 w-4" />

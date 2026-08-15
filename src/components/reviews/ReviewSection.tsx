@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
 import { Separator } from "@/components/ui/separator";
 import { ReviewStats } from "./ReviewStats";
@@ -25,6 +26,7 @@ export function ReviewSection({
   totalReviews,
   ratingDistribution,
 }: ReviewSectionProps) {
+  const t = useTranslations("reviews");
   const { data: session } = useSession();
   const [reviews, setReviews] = useState(initialReviews);
   const [stats, setStats] = useState({ averageRating, totalReviews, ratingDistribution });
@@ -79,7 +81,7 @@ export function ReviewSection({
 
   return (
     <div className="mt-16">
-      <h2 className="mb-7 text-[28px] font-extrabold tracking-[-0.02em]">Відгуки покупців</h2>
+      <h2 className="mb-7 text-[28px] font-extrabold tracking-[-0.02em]">{t("title")}</h2>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Left: Stats + Form */}

@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     const token = request.nextUrl.searchParams.get("token");
 
     // `error`/`message` strings are for logs/API consumers; clients map
-    // `code` to Ukrainian copy (src/content/newsletter.ts).
+    // `code` to locale copy (newsletter.confirm.byCode in messages/{uk,ru}.json).
     if (!token) {
       return apiError("Confirmation token is required", 400, "TOKEN_REQUIRED");
     }

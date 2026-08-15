@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Trash2, ShoppingBag, AlertCircle, Lock } from "lucide-react";
 import {
   AlertDialog,
@@ -21,7 +22,6 @@ import { useCartStore, CartItem } from "@/stores/cart.store";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/format";
 import { trackViewCart } from "@/lib/analytics";
-import { cart } from "@/content/cart";
 
 interface StockInfo {
   productId: string;
@@ -32,6 +32,7 @@ interface StockInfo {
 
 export default function CartPage() {
   const router = useRouter();
+  const t = useTranslations("cart");
   const { items, updateQuantity, removeItem, clearCart, getTotalPrice } = useCartStore();
   const [stockInfo, setStockInfo] = useState<Map<string, StockInfo>>(new Map());
   const [isValidating, setIsValidating] = useState(false);
@@ -101,13 +102,13 @@ export default function CartPage() {
     if (!info) return null;
 
     if (!info.isAvailable) {
-      if (info.currentStock === 0) return { type: "error", message: cart.stock.outOfStock };
+      if (info.currentStock === 0) return { type: "error", message: t("stock.outOfStock") };
       if (info.currentStock < item.quantity)
-        return { type: "warning", message: cart.stock.onlyN(info.currentStock) };
+        return { type: "warning", message: t("stock.onlyN", { count: info.currentStock }) };
       // Deactivated product with stock remaining: validate reports unavailable
       // but neither stock branch fires — without this the line looks fine here
       // while checkout 400s PRODUCT_UNAVAILABLE in a loop (PR #29 r5).
-      return { type: "error", message: cart.stock.unavailable };
+      return { type: "error", message: t("stock.unavailable") };
     }
     return null;
   };
@@ -130,14 +131,14 @@ export default function CartPage() {
   if (items.length === 0) {
     return (
       <div className="container py-12">
-        <h1 className="text-3xl font-extrabold tracking-tight">{cart.title}</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight">{t("title")}</h1>
         <div className="border-border mt-8 rounded-2xl border border-dashed p-14 text-center">
-          <p className="text-foreground text-base font-bold">{cart.empty.title}</p>
+          <p className="text-foreground text-base font-bold">{t("empty.title")}</p>
           <Link
             href="/products"
             className="text-foreground mt-2 inline-block text-sm font-bold underline underline-offset-4"
           >
-            {cart.empty.cta}
+            {t("empty.cta")}
           </Link>
         </div>
       </div>
@@ -146,9 +147,9 @@ export default function CartPage() {
 
   return (
     <div className="container py-12">
-      <h1 className="text-3xl font-extrabold tracking-tight">{cart.title}</h1>
+      <h1 className="text-3xl font-extrabold tracking-tight">{t("title")}</h1>
       <p className="text-muted-foreground mt-2 text-sm font-semibold">
-        {cart.itemsCount(items.length)}
+        {t("itemsCount", { count: items.length })}
       </p>
 
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(340px,400px)] lg:items-start">
@@ -157,8 +158,8 @@ export default function CartPage() {
             {items.map((item) => {
               const stockStatus = getItemStockStatus(item);
               const variantLine = [
-                item.color && `${cart.variant.color} ${item.color}`,
-                item.size && `${cart.variant.size} ${item.size}`,
+                item.color && `${t("variant.color")} ${item.color}`,
+                item.size && `${t("variant.size")} ${item.size}`,
               ]
                 .filter(Boolean)
                 .join(" · ");
@@ -207,7 +208,7 @@ export default function CartPage() {
                   <div className="border-border-strong flex items-center overflow-hidden rounded-[10px] border">
                     <button
                       type="button"
-                      aria-label={cart.quantity.decrease}
+                      aria-label={t("quantity.decrease")}
                       className="text-foreground hover:bg-muted h-9 w-9 text-base transition-colors"
                       onClick={() =>
                         updateQuantity(item.productId, item.quantity - 1, item.variantId)
@@ -218,7 +219,7 @@ export default function CartPage() {
                     <span className="w-8 text-center text-sm font-bold">{item.quantity}</span>
                     <button
                       type="button"
-                      aria-label={cart.quantity.increase}
+                      aria-label={t("quantity.increase")}
                       className="text-foreground hover:bg-muted h-9 w-9 text-base transition-colors disabled:cursor-not-allowed disabled:opacity-40"
                       onClick={() =>
                         updateQuantity(item.productId, item.quantity + 1, item.variantId)
@@ -233,7 +234,7 @@ export default function CartPage() {
                   </p>
                   <button
                     type="button"
-                    aria-label={cart.remove}
+                    aria-label={t("remove")}
                     className="text-muted-foreground hover:text-foreground p-1.5 transition-colors"
                     onClick={() => removeItem(item.productId, item.variantId)}
                   >
@@ -248,7 +249,7 @@ export default function CartPage() {
               href="/products"
               className="text-muted-foreground hover:text-foreground text-sm font-bold transition-colors"
             >
-              ← {cart.continueShopping}
+              ← {t("continueShopping")}
             </Link>
             <AlertDialog>
               <AlertDialogTrigger asChild>
@@ -256,21 +257,21 @@ export default function CartPage() {
                   type="button"
                   className="text-muted-foreground hover:text-destructive text-sm font-bold transition-colors"
                 >
-                  {cart.clear.action}
+                  {t("clear.action")}
                 </button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>{cart.clear.dialogTitle}</AlertDialogTitle>
-                  <AlertDialogDescription>{cart.clear.dialogDescription}</AlertDialogDescription>
+                  <AlertDialogTitle>{t("clear.dialogTitle")}</AlertDialogTitle>
+                  <AlertDialogDescription>{t("clear.dialogDescription")}</AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>{cart.clear.cancel}</AlertDialogCancel>
+                  <AlertDialogCancel>{t("clear.cancel")}</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={clearCart}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   >
-                    {cart.clear.confirm}
+                    {t("clear.confirm")}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -279,32 +280,32 @@ export default function CartPage() {
         </div>
 
         <div className="bg-card border-border rounded-[20px] border p-7 lg:sticky lg:top-24">
-          <h2 className="text-xl font-extrabold">{cart.summary.title}</h2>
+          <h2 className="text-xl font-extrabold">{t("summary.title")}</h2>
           <div className="mt-5 flex flex-col gap-3 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">
-                {cart.summary.itemsLabel} ({totalQuantity})
+                {t("summary.itemsLabel")} ({totalQuantity})
               </span>
               <span className="font-bold">{formatPrice(subtotal)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{cart.summary.shippingLabel}</span>
+              <span className="text-muted-foreground">{t("summary.shippingLabel")}</span>
               <span className="text-muted-foreground text-[13px]">
-                {cart.summary.shippingValue}
+                {t("summary.shippingValue")}
               </span>
             </div>
           </div>
           <div className="border-border mt-5 flex items-center justify-between border-t pt-4">
-            <span className="text-[15px] font-bold">{cart.summary.totalLabel}</span>
+            <span className="text-[15px] font-bold">{t("summary.totalLabel")}</span>
             <span className="text-xl font-extrabold">{formatPrice(total)}</span>
           </div>
           {hasStockIssues() && (
             <div className="bg-destructive/10 text-destructive mt-4 rounded-md p-3 text-sm">
               <p className="flex items-center gap-2 font-medium">
                 <AlertCircle className="h-4 w-4" />
-                {cart.summary.stockIssues.title}
+                {t("summary.stockIssues.title")}
               </p>
-              <p className="text-muted-foreground mt-1">{cart.summary.stockIssues.description}</p>
+              <p className="text-muted-foreground mt-1">{t("summary.stockIssues.description")}</p>
             </div>
           )}
           <button
@@ -313,11 +314,11 @@ export default function CartPage() {
             onClick={() => router.push("/checkout")}
             disabled={hasStockIssues() || isValidating}
           >
-            {isValidating ? cart.summary.validating : cart.summary.checkoutCta}
+            {isValidating ? t("summary.validating") : t("summary.checkoutCta")}
           </button>
           <p className="text-muted-foreground mt-3.5 flex items-center justify-center gap-2 text-xs font-semibold">
             <Lock className="h-3.5 w-3.5" />
-            {cart.summary.securePayment}
+            {t("summary.securePayment")}
           </p>
         </div>
       </div>

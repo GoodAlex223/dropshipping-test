@@ -994,6 +994,26 @@ these are the standing improvements.
   previous deploy, and keep `VERCEL_FORCE_NO_BUILD_CACHE=1` / dashboard cache-off redeploy as
   the standard remedy. (High value, Low effort) `[relates-to: 🔵 production-launch deploy runbook, 2026-08-10]`
 
+### [2026-08-15] From: PR #37 review chat (dev-console warnings)
+
+**Origin**: user-pasted dev-console warnings during the G9 visual gate, assessed in-chat; the
+deferral's missing recording was re-raised by PR #37 review round 4. 🔵 User-Flagged.
+
+- 🔵 **React-19-style `ui/` primitives drop refs on React 18 — `SheetOverlay` warning +
+  Sheet/Dialog `aria-describedby` gap** — 22 of 24 `src/components/ui/` primitives are
+  React-19-era shadcn plain function components; on pinned React 18.3.1, React strips the ref
+  Radix passes (dev console: `Function components cannot be given refs` for `SheetOverlay` on
+  every drawer/menu open; worst case an untracked overlay exit animation — prod builds strip
+  the warning). Same template class: `SheetContent`/`DialogContent` render without a
+  description element (`Missing aria-describedby` ×2). Pre-existing — 0 branch commits touch
+  `ui/sheet.tsx`, though PR #37 ships adjacent code (the LocaleSwitcher row and
+  `overflow-y-auto` on that same `SheetContent`). Fix: targeted `forwardRef` wrap of the
+  ref-receiving primitives (sonner-precedent hand-edit with a re-apply note) plus
+  `SheetDescription`/`aria-describedby={undefined}` at usage sites; the ROADMAP'd React 19
+  upgrade retires the ref half on its own. (Low value, Low effort)
+  `[possible-dup-of: 🟤 Textarea drops refs — react-hook-form cannot focus admin product fields, 2026-08-08]`
+  [PR #37 review round 4 re-raise, 2026-08-15]
+
 ---
 
 ## Technical Debt

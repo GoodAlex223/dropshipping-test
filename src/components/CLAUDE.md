@@ -28,10 +28,11 @@ components/
 │   └── index.ts
 ├── common/
 │   ├── AnnouncementBar.tsx  # Launch marquee (G8): SiteAnnouncement shape, id-scoped dismissal, measured N-copy gap-free stream, pill CTA; sticky with Header via the shop layout wrapper; reduced-motion reset lives UN-layered in globals.css (PR #36)
-│   ├── Header.tsx         # Site header with nav, cart, auth; chrome strings from src/content/site.ts (site.header, G4) — sticky classes moved to the shop layout's shared wrapper (G8)
+│   ├── Header.tsx         # Site header with nav, cart, auth; chrome strings via useTranslations("header") from messages/uk.json (TASK-039 G9 superseded src/content/site.ts's site.header block) — sticky classes moved to the shop layout's shared wrapper (G8); mounts LocaleSwitcher
+│   ├── LocaleSwitcher.tsx  # UA | RU header toggle (TASK-039): useLocale()/useTranslations("common"), disables the active-locale button, calls the setLocale server action (src/i18n/actions.ts) inside useTransition
 │   ├── Footer.tsx         # Site footer with NewsletterSignup component
-│   ├── NewsletterSignup.tsx  # Newsletter subscription form (email input, success state); copy from src/content/newsletter.ts (signup.byCode/fallback, G4)
-│   ├── CookieConsent.tsx  # GDPR cookie consent banner + GTM loader (Zustand persisted); copy from src/content/system.ts (cookies, G4)
+│   ├── NewsletterSignup.tsx  # Newsletter subscription form (email input, success state); copy via useTranslations("newsletter.signup") — byCode/fallback keys, t.has(key as never) guard (TASK-039 G9 superseded src/content/newsletter.ts, deleted)
+│   ├── CookieConsent.tsx  # GDPR cookie consent banner + GTM loader (Zustand persisted); copy via useTranslations("system.cookies") (TASK-039 G9 superseded src/content/system.ts, deleted)
 │   ├── StatusScreen.tsx   # Hook-free shared status-page treatment (icon/tone/title/description/meta/actions); no "use client" — server-usable, not-found.tsx renders it directly; server callers may only pass href actions since onClick functions can't cross the server→client boundary
 │   ├── ResourceHints.tsx  # Resource hints (preconnect/dns-prefetch for third-party domains)
 │   └── index.ts
@@ -54,7 +55,7 @@ components/
 │   ├── StarRating.tsx     # Star rating input component
 │   └── index.ts
 ├── shop/
-│   ├── CartDrawer.tsx     # Slide-out cart drawer (Sheet) with view_cart tracking; Mirox dark restyle (G1/PR #28) — strings via content/cart.ts, «Колір: X · Розмір: Y» variant line from CartItem.color/size
+│   ├── CartDrawer.tsx     # Slide-out cart drawer (Sheet) with view_cart tracking; Mirox dark restyle (G1/PR #28) — strings via useTranslations("cart") (TASK-039 G9 superseded content/cart.ts, deleted), «Колір: X · Розмір: Y» variant line built from t("variant.color")/t("variant.size") + CartItem.color/size
 │   └── index.ts
 ├── showcase/              # Multi-theme showcase system
 │   ├── bold/              # Bold theme components (Hero, Features, Categories, ProductGrid, CTA)

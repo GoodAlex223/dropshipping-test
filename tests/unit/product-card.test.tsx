@@ -1,5 +1,6 @@
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { screen, fireEvent, act } from "@testing-library/react";
 import { describe, it, expect, vi, afterEach } from "vitest";
+import { renderWithIntl } from "../helpers/render-with-intl";
 import { ProductCard } from "@/components/products/ProductCard";
 
 /**
@@ -38,7 +39,7 @@ const base = {
 
 describe("ProductCard", () => {
   it("renders the discount badge with the handoff pill classes, no destructive/red class", () => {
-    const { container } = render(<ProductCard product={base} />);
+    const { container } = renderWithIntl(<ProductCard product={base} />);
     const badge = screen.getByText("-20%");
     expect(badge.className).toContain("bg-secondary");
     expect(badge.className).toContain("border-border-strong");
@@ -49,19 +50,19 @@ describe("ProductCard", () => {
   });
 
   it("shows the branded fallback when an image fails to load", () => {
-    render(<ProductCard product={base} />);
+    renderWithIntl(<ProductCard product={base} />);
     const img = screen.getByAltText("Hoodie");
     fireEvent.error(img);
     expect(screen.getByTestId("product-image-fallback")).toBeInTheDocument();
   });
 
   it("shows the branded fallback when no image is provided", () => {
-    render(<ProductCard product={{ ...base, images: [] }} />);
+    renderWithIntl(<ProductCard product={{ ...base, images: [] }} />);
     expect(screen.getByTestId("product-image-fallback")).toBeInTheDocument();
   });
 
   it("renders the whole card as a single link, with no separate View Product/Details button", () => {
-    render(<ProductCard product={base} />);
+    renderWithIntl(<ProductCard product={base} />);
     const links = screen.getAllByRole("link");
     expect(links).toHaveLength(1);
     expect(links[0]).toHaveAttribute("href", "/products/mirox-hoodie");
@@ -71,7 +72,7 @@ describe("ProductCard", () => {
   });
 
   it("gives the whole-card link an accessible name equal to just the product name", () => {
-    render(<ProductCard product={base} />);
+    renderWithIntl(<ProductCard product={base} />);
     // aria-label overrides the link's nested text content (category, price,
     // size row, ...) as its accessible name — this specifically proves a
     // screen reader announces "Mirox Hoodie", not the entire card's text.
@@ -84,13 +85,13 @@ describe("ProductCard", () => {
     // comparePrice cleared: TASK-036's single-badge precedence (discount >
     // НОВИНКА > out-of-stock) would otherwise show the discount badge
     // instead of the out-of-stock label this test is asserting on.
-    render(<ProductCard product={{ ...base, stock: 0, comparePrice: null }} />);
+    renderWithIntl(<ProductCard product={{ ...base, stock: 0, comparePrice: null }} />);
     expect(screen.getAllByRole("link")).toHaveLength(1);
     expect(screen.getByText("Немає в наявності")).toBeInTheDocument();
   });
 
   it("renders deduped Size-variant values in canonical S/M/L/XL/XXL order", () => {
-    render(
+    renderWithIntl(
       <ProductCard
         product={{
           ...base,
@@ -109,12 +110,14 @@ describe("ProductCard", () => {
   });
 
   it("renders no sizes row when variants are absent", () => {
-    render(<ProductCard product={base} />);
+    renderWithIntl(<ProductCard product={base} />);
     expect(screen.queryByText(/·/)).not.toBeInTheDocument();
   });
 
   it("renders no sizes row when variants exist but none are Size", () => {
-    render(<ProductCard product={{ ...base, variants: [{ name: "Color", value: "Чорний" }] }} />);
+    renderWithIntl(
+      <ProductCard product={{ ...base, variants: [{ name: "Color", value: "Чорний" }] }} />
+    );
     expect(screen.queryByText(/·/)).not.toBeInTheDocument();
   });
 });
@@ -124,7 +127,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 
 describe("ProductCard — TASK-036 upgrades", () => {
   it("shows НОВИНКА for a fresh product without discount", () => {
-    render(
+    renderWithIntl(
       <ProductCard
         product={{
           ...base,
@@ -137,7 +140,7 @@ describe("ProductCard — TASK-036 upgrades", () => {
   });
 
   it("discount badge wins over НОВИНКА (one badge max)", () => {
-    render(
+    renderWithIntl(
       <ProductCard product={{ ...base, createdAt: new Date(now - 5 * DAY_MS).toISOString() }} />
     );
     expect(screen.getByText("-20%")).toBeInTheDocument();
@@ -145,7 +148,7 @@ describe("ProductCard — TASK-036 upgrades", () => {
   });
 
   it("renders no НОВИНКА badge for an old product", () => {
-    render(
+    renderWithIntl(
       <ProductCard
         product={{
           ...base,
@@ -158,7 +161,7 @@ describe("ProductCard — TASK-036 upgrades", () => {
   });
 
   it("renders display-only colour swatches from Color variants", () => {
-    render(
+    renderWithIntl(
       <ProductCard
         product={{
           ...base,
@@ -177,7 +180,7 @@ describe("ProductCard — TASK-036 upgrades", () => {
 
   it("renders quick-action buttons only when onQuickView is provided", () => {
     const onQuickView = vi.fn();
-    render(<ProductCard product={base} onQuickView={onQuickView} />);
+    renderWithIntl(<ProductCard product={base} onQuickView={onQuickView} />);
     fireEvent.click(screen.getByRole("button", { name: "Швидкий перегляд" }));
     expect(onQuickView).toHaveBeenCalledWith({ focusSizes: false });
     fireEvent.click(screen.getByRole("button", { name: "В кошик" }));
@@ -196,7 +199,7 @@ describe("ProductCard — TASK-036 upgrades", () => {
     // directly: pointer-events must start "none" and only flip to "auto"
     // via the group-hover/group-focus-within variants that also drive the
     // overlay's opacity, never as a bare unconditional utility.
-    render(<ProductCard product={base} onQuickView={vi.fn()} />);
+    renderWithIntl(<ProductCard product={base} onQuickView={vi.fn()} />);
     for (const name of ["Швидкий перегляд", "В кошик"]) {
       const classes = screen.getByRole("button", { name }).className.split(/\s+/);
       expect(classes).not.toContain("pointer-events-auto");
@@ -207,14 +210,14 @@ describe("ProductCard — TASK-036 upgrades", () => {
   });
 
   it("hides «В кошик» (but keeps quick view) when out of stock", () => {
-    render(<ProductCard product={{ ...base, stock: 0 }} onQuickView={vi.fn()} />);
+    renderWithIntl(<ProductCard product={{ ...base, stock: 0 }} onQuickView={vi.fn()} />);
     expect(screen.getByRole("button", { name: "Швидкий перегляд" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "В кошик" })).not.toBeInTheDocument();
   });
 
   it("stops quick-action clicks bubbling to a wrapping click handler (card link area still bubbles)", () => {
     const wrapperClick = vi.fn();
-    render(
+    renderWithIntl(
       <div onClick={wrapperClick}>
         <ProductCard product={base} onQuickView={vi.fn()} />
       </div>
@@ -241,11 +244,11 @@ describe("ProductCard — TASK-036 upgrades", () => {
         { url: "https://example.com/b.jpg", alt: "back" },
       ],
     };
-    const { unmount } = render(<ProductCard product={two} />);
+    const { unmount } = renderWithIntl(<ProductCard product={two} />);
     expect(screen.getByAltText("back")).toBeInTheDocument();
     expect(screen.getAllByRole("img")).toHaveLength(2);
     unmount();
-    render(<ProductCard product={base} />);
+    renderWithIntl(<ProductCard product={base} />);
     expect(screen.getAllByRole("img")).toHaveLength(1); // single-image product: unchanged
   });
 });
@@ -259,7 +262,7 @@ describe("ProductCard — R1 equal-height class contract", () => {
   // extra space to consume. See the re-screenshot in the revision report
   // for the actual rendered proof.
   it("gives the card root h-full + flex flex-col", () => {
-    render(<ProductCard product={base} />);
+    renderWithIntl(<ProductCard product={base} />);
     const classes = screen.getByTestId("product-card").className.split(/\s+/);
     expect(classes).toContain("h-full");
     expect(classes).toContain("flex");
@@ -272,7 +275,7 @@ describe("ProductCard — R1 equal-height class contract", () => {
     // normalizer collapses to a regular space before matching — comparing
     // against the raw formatPrice() string (still containing  ) would
     // never match. The price row's own class list is the stable target.
-    const { container } = render(<ProductCard product={base} />);
+    const { container } = renderWithIntl(<ProductCard product={base} />);
     const priceRow = container.querySelector(".mt-auto");
     expect(priceRow).not.toBeNull();
     expect(priceRow!.className).not.toContain("mt-2");
@@ -290,20 +293,20 @@ describe("ProductCard — R2 image carousel", () => {
   };
 
   it("renders no carousel arrows for a single-image product", () => {
-    render(<ProductCard product={base} />);
+    renderWithIntl(<ProductCard product={base} />);
     expect(screen.queryByRole("button", { name: "Попереднє фото" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Наступне фото" })).not.toBeInTheDocument();
   });
 
   it("renders prev/next arrows for a multi-image product", () => {
-    render(<ProductCard product={multi} />);
+    renderWithIntl(<ProductCard product={multi} />);
     expect(screen.getByRole("button", { name: "Попереднє фото" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Наступне фото" })).toBeInTheDocument();
   });
 
   it("advances the visible image on next-arrow click, without navigating or bubbling to a wrapper handler", () => {
     const wrapperClick = vi.fn();
-    render(
+    renderWithIntl(
       <div onClick={wrapperClick}>
         <ProductCard product={multi} />
       </div>
@@ -322,7 +325,7 @@ describe("ProductCard — R2 image carousel", () => {
   });
 
   it("steps backward (wrapping to the last image) on prev-arrow click", () => {
-    render(<ProductCard product={multi} />);
+    renderWithIntl(<ProductCard product={multi} />);
     const frontWrapper = screen.getByAltText("front").parentElement!;
     const sideWrapper = screen.getByAltText("side").parentElement!;
     expect(frontWrapper.className).toContain("opacity-100");
@@ -337,7 +340,7 @@ describe("ProductCard — R2 image carousel", () => {
     // Same regression contract as the quick-action buttons (Task 10 E2E
     // finding): an unconditional pointer-events-auto would let an invisible
     // arrow intercept clicks meant for the card link beneath it.
-    render(<ProductCard product={multi} />);
+    renderWithIntl(<ProductCard product={multi} />);
     for (const name of ["Попереднє фото", "Наступне фото"]) {
       const classes = screen.getByRole("button", { name }).className.split(/\s+/);
       expect(classes).not.toContain("pointer-events-auto");
@@ -372,7 +375,7 @@ describe("ProductCard — fix round 1: hover boundary is the Card root", () => {
   it("starts autoplay when the Card root itself is entered (not just the image area)", () => {
     vi.useFakeTimers();
     try {
-      render(<ProductCard product={multi} />);
+      renderWithIntl(<ProductCard product={multi} />);
       const frontWrapper = screen.getByAltText("front").parentElement!;
       const backWrapper = screen.getByAltText("back").parentElement!;
 
@@ -395,7 +398,7 @@ describe("ProductCard — fix round 1: hover boundary is the Card root", () => {
   it("does not reset to image[0] when the cursor moves onto a descendant overlay arrow", () => {
     vi.useFakeTimers();
     try {
-      render(<ProductCard product={multi} />);
+      renderWithIntl(<ProductCard product={multi} />);
       const frontWrapper = screen.getByAltText("front").parentElement!;
       const backWrapper = screen.getByAltText("back").parentElement!;
 
@@ -417,7 +420,7 @@ describe("ProductCard — fix round 1: hover boundary is the Card root", () => {
   });
 
   it("resets to image[0] only when the cursor actually leaves the Card", () => {
-    render(<ProductCard product={multi} />);
+    renderWithIntl(<ProductCard product={multi} />);
     const frontWrapper = screen.getByAltText("front").parentElement!;
 
     fireEvent.click(screen.getByRole("button", { name: "Наступне фото" })); // move off image[0]
@@ -431,7 +434,7 @@ describe("ProductCard — fix round 1: hover boundary is the Card root", () => {
 
 describe("ProductCard — R3 quick-buy cart icon", () => {
   it("renders a cart icon (not the former text label) with an accessible name of «В кошик»", () => {
-    render(<ProductCard product={base} onQuickView={vi.fn()} />);
+    renderWithIntl(<ProductCard product={base} onQuickView={vi.fn()} />);
     const button = screen.getByRole("button", { name: "В кошик" });
     expect(button).not.toHaveTextContent("В кошик");
     expect(button.querySelector("svg")).toBeInTheDocument();
@@ -448,7 +451,7 @@ describe("ProductCard — final-review Fix 1: hover-capability gating (not just 
   };
 
   it("gates the quick-action overlay on [@media(hover:hover)]:md:flex, not bare md:flex", () => {
-    render(<ProductCard product={base} onQuickView={vi.fn()} />);
+    renderWithIntl(<ProductCard product={base} onQuickView={vi.fn()} />);
     const overlay = screen.getByRole("button", { name: "Швидкий перегляд" }).closest("div")!;
     const classes = overlay.className.split(/\s+/);
     expect(classes).toContain("hidden");
@@ -457,7 +460,7 @@ describe("ProductCard — final-review Fix 1: hover-capability gating (not just 
   });
 
   it("gates the carousel-arrow overlay on [@media(hover:hover)]:md:flex, not bare md:flex", () => {
-    render(<ProductCard product={multi} />);
+    renderWithIntl(<ProductCard product={multi} />);
     const overlay = screen.getByRole("button", { name: "Наступне фото" }).closest("div")!;
     const classes = overlay.className.split(/\s+/);
     expect(classes).toContain("hidden");
@@ -489,7 +492,7 @@ describe("ProductCard — final-review Fix 1 / Fix 5: autoplay gating", () => {
     mockMatchMedia({ hoverCapable: false });
     vi.useFakeTimers();
     try {
-      render(<ProductCard product={multi} />);
+      renderWithIntl(<ProductCard product={multi} />);
       const frontWrapper = screen.getByAltText("front").parentElement!;
       fireEvent.mouseEnter(screen.getByTestId("product-card"));
       act(() => {
@@ -505,7 +508,7 @@ describe("ProductCard — final-review Fix 1 / Fix 5: autoplay gating", () => {
     mockMatchMedia({ hoverCapable: true, reducedMotion: true });
     vi.useFakeTimers();
     try {
-      render(<ProductCard product={multi} />);
+      renderWithIntl(<ProductCard product={multi} />);
       const frontWrapper = screen.getByAltText("front").parentElement!;
       fireEvent.mouseEnter(screen.getByTestId("product-card"));
       act(() => {
@@ -521,7 +524,7 @@ describe("ProductCard — final-review Fix 1 / Fix 5: autoplay gating", () => {
     mockMatchMedia({ hoverCapable: true, reducedMotion: false });
     vi.useFakeTimers();
     try {
-      render(<ProductCard product={multi} />);
+      renderWithIntl(<ProductCard product={multi} />);
       const backWrapper = screen.getByAltText("back").parentElement!;
       fireEvent.mouseEnter(screen.getByTestId("product-card"));
       act(() => {

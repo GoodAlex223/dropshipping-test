@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Check, Package, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +17,7 @@ import {
 import { ReviewSection, StarRating } from "@/components/reviews";
 import { useCartStore } from "@/stores/cart.store";
 import { cn } from "@/lib/utils";
-import { formatPrice, pluralizeUk } from "@/lib/format";
+import { formatPrice } from "@/lib/format";
 import { COLOR_SWATCH_CLASSES, SIZE_ORDER, rankSizeValues } from "@/lib/product-display";
 import { trackViewItem, trackAddToCart } from "@/lib/analytics";
 import type { ReviewWithUser, RatingDistribution, StyleSibling, BundleCompanion } from "@/types";
@@ -78,6 +79,7 @@ export interface Product {
 const LOW_STOCK_THRESHOLD = 5;
 
 export function ProductDetailClient({ product }: { product: Product }) {
+  const t = useTranslations("products");
   const router = useRouter();
   const { addItem } = useCartStore();
 
@@ -91,7 +93,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
       .filter((v): v is ProductVariant => Boolean(v));
   }, [product.variants]);
 
-  // «Підбір розміру» only makes sense for products carrying real S–XXL sizes;
+  // The size picker only makes sense for products carrying real S–XXL sizes;
   // one-size products (e.g. caps) have a Size variant outside SIZE_ORDER.
   const showSizePicker = sizes.some((v) => (SIZE_ORDER as readonly string[]).includes(v.value));
 
@@ -193,14 +195,14 @@ export function ProductDetailClient({ product }: { product: Product }) {
 
   return (
     <div className="container py-6 lg:py-8" data-hydrated={hydrated ? "true" : undefined}>
-      {/* Breadcrumb — Головна / Каталог / {name} (catalog markup precedent) */}
+      {/* Breadcrumb — Home / Catalog / {name} (catalog markup precedent) */}
       <nav className="mb-4 text-[12.5px] text-[#737373]">
         <Link href="/" className="hover:text-white">
-          Головна
+          {t("breadcrumbHome")}
         </Link>{" "}
         /{" "}
         <Link href="/products" className="hover:text-white">
-          Каталог
+          {t("catalogName")}
         </Link>{" "}
         / <span className="text-[#a3a3a3]">{product.name}</span>
       </nav>
@@ -231,8 +233,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
             <div className="mt-2.5 flex items-center gap-2">
               <StarRating value={Math.round(product.averageRating)} size="sm" />
               <a href="#reviews" className="text-[13px] text-[#a3a3a3] hover:text-white">
-                {product.totalReviews}{" "}
-                {pluralizeUk(product.totalReviews, "відгук", "відгуки", "відгуків")}
+                {t("detail.reviewCount", { count: product.totalReviews })}
               </a>
             </div>
           )}
@@ -240,12 +241,13 @@ export function ProductDetailClient({ product }: { product: Product }) {
           {(product.colorValue || product.styleSiblings.length > 0) && (
             <div className="mt-4.5">
               <div className="text-[13.5px] font-semibold text-[#a3a3a3]">
-                Колір: <span className="text-foreground">{product.colorValue ?? "—"}</span>
+                {t("variant.color")}{" "}
+                <span className="text-foreground">{product.colorValue ?? "—"}</span>
               </div>
               <div className="mt-2.5 flex gap-2.5">
                 {product.colorValue && (
                   <span
-                    aria-label={`Колір: ${product.colorValue} (обраний)`}
+                    aria-label={t("variant.colorAriaSelected", { value: product.colorValue })}
                     className={cn(
                       COLOR_SWATCH_CLASSES[product.colorValue] ?? "bg-muted",
                       "h-9 w-9 rounded-full border-2 border-white"
@@ -256,7 +258,10 @@ export function ProductDetailClient({ product }: { product: Product }) {
                   <Link
                     key={sibling.slug}
                     href={`/products/${sibling.slug}`}
-                    aria-label={`Колір: ${sibling.colorValue ?? sibling.name} — ${sibling.name}`}
+                    aria-label={t("variant.colorAriaSibling", {
+                      value: sibling.colorValue ?? sibling.name,
+                      name: sibling.name,
+                    })}
                     title={sibling.name}
                     className={cn(
                       "h-9 w-9 rounded-full border transition-colors hover:border-white",
@@ -267,7 +272,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
                 {legacyExtraColors.map((value) => (
                   <span
                     key={value}
-                    aria-label={`Колір: ${value}`}
+                    aria-label={t("variant.colorAria", { value })}
                     title={value}
                     className={cn(
                       "h-9 w-9 rounded-full border",
@@ -281,7 +286,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
 
           {sizes.length > 0 && (
             <div className="mt-4.5">
-              <div className="text-[13.5px] font-semibold text-[#a3a3a3]">Розмір:</div>
+              <div className="text-[13.5px] font-semibold text-[#a3a3a3]">{t("variant.size")}</div>
               <div className="mt-2.5 flex flex-wrap gap-2.5">
                 {sizes.map((variant) => {
                   const isActive = variant.id === selectedSizeId;
@@ -311,13 +316,13 @@ export function ProductDetailClient({ product }: { product: Product }) {
 
           <div className="mt-4.5 flex items-center justify-between text-[13.5px]">
             {outOfStock ? (
-              <span className="text-muted-foreground font-bold">Немає в наявності</span>
+              <span className="text-muted-foreground font-bold">{t("detail.outOfStock")}</span>
             ) : lowStock ? (
-              <span className="font-bold">Залишилось {currentStock} шт</span>
+              <span className="font-bold">{t("detail.lowStock", { count: currentStock })}</span>
             ) : (
-              <span className="text-available font-bold">● В наявності</span>
+              <span className="text-available font-bold">{t("detail.inStock")}</span>
             )}
-            <span className="text-[#a3a3a3]">Доставка Новою Поштою</span>
+            <span className="text-[#a3a3a3]">{t("detail.shippingNote")}</span>
           </div>
 
           <div className="mt-3 flex flex-col gap-2.5">
@@ -329,10 +334,10 @@ export function ProductDetailClient({ product }: { product: Product }) {
             >
               {addedToCart ? (
                 <span className="inline-flex items-center gap-2">
-                  <Check className="h-4 w-4" /> ДОДАНО В КОШИК
+                  <Check className="h-4 w-4" /> {t("detail.addedToCart")}
                 </span>
               ) : (
-                "ДОДАТИ В КОШИК"
+                t("detail.addToCart")
               )}
             </button>
             <button
@@ -341,11 +346,11 @@ export function ProductDetailClient({ product }: { product: Product }) {
               disabled={outOfStock || isAddingToCart}
               className="border-border-strong text-foreground rounded-[10px] border p-4 text-sm font-bold tracking-[0.06em] transition-colors hover:border-white disabled:cursor-not-allowed disabled:opacity-50"
             >
-              КУПИТИ ЗАРАЗ
+              {t("detail.buyNow")}
             </button>
           </div>
 
-          {/* «У вибране» and «Відкрити фото замірів» deliberately absent — spec §7 ledger #2/#3. */}
+          {/* "Wishlist" and "Open size-chart photo" deliberately absent — spec §7 ledger #2/#3. */}
           <div className="mt-4">
             <SocialShareButtons
               productId={product.id}
@@ -374,10 +379,12 @@ export function ProductDetailClient({ product }: { product: Product }) {
         />
       </div>
 
-      {/* Опис — kept for SEO (spec §7 ledger #9) */}
+      {/* Description — kept for SEO (spec §7 ledger #9) */}
       {product.description && (
-        <section aria-label="Опис" className="mt-16">
-          <h2 className="mb-5 text-[28px] font-extrabold tracking-[-0.02em]">Опис</h2>
+        <section aria-label={t("detail.description")} className="mt-16">
+          <h2 className="mb-5 text-[28px] font-extrabold tracking-[-0.02em]">
+            {t("detail.description")}
+          </h2>
           <p className="text-foreground/80 max-w-3xl text-[14.5px] leading-relaxed whitespace-pre-wrap">
             {product.description}
           </p>
@@ -396,8 +403,10 @@ export function ProductDetailClient({ product }: { product: Product }) {
       </div>
 
       {product.relatedProducts.length > 0 && (
-        <section aria-label="Схожі товари" className="mt-16">
-          <h2 className="mb-7 text-[28px] font-extrabold tracking-[-0.02em]">Схожі товари</h2>
+        <section aria-label={t("detail.relatedProducts")} className="mt-16">
+          <h2 className="mb-7 text-[28px] font-extrabold tracking-[-0.02em]">
+            {t("detail.relatedProducts")}
+          </h2>
           <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
             {product.relatedProducts.map((relatedProduct) => (
               <ProductCard key={relatedProduct.id} product={relatedProduct} />
@@ -412,18 +421,17 @@ export function ProductDetailClient({ product }: { product: Product }) {
 }
 
 export function ProductNotFound() {
+  const t = useTranslations("products");
   const router = useRouter();
   return (
     <div className="container py-16">
       <div className="flex flex-col items-center justify-center text-center">
         <Package className="text-muted-foreground h-16 w-16" />
-        <h1 className="mt-4 text-2xl font-extrabold">Товар не знайдено</h1>
-        <p className="text-muted-foreground mt-2">
-          Товару, який ви шукаєте, не існує, або його було видалено.
-        </p>
+        <h1 className="mt-4 text-2xl font-extrabold">{t("detail.notFoundTitle")}</h1>
+        <p className="text-muted-foreground mt-2">{t("detail.notFoundDescription")}</p>
         <Button className="mt-6" onClick={() => router.push("/products")}>
           <ArrowLeft className="mr-2 h-4 w-4" />
-          До каталогу
+          {t("detail.backToCatalog")}
         </Button>
       </div>
     </div>

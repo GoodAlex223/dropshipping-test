@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { feedback } from "@/content/feedback";
+import { useTranslations } from "next-intl";
 import { FeedbackForm } from "./feedback-form";
 
 // Metadata stays EN like the rest of the SEO layer (BACKLOG'd for the
@@ -10,10 +10,11 @@ export const metadata: Metadata = {
 };
 
 export default function FeedbackPage() {
+  const t = useTranslations("feedback.page");
   return (
     <div className="container max-w-2xl py-12">
-      <h1 className="text-3xl font-bold tracking-tight">{feedback.page.title}</h1>
-      <p className="text-muted-foreground mt-3">{feedback.page.description}</p>
+      <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+      <p className="text-muted-foreground mt-3">{t("description")}</p>
       <div className="mt-8">
         <FeedbackForm />
       </div>

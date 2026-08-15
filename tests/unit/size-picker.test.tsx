@@ -1,10 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent } from "@testing-library/react";
+import { renderWithIntl } from "../helpers/render-with-intl";
 import { SizePicker } from "@/components/products/SizePicker";
 
 describe("SizePicker", () => {
   it("renders defaults 180/75 → L with Ukrainian copy", () => {
-    render(<SizePicker />);
+    renderWithIntl(<SizePicker />);
     expect(screen.getByRole("heading", { name: "Підбір розміру" })).toBeInTheDocument();
     expect(screen.getByLabelText(/Зріст/)).toHaveValue(180);
     expect(screen.getByLabelText(/Вага/)).toHaveValue(75);
@@ -12,13 +13,13 @@ describe("SizePicker", () => {
   });
 
   it("recomputes on input change (192 → XXL)", () => {
-    render(<SizePicker />);
+    renderWithIntl(<SizePicker />);
     fireEvent.change(screen.getByLabelText(/Зріст/), { target: { value: "192" } });
     expect(screen.getByTestId("recommended-size")).toHaveTextContent("XXL");
   });
 
   it("falls back to defaults on cleared input", () => {
-    render(<SizePicker />);
+    renderWithIntl(<SizePicker />);
     fireEvent.change(screen.getByLabelText(/Зріст/), { target: { value: "" } });
     expect(screen.getByTestId("recommended-size")).toHaveTextContent("L");
   });

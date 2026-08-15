@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { screen, fireEvent, waitFor } from "@testing-library/react";
+import { renderWithIntl } from "../helpers/render-with-intl";
 
 const searchParamsGet = vi.fn();
 vi.mock("next/navigation", () => ({
@@ -28,7 +29,7 @@ describe("newsletter confirm page", () => {
   it("shows the success copy for CONFIRMED", async () => {
     searchParamsGet.mockReturnValue("tok-1");
     stubFetch({ ok: true, body: { code: "CONFIRMED", message: "en text" } });
-    render(<NewsletterConfirmPage />);
+    renderWithIntl(<NewsletterConfirmPage />);
     expect(await screen.findByText("Підписку підтверджено!")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Продовжити покупки" })).toHaveAttribute("href", "/");
   });
@@ -36,28 +37,28 @@ describe("newsletter confirm page", () => {
   it("distinguishes ALREADY_CONFIRMED from CONFIRMED", async () => {
     searchParamsGet.mockReturnValue("tok-1");
     stubFetch({ ok: true, body: { code: "ALREADY_CONFIRMED" } });
-    render(<NewsletterConfirmPage />);
+    renderWithIntl(<NewsletterConfirmPage />);
     expect(await screen.findByText("Підписку вже підтверджено")).toBeInTheDocument();
   });
 
   it("shows the expired copy for LINK_EXPIRED", async () => {
     searchParamsGet.mockReturnValue("tok-1");
     stubFetch({ ok: false, body: { code: "LINK_EXPIRED", error: "en text" } });
-    render(<NewsletterConfirmPage />);
+    renderWithIntl(<NewsletterConfirmPage />);
     expect(await screen.findByText("Посилання застаріло")).toBeInTheDocument();
   });
 
   it("falls back to generic Ukrainian copy on an unknown code", async () => {
     searchParamsGet.mockReturnValue("tok-1");
     stubFetch({ ok: false, body: { code: "SOMETHING_NEW" } });
-    render(<NewsletterConfirmPage />);
+    renderWithIntl(<NewsletterConfirmPage />);
     expect(await screen.findByText("Щось пішло не так")).toBeInTheDocument();
   });
 
   it("shows invalid-link copy without fetching when token is missing", () => {
     searchParamsGet.mockReturnValue(null);
     stubFetch({ ok: true, body: {} });
-    render(<NewsletterConfirmPage />);
+    renderWithIntl(<NewsletterConfirmPage />);
     expect(screen.getByText("Недійсне посилання")).toBeInTheDocument();
     expect(global.fetch).not.toHaveBeenCalled();
   });
@@ -69,7 +70,7 @@ describe("newsletter unsubscribe page", () => {
       key === "email" ? "a@b.ua" : "valid-token"
     );
     stubFetch({ ok: true, body: { code: "UNSUBSCRIBED", message: "en" } });
-    render(<NewsletterUnsubscribePage />);
+    renderWithIntl(<NewsletterUnsubscribePage />);
     expect(screen.getByText(/a@b\.ua/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Так, відписатися" }));
     await waitFor(() => expect(screen.getByText("Ви відписалися")).toBeInTheDocument());
@@ -77,14 +78,14 @@ describe("newsletter unsubscribe page", () => {
 
   it("shows invalid-link copy when params are missing", () => {
     searchParamsGet.mockReturnValue(null);
-    render(<NewsletterUnsubscribePage />);
+    renderWithIntl(<NewsletterUnsubscribePage />);
     expect(screen.getByText("Недійсне посилання")).toBeInTheDocument();
   });
 
   it("maps error codes through the content layer", async () => {
     searchParamsGet.mockImplementation((key: string) => (key === "email" ? "a@b.ua" : "bad-token"));
     stubFetch({ ok: false, body: { code: "INVALID_UNSUBSCRIBE_LINK", error: "en" } });
-    render(<NewsletterUnsubscribePage />);
+    renderWithIntl(<NewsletterUnsubscribePage />);
     fireEvent.click(screen.getByRole("button", { name: "Так, відписатися" }));
     await waitFor(() => expect(screen.getByText("Недійсне посилання")).toBeInTheDocument());
   });

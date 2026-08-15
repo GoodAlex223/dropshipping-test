@@ -1,5 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
+import { renderWithIntl } from "../helpers/render-with-intl";
 
 vi.mock("@/components/common/NewsletterSignup", () => ({
   NewsletterSignup: () => <div data-testid="newsletter" />,
@@ -9,18 +10,18 @@ import { Footer } from "@/components/common/Footer";
 
 describe("Footer", () => {
   it("uses the Mirox tagline, not the generic template copy", () => {
-    render(<Footer />);
+    renderWithIntl(<Footer />);
     expect(screen.queryByText(/one-stop shop for quality products/i)).not.toBeInTheDocument();
     expect(screen.getByText(/цінує якість і мінімалізм/)).toBeInTheDocument();
   });
 
   it("links to the social profiles", () => {
-    render(<Footer />);
+    renderWithIntl(<Footer />);
     expect(screen.getByRole("link", { name: /Instagram/ })).toBeInTheDocument();
   });
 
   it("links only to routes that exist, and still contains real navigation", () => {
-    render(<Footer />);
+    renderWithIntl(<Footer />);
     const dead = ["/contact", "/faq", "/shipping", "/returns", "/about", "/privacy", "/terms"];
     const links = screen.getAllByRole("link");
     const hrefs = links
@@ -40,7 +41,7 @@ describe("Footer", () => {
   });
 
   it("uses the Ukrainian copyright-row link labels", () => {
-    render(<Footer />);
+    renderWithIntl(<Footer />);
     expect(screen.getByRole("link", { name: "Каталог" })).toHaveAttribute("href", "/products");
     expect(screen.getByRole("link", { name: "Категорії" })).toHaveAttribute("href", "/categories");
     expect(screen.getByRole("link", { name: "Новинки" })).toHaveAttribute(
@@ -54,7 +55,7 @@ describe("Footer", () => {
   });
 
   it("invites visitors to follow along on social", () => {
-    render(<Footer />);
+    renderWithIntl(<Footer />);
     expect(screen.getByText("Слідкуйте за нами")).toBeInTheDocument();
   });
 });

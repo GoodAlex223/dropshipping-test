@@ -2,15 +2,23 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { IMAGE_SIZES } from "@/lib/image-utils";
 import { formatPrice } from "@/lib/format";
-import { isNewProduct } from "@/lib/product-badges";
+import { getProductBadge, type ProductBadge } from "@/lib/product-badges";
 import { COLOR_SWATCH_CLASSES, rankSizeValues } from "@/lib/product-display";
 import { cn } from "@/lib/utils";
 import { ProductImage } from "./ProductImage";
+
+/** CSS-only, per badge key — kept in the component since it's visual, not copy. */
+const BADGE_CLASSES: Record<ProductBadge["key"], string> = {
+  sale: "bg-secondary border-border-strong text-foreground",
+  new: "bg-white text-black border-transparent",
+  outOfStock: "bg-secondary text-foreground",
+};
 
 /** Card-hover carousel autoplay tick, milliseconds (R2). */
 const CAROUSEL_INTERVAL_MS = 1500;
@@ -59,8 +67,8 @@ interface ProductCardProps {
   showCategory?: boolean;
   /**
    * When provided, a hover overlay renders two quick-action buttons.
-   * `focusSizes: true` on «В кошик» tells the consumer to open the quick
-   * view already focused on size selection; `false` on «Швидкий перегляд»
+   * `focusSizes: true` on "Add to cart" tells the consumer to open the quick
+   * view already focused on size selection; `false` on "Quick view"
    * just opens it. Omitted entirely on server-rendered rails (homepage),
    * where there is no client-side quick view to open.
    */
@@ -80,17 +88,13 @@ function getSizeLabel(variants: ProductVariantOption[] | undefined): string | nu
 }
 
 export function ProductCard({ product, showCategory = true, onQuickView }: ProductCardProps) {
+  const t = useTranslations("products");
   const price = typeof product.price === "string" ? parseFloat(product.price) : product.price;
   const comparePrice = product.comparePrice
     ? typeof product.comparePrice === "string"
       ? parseFloat(product.comparePrice)
       : product.comparePrice
     : null;
-
-  const discount =
-    comparePrice && comparePrice > price
-      ? Math.round(((comparePrice - price) / comparePrice) * 100)
-      : null;
 
   const isOutOfStock = product.stock <= 0;
   const sizeLabel = getSizeLabel(product.variants);
@@ -132,14 +136,20 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
     new Set(product.variants?.filter((v) => v.name === "Color").map((v) => v.value) ?? [])
   ).filter((value) => value in COLOR_SWATCH_CLASSES);
 
-  // Single badge max — precedence is discount > НОВИНКА > out-of-stock (spec §4).
-  const badge = discount
-    ? { label: `-${discount}%`, className: "bg-secondary border-border-strong text-foreground" }
-    : product.createdAt && isNewProduct(product.createdAt)
-      ? { label: "НОВИНКА", className: "bg-white text-black border-transparent" }
-      : isOutOfStock
-        ? { label: "Немає в наявності", className: "bg-secondary text-foreground" }
-        : null;
+  // Single badge max — precedence rule lives in getProductBadge (@/lib/product-badges).
+  const badge = getProductBadge({
+    price,
+    comparePrice,
+    createdAt: product.createdAt,
+    stock: product.stock,
+  });
+  const badgeLabel = badge
+    ? badge.key === "sale"
+      ? t("badges.sale", { percent: badge.percent })
+      : badge.key === "new"
+        ? t("badges.new")
+        : t("badges.outOfStock")
+    : null;
 
   return (
     <Card
@@ -210,10 +220,10 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
                 variant="secondary"
                 className={cn(
                   "rounded-full px-2.5 py-1 text-[10.5px] font-extrabold",
-                  badge.className
+                  BADGE_CLASSES[badge.key]
                 )}
               >
-                {badge.label}
+                {badgeLabel}
               </Badge>
             </div>
           )}
@@ -252,7 +262,7 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
                 <span
                   key={value}
                   role="img"
-                  aria-label={`Колір: ${value}`}
+                  aria-label={t("variant.colorAria", { value })}
                   title={value}
                   className={cn("h-4 w-4 rounded-full border", COLOR_SWATCH_CLASSES[value])}
                 />
@@ -283,7 +293,7 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
         <div className="pointer-events-none absolute inset-x-0 top-0 hidden aspect-square items-center justify-between px-2 opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100 [@media(hover:hover)]:md:flex">
           <button
             type="button"
-            aria-label="Попереднє фото"
+            aria-label={t("card.prevPhoto")}
             onClick={(e) => {
               // Same lesson as the quick-action fix: this sits over the
               // card's <a>, and catalog/rail wrappers add their own click
@@ -301,7 +311,7 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
           </button>
           <button
             type="button"
-            aria-label="Наступне фото"
+            aria-label={t("card.nextPhoto")}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -342,21 +352,21 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
             // intercepts pointer events").
             className="border-border-strong pointer-events-none rounded-[10px] border bg-black/80 px-3 py-2 text-[12px] font-bold backdrop-blur-sm group-focus-within:pointer-events-auto group-hover:pointer-events-auto hover:border-white"
           >
-            Швидкий перегляд
+            {t("card.quickView")}
           </button>
           {!isOutOfStock && (
             <button
               type="button"
-              aria-label="В кошик"
+              aria-label={t("card.addToCartAria")}
               onClick={(e) => {
                 e.stopPropagation();
                 onQuickView({ focusSizes: true });
               }}
-              // Cart glyph, not the former "В кошик" text label (R3) — the
-              // exact icon Header.tsx uses top-right. aria-label keeps the
-              // accessible name identical to before so existing
-              // getByRole("button", { name: "В кошик" }) queries still find
-              // it.
+              // Cart glyph, not the former text label (R3) — the exact icon
+              // Header.tsx uses top-right. aria-label keeps the accessible
+              // name identical to before (t("card.addToCartAria")'s current
+              // Ukrainian value) so the existing test's getByRole locator by
+              // that name still finds it.
               className="pointer-events-none flex items-center justify-center rounded-[10px] bg-white px-3 py-2 text-black group-focus-within:pointer-events-auto group-hover:pointer-events-auto hover:bg-[#e5e5e5]"
             >
               <ShoppingCart className="h-4 w-4" />

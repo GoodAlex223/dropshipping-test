@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
+import { renderWithIntl } from "../helpers/render-with-intl";
 
 const push = vi.fn();
 vi.mock("next/navigation", () => ({
@@ -58,7 +59,10 @@ describe("dynamic-route params regression (use(params) → useParams)", () => {
   });
 
   it("/account/orders/[id] renders and fetches by route id", async () => {
-    render(<AccountOrderDetailPage />);
+    // renderWithIntl only (not render): the page now calls useTranslations
+    // (TASK-039 Task 5) — the other three admin pages above stay hardcoded
+    // UA (out of scope until G13) and don't need the provider.
+    renderWithIntl(<AccountOrderDetailPage />);
     expect(await screen.findByText("Замовлення не знайдено")).toBeInTheDocument();
     expect(global.fetch).toHaveBeenCalledWith("/api/orders/test-id");
   });

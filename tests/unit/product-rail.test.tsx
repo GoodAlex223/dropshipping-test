@@ -1,5 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
+import { renderWithIntl } from "../helpers/render-with-intl";
 import { ProductRail } from "@/components/home/ProductRail";
 import type { ProductCardData } from "@/lib/product-queries";
 
@@ -34,7 +35,7 @@ const products: ProductCardData[] = [
 
 describe("ProductRail", () => {
   it("renders the heading and the view-all link", () => {
-    render(
+    renderWithIntl(
       <ProductRail
         title="Bestsellers"
         products={products}
@@ -50,7 +51,7 @@ describe("ProductRail", () => {
   });
 
   it("renders a card per product", () => {
-    const { container } = render(
+    const { container } = renderWithIntl(
       <ProductRail
         title="Featured"
         products={products}
@@ -70,7 +71,7 @@ describe("ProductRail", () => {
   });
 
   it("renders nothing at all when there are no products", () => {
-    const { container } = render(
+    const { container } = renderWithIntl(
       <ProductRail title="Featured" products={[]} viewAllHref="/products" viewAllLabel="View all" />
     );
     expect(container).toBeEmptyDOMElement();

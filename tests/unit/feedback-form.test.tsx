@@ -1,5 +1,6 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { renderWithIntl } from "../helpers/render-with-intl";
 
 vi.mock("sonner", () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
@@ -20,7 +21,7 @@ afterEach(() => {
 describe("FeedbackForm", () => {
   it("submits message-only feedback and shows the success box", async () => {
     fetchMock.mockResolvedValue({ ok: true, json: async () => ({ code: "FEEDBACK_SENT" }) });
-    render(<FeedbackForm />);
+    renderWithIntl(<FeedbackForm />);
 
     fireEvent.change(screen.getByLabelText("Повідомлення"), {
       target: { value: "Кнопка кошика не працює" },
@@ -35,7 +36,7 @@ describe("FeedbackForm", () => {
   });
 
   it("keeps the honeypot field out of sight and out of the tab order", () => {
-    render(<FeedbackForm />);
+    renderWithIntl(<FeedbackForm />);
     const honeypot = document.querySelector('input[name="website"]');
     expect(honeypot).not.toBeNull();
     expect(honeypot!.getAttribute("tabindex")).toBe("-1");
@@ -44,7 +45,7 @@ describe("FeedbackForm", () => {
 
   it("maps SEND_FAILED to the Ukrainian toast and keeps the form on screen", async () => {
     fetchMock.mockResolvedValue({ ok: false, json: async () => ({ code: "SEND_FAILED" }) });
-    render(<FeedbackForm />);
+    renderWithIntl(<FeedbackForm />);
 
     fireEvent.change(screen.getByLabelText("Повідомлення"), {
       target: { value: "Каталог вантажиться повільно" },
@@ -60,7 +61,7 @@ describe("FeedbackForm", () => {
   });
 
   it("toasts the validation copy instead of silently ignoring a whitespace-only message", async () => {
-    render(<FeedbackForm />);
+    renderWithIntl(<FeedbackForm />);
 
     fireEvent.change(screen.getByLabelText("Повідомлення"), { target: { value: "     " } });
     fireEvent.click(screen.getByRole("button", { name: "Надіслати" }));
@@ -73,7 +74,7 @@ describe("FeedbackForm", () => {
 
   it("falls back to the generic Ukrainian error when fetch rejects", async () => {
     fetchMock.mockRejectedValue(new Error("offline"));
-    render(<FeedbackForm />);
+    renderWithIntl(<FeedbackForm />);
 
     fireEvent.change(screen.getByLabelText("Повідомлення"), {
       target: { value: "Каталог вантажиться повільно" },

@@ -4,12 +4,13 @@ export const dynamic = "force-dynamic";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Package, ArrowRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { account } from "@/content/account";
 
 export default function AccountPage() {
+  const t = useTranslations("account");
   const { data: session, status } = useSession();
 
   if (status === "loading") {
@@ -33,9 +34,9 @@ export default function AccountPage() {
       <Card>
         <CardContent className="py-6">
           <h2 className="text-xl font-semibold">
-            {account.overview.welcome(session?.user?.name || account.overview.nameFallback)}
+            {t("overview.welcome", { name: session?.user?.name || t("overview.nameFallback") })}
           </h2>
-          <p className="text-muted-foreground mt-1">{account.overview.description}</p>
+          <p className="text-muted-foreground mt-1">{t("overview.description")}</p>
         </CardContent>
       </Card>
 
@@ -50,15 +51,15 @@ export default function AccountPage() {
             <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
               <Package className="text-primary h-5 w-5" />
             </div>
-            <CardTitle className="text-base">{account.overview.ordersCard.title}</CardTitle>
+            <CardTitle className="text-base">{t("overview.ordersCard.title")}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground mb-4 text-sm">
-              {account.overview.ordersCard.description}
+              {t("overview.ordersCard.description")}
             </p>
             <Button variant="outline" size="sm" asChild>
               <Link href="/account/orders">
-                {account.overview.ordersCard.cta}
+                {t("overview.ordersCard.cta")}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
@@ -69,19 +70,17 @@ export default function AccountPage() {
       {/* Account Info */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">{account.overview.info.title}</CardTitle>
+          <CardTitle className="text-base">{t("overview.info.title")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
-                {account.overview.info.name}
-              </p>
-              <p>{session?.user?.name || account.overview.info.notSet}</p>
+              <p className="text-muted-foreground text-sm font-medium">{t("overview.info.name")}</p>
+              <p>{session?.user?.name || t("overview.info.notSet")}</p>
             </div>
             <div>
               <p className="text-muted-foreground text-sm font-medium">
-                {account.overview.info.email}
+                {t("overview.info.email")}
               </p>
               <p>{session?.user?.email}</p>
             </div>

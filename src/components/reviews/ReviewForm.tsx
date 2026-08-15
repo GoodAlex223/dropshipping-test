@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -21,6 +22,7 @@ interface ReviewFormProps {
 }
 
 export function ReviewForm({ productId, orderId, onReviewCreated }: ReviewFormProps) {
+  const t = useTranslations("reviews");
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,7 +31,7 @@ export function ReviewForm({ productId, orderId, onReviewCreated }: ReviewFormPr
     e.preventDefault();
 
     if (rating === 0) {
-      toast.error("Оберіть оцінку");
+      toast.error(t("form.selectRatingError"));
       return;
     }
 
@@ -48,16 +50,16 @@ export function ReviewForm({ productId, orderId, onReviewCreated }: ReviewFormPr
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Не вдалося надіслати відгук");
+        throw new Error(data.error || t("form.submitError"));
       }
 
       const review = await response.json();
-      toast.success("Відгук надіслано!");
+      toast.success(t("form.submitSuccess"));
       onReviewCreated(review);
       setRating(0);
       setComment("");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Не вдалося надіслати відгук");
+      toast.error(err instanceof Error ? err.message : t("form.submitError"));
     } finally {
       setIsSubmitting(false);
     }
@@ -68,23 +70,23 @@ export function ReviewForm({ productId, orderId, onReviewCreated }: ReviewFormPr
       onSubmit={handleSubmit}
       className="bg-card border-border space-y-4 rounded-2xl border p-5"
     >
-      <h3 className="font-extrabold">Написати відгук</h3>
+      <h3 className="font-extrabold">{t("form.heading")}</h3>
 
       <div className="space-y-2">
-        <Label>Оцінка *</Label>
+        <Label>{t("form.ratingLabel")}</Label>
         <StarRating value={rating} onChange={setRating} size="lg" />
       </div>
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label htmlFor="review-comment">Коментар (необов’язково)</Label>
+          <Label htmlFor="review-comment">{t("form.commentLabel")}</Label>
           <span className="text-muted-foreground text-xs">{comment.length}/2000</span>
         </div>
         <Textarea
           id="review-comment"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          placeholder="Поділіться враженнями про товар…"
+          placeholder={t("form.commentPlaceholder")}
           rows={4}
           maxLength={2000}
           disabled={isSubmitting}
@@ -93,7 +95,7 @@ export function ReviewForm({ productId, orderId, onReviewCreated }: ReviewFormPr
 
       <Button type="submit" disabled={rating === 0 || isSubmitting}>
         {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        {isSubmitting ? "Надсилаємо…" : "Надіслати відгук"}
+        {isSubmitting ? t("form.submitting") : t("form.submit")}
       </Button>
     </form>
   );

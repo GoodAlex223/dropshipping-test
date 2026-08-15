@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { Loader2, ShoppingBag, Lock, Instagram, Send, MessageCircle } from "lucide-react";
 import {
   Form,
@@ -30,22 +31,7 @@ import { trackBeginCheckout, trackAddShippingInfo, trackAddPaymentInfo } from "@
 
 type CheckoutStep = "information" | "shipping" | "payment";
 
-const STEPS: Array<{ id: CheckoutStep; label: string }> = [
-  { id: "information", label: checkout.steps.contacts },
-  { id: "shipping", label: checkout.steps.delivery },
-  { id: "payment", label: checkout.steps.payment },
-];
-
 const inputClass = "border-border-strong bg-background rounded-[10px] border px-3.5 py-3 text-sm";
-
-// Server error codes → localized copy; the API's `error` text is for logs.
-// Unknown/absent codes fall back to errors.orderFailed (PR #29 r4).
-const ORDER_ERROR_MESSAGES: Record<string, string> = {
-  PRODUCT_UNAVAILABLE: checkout.payment.errors.productUnavailable,
-  INVALID_VARIANT: checkout.payment.errors.invalidVariant,
-  INVALID_SHIPPING_METHOD: checkout.payment.errors.invalidShippingMethod,
-  INVALID_ORDER_DATA: checkout.payment.errors.invalidOrderData,
-};
 
 // Hydration gate without a setState-in-effect (react-hooks/set-state-in-effect,
 // PR #29 r5): false during SSR + the hydration render, true right after —
@@ -59,6 +45,8 @@ const useHydrated = () =>
   );
 
 export default function CheckoutPage() {
+  const t = useTranslations("checkout");
+  const tShipping = useTranslations("shipping");
   const router = useRouter();
   const { data: session } = useSession();
   const { items, getTotalPrice, clearCart } = useCartStore();
@@ -66,6 +54,16 @@ export default function CheckoutPage() {
   const [currentStep, setCurrentStep] = useState<CheckoutStep>("information");
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Step nav labels: the internal step ids ("information"/"shipping") predate
+  // this migration and don't literally match their catalog keys
+  // ("contacts"/"delivery") — preserved as-is, just computed per-render now
+  // that labels come from t() instead of a module-level content import.
+  const STEPS: Array<{ id: CheckoutStep; label: string }> = [
+    { id: "information", label: t("steps.contacts") },
+    { id: "shipping", label: t("steps.delivery") },
+    { id: "payment", label: t("steps.payment") },
+  ];
 
   const form = useForm<CheckoutInput>({
     resolver: zodResolver(checkoutSchema),
@@ -175,8 +173,12 @@ export default function CheckoutPage() {
       if (!response.ok || !data?.orderNumber) {
         // User-facing copy never routes through err.message — a fetch
         // TypeError would surface browser-English otherwise (PR #29 r5).
+        // Server error codes → localized copy via a guarded dynamic key
+        // (next-intl v4.13.6 t.has, verified available — TASK-039 Task 5);
+        // unknown/absent codes fall back to errors.orderFailed.
         const code = data?.code as string | undefined;
-        setError((code && ORDER_ERROR_MESSAGES[code]) || checkout.payment.errors.orderFailed);
+        const key = code ? `errors.${code}` : "";
+        setError(key && t.has(key as never) ? t(key as never) : t("errors.orderFailed"));
         setIsProcessing(false);
         return;
       }
@@ -184,7 +186,7 @@ export default function CheckoutPage() {
       clearCart();
       router.push(`/checkout/confirmation?order=${data.orderNumber}`);
     } catch {
-      setError(checkout.payment.errors.orderFailed);
+      setError(t("errors.orderFailed"));
       setIsProcessing(false);
     }
   };
@@ -202,13 +204,13 @@ export default function CheckoutPage() {
       <div className="container py-16">
         <div className="mx-auto max-w-md text-center">
           <ShoppingBag className="text-muted-foreground mx-auto h-16 w-16" />
-          <h1 className="mt-6 text-2xl font-extrabold">{checkout.empty.title}</h1>
-          <p className="text-muted-foreground mt-2">{checkout.empty.description}</p>
+          <h1 className="mt-6 text-2xl font-extrabold">{t("empty.title")}</h1>
+          <p className="text-muted-foreground mt-2">{t("empty.description")}</p>
           <Link
             href="/products"
             className="mt-6 inline-block rounded-[10px] bg-white px-7 py-4 text-[13.5px] font-extrabold tracking-[0.06em] text-black transition-colors hover:bg-[#e5e5e5]"
           >
-            {checkout.empty.cta}
+            {t("empty.cta")}
           </Link>
         </div>
       </div>
@@ -217,20 +219,20 @@ export default function CheckoutPage() {
 
   return (
     <div className="container py-10 lg:py-12">
-      <h1 className="text-3xl font-extrabold tracking-tight lg:text-4xl">{checkout.title}</h1>
+      <h1 className="text-3xl font-extrabold tracking-tight lg:text-4xl">{t("title")}</h1>
 
       {/* Step nav — numbered circles per handoff */}
       <div className="mt-6 mb-8 flex items-center gap-2 text-[13px] font-bold">
         <div className="flex items-center gap-2">
           <Link
             href="/cart"
-            aria-label={checkout.steps.cart}
+            aria-label={t("steps.cart")}
             className="text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors"
           >
             <span className="flex h-6 w-6 items-center justify-center rounded-full border border-white bg-transparent text-[11.5px]">
               <ShoppingBag className="h-3 w-3" />
             </span>
-            <span className="hidden sm:inline">{checkout.steps.cart}</span>
+            <span className="hidden sm:inline">{t("steps.cart")}</span>
           </Link>
           <span className="text-muted-foreground mx-1">→</span>
         </div>
@@ -270,21 +272,21 @@ export default function CheckoutPage() {
         <div>
           <Form {...form}>
             <form className="space-y-6">
-              {/* Step 1 — Контакти */}
+              {/* Step 1 — contacts */}
               {currentStep === "information" && (
                 <div className="bg-card border-border rounded-[20px] border p-7 lg:p-8">
-                  <h2 className="text-xl font-extrabold">{checkout.contact.heading}</h2>
+                  <h2 className="text-xl font-extrabold">{t("contact.heading")}</h2>
                   <div className="mt-6 grid gap-4 sm:grid-cols-2">
                     <FormField
                       control={form.control}
                       name="shippingAddress.name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{checkout.contact.name.label}</FormLabel>
+                          <FormLabel>{t("contact.name.label")}</FormLabel>
                           <FormControl>
                             <Input
                               className={inputClass}
-                              placeholder={checkout.contact.name.placeholder}
+                              placeholder={t("contact.name.placeholder")}
                               {...field}
                             />
                           </FormControl>
@@ -297,12 +299,12 @@ export default function CheckoutPage() {
                       name="shippingAddress.phone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{checkout.contact.phone.label}</FormLabel>
+                          <FormLabel>{t("contact.phone.label")}</FormLabel>
                           <FormControl>
                             <Input
                               type="tel"
                               className={inputClass}
-                              placeholder={checkout.contact.phone.placeholder}
+                              placeholder={t("contact.phone.placeholder")}
                               {...field}
                             />
                           </FormControl>
@@ -315,12 +317,12 @@ export default function CheckoutPage() {
                       name="email"
                       render={({ field }) => (
                         <FormItem className="sm:col-span-2">
-                          <FormLabel>{checkout.contact.email.label}</FormLabel>
+                          <FormLabel>{t("contact.email.label")}</FormLabel>
                           <FormControl>
                             <Input
                               type="email"
                               className={inputClass}
-                              placeholder={checkout.contact.email.placeholder}
+                              placeholder={t("contact.email.placeholder")}
                               {...field}
                             />
                           </FormControl>
@@ -334,15 +336,15 @@ export default function CheckoutPage() {
                     className="mt-6 rounded-[10px] bg-white px-7 py-4 text-[13px] font-extrabold tracking-[0.06em] text-black transition-colors hover:bg-[#e5e5e5]"
                     onClick={handleContinueToShipping}
                   >
-                    {checkout.contact.next}
+                    {t("contact.next")}
                   </button>
                 </div>
               )}
 
-              {/* Step 2 — Доставка */}
+              {/* Step 2 — delivery */}
               {currentStep === "shipping" && (
                 <div className="bg-card border-border rounded-[20px] border p-7 lg:p-8">
-                  <h2 className="text-xl font-extrabold">{checkout.delivery.heading}</h2>
+                  <h2 className="text-xl font-extrabold">{t("delivery.heading")}</h2>
                   <FormField
                     control={form.control}
                     name="shippingMethod"
@@ -368,7 +370,7 @@ export default function CheckoutPage() {
                                   <RadioGroupItem value={method.id} id={method.id} />
                                   <span>
                                     <span className="block text-[14.5px] font-bold">
-                                      {method.name}
+                                      {tShipping(method.id as never)}
                                     </span>
                                     <span className="text-muted-foreground mt-0.5 block text-[12.5px]">
                                       {method.description}
@@ -392,11 +394,11 @@ export default function CheckoutPage() {
                       name="shippingAddress.city"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{checkout.delivery.city.label}</FormLabel>
+                          <FormLabel>{t("delivery.city.label")}</FormLabel>
                           <FormControl>
                             <Input
                               className={inputClass}
-                              placeholder={checkout.delivery.city.placeholder}
+                              placeholder={t("delivery.city.placeholder")}
                               {...field}
                             />
                           </FormControl>
@@ -409,11 +411,11 @@ export default function CheckoutPage() {
                       name="shippingAddress.line1"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{checkout.delivery.address.label}</FormLabel>
+                          <FormLabel>{t("delivery.address.label")}</FormLabel>
                           <FormControl>
                             <Input
                               className={inputClass}
-                              placeholder={checkout.delivery.address.placeholder}
+                              placeholder={t("delivery.address.placeholder")}
                               {...field}
                             />
                           </FormControl>
@@ -426,11 +428,11 @@ export default function CheckoutPage() {
                       name="customerNotes"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{checkout.delivery.notes.label}</FormLabel>
+                          <FormLabel>{t("delivery.notes.label")}</FormLabel>
                           <FormControl>
                             <Textarea
                               className={`${inputClass} resize-none`}
-                              placeholder={checkout.delivery.notes.placeholder}
+                              placeholder={t("delivery.notes.placeholder")}
                               maxLength={500}
                               {...field}
                             />
@@ -446,32 +448,32 @@ export default function CheckoutPage() {
                       className="border-border-strong hover:border-muted-foreground rounded-[10px] border px-6 py-4 text-[13px] font-bold transition-colors"
                       onClick={() => setCurrentStep("information")}
                     >
-                      {checkout.delivery.back}
+                      {t("delivery.back")}
                     </button>
                     <button
                       type="button"
                       className="rounded-[10px] bg-white px-7 py-4 text-[13px] font-extrabold tracking-[0.06em] text-black transition-colors hover:bg-[#e5e5e5]"
                       onClick={handleContinueToPayment}
                     >
-                      {checkout.delivery.next}
+                      {t("delivery.next")}
                     </button>
                   </div>
                 </div>
               )}
 
-              {/* Step 3 — Оплата (no payment processing — COD, spec §2) */}
+              {/* Step 3 — payment (no payment processing — COD, spec §2) */}
               {currentStep === "payment" && (
                 <div className="bg-card border-border rounded-[20px] border p-7 lg:p-8">
-                  <h2 className="text-xl font-extrabold">{checkout.payment.heading}</h2>
+                  <h2 className="text-xl font-extrabold">{t("payment.heading")}</h2>
 
                   <div className="border-border mt-6 rounded-[14px] border border-white p-5">
-                    <p className="text-[14.5px] font-bold">{checkout.payment.cod.name}</p>
+                    <p className="text-[14.5px] font-bold">{t("payment.cod.name")}</p>
                     <p className="text-muted-foreground mt-0.5 text-[12.5px]">
-                      {checkout.payment.cod.description}
+                      {t("payment.cod.description")}
                     </p>
                   </div>
                   <p className="text-muted-foreground mt-3 text-sm font-semibold">
-                    {checkout.payment.noPrepay}
+                    {t("payment.noPrepay")}
                   </p>
 
                   {/* Content-gated prepay block (spec §2): card details when the
@@ -479,7 +481,7 @@ export default function CheckoutPage() {
                   <div className="bg-muted/40 border-border mt-5 rounded-[14px] border p-5 text-sm">
                     {checkout.payment.prepay.cardNumber ? (
                       <>
-                        <p className="font-semibold">{checkout.payment.prepay.cardLabel}</p>
+                        <p className="font-semibold">{t("payment.prepay.cardLabel")}</p>
                         <p className="mt-1 text-base font-extrabold tracking-wider">
                           {checkout.payment.prepay.cardNumber}
                         </p>
@@ -489,11 +491,11 @@ export default function CheckoutPage() {
                           </p>
                         )}
                         <p className="text-muted-foreground mt-3">
-                          {checkout.payment.prepay.contactLabel}
+                          {t("payment.prepay.contactLabel")}
                         </p>
                       </>
                     ) : (
-                      <p className="text-muted-foreground">{checkout.payment.prepay.offer}</p>
+                      <p className="text-muted-foreground">{t("payment.prepay.offer")}</p>
                     )}
                     <div className="mt-3 flex items-center gap-4">
                       {checkout.contacts.instagram && (
@@ -542,7 +544,7 @@ export default function CheckoutPage() {
                       onClick={() => setCurrentStep("shipping")}
                       disabled={isProcessing}
                     >
-                      {checkout.payment.back}
+                      {t("payment.back")}
                     </button>
                     <button
                       type="button"
@@ -553,10 +555,10 @@ export default function CheckoutPage() {
                       {isProcessing ? (
                         <span className="flex items-center justify-center gap-2">
                           <Loader2 className="h-4 w-4 animate-spin" />
-                          {checkout.payment.submitting}
+                          {t("payment.submitting")}
                         </span>
                       ) : (
-                        `${checkout.payment.submit} — ${formatPrice(total)}`
+                        `${t("payment.submit")} — ${formatPrice(total)}`
                       )}
                     </button>
                   </div>
@@ -566,13 +568,17 @@ export default function CheckoutPage() {
           </Form>
         </div>
 
-        {/* Ваше замовлення */}
+        {/* Order summary */}
         <div className="lg:sticky lg:top-24 lg:self-start">
           <div className="bg-card border-border rounded-[20px] border p-7">
-            <h2 className="text-lg font-extrabold">{checkout.summary.heading}</h2>
+            <h2 className="text-lg font-extrabold">{t("summary.heading")}</h2>
             <div className="mt-5 flex max-h-64 flex-col gap-3.5 overflow-y-auto">
               {items.map((item) => {
-                const variantLine = [item.color, item.size, checkout.summary.qty(item.quantity)]
+                const variantLine = [
+                  item.color,
+                  item.size,
+                  t("summary.qty", { count: item.quantity }),
+                ]
                   .filter(Boolean)
                   .join(" · ");
                 return (
@@ -606,21 +612,21 @@ export default function CheckoutPage() {
             </div>
             <div className="border-border mt-5 flex flex-col gap-2.5 border-t pt-4 text-[13.5px]">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{checkout.summary.itemsLabel}</span>
+                <span className="text-muted-foreground">{t("summary.itemsLabel")}</span>
                 <span className="font-bold whitespace-nowrap">{formatPrice(subtotal)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{checkout.summary.shippingLabel}</span>
+                <span className="text-muted-foreground">{t("summary.shippingLabel")}</span>
                 <span className="font-bold whitespace-nowrap">{formatPrice(shippingCost)}</span>
               </div>
               <div className="mt-1.5 flex justify-between text-base">
-                <span className="font-bold">{checkout.summary.totalLabel}</span>
+                <span className="font-bold">{t("summary.totalLabel")}</span>
                 <span className="font-extrabold whitespace-nowrap">{formatPrice(total)}</span>
               </div>
             </div>
             <p className="text-muted-foreground mt-4 flex items-center justify-center gap-2 text-xs font-semibold">
               <Lock className="h-3.5 w-3.5" />
-              {checkout.secureNote}
+              {t("secureNote")}
             </p>
           </div>
         </div>

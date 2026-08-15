@@ -1,18 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { recommendSize } from "@/lib/size-recommendation";
 
 const DEFAULT_HEIGHT = 180;
 const DEFAULT_WEIGHT = 75;
 
 /**
- * «Підбір розміру» card (Mirox Product.dc.html): height/weight inputs → a
+ * "Size picker" card (Mirox Product.dc.html): height/weight inputs → a
  * recommended size via the placeholder formula in @/lib/size-recommendation.
  * Deliberately uncoupled from the buy panel — it recommends, never selects
  * (TASK-045 replaces the logic with real size charts).
  */
 export function SizePicker() {
+  const t = useTranslations("products");
   const [height, setHeight] = useState<string>(String(DEFAULT_HEIGHT));
   const [weight, setWeight] = useState<string>(String(DEFAULT_WEIGHT));
 
@@ -25,14 +27,14 @@ export function SizePicker() {
 
   return (
     <div className="bg-card border-border rounded-[20px] border p-6 sm:p-8">
-      <h2 className="text-[22px] font-extrabold">Підбір розміру</h2>
+      <h2 className="text-[22px] font-extrabold">{t("sizePicker.title")}</h2>
       <p className="text-muted-foreground mt-2 mb-6 text-[13.5px] leading-normal">
-        Вкажіть свій зріст і вагу, ми підберемо ідеальний розмір
+        {t("sizePicker.subtitle")}
       </p>
       <div className="grid gap-6 sm:grid-cols-2">
         <div className="flex flex-col gap-3.5">
           <label className="text-muted-foreground flex flex-col gap-1.5 text-[12.5px] font-semibold">
-            Зріст (см)
+            {t("sizePicker.heightLabel")}
             <input
               type="number"
               value={height}
@@ -41,7 +43,7 @@ export function SizePicker() {
             />
           </label>
           <label className="text-muted-foreground flex flex-col gap-1.5 text-[12.5px] font-semibold">
-            Вага (кг)
+            {t("sizePicker.weightLabel")}
             <input
               type="number"
               value={weight}
@@ -51,15 +53,19 @@ export function SizePicker() {
           </label>
         </div>
         <div className="bg-background border-border rounded-[14px] border p-5">
-          <div className="text-muted-foreground text-[12.5px] font-semibold">Ваш розмір:</div>
+          <div className="text-muted-foreground text-[12.5px] font-semibold">
+            {t("sizePicker.resultLabel")}
+          </div>
           <div data-testid="recommended-size" className="my-1 text-[44px] font-extrabold">
             {recommended}
           </div>
-          <div className="text-muted-foreground mb-1.5 text-xs font-semibold">Рекомендації:</div>
+          <div className="text-muted-foreground mb-1.5 text-xs font-semibold">
+            {t("sizePicker.recommendationsLabel")}
+          </div>
           <ul className="text-foreground/80 list-disc pl-4 text-[12.5px] leading-relaxed">
-            <li>Вільна посадка</li>
-            <li>Комфорт у русі</li>
-            <li>Ідеальний вибір</li>
+            <li>{t("sizePicker.recommendations.fit")}</li>
+            <li>{t("sizePicker.recommendations.comfort")}</li>
+            <li>{t("sizePicker.recommendations.idealChoice")}</li>
           </ul>
         </div>
       </div>

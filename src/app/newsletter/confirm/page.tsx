@@ -3,22 +3,22 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { StatusScreen } from "@/components/common/StatusScreen";
-import { newsletter, type NewsletterOutcomeCopy } from "@/content/newsletter";
 
 type ConfirmState =
   | { status: "loading" }
-  | { status: "success"; copy: NewsletterOutcomeCopy }
-  | { status: "error"; copy: NewsletterOutcomeCopy };
+  | { status: "success"; code: string }
+  | { status: "error"; code: string };
 
 function ConfirmContent() {
+  const t = useTranslations("newsletter.confirm");
+  const tActions = useTranslations("newsletter.actions");
   const searchParams = useSearchParams();
   const token = searchParams?.get("token") ?? null;
 
   const [state, setState] = useState<ConfirmState>(
-    token
-      ? { status: "loading" }
-      : { status: "error", copy: newsletter.confirm.byCode.TOKEN_REQUIRED }
+    token ? { status: "loading" } : { status: "error", code: "TOKEN_REQUIRED" }
   );
 
   useEffect(() => {
@@ -29,12 +29,10 @@ function ConfirmContent() {
         const response = await fetch(`/api/newsletter/confirm?token=${token}`);
         const data = await response.json().catch(() => ({}));
         // API prose is EN log text; `code` drives the Ukrainian copy.
-        const copy =
-          (data.code && newsletter.confirm.byCode[data.code]) ||
-          (response.ok ? newsletter.confirm.byCode.CONFIRMED : newsletter.confirm.fallback);
-        setState({ status: response.ok ? "success" : "error", copy });
+        const code = (data.code as string | undefined) || (response.ok ? "CONFIRMED" : "");
+        setState({ status: response.ok ? "success" : "error", code });
       } catch {
-        setState({ status: "error", copy: newsletter.confirm.fallback });
+        setState({ status: "error", code: "" });
       }
     }
 
@@ -46,20 +44,29 @@ function ConfirmContent() {
       <StatusScreen
         icon={Loader2}
         iconClassName="animate-spin"
-        title={newsletter.confirm.loading.title}
-        description={newsletter.confirm.loading.description}
+        title={t("loading.title")}
+        description={t("loading.description")}
       />
     );
   }
+
+  // Guarded dynamic key (next-intl v4.13.6 t.has, verified available —
+  // TASK-039 Task 5): each byCode entry is an object ({title, description}),
+  // so the guard checks the STRING LEAF (.title), never the parent object
+  // path — t.has() returns true for object paths too, which would be a false
+  // pass. `as never` is the deliberate escape hatch for next-intl's
+  // generically-typed key union (rejects a widened runtime string).
+  const leaf = state.code ? `byCode.${state.code}.title` : "";
+  const base = leaf && t.has(leaf as never) ? `byCode.${state.code}` : "fallback";
 
   if (state.status === "success") {
     return (
       <StatusScreen
         icon={CheckCircle2}
         tone="success"
-        title={state.copy.title}
-        description={state.copy.description}
-        actions={[{ label: newsletter.actions.continueShopping, href: "/" }]}
+        title={t(`${base}.title` as never)}
+        description={t(`${base}.description` as never)}
+        actions={[{ label: tActions("continueShopping"), href: "/" }]}
       />
     );
   }
@@ -68,22 +75,19 @@ function ConfirmContent() {
     <StatusScreen
       icon={XCircle}
       tone="error"
-      title={state.copy.title}
-      description={state.copy.description}
-      actions={[{ label: newsletter.actions.goHome, href: "/", variant: "outline" }]}
+      title={t(`${base}.title` as never)}
+      description={t(`${base}.description` as never)}
+      actions={[{ label: tActions("goHome"), href: "/", variant: "outline" }]}
     />
   );
 }
 
 export default function NewsletterConfirmPage() {
+  const t = useTranslations("newsletter.confirm");
   return (
     <Suspense
       fallback={
-        <StatusScreen
-          icon={Loader2}
-          iconClassName="animate-spin"
-          title={newsletter.confirm.loading.title}
-        />
+        <StatusScreen icon={Loader2} iconClassName="animate-spin" title={t("loading.title")} />
       }
     >
       <ConfirmContent />

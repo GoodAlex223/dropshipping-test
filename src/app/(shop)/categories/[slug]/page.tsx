@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/db";
 import { getCategoryMetadata, getBreadcrumbJsonLd, siteConfig } from "@/lib/seo";
 import { CategoryClient, CategoryNotFound, type Category } from "./category-client";
@@ -49,11 +50,11 @@ async function getCategory(slug: string): Promise<Category | null> {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const category = await getCategory(slug);
+  const [category, t] = await Promise.all([getCategory(slug), getTranslations("seo")]);
 
   if (!category) {
     return {
-      title: "Category Not Found",
+      title: t("categoryNotFound"),
     };
   }
 
@@ -68,7 +69,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function CategoryPage({ params }: PageProps) {
   const { slug } = await params;
-  const category = await getCategory(slug);
+  const [category, t] = await Promise.all([getCategory(slug), getTranslations("seo")]);
 
   if (!category) {
     return <CategoryNotFound />;
@@ -76,8 +77,8 @@ export default async function CategoryPage({ params }: PageProps) {
 
   // Build breadcrumb items
   const breadcrumbItems = [
-    { name: "Home", url: siteConfig.url },
-    { name: "Categories", url: `${siteConfig.url}/categories` },
+    { name: t("breadcrumb.home"), url: siteConfig.url },
+    { name: t("breadcrumb.categories"), url: `${siteConfig.url}/categories` },
   ];
 
   if (category.parent) {

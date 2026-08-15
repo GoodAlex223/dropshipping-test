@@ -1,13 +1,20 @@
 import type { Metadata } from "next";
-import { BRAND_NAME, BRAND_META_SUFFIX, BRAND_DESCRIPTION } from "@/content/brand";
+import { getTranslations } from "next-intl/server";
+import { BRAND_NAME } from "@/content/brand";
 
 // Base site configuration
+//
+// No `description` field here (Task 8): the value is now locale-dependent
+// (messages/uk.json `brand.description`, translated per-request), so it
+// can't live on a plain module-level object the way BRAND_DESCRIPTION used
+// to. The three helpers below that need it (getDefaultMetadata,
+// getHomeMetadata, getProductMetadata's last-resort fallback) each fetch it
+// directly via `getTranslations("brand")` instead.
 export const siteConfig = {
   // Env var still wins so deployments can override, but the fallback is the
   // real brand rather than the generic "Store" placeholder. Setting
   // NEXT_PUBLIC_STORE_NAME in production remains BACKLOG'd.
   name: process.env.NEXT_PUBLIC_STORE_NAME || BRAND_NAME,
-  description: BRAND_DESCRIPTION,
   url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
   ogImage: "/og-image.png",
   // No real Twitter/X account exists for the brand (the site-wide socials
@@ -17,15 +24,20 @@ export const siteConfig = {
   locale: "en_US",
 };
 
-// Default metadata configuration
-export function getDefaultMetadata(): Metadata {
+// Default metadata configuration. Async (Task 8): `description` now comes
+// from the request-scoped i18n catalog (messages/uk.json `brand.description`)
+// instead of a static import, and the root layout awaits this inside
+// generateMetadata().
+export async function getDefaultMetadata(): Promise<Metadata> {
+  const t = await getTranslations("brand");
+  const description = t("description");
   return {
     metadataBase: new URL(siteConfig.url),
     title: {
       default: siteConfig.name,
       template: `%s | ${siteConfig.name}`,
     },
-    description: siteConfig.description,
+    description,
     keywords: ["online store", "e-commerce", "shopping", "deals", "products", "fast shipping"],
     authors: [{ name: siteConfig.name }],
     creator: siteConfig.name,
@@ -50,7 +62,7 @@ export function getDefaultMetadata(): Metadata {
       url: siteConfig.url,
       siteName: siteConfig.name,
       title: siteConfig.name,
-      description: siteConfig.description,
+      description,
     },
     // No `images` here either: postProcessMetadata auto-fills twitter.images
     // from the resolved openGraph.images (the generated card) whenever twitter
@@ -58,7 +70,7 @@ export function getDefaultMetadata(): Metadata {
     twitter: {
       card: "summary_large_image",
       title: siteConfig.name,
-      description: siteConfig.description,
+      description,
     },
     robots: {
       index: true,
@@ -87,8 +99,10 @@ export function getDefaultMetadata(): Metadata {
   };
 }
 
-// Generate product metadata
-export function getProductMetadata(product: {
+// Generate product metadata. Async (Task 8): the last-resort description
+// fallback (no metaDesc/shortDesc/description on the product at all) now
+// reads the i18n catalog's brand.description instead of siteConfig.description.
+export async function getProductMetadata(product: {
   name: string;
   slug: string;
   description?: string | null;
@@ -98,13 +112,11 @@ export function getProductMetadata(product: {
   price: string;
   comparePrice?: string | null;
   category?: { name: string; slug: string };
-}): Metadata {
+}): Promise<Metadata> {
+  const t = await getTranslations("brand");
   const title = product.metaTitle || product.name;
   const description =
-    product.metaDesc ||
-    product.shortDesc ||
-    product.description?.slice(0, 160) ||
-    siteConfig.description;
+    product.metaDesc || product.shortDesc || product.description?.slice(0, 160) || t("description");
   const url = `${siteConfig.url}/products/${product.slug}`;
 
   // Note: OG images are generated dynamically by opengraph-image.tsx (file convention).
@@ -130,7 +142,15 @@ export function getProductMetadata(product: {
   };
 }
 
-// Generate category metadata
+// Generate category metadata. Stays SYNC (Task 8 didn't touch it): title and
+// openGraph.title are pure DB data (category.name), and the description's
+// fallback sentence below ("Shop {name} products...") is its own pre-existing
+// English literal, distinct from the BRAND_DESCRIPTION move and outside
+// Task 8's enumerated fixed set (not in the closing BACKLOG entry, not
+// matched by the brief's Step 1 grep). It's effectively unreachable today —
+// every seeded category has a description — but is real, reachable English
+// the moment an admin saves a category with a blank description. Flagged for
+// a follow-up BACKLOG entry rather than converted here (see task-8-report.md).
 export function getCategoryMetadata(category: {
   name: string;
   slug: string;
@@ -174,68 +194,82 @@ export function getCategoryMetadata(category: {
   };
 }
 
-// Generate home page metadata
-export function getHomeMetadata(): Metadata {
+// Generate home page metadata. Async (Task 8): both strings now come from
+// the i18n catalog (brand.description, brand.metaSuffix) instead of the
+// removed BRAND_DESCRIPTION/local BRAND_META_SUFFIX import.
+export async function getHomeMetadata(): Promise<Metadata> {
+  const t = await getTranslations("brand");
   return {
     title: {
-      absolute: `${siteConfig.name} — ${BRAND_META_SUFFIX}`,
+      absolute: `${siteConfig.name} — ${t("metaSuffix")}`,
     },
-    description: siteConfig.description,
+    description: t("description"),
     alternates: {
       canonical: siteConfig.url,
     },
   };
 }
 
-// Generate products listing page metadata
-export function getProductsListingMetadata(): Metadata {
+// Generate products listing page metadata. Async (Task 8): title/description
+// strings are newly-authored UA translations in the "seo" catalog namespace
+// (previously hardcoded English — see BACKLOG 2026-08-09 "SEO/metadata layer
+// still English").
+export async function getProductsListingMetadata(): Promise<Metadata> {
+  const t = await getTranslations("seo");
   const url = `${siteConfig.url}/products`;
+  const title = t("productsListing.title");
   return {
-    title: "All Products",
-    description:
-      "Browse our complete collection of quality products. Find great deals and fast shipping on everything you need.",
+    title,
+    description: t("productsListing.description"),
     alternates: {
       canonical: url,
     },
     openGraph: {
-      title: `All Products | ${siteConfig.name}`,
-      description: "Browse our complete collection of quality products.",
+      title: `${title} | ${siteConfig.name}`,
+      description: t("productsListing.ogDescription"),
       url,
     },
   };
 }
 
-// Generate categories listing page metadata
-export function getCategoriesListingMetadata(): Metadata {
+// Generate categories listing page metadata. Async (Task 8), same reason as
+// getProductsListingMetadata above. NOTE: the pre-existing English source had
+// two different phrasings for the page title ("Shop by Category") and the
+// OG title ("Categories") — translated independently below (ogTitle is its
+// own catalog key), and both happen to read most naturally as the same UA
+// word «Категорії» (matching the header nav / categories-page H1 convention
+// per the task brief's guidance), which incidentally makes title and ogTitle
+// consistent with each other for the first time.
+export async function getCategoriesListingMetadata(): Promise<Metadata> {
+  const t = await getTranslations("seo");
   const url = `${siteConfig.url}/categories`;
   return {
-    title: "Shop by Category",
-    description:
-      "Browse products by category. Find exactly what you're looking for in our organized collection.",
+    title: t("categoriesListing.title"),
+    description: t("categoriesListing.description"),
     alternates: {
       canonical: url,
     },
     openGraph: {
-      title: `Categories | ${siteConfig.name}`,
-      description: "Browse products by category.",
+      title: `${t("categoriesListing.ogTitle")} | ${siteConfig.name}`,
+      description: t("categoriesListing.ogDescription"),
       url,
     },
   };
 }
 
-// Generate auth page metadata (login/register)
-export function getAuthMetadata(type: "login" | "register"): Metadata {
-  const titles = {
-    login: "Sign In",
-    register: "Create Account",
-  };
-  const descriptions = {
-    login: `Sign in to your ${siteConfig.name} account to access your orders, saved items, and more.`,
-    register: `Create a ${siteConfig.name} account to save your favorites, track orders, and checkout faster.`,
-  };
+// Generate auth page metadata (login/register). Async (Task 8); static
+// literal keys (not a template-literal `auth.${type}.title`) so the typed
+// next-intl message schema (global.d.ts) checks each branch independently.
+export async function getAuthMetadata(type: "login" | "register"): Promise<Metadata> {
+  const t = await getTranslations("seo");
+  const title = type === "login" ? t("auth.login.title") : t("auth.register.title");
+  const description =
+    type === "login"
+      ? t("auth.login.description", { name: siteConfig.name })
+      : t("auth.register.description", { name: siteConfig.name });
   return {
-    title: titles[type],
-    description: descriptions[type],
+    title,
+    description,
     robots: {
       index: false,
       follow: false,

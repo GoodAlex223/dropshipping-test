@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Facebook, Twitter, MessageCircle, Send, Link2, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -50,6 +51,7 @@ export function SocialShareButtons({
   productSlug,
   productImage,
 }: SocialShareButtonsProps) {
+  const t = useTranslations("products");
   const getUrl = () => `${window.location.origin}/products/${productSlug}`;
 
   const handlePlatformShare = (platform: SharePlatform) => {
@@ -71,9 +73,9 @@ export function SocialShareButtons({
 
     try {
       await navigator.clipboard.writeText(url);
-      toast.success("Посилання скопійовано!");
+      toast.success(t("share.linkCopied"));
     } catch {
-      toast.error("Не вдалося скопіювати посилання");
+      toast.error(t("share.copyFailed"));
     }
   };
 
@@ -96,7 +98,7 @@ export function SocialShareButtons({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <span className="text-muted-foreground text-sm font-medium">Поділитися:</span>
+      <span className="text-muted-foreground text-sm font-medium">{t("share.label")}</span>
 
       {SHARE_PLATFORMS.map(({ platform, icon: Icon, label }) => (
         <Button
@@ -105,7 +107,7 @@ export function SocialShareButtons({
           size="icon"
           className="h-8 w-8"
           onClick={() => handlePlatformShare(platform)}
-          aria-label={`Поділитися: ${label}`}
+          aria-label={t("share.platformAria", { platform: label })}
         >
           <Icon className="h-3.5 w-3.5" />
         </Button>
@@ -116,7 +118,7 @@ export function SocialShareButtons({
         size="icon"
         className="h-8 w-8"
         onClick={handleCopyLink}
-        aria-label="Скопіювати посилання"
+        aria-label={t("share.copyAria")}
       >
         <Link2 className="h-3.5 w-3.5" />
       </Button>
@@ -127,7 +129,7 @@ export function SocialShareButtons({
         size="icon"
         className="h-8 w-8 sm:hidden"
         onClick={handleNativeShare}
-        aria-label="Поділитися"
+        aria-label={t("share.nativeAria")}
       >
         <Share2 className="h-3.5 w-3.5" />
       </Button>

@@ -1,5 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { renderWithIntl } from "../helpers/render-with-intl";
 
 // ---------------------------------------------------------------------------
 // Mocks
@@ -62,7 +63,7 @@ beforeEach(() => {
  */
 describe("HomePage new-arrivals rail", () => {
   it("renders the Новинки rail with the 4 mocked products and a view-all link to /products", async () => {
-    render(await HomePage());
+    renderWithIntl(await HomePage());
 
     expect(screen.getByRole("heading", { name: "Новинки" })).toBeInTheDocument();
     expect(screen.getByText("Product n1")).toBeInTheDocument();
@@ -91,7 +92,7 @@ describe("HomePage resilience", () => {
       new Error("The table `public.reviews` does not exist in the current database.")
     );
 
-    render(await HomePage());
+    renderWithIntl(await HomePage());
 
     // Rest of the page is intact; the testimonials section simply doesn't mount.
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("СТИЛЬ.");
@@ -117,7 +118,7 @@ describe("HomePage resilience", () => {
       },
     ]);
 
-    render(await HomePage());
+    renderWithIntl(await HomePage());
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("СТИЛЬ.");
     expect(screen.getByRole("heading", { name: "Відгуки покупців" })).toBeInTheDocument();
@@ -128,7 +129,7 @@ describe("HomePage resilience", () => {
 
 describe("HomePage composition", () => {
   it("renders the benefit strip titles", async () => {
-    render(await HomePage());
+    renderWithIntl(await HomePage());
 
     expect(screen.getByText("Швидка доставка")).toBeInTheDocument();
     expect(screen.getByText("Преміум якість")).toBeInTheDocument();
@@ -149,7 +150,7 @@ describe("HomePage composition", () => {
       },
     ]);
 
-    render(await HomePage());
+    renderWithIntl(await HomePage());
 
     // Hero renders the real src/content/home.ts copy (this file never mocks
     // @/content/home) as the page's only h1 — every other section heading

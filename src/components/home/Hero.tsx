@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { DEFAULT_BLUR_DATA_URL } from "@/lib/image-utils";
 import { home } from "@/content/home";
@@ -27,8 +28,14 @@ import { Logo } from "@/components/common/Logo";
  * TASK-034 (a fixed-shade descendant going invisible against the surface).
  */
 export function Hero() {
-  const { eyebrow, headline, subtitle, primaryCta, secondaryCta, image } = home.hero;
+  const { eyebrow, primaryCta, secondaryCta, image } = home.hero;
   const hasImage = image !== null;
+  const t = useTranslations("home");
+  // Two fixed catalog keys (TASK-039 G9), not an arbitrary-length config
+  // array — headline is always exactly two lines now. Kept as a small array
+  // (not two separate <span> blocks) so both layout branches below can keep
+  // the existing .map()+stagger-delay rendering unchanged.
+  const headline = [t("hero.headline1"), t("hero.headline2")];
 
   return (
     <section className="border-border bg-background text-foreground relative overflow-hidden border-b">
@@ -70,7 +77,7 @@ export function Hero() {
               </p>
             )}
 
-            {/* Single h1: three content lines, not three headings. */}
+            {/* Single h1: two content lines (home.hero.headline1/2), not two headings. */}
             <h1 className="font-heading mt-6 text-4xl leading-[1.08] font-extrabold tracking-tight sm:text-5xl lg:text-[64px] lg:leading-[1.05]">
               {headline.map((line, i) => (
                 <span
@@ -84,15 +91,15 @@ export function Hero() {
             </h1>
 
             <p className="text-muted-foreground mt-6 max-w-[420px] text-base lg:text-lg">
-              {subtitle}
+              {t("hero.subtitle")}
             </p>
 
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg">
-                <Link href={primaryCta.href}>{primaryCta.label}</Link>
+                <Link href={primaryCta.href}>{t("hero.primaryCta")}</Link>
               </Button>
               <Button asChild variant="outline" size="lg">
-                <Link href={secondaryCta.href}>{secondaryCta.label}</Link>
+                <Link href={secondaryCta.href}>{t("hero.secondaryCta")}</Link>
               </Button>
             </div>
           </div>
@@ -128,7 +135,7 @@ export function Hero() {
             <div className="relative h-full w-full lg:min-h-[620px]">
               <Image
                 src={image.src}
-                alt={image.alt}
+                alt={t("hero.imageAlt")}
                 fill
                 // This is the LCP element: eager-loaded, explicitly sized, blurred-in.
                 priority
@@ -166,7 +173,7 @@ export function Hero() {
               </p>
             )}
 
-            {/* Single h1: three content lines, not three headings. */}
+            {/* Single h1: two content lines (home.hero.headline1/2), not two headings. */}
             <h1 className="font-heading mt-6 text-5xl leading-[0.95] font-extrabold tracking-tight sm:text-6xl lg:text-7xl">
               {headline.map((line, i) => (
                 <span
@@ -179,14 +186,14 @@ export function Hero() {
               ))}
             </h1>
 
-            <p className="text-muted-foreground mt-6 text-base sm:text-lg">{subtitle}</p>
+            <p className="text-muted-foreground mt-6 text-base sm:text-lg">{t("hero.subtitle")}</p>
 
             <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center">
               <Button asChild size="lg">
-                <Link href={primaryCta.href}>{primaryCta.label}</Link>
+                <Link href={primaryCta.href}>{t("hero.primaryCta")}</Link>
               </Button>
               <Button asChild variant="outline" size="lg">
-                <Link href={secondaryCta.href}>{secondaryCta.label}</Link>
+                <Link href={secondaryCta.href}>{t("hero.secondaryCta")}</Link>
               </Button>
             </div>
           </div>
