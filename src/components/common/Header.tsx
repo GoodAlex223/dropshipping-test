@@ -192,7 +192,7 @@ export function Header() {
               <span className="sr-only">{t("toggleMenu")}</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-[300px] sm:w-[350px]">
+          <SheetContent side="left" className="w-[300px] overflow-y-auto sm:w-[350px]">
             <SheetHeader className="text-left">
               <SheetTitle>{t("menu")}</SheetTitle>
             </SheetHeader>
