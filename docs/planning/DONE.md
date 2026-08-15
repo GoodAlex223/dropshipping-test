@@ -8,6 +8,25 @@ Completed tasks with implementation details and learnings.
 
 ## 2026-08 (August)
 
+### [2026-08-15] G14 - Rebrand Residuals: Variant Names «Розмір»/«Колір» + Design-Gap Audit (WEEKLY batch)
+
+**Plan**: [docs/archive/plans/2026-08-15_g14-rebrand-residuals.md](../archive/plans/2026-08-15_g14-rebrand-residuals.md) (bounded path — design approved in chat, no spec file; progress log carries the full audit record)
+**PR**: [#38](https://github.com/GoodAlex223/dropshipping-test/pull/38) — merged `caf8103` (2026-08-15, `--merge`; review posted "No issues found")
+**Audit Artifact**: https://claude.ai/code/artifact/8c7a8a92-336f-42fc-b208-c69de7e751c5 (7 mockups vs 12 shipped page states)
+
+**Summary**: Both halves of the user's 2026-08-11 scope-expansion steer. **Rename**: `ProductVariant.name` data values «Size»/«Color» → «Розмір»/«Колір» everywhere — new `src/lib/variant-names.ts` (`VARIANT_NAMES`) consumed by all 14 storefront call sites AND the seed (relative import, 36 rows), so seed and code cannot drift; prod renamed by data migration `20260815095848_rename_variant_names_ua` via `vercel-build`'s `migrate deploy` (**user-approved design decision superseding the WEEKLY/P2 premise** — no re-seed needed, no broken deploy window). Historical `variantInfo` snapshots stay frozen; new orders emit «Розмір: M» automatically (the `${variant.name}: ${value}` builders read the DB). URL params and cart-store field names stay English (contracts, not copy). **Audit**: all 7 `design_handoff_mirox/*.dc.html` vs shipped pages at 1440+390, incl. the never-tracked `Mirox Mobile.dc.html` — verdict: the storefront matches its handoff; 8 deltas verified as already-ruled decisions; 3 unruled finds → 1 fixed in-branch (blur shimmer was still the pre-rebrand gray-100/200, flashing bright on the black theme → recolored #0D0D0D/#1A1A1A), 2 filed 🟤 (mobile «Новинки» horizontal rail; checkout distraction-free header).
+
+**Key changes**:
+
+- 3 branch commits; 773 tests green throughout (7 unit-test files' fixtures renamed; filter-bar/e2e needed nothing — param keys + catalog labels were already «Розмір», and the e2e `/— Size/` count-0 assertion stays as a legacy guard)
+- Migration first draft used the Prisma model name `"ProductVariant"`; the shadow-DB replay failed it (P1014) before it reached any real DB — fixed to the `@@map`ped `"product_variants"`. Applied + reseed-verified: 28 «Розмір» / 8 «Колір» / 0 legacy
+- Browser-verified against the renamed local DB: PDP size picker, styleGroup colorway sibling swatch, catalog `?size=M` filter, cart line «Колір: Чорний · Розмір: S»
+- Audit method: every candidate gap checked against recorded rulings BEFORE being called a gap — 8 would-be findings dissolved into existing decisions (hero eyebrow 2026-07-28, no-dead-links nav/footer → TASK-055, «У вибране» → TASK-041, фото замірів → TASK-056, 1-click + промокод → TASK-043, single name field → G2 §2, filter sheet → TASK-036 R5); cart-mobile overflow suspicion disproven by measurement (`scrollWidth == clientWidth`)
+- Shimmer fix verified in fresh SSR HTML after the stale-`.next` gotcha served the old constant from a hot dev server (server restart + `.next` clear required — the memory pattern held)
+- BACKLOG `[2026-08-15] From: G14 design-gap audit` files the 2 larger finds for the pre-launch week; WEEKLY G14 + P2 premise lines superseded in place
+
+**Learnings**: raw SQL in Prisma data migrations must use the `@@map`ped table name, and `migrate dev`'s shadow-DB replay is the net that catches it pre-prod; a design-gap audit needs a rulings-first pass — most mockup↔shipped deltas in a decision-logged repo are settled decisions, and calling them gaps would have manufactured 8 false findings.
+
 ### [2026-08-15] G9 - TASK-039 i18n Foundation: UA Default + RU Toggle (next-intl cookie mode)
 
 **Plan**: [docs/archive/plans/2026-08-14_task-039-i18n-foundation.md](../archive/plans/2026-08-14_task-039-i18n-foundation.md) (11 SDD tasks; the execution record carries both visual-gate rounds and all four PR-review rounds)

@@ -11,7 +11,7 @@
 ## Parallel Work
 
 - **Client chases: ⏸️ paused by the G7/TASK-056 deferral (user, 2026-08-11)** — the whole client round-trip (photography, logo vector, socials/claims, size charts, legal copy, domain purchase, WhatsApp/bank details, NP API key) holds until the pre-launch week. The live consequence stands: prod `EMAIL_FROM=onboarding@resend.dev` delivers order emails only to the Resend owner's inbox, so real customers get no order email until the domain items close. Nothing is chased this week; the paused checklist lives in [TODO.md](TODO.md) TASK-056 + decision doc §5.3. **The pre-launch week is now identified: next week, Aug 17–21** (user, 2026-08-11) — the consolidated ask runs then.
-- 🟡 **P2 — Prod data re-seed after the variant-name rename (1 SP, user-gated)**: G14's «Size»→«Розмір»/«Колір» seed rename only reaches prod via a re-seed (`SEED_ALLOW_REMOTE=1` against the Neon direct endpoint, read-only preflight first — last week's P1 runbook). Gated on explicit user approval at G14 completion.
+- 🟡 **P2 — Prod data re-seed after the variant-name rename (1 SP, user-gated)**: ~~G14's «Size»→«Розмір»/«Колір» seed rename only reaches prod via a re-seed (`SEED_ALLOW_REMOTE=1` against the Neon direct endpoint, read-only preflight first — last week's P1 runbook). Gated on explicit user approval at G14 completion.~~ **Superseded 2026-08-15 (G14 design, user-approved)**: the rename reached prod via data migration `20260815095848_rename_variant_names_ua` at the PR #38 deploy — P2's stated motivation is gone and no re-seed ran. The re-seed runbook itself stays available for any future deliberate prod data refresh (still user-gated).
 
 ---
 
@@ -87,8 +87,8 @@ _Group IDs continue from last week (G1–G7 are permanently taken by DONE.md and
 
 > User steer 2026-08-11: the «Size: M» fix (un-holds the [2026-08-07] G2-gate hold-off ruling) + "maybe we have not finished redesigning of some pages (due to design files)" — settled by an audit against the 7 design-handoff files rather than guesswork. ~~The rename's prod effect requires P2 (user-gated re-seed).~~ **Superseded 2026-08-15 (G14 design, user-approved)**: prod renames via a data migration (`20260815095848_rename_variant_names_ua`) applied by `vercel-build`'s `migrate deploy` at the next deploy — no P2 dependency; P2 stays gated for its other purposes.
 
-- [ ] Variant-name UA rename: seed «Розмір»/«Колір» + the 12+ `v.name === "Size"/"Color"` call sites (ProductCard, QuickViewDialog, PDP page/client, styleGroup colorway lookups — via a shared variant-name constant so a 13th site can't drift) + tests; retires «Size: M» from cart lines, receipts and emails (3) — user steer 2026-08-11, un-holding BACKLOG [2026-08-07] G2 post-gate [HIGH]
-- [ ] Design-handoff gap audit: compare all 7 `docs/design/design_handoff_mirox/*.dc.html` against shipped pages — esp. `Mirox Mobile.dc.html`, never tracked as built (Cart/Catalog/Checkout/Home/Product shipped via G1/TASK-036/G2/TASK-057/TASK-037; Contacts = TASK-055, client-blocked); fix small gaps in-place, file larger finds for the pre-launch week (2) — user steer 2026-08-11
+- [x] ✅ Variant-name UA rename: seed «Розмір»/«Колір» + the 12+ `v.name === "Size"/"Color"` call sites (ProductCard, QuickViewDialog, PDP page/client, styleGroup colorway lookups — via a shared variant-name constant so a 13th site can't drift) + tests; retires «Size: M» from cart lines, receipts and emails (3) — user steer 2026-08-11, un-holding BACKLOG [2026-08-07] G2 post-gate [HIGH]
+- [x] ✅ Design-handoff gap audit: compare all 7 `docs/design/design_handoff_mirox/*.dc.html` against shipped pages — esp. `Mirox Mobile.dc.html`, never tracked as built (Cart/Catalog/Checkout/Home/Product shipped via G1/TASK-036/G2/TASK-057/TASK-037; Contacts = TASK-055, client-blocked); fix small gaps in-place, file larger finds for the pre-launch week (2) — user steer 2026-08-11
 
 ---
 
@@ -111,7 +111,7 @@ _Group IDs continue from last week (G1–G7 are permanently taken by DONE.md and
 ### Thursday — i18n externalization + rebrand residuals
 
 - ✅ **[G9](#g9-task-039-i18n-foundation-solo)** 🔵 — part 2: content-layer externalization + §7.4 verification. (Shipped Fri 2026-08-15, PR #37.)
-- **[G14](#g14-rebrand-residuals-variant-names--design-gap-audit-batch)** 🔵 — variant rename + design-gap audit.
+- ✅ **[G14](#g14-rebrand-residuals-variant-names--design-gap-audit-batch)** 🔵 — variant rename + design-gap audit. (Shipped Fri 2026-08-15, PR #38 `caf8103`; prod rename via data migration — P2 not needed.)
 - **[G10](#g10-weekly-reviews-batch)** ⚪ — part 1: plugins + Claude best-practices slots (defers first if the day jams).
 
 ### Friday — Admin sweep + linter + reviews close + stretch
@@ -134,8 +134,8 @@ _Group IDs continue from last week (G1–G7 are permanently taken by DONE.md and
 | G11 | Docs-Freshness Linter `[solo]`                      | docs tooling       | 🟤 Auto     | 1      | 3        | Fri           | ☐ Planned                                                             |
 | G12 | Categories-to-Catalog Redesign `[batch]` 🏆         | storefront/catalog | 🔵 User     | 3      | 5        | Fri (stretch) | ☐ Planned                                                             |
 | G13 | Admin Translation & Alignment `[solo]`              | admin panel        | 🔵 User     | 3      | 8        | Fri→spill     | ☐ Planned                                                             |
-| G14 | Rebrand Residuals: Variants + Design Gaps `[batch]` | storefront/data    | 🔵 User     | 2      | 5        | Thu           | ☐ Planned                                                             |
-| P2  | Prod re-seed after variant rename (user-gated)      | ops/data           | 🟡 Ops      | 1      | 1        | on G14 done   | ☐ Gated                                                               |
+| G14 | Rebrand Residuals: Variants + Design Gaps `[batch]` | storefront/data    | 🔵 User     | 2      | 5        | Thu           | ✅ PR [#38](https://github.com/GoodAlex223/dropshipping-test/pull/38) |
+| P2  | Prod re-seed after variant rename (user-gated)      | ops/data           | 🟡 Ops      | 1      | 1        | on G14 done   | ⛔ Superseded (G14 migration)                                         |
 |     | **Total**                                           |                    |             | **19** | **40**   |               |                                                                       |
 
 _Source legend: 🔵 User · 🟡 Ops · 🟤 Auto · ⚪ Overhead (exempt from the quota denominator). Status on completion: `✅ PR #N` (the number, never a bare ✅)._

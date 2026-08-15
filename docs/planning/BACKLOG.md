@@ -1068,7 +1068,7 @@ rest 🟤 Auto-Generated.
 was settled by auditing all 7 `docs/design/design_handoff_mirox/*.dc.html` files against the
 shipped pages (desktop 1440 + mobile 390, incl. the never-tracked `Mirox Mobile.dc.html`).
 Specific findings audit-surfaced → 🟤. Full findings table in the G14 plan
-(`docs/planning/plans/2026-08-15_g14-rebrand-residuals.md`) and the audit Artifact. Every other
+(`docs/archive/plans/2026-08-15_g14-rebrand-residuals.md`) and the audit Artifact. Every other
 mockup↔shipped delta checked out as already ruled and tracked (eyebrow removal 2026-07-28,
 no-dead-links nav/footer truncation → TASK-055, «У вибране» → TASK-041, «Відкрити фото
 замірів» → TASK-056, 1-click + промокод → TASK-043, single name field → G2 spec §2). The
