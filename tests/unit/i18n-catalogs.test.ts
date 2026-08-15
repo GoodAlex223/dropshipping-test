@@ -286,10 +286,10 @@ describe("byCode coverage (replaces content.test.ts's byCode blocks 1:1 — TASK
 describe("Prisma enum → account status label coverage", () => {
   // The account pages render t(`orderStatus.${status}`) / t(`paymentStatus.${status}`)
   // with a raw-status runtime fallback; this block is the drift net that fails
-  // BEFORE a new Prisma enum value ships unlabeled. (content.test.ts's map
-  // coverage guards only the admin-side content/account.ts duplicate and is
-  // deleted together with that module at G13 — this block is its successor
-  // for the catalog.)
+  // BEFORE a new Prisma enum value ships unlabeled. (Sole net since PR #37
+  // review round 2 deleted src/content/account.ts and its map-coverage tests —
+  // the maps had no production consumers; admin renders raw enum values until
+  // G13 sources labels from the catalog.)
   const orderStatusLabels = uk.account.orderStatus as Record<string, string>;
   const paymentStatusLabels = uk.account.paymentStatus as Record<string, string>;
 
