@@ -134,7 +134,7 @@ _Group IDs continue from last week (G1–G7 are permanently taken by DONE.md and
 | --- | --------------------------------------------------- | ------------------ | ----------- | ------ | -------- | ------------- | --------------------------------------------------------------------- |
 | G8  | Launch Feedback Loop `[batch]`                      | storefront/comms   | 🔵 User     | 2      | 5        | Tue–Wed       | ✅ PR #35                                                             |
 | G9  | TASK-039 i18n Foundation `[solo]`                   | i18n/content       | 🔵 User     | 3      | 8        | Wed–Thu       | ✅ PR [#37](https://github.com/GoodAlex223/dropshipping-test/pull/37) |
-| G10 | Weekly Reviews `[batch]`                            | recurring reviews  | ⚪ Overhead | 4      | 5        | Thu–Fri       | ☐ Planned                                                             |
+| G10 | Weekly Reviews `[batch]`                            | recurring reviews  | ⚪ Overhead | 4      | 5        | Thu–Fri       | ✅ PR [#39](https://github.com/GoodAlex223/dropshipping-test/pull/39) |
 | G11 | Docs-Freshness Linter `[solo]`                      | docs tooling       | 🟤 Auto     | 1      | 3        | Fri           | ☐ Planned                                                             |
 | G12 | Categories-to-Catalog Redesign `[batch]` 🏆         | storefront/catalog | 🔵 User     | 3      | 5        | Fri (stretch) | ☐ Planned                                                             |
 | G13 | Admin Translation & Alignment `[solo]`              | admin panel        | 🔵 User     | 3      | 8        | Fri→spill     | ☐ Planned                                                             |
