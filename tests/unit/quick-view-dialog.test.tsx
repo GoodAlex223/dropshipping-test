@@ -36,9 +36,9 @@ const product = {
   category: { name: "Худі", slug: "hudi" },
   images: [{ url: "https://example.com/a.jpg", alt: "front" }],
   variants: [
-    { id: "v-s", name: "Size", value: "S", stock: 5, price: null },
-    { id: "v-m", name: "Size", value: "M", stock: 8, price: null },
-    { id: "v-black", name: "Color", value: "Чорний", stock: 30, price: null },
+    { id: "v-s", name: "Розмір", value: "S", stock: 5, price: null },
+    { id: "v-m", name: "Розмір", value: "M", stock: 8, price: null },
+    { id: "v-black", name: "Колір", value: "Чорний", stock: 30, price: null },
   ],
 };
 
@@ -82,7 +82,7 @@ describe("QuickViewDialog", () => {
   it("disables out-of-stock size chips", () => {
     const oos = {
       ...product,
-      variants: [{ id: "v-s", name: "Size", value: "S", stock: 0, price: null }],
+      variants: [{ id: "v-s", name: "Розмір", value: "S", stock: 0, price: null }],
     };
     renderWithIntl(<QuickViewDialog product={oos} focusSizes={false} onOpenChange={vi.fn()} />);
     expect(screen.getByRole("button", { name: "S" })).toBeDisabled();
@@ -104,7 +104,7 @@ describe("QuickViewDialog", () => {
   it("uses the variant price when the variant has its own", () => {
     const priced = {
       ...product,
-      variants: [{ id: "v-l", name: "Size", value: "L", stock: 3, price: "1390" }],
+      variants: [{ id: "v-l", name: "Розмір", value: "L", stock: 3, price: "1390" }],
     };
     renderWithIntl(<QuickViewDialog product={priced} focusSizes={false} onOpenChange={vi.fn()} />);
     fireEvent.click(screen.getByRole("button", { name: "L" }));

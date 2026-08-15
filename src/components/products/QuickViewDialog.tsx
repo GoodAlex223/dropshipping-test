@@ -12,6 +12,7 @@ import { IMAGE_SIZES } from "@/lib/image-utils";
 import { cn } from "@/lib/utils";
 import { ProductImage } from "./ProductImage";
 import { SIZE_ORDER, COLOR_SWATCH_CLASSES } from "@/lib/product-display";
+import { VARIANT_NAMES } from "@/lib/variant-names";
 
 /** Dialog carousel autoplay tick, milliseconds (R2) — slower than the card's
  *  since the dialog is a deliberate, focused view rather than a hover peek. */
@@ -92,7 +93,7 @@ export function QuickViewDialog({ product, focusSizes, onOpenChange }: QuickView
   };
 
   const sizes = useMemo(() => {
-    const sizeVariants = product?.variants.filter((v) => v.name === "Size") ?? [];
+    const sizeVariants = product?.variants.filter((v) => v.name === VARIANT_NAMES.size) ?? [];
     const uniqueValues = Array.from(new Set(sizeVariants.map((v) => v.value)));
     const ranked = SIZE_ORDER.filter((s) => uniqueValues.includes(s));
     const extras = uniqueValues.filter((v) => !(SIZE_ORDER as readonly string[]).includes(v));
@@ -105,7 +106,9 @@ export function QuickViewDialog({ product, focusSizes, onOpenChange }: QuickView
   const colorValues = useMemo(
     () =>
       Array.from(
-        new Set(product?.variants.filter((v) => v.name === "Color").map((v) => v.value) ?? [])
+        new Set(
+          product?.variants.filter((v) => v.name === VARIANT_NAMES.color).map((v) => v.value) ?? []
+        )
       ).filter((value) => value in COLOR_SWATCH_CLASSES),
     [product]
   );
@@ -127,7 +130,7 @@ export function QuickViewDialog({ product, focusSizes, onOpenChange }: QuickView
 
   const handleAddToCart = () => {
     const price = selectedSize?.price ? parseFloat(selectedSize.price) : parseFloat(product.price);
-    const color = product.variants.find((v) => v.name === "Color")?.value;
+    const color = product.variants.find((v) => v.name === VARIANT_NAMES.color)?.value;
 
     addItem({
       productId: product.id,

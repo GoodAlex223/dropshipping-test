@@ -77,8 +77,8 @@ describe("getFeaturedProducts", () => {
       {
         ...row("a"),
         variants: [
-          { name: "Size", value: "M" },
-          { name: "Color", value: "Чорний" },
+          { name: "Розмір", value: "M" },
+          { name: "Колір", value: "Чорний" },
         ],
       },
     ]);
@@ -93,8 +93,8 @@ describe("getFeaturedProducts", () => {
       })
     );
     expect(result[0].variants).toEqual([
-      { name: "Size", value: "M" },
-      { name: "Color", value: "Чорний" },
+      { name: "Розмір", value: "M" },
+      { name: "Колір", value: "Чорний" },
     ]);
   });
 });

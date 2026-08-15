@@ -1,5 +1,7 @@
 // Product seed data — Mirox clothing catalog (UA, UAH)
 
+import { VARIANT_NAMES } from "../../src/lib/variant-names";
+
 // Same pattern as seed-data/orders.ts: `now` is captured once at module load
 // (i.e. whenever `npm run db:seed` runs), and every product's `createdAt` is
 // expressed relative to it. That keeps the RELATIVE recency ordering between
@@ -73,11 +75,11 @@ export const products: ProductSeed[] = [
       { url: "/images/products/pd-thumb-5.png", alt: "Худі Mirox Basic — деталь 5", position: 5 },
     ],
     variants: [
-      { name: "Size", value: "S", stock: 8 },
-      { name: "Size", value: "M", stock: 12 },
-      { name: "Size", value: "L", stock: 12 },
-      { name: "Size", value: "XL", stock: 10 },
-      { name: "Color", value: "Чорний", stock: 30 },
+      { name: VARIANT_NAMES.size, value: "S", stock: 8 },
+      { name: VARIANT_NAMES.size, value: "M", stock: 12 },
+      { name: VARIANT_NAMES.size, value: "L", stock: 12 },
+      { name: VARIANT_NAMES.size, value: "XL", stock: 10 },
+      { name: VARIANT_NAMES.color, value: "Чорний", stock: 30 },
     ],
   },
   {
@@ -98,12 +100,12 @@ export const products: ProductSeed[] = [
       { url: "/images/products/p-tshirt.png", alt: "Футболка Mirox — вид спереду", position: 0 },
     ],
     variants: [
-      { name: "Size", value: "S", stock: 20 },
-      { name: "Size", value: "M", stock: 28 },
-      { name: "Size", value: "L", stock: 28 },
-      { name: "Size", value: "XL", stock: 20 },
+      { name: VARIANT_NAMES.size, value: "S", stock: 20 },
+      { name: VARIANT_NAMES.size, value: "M", stock: 28 },
+      { name: VARIANT_NAMES.size, value: "L", stock: 28 },
+      { name: VARIANT_NAMES.size, value: "XL", stock: 20 },
       // p-tshirt.png depicts the white tee — colour must match the photo (gate fix 2026-08-03)
-      { name: "Color", value: "Білий", stock: 64 },
+      { name: VARIANT_NAMES.color, value: "Білий", stock: 64 },
     ],
   },
   {
@@ -123,11 +125,11 @@ export const products: ProductSeed[] = [
       { url: "/images/products/p-olimp.png", alt: "Олімпійка Mirox — вид спереду", position: 0 },
     ],
     variants: [
-      { name: "Size", value: "S", stock: 10 },
-      { name: "Size", value: "M", stock: 15 },
-      { name: "Size", value: "L", stock: 15 },
-      { name: "Size", value: "XL", stock: 10 },
-      { name: "Color", value: "Чорний", stock: 50 },
+      { name: VARIANT_NAMES.size, value: "S", stock: 10 },
+      { name: VARIANT_NAMES.size, value: "M", stock: 15 },
+      { name: VARIANT_NAMES.size, value: "L", stock: 15 },
+      { name: VARIANT_NAMES.size, value: "XL", stock: 10 },
+      { name: VARIANT_NAMES.color, value: "Чорний", stock: 50 },
     ],
   },
   {
@@ -153,11 +155,11 @@ export const products: ProductSeed[] = [
       },
     ],
     variants: [
-      { name: "Size", value: "S", stock: 8 },
-      { name: "Size", value: "M", stock: 11 },
-      { name: "Size", value: "L", stock: 11 },
-      { name: "Size", value: "XL", stock: 8 },
-      { name: "Color", value: "Білий", stock: 38 },
+      { name: VARIANT_NAMES.size, value: "S", stock: 8 },
+      { name: VARIANT_NAMES.size, value: "M", stock: 11 },
+      { name: VARIANT_NAMES.size, value: "L", stock: 11 },
+      { name: VARIANT_NAMES.size, value: "XL", stock: 8 },
+      { name: VARIANT_NAMES.color, value: "Білий", stock: 38 },
     ],
   },
   {
@@ -181,11 +183,11 @@ export const products: ProductSeed[] = [
       },
     ],
     variants: [
-      { name: "Size", value: "M", stock: 10 },
-      { name: "Size", value: "L", stock: 10 },
-      { name: "Size", value: "XL", stock: 9 },
-      { name: "Size", value: "XXL", stock: 5 },
-      { name: "Color", value: "Чорний", stock: 34 },
+      { name: VARIANT_NAMES.size, value: "M", stock: 10 },
+      { name: VARIANT_NAMES.size, value: "L", stock: 10 },
+      { name: VARIANT_NAMES.size, value: "XL", stock: 9 },
+      { name: VARIANT_NAMES.size, value: "XXL", stock: 5 },
+      { name: VARIANT_NAMES.color, value: "Чорний", stock: 34 },
     ],
   },
   {
@@ -205,10 +207,10 @@ export const products: ProductSeed[] = [
       { url: "/images/products/p-cargo.png", alt: "Штани Mirox Cargo — вид спереду", position: 0 },
     ],
     variants: [
-      { name: "Size", value: "S", stock: 8 },
-      { name: "Size", value: "M", stock: 10 },
-      { name: "Size", value: "L", stock: 9 },
-      { name: "Color", value: "Чорний", stock: 27 },
+      { name: VARIANT_NAMES.size, value: "S", stock: 8 },
+      { name: VARIANT_NAMES.size, value: "M", stock: 10 },
+      { name: VARIANT_NAMES.size, value: "L", stock: 9 },
+      { name: VARIANT_NAMES.color, value: "Чорний", stock: 27 },
     ],
   },
   {
@@ -232,11 +234,11 @@ export const products: ProductSeed[] = [
       },
     ],
     variants: [
-      { name: "Size", value: "S", stock: 10 },
-      { name: "Size", value: "M", stock: 13 },
-      { name: "Size", value: "L", stock: 13 },
-      { name: "Size", value: "XL", stock: 8 },
-      { name: "Color", value: "Чорний", stock: 44 },
+      { name: VARIANT_NAMES.size, value: "S", stock: 10 },
+      { name: VARIANT_NAMES.size, value: "M", stock: 13 },
+      { name: VARIANT_NAMES.size, value: "L", stock: 13 },
+      { name: VARIANT_NAMES.size, value: "XL", stock: 8 },
+      { name: VARIANT_NAMES.color, value: "Чорний", stock: 44 },
     ],
   },
   {
@@ -254,8 +256,8 @@ export const products: ProductSeed[] = [
     createdAt: daysAgo(45),
     images: [{ url: "/images/products/p-cap.png", alt: "Кепка Mirox — вид спереду", position: 0 }],
     variants: [
-      { name: "Size", value: "Один розмір", stock: 60 },
-      { name: "Color", value: "Чорний", stock: 60 },
+      { name: VARIANT_NAMES.size, value: "Один розмір", stock: 60 },
+      { name: VARIANT_NAMES.color, value: "Чорний", stock: 60 },
     ],
   },
 ];

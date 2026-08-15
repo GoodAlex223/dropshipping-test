@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 import { getSalesRanking } from "@/lib/product-queries";
+import { VARIANT_NAMES } from "@/lib/variant-names";
 
 export const dynamic = "force-dynamic";
 
@@ -35,7 +36,7 @@ const LIST_SELECT = {
   },
   variants: {
     select: { id: true, name: true, value: true, stock: true, price: true },
-    // Deterministic "first Color row" for consumers deriving a colorway
+    // Deterministic "first colorway (Колір) row" for consumers deriving a colorway
     // (QuickViewDialog cart lines) — same tiebreaker as the PDP query.
     orderBy: [{ createdAt: "asc" as const }, { id: "asc" as const }],
   },
@@ -104,10 +105,10 @@ export async function GET(request: NextRequest) {
 
     const variantConditions: Prisma.ProductWhereInput[] = [];
     if (size) {
-      variantConditions.push({ variants: { some: { name: "Size", value: size } } });
+      variantConditions.push({ variants: { some: { name: VARIANT_NAMES.size, value: size } } });
     }
     if (color) {
-      variantConditions.push({ variants: { some: { name: "Color", value: color } } });
+      variantConditions.push({ variants: { some: { name: VARIANT_NAMES.color, value: color } } });
     }
     if (variantConditions.length > 0) {
       where.AND = variantConditions;

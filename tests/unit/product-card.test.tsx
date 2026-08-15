@@ -96,11 +96,11 @@ describe("ProductCard", () => {
         product={{
           ...base,
           variants: [
-            { name: "Size", value: "L" },
-            { name: "Size", value: "S" },
-            { name: "Size", value: "XL" },
-            { name: "Size", value: "S" }, // duplicate — must not repeat in the row
-            { name: "Color", value: "White" }, // non-Size — must not appear in the row
+            { name: "Розмір", value: "L" },
+            { name: "Розмір", value: "S" },
+            { name: "Розмір", value: "XL" },
+            { name: "Розмір", value: "S" }, // duplicate — must not repeat in the row
+            { name: "Колір", value: "White" }, // non-Розмір — must not appear in the row
           ],
         }}
       />
@@ -116,7 +116,7 @@ describe("ProductCard", () => {
 
   it("renders no sizes row when variants exist but none are Size", () => {
     renderWithIntl(
-      <ProductCard product={{ ...base, variants: [{ name: "Color", value: "Чорний" }] }} />
+      <ProductCard product={{ ...base, variants: [{ name: "Колір", value: "Чорний" }] }} />
     );
     expect(screen.queryByText(/·/)).not.toBeInTheDocument();
   });
@@ -166,9 +166,9 @@ describe("ProductCard — TASK-036 upgrades", () => {
         product={{
           ...base,
           variants: [
-            { name: "Color", value: "Чорний" },
-            { name: "Color", value: "Білий" },
-            { name: "Color", value: "Чорний" }, // duplicate — one swatch only
+            { name: "Колір", value: "Чорний" },
+            { name: "Колір", value: "Білий" },
+            { name: "Колір", value: "Чорний" }, // duplicate — one swatch only
           ],
         }}
       />
