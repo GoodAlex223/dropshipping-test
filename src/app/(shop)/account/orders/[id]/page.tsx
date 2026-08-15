@@ -72,6 +72,12 @@ interface Order {
 export default function OrderDetailPage() {
   const t = useTranslations("account");
   const format = useFormatter();
+  // Unknown enum values degrade to the raw status, never the key path
+  // (parity with main's `?? status`); drift net in i18n-catalogs.test.ts.
+  const statusLabel = (s: string) =>
+    t.has(`orderStatus.${s}` as never) ? t(`orderStatus.${s}` as never) : s;
+  const paymentLabel = (s: string) =>
+    t.has(`paymentStatus.${s}` as never) ? t(`paymentStatus.${s}` as never) : s;
   // non-null: the pages-compat types in next-env.d.ts make useParams() nullable; App Router always supplies params
   const { id } = useParams<{ id: string }>()!;
   const router = useRouter();
@@ -188,7 +194,7 @@ export default function OrderDetailPage() {
           </div>
         </div>
         <Badge variant="secondary" className={`${getOrderStatusStyle(order.status)} text-sm`}>
-          {t(`orderStatus.${order.status}` as never)}
+          {statusLabel(order.status)}
         </Badge>
       </div>
 
@@ -402,7 +408,7 @@ export default function OrderDetailPage() {
                   variant={order.paymentStatus === "PAID" ? "default" : "secondary"}
                   className="text-xs"
                 >
-                  {t(`paymentStatus.${order.paymentStatus}` as never)}
+                  {paymentLabel(order.paymentStatus)}
                 </Badge>
               </div>
               {order.paidAt && (

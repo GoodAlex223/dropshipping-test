@@ -1,4 +1,5 @@
 import { screen } from "@testing-library/react";
+import { OrderStatus, PaymentStatus } from "@prisma/client";
 import { describe, expect, it } from "vitest";
 import { useTranslations } from "next-intl";
 import { createElement } from "react";
@@ -279,5 +280,34 @@ describe("byCode coverage (replaces content.test.ts's byCode blocks 1:1 — TASK
       createElement(HasProbe, { namespace: "newsletter.confirm", msgKey: "byCode.CONFIRMED.title" })
     );
     expect(screen.getByText("true")).toBeInTheDocument();
+  });
+});
+
+describe("Prisma enum → account status label coverage", () => {
+  // The account pages render t(`orderStatus.${status}`) / t(`paymentStatus.${status}`)
+  // with a raw-status runtime fallback; this block is the drift net that fails
+  // BEFORE a new Prisma enum value ships unlabeled. (content.test.ts's map
+  // coverage guards only the admin-side content/account.ts duplicate and is
+  // deleted together with that module at G13 — this block is its successor
+  // for the catalog.)
+  const orderStatusLabels = uk.account.orderStatus as Record<string, string>;
+  const paymentStatusLabels = uk.account.paymentStatus as Record<string, string>;
+
+  it("labels every OrderStatus value in uk.json", () => {
+    const values = Object.values(OrderStatus);
+    expect(values.length).toBeGreaterThan(0);
+    for (const s of values) {
+      expect(orderStatusLabels[s], `uk.account.orderStatus.${s}`).toBeTruthy();
+      expect(orderStatusLabels[s]).toMatch(/[Ѐ-ӿ]/);
+    }
+  });
+
+  it("labels every PaymentStatus value in uk.json", () => {
+    const values = Object.values(PaymentStatus);
+    expect(values.length).toBeGreaterThan(0);
+    for (const s of values) {
+      expect(paymentStatusLabels[s], `uk.account.paymentStatus.${s}`).toBeTruthy();
+      expect(paymentStatusLabels[s]).toMatch(/[Ѐ-ӿ]/);
+    }
   });
 });

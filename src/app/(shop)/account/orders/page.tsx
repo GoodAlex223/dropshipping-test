@@ -62,6 +62,10 @@ const ORDER_FILTER_STATUSES = [
 function OrdersPageContent() {
   const t = useTranslations("account");
   const format = useFormatter();
+  // Unknown enum values degrade to the raw status, never the key path
+  // (parity with main's `?? status`); drift net in i18n-catalogs.test.ts.
+  const statusLabel = (s: string) =>
+    t.has(`orderStatus.${s}` as never) ? t(`orderStatus.${s}` as never) : s;
   const router = useRouter();
   const searchParams = useSearchParams();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -150,7 +154,7 @@ function OrdersPageContent() {
             <SelectItem value="all">{t("orders.filter.all")}</SelectItem>
             {ORDER_FILTER_STATUSES.map((s) => (
               <SelectItem key={s} value={s}>
-                {t(`orderStatus.${s}` as never)}
+                {statusLabel(s)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -194,7 +198,7 @@ function OrdersPageContent() {
                     </div>
                     <div className="flex items-center gap-4">
                       <Badge variant="secondary" className={getOrderStatusStyle(order.status)}>
-                        {t(`orderStatus.${order.status}` as never)}
+                        {statusLabel(order.status)}
                       </Badge>
                       <Button variant="outline" size="sm" asChild>
                         <Link href={`/account/orders/${order.id}`}>
