@@ -315,8 +315,10 @@ defect.
 
 ## 11. Run 2 (2026-08-15, WEEKLY G10) — what the design produced on its second execution
 
-This spec is the **frozen first-run design**; the live methodology is
-[`REVIEW-QUEUE.md`](../../planning/REVIEW-QUEUE.md). Recorded here only where run 2 changed something
+This spec is **live**, per §10 above — findings are corrected here, not annotated as superseded. It is the
+**first-run design record**; the **methodology of record** is
+[`REVIEW-QUEUE.md`](../../planning/REVIEW-QUEUE.md), which is where a running run reads its rules. The two
+roles are different, and neither makes this document frozen. Recorded here only where run 2 changed something
 this document asserts:
 
 - **Convention 1's cadence evidence was refreshed.** It cited only run 1's 9 rows; run 2 wrote **14**

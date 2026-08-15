@@ -1135,6 +1135,10 @@ Next-up parks (`defer`) or recorded as rows only (`pass`).
   not replace — the standing G2 hardening bundle (confirmation-page ownership check) that the
   pre-launch week already inherits. (High value, Low-Med effort) [G10 run 2 slot 1, 2026-08-15]
 
+---
+
+## Technical Debt
+
 Known issues that should be addressed eventually.
 
 | Item                          | Impact                              | Effort | Added      |
