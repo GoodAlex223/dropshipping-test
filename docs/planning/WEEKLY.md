@@ -46,12 +46,16 @@ _Group IDs continue from last week (G1–G7 are permanently taken by DONE.md and
 
 ⚪ Overhead · recurring reviews · **5 SP** · Thu–Fri
 
-> Run 2. Read [REVIEW-QUEUE.md](REVIEW-QUEUE.md) first — the run recipe (incl. the step-5 re-check pass), the standing launch-push lens (high adopt bar), Convention-4 cheap re-trigger checks on the six parks, and Convention 7's deferral of the three-scope lens here (re-trigger check only). Sequential in-session per Convention 8. **Pressure valve**: under this week's deliberate overload, G10 defers first (the batch's own under-deadline rule) — noted here so a deferral is a recorded move, not a silent drop.
+> Run 2. Read [REVIEW-QUEUE.md](REVIEW-QUEUE.md) first — the run recipe (incl. the step-5 re-check pass), the standing launch-push lens (high adopt bar), Convention-4 cheap re-trigger checks on the six parks, and Convention 7's deferral of the three-scope lens here (re-trigger check only). Sequential in-session per Convention 8. ~~**Pressure valve**: under this week's deliberate overload, G10 defers first (the batch's own under-deadline rule) — noted here so a deferral is a recorded move, not a silent drop.~~
+>
+> **Pressure valve NOT exercised — recorded as a decision, not a silent override (2026-08-15).** G10 was this week's designated first-to-defer; the user selected it to run anyway on Sat 2026-08-15, after G9 and G14 shipped. It ran in full (4 slots, no trimming). G11/G12/G13 remain unshipped, so the valve is still available to them.
+>
+> **✅ Ran 2026-08-15** — 14 Reviewed-log rows (3 / 1 / 2 / 8 by slot): **1 adopt · 7 defer · 2 pass · 3 propagate**, plus 1 process row. All six run-1 parks got their Convention-4 cheap check (4 unmet and not re-read, 1 fired, 1 counter). Full log, reasoning and re-trigger conditions: [REVIEW-QUEUE.md](REVIEW-QUEUE.md).
 
-- [ ] Plugins: two independent tops — best not-yet-reviewed from the official Claude plugin store AND best from the wider internet, each row tagged `source:` (2)
-- [ ] Claude best-practices: top not-yet-reviewed candidate via date-aware web search (1)
-- [ ] Non-Claude AI best-practices: same, for non-Claude tools — carries the bias-watch counter (run 2 of the 2-more-runs condition) (1)
-- [ ] Cross-project propagation (outbound): scan window = shipped since run 1 — PR #33 close-out, the PR #34 hotfix arc, the G7 deferral, new memory files — `propagate | pass | defer` rows; a `propagate` files a TODO § 🔀 Spawned row (1)
+- [x] Plugins: two independent tops — best not-yet-reviewed from the official Claude plugin store AND best from the wider internet, each row tagged `source:` (2) — **`claude-security` adopt** (official; run 1's park fired — the pre-launch week is Mon Aug 17), `security-guidance` + `logic-lens` defer. 3 rows, not 2: the fired park held two candidates and both were read rather than re-parked unreviewed.
+- [x] Claude best-practices: top not-yet-reviewed candidate via date-aware web search (1) — Anthropic's ["The new rules of context engineering for Claude 5 generation models"](https://claude.com/blog/the-new-rules-of-context-engineering-for-claude-5-generation-models) (2026-07-24): **defer**. Most of it is already adopted/consumed/practiced here (each claim quotes its matched line); the one uncovered part — judgement over rigid counts — is Cleanup-Week-shaped, and the Cleanup Week is user-confirmed for after launch. Sharpened the standing run-1 🟤 with a second axis rather than filing a new entry.
+- [x] Non-Claude AI best-practices: same, for non-Claude tools — carries the bias-watch counter (run 2 of the 2-more-runs condition) (1) — GitHub `spec-kit`: **pass** as a toolchain (its pipeline duplicates the superpowers flow), but `/speckit.analyze` and `/speckit.converge` routed as **design input to G11**, incl. a spec-vs-code direction the linter entry did not cover. **Counter did NOT increment**: run 1's condition is "the same reason", and this pass has a different one. The park's condition was rewritten to name the real dead end (searching this category for _portability_ practices, not the category itself) — and rewriting a condition **re-bases its counter to 0 of 2**, since run 1's portability-aimed pass no longer qualifies under the new rule.
+- [x] Cross-project propagation (outbound): scan window = shipped since run 1 — PR #33 close-out, the PR #34 hotfix arc, the G7 deferral, new memory files — `propagate | pass | defer` rows; a `propagate` files a TODO § 🔀 Spawned row (1) — **window widened by user ruling** to everything since run 1 (PRs #33–#38 + all memory files 2026-08-11→08-15); the planned list predated PRs #35–#38. 8 rows: **3 propagate** (serverless-freeze fire-and-forget — the only one backed by a production incident; working-copy-moves-mid-session; the missing _review_ half of in-branch-decisions, with the already-covered authoring half quoted from `~/.claude/CLAUDE.md:63` and deliberately not duplicated), 4 defer routed as **fold-ins** against existing rows, 1 grouped pass for stack-pinned facts.
 
 ### G11. Docs-Freshness Linter [solo]
 
@@ -112,13 +116,13 @@ _Group IDs continue from last week (G1–G7 are permanently taken by DONE.md and
 
 - ✅ **[G9](#g9-task-039-i18n-foundation-solo)** 🔵 — part 2: content-layer externalization + §7.4 verification. (Shipped Fri 2026-08-15, PR #37.)
 - ✅ **[G14](#g14-rebrand-residuals-variant-names--design-gap-audit-batch)** 🔵 — variant rename + design-gap audit. (Shipped Fri 2026-08-15, PR #38 `caf8103`; prod rename via data migration — P2 not needed.)
-- **[G10](#g10-weekly-reviews-batch)** ⚪ — part 1: plugins + Claude best-practices slots (defers first if the day jams).
+- ✅ **[G10](#g10-weekly-reviews-batch)** ⚪ — part 1: plugins + Claude best-practices slots (defers first if the day jams). (Ran Sat 2026-08-15 — the whole batch in one session, not split across Thu/Fri; the day did jam, and the user ran it anyway rather than exercising the valve.)
 
 ### Friday — Admin sweep + linter + reviews close + stretch
 
 - **[G13](#g13-admin-translation--alignment-solo)** 🔵 — admin sweep, on G9's landed mechanism; weekend spill expected and accepted.
 - **[G11](#g11-docs-freshness-linter-solo)** 🟤 — the OVERDUE linter.
-- **[G10](#g10-weekly-reviews-batch)** ⚪ — part 2: non-Claude slot + propagation scan.
+- ✅ **[G10](#g10-weekly-reviews-batch)** ⚪ — part 2: non-Claude slot + propagation scan. (Ran Sat 2026-08-15 in the same session as part 1.)
 - 🏆 **[G12](#g12-categories-to-catalog-redesign-batch-)** 🔵 — stretch, behind everything above.
 - Week close-out: statuses → `✅ PR #N`, spillover check (**add the Spillover header line if delivery runs past Sun Aug 16**), seed the pre-launch week (client ask + polish + carried finds).
 
@@ -130,7 +134,7 @@ _Group IDs continue from last week (G1–G7 are permanently taken by DONE.md and
 | --- | --------------------------------------------------- | ------------------ | ----------- | ------ | -------- | ------------- | --------------------------------------------------------------------- |
 | G8  | Launch Feedback Loop `[batch]`                      | storefront/comms   | 🔵 User     | 2      | 5        | Tue–Wed       | ✅ PR #35                                                             |
 | G9  | TASK-039 i18n Foundation `[solo]`                   | i18n/content       | 🔵 User     | 3      | 8        | Wed–Thu       | ✅ PR [#37](https://github.com/GoodAlex223/dropshipping-test/pull/37) |
-| G10 | Weekly Reviews `[batch]`                            | recurring reviews  | ⚪ Overhead | 4      | 5        | Thu–Fri       | ☐ Planned                                                             |
+| G10 | Weekly Reviews `[batch]`                            | recurring reviews  | ⚪ Overhead | 4      | 5        | Thu–Fri       | ✅ PR [#39](https://github.com/GoodAlex223/dropshipping-test/pull/39) |
 | G11 | Docs-Freshness Linter `[solo]`                      | docs tooling       | 🟤 Auto     | 1      | 3        | Fri           | ☐ Planned                                                             |
 | G12 | Categories-to-Catalog Redesign `[batch]` 🏆         | storefront/catalog | 🔵 User     | 3      | 5        | Fri (stretch) | ☐ Planned                                                             |
 | G13 | Admin Translation & Alignment `[solo]`              | admin panel        | 🔵 User     | 3      | 8        | Fri→spill     | ☐ Planned                                                             |

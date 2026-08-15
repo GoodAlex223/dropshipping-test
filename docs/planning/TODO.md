@@ -1,6 +1,6 @@
 # TODO
 
-**Last Updated**: 2026-08-11
+**Last Updated**: 2026-08-15
 
 Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-shop-program-design.md) · Current week: [WEEKLY.md](WEEKLY.md)
 
@@ -88,6 +88,42 @@ verify that out-of-tree work landed. Kept separate from the in-tree spawned task
       docs/README.md's Archived Plans table" ([2026-08-09] From: G4 completion) and is **not**
       duplicated here. Use it as the concrete case when writing the rule: a "was the index
       touched?" check passes on it, a bidirectional one does not.
+- [ ] **Propagate "await background side effects — serverless freeze kills fire-and-forget" to
+      `~/.claude/POLICIES/error-handling.md`** — _filed 2026-08-15, G10 run 2._ Verified absent
+      from the global tree. The only rule in this batch backed by a **production incident**:
+      `/api/checkout/create-order` called `sendOrderConfirmationEmail(...).catch(() => {})`
+      without `await`; the Vercel function instance freezes the moment the response returns, so
+      the fetch to Resend never executed — prod returned 200 and sent **zero** order emails for
+      days (PR #34). It is invisible to local dev, where a long-running server lets the promise
+      finish, and invisible to CI. The rule: `await` background-ish side effects before
+      returning (keep failures non-fatal with `.catch`), or use the platform's `waitUntil` when
+      response latency matters; sweep any route that fires-and-forgets a queue enqueue,
+      analytics ping or webhook for the same class. Pair it with the regression shape that
+      catches it — a race test asserting the response promise **cannot** resolve before the
+      side-effect promise (red on fire-and-forget, green on await). Applies to any serverless
+      target: Vercel, Lambda, Cloudflare Workers.
+- [ ] **Propagate "re-read live git state before any close-out — the working copy moves
+      mid-session" to `~/.claude/WORKFLOW.md`** — _filed 2026-08-15, G10 run 2._ Verified absent
+      from the global tree. Not project-shaped: it is a property of how this user works —
+      editing the same checkout while a session runs. On 2026-08-15, during an ~8-minute agent
+      fan-out, the user merged PR #38, pulled, and committed twice; every field of the
+      session-start `gitStatus` snapshot (branch, HEAD, PR state) was false by the time
+      close-out started, and a doc write failed on a plan path that close-out had already
+      archived. The rule: before any close-out, doc write, commit, or claim about repo state,
+      re-read `git status -sb`, `git rev-parse HEAD`, `git log --oneline -5` and
+      `gh pr view N --json state,mergedAt`, and reconcile against what you last believed. Treat
+      "file not found" on a path a subagent reported as a **state-moved** signal, not a subagent
+      error — check `docs/archive/` before re-creating anything.
+- [ ] **Propagate "read in-branch history before treating a frozen plan as authority" to
+      `~/.claude/POLICIES/code-review.md`** — _filed 2026-08-15, G10 run 2._ **Only the missing
+      half**: `~/.claude/CLAUDE.md:63` already carries the authoring half — _"Frozen plans/specs
+      get a superseded note; a live doc must simply be **corrected**."_ — and that is not
+      duplicated. Absent is the **review** half: a reviewer reading a diff against a frozen plan
+      reports a _deliberate in-branch reversal_ as a regression, because the plan is the only
+      authority it was given. The rule: run `git log main..HEAD` before treating a plan or spec
+      as the standard the diff is judged against, so decisions made and recorded inside the
+      branch are visible. Its corollary belongs in the same paragraph: several agents agreeing
+      about the same truncated input is not corroboration.
 
 #### [TASK-055] Content & legal pages
 

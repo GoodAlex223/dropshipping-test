@@ -495,6 +495,32 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 
   Complementary option raised in the same review: lower/reword the code-review skill's severity rubric so doc-drift findings (which top out ~75 vs the 80 gate) clear on their own — this covers the drift a linter structurally cannot see, e.g. PR #26 finding 1's stale in-code JSDoc. See the `code-review-threshold-understates-doc-findings` memory. (Med value, Low effort) `[possible-dup-of: "Automated doc freshness check" in the [2026-02-10] From: TASK-030 group]` — related but not identical: that item compares a doc's `Last Updated` header against **git file timestamps** (finds stale docs); this one compares the header against the **`docs/README.md` index row** (finds two-places-disagree drift). Same likely host script, different checks — build together, but neither subsumes the other. The same group's "Link checker in CI" is a third candidate for that script.
 
+  **Design input added 2026-08-15 (G10 run 2, slot 3 — evidence, not a new entry).** GitHub's
+  [`spec-kit`](https://github.com/github/spec-kit) (128.9k stars, MIT, 30+ agent integrations)
+  splits this problem into **two** checks that are worth keeping distinct when scoping the script,
+  because this repo performs both by hand: `/speckit.analyze` is _"Cross-artifact consistency &
+  coverage analysis"_ — doc-vs-doc, which is exactly the header↔index-row check above — while
+  `/speckit.converge` _"assesses the codebase against spec/plan/tasks and appends remaining work as
+  new tasks"_ — **spec-vs-code**, a direction this entry does not currently cover. The second is
+  not hypothetical here: G14's design-gap audit (2026-08-15) was a manual `converge` run, comparing
+  7 `.dc.html` handoff files against shipped pages and filing the deltas as 🟤 rows. Treat
+  spec-vs-code as a **later, separate** check — the entry's own false-positive warning applies
+  doubly to it — but scope the host script so it can host both rather than hard-wiring it to
+  header↔row pairs. The toolchain itself was **passed**, not adopted: its pipeline duplicates the
+  superpowers spec→plan→TDD flow already in use here.
+
+  **Why the rubric half keeps recurring — the mechanism, added 2026-08-15 (PR #39 review round 2).**
+  The complementary option above has been re-derived 19 times without moving, and the reason is
+  arithmetic rather than judgement: **the rubric only emits 0 / 25 / 50 / 75 / 100**, so an 80 gate
+  is in practice a **100 gate** — nothing can score between 75 and 100, and doc-drift findings top
+  out at 75 by construction. That is why this class lands in chat rather than on the PR every time,
+  and why "lower the threshold slightly" is the wrong shape of fix: 80 → 75 would flip the gate from
+  admitting only certainties to admitting every 75, with no middle setting available. PR #39 is the
+  sharpest evidence yet — **four findings at 75, all four real, all four fixed**, plus a fifth at 50
+  that also warranted fixing and which the reviewer conceded on re-examination. Whatever the fix is
+  (reword so doc findings can reach 100, add a separate doc-drift gate, or emit sub-threshold
+  findings to chat by design), it has to account for the quantization, not just the number.
+
 - 🟤 **`/api/products` passes unvalidated `parseFloat()` output into the Prisma `price` filter** — `src/app/api/products/route.ts:69-74` does `if (minPrice) { where.price = { ..., gte: parseFloat(minPrice) } }` (same shape for `maxPrice`/`lte`). The truthiness guard rejects an empty string but not a non-numeric one, so `?minPrice=abc` yields `parseFloat("abc")` → `NaN`, which reaches a Prisma `Decimal @db.Decimal(10, 2)` comparison. **Verified**: the code path, that the lines are byte-identical to `main` (pre-existing — predates TASK-036, which is why PR #26's review correctly ruled it out of scope), and that root `CLAUDE.md`'s documented "Query param validation pattern" prescribes the opposite (`!isNaN(num) && num >= min && num <= max`, then conditional spread). **Not verified**: the observable runtime behaviour of `NaN` in a Prisma Decimal `gte` — it may throw `PrismaClientValidationError` (500) or be coerced; confirm before choosing between "ignore the param" and "400 Bad Request". PR #26 added the analogous guard on the _client_ side only (`parseNumericParam` in `products-content.tsx`, commit `a7faf75`), so the API is reachable unguarded by any direct caller or crawler. (Low value, Low effort) `[possible-dup-of: "Fix getPagination() NaN propagation" — BACKLOG.md:292, under [2026-02-10] From: TASK-029 → Origin: feat/task-028-test-coverage branch]` — same NaN-propagation class in the same file, but a distinct defect: that one is `parseInt` → `Math.max(1, NaN)` → `NaN` page/limit in `getPagination()`; this one is `parseFloat` → `NaN` in the price `where`. Worth fixing in one pass, but neither entry covers the other.
 
 ### [2026-08-01] From: TASK-037 product page redesign (plan extraction)
@@ -886,6 +912,18 @@ while evaluating candidates; they route 🟤 by the source rule, independent of 
   This also discharges the standing global-CLAUDE.md obligation to audit a project file whenever
   it crosses ~200 lines. Source: <https://code.claude.com/docs/en/memory> (fetched 2026-08-10).
   (High value, Med effort)
+  **↑ Second axis added 2026-08-15 (G10 run 2, slot 2 — evidence, not a new entry).** The
+  argument above is purely about **length**. Anthropic's ["The new rules of context engineering
+  for Claude 5 generation models"](https://claude.com/blog/the-new-rules-of-context-engineering-for-claude-5-generation-models)
+  (2026-07-24) argues the more costly problem is **over-constraint**: it reports that over 80% of
+  Claude Code's own system prompt was removed for newer models with no performance loss, and it
+  replaces rigid directives with judgement — its worked example swaps _"Default to writing no
+  comments. Never write multi-paragraph docstrings"_ for _"Write code that reads like the
+  surrounding code: match its comment density, naming, and idiom."_ So when this entry is worked,
+  trim for **character as well as length**: rules stated as fixed counts (minimums, every-N-lines
+  checkpoints) are the shape the post says to convert to judgement. Note the same critique lands
+  harder on the **global** `~/.claude/CLAUDE.md` than on this repo's file, and this repo has no
+  sink for global-config work — recorded against Convention 7's re-trigger in REVIEW-QUEUE.md.
 
 ### [2026-08-10] From: G5 prod email config round-trip (user)
 
@@ -1088,6 +1126,26 @@ audit's one small fix (light blur shimmer → dark) shipped in-branch.
   recorded on this delta (checked spec + plan). Standard conversion practice, but needs a
   checkout-scoped layout and a decision on how far to strip (keep the Кошик stepper link as
   escape hatch?). (Med value, Med effort) [G14 audit, 2026-08-15]
+
+### [2026-08-15] From: G10 weekly reviews run 2
+
+**Origin**: the Weekly Reviews batch's second run — see
+[REVIEW-QUEUE.md](REVIEW-QUEUE.md) for the full Reviewed log, verdicts and re-trigger
+conditions. Slot 1's official candidate is the run's single `adopt`; the rest is routed to
+Next-up parks (`defer`) or recorded as rows only (`pass`).
+
+- 🟤 **Run a `claude-security` deep scan in the pre-launch week** — the run-2 `adopt` (slot 1,
+  official). Install `claude-security@claude-plugins-official` (first-party, v0.10.0, Anthropic)
+  and run a scoped scan before real customer traffic. It runs entirely in-session at a chosen
+  effort tier, hands every candidate finding to independent verifiers told to disprove it, and
+  computes the verification tally in code rather than letting the finding-producing model assert
+  it. Target surface: auth (NextAuth v5 + middleware), API routes and their `requireAdmin()` /
+  `requireAuth()` guards, `/api/checkout/create-order` (guest COD, no auth), the HMAC unsubscribe
+  token path, admin routes, and a secrets pass. Preconditions already measured: Python 3.11.2
+  (needs ≥3.9) ✅, git checkout ✅. Reports land in a self-gitignoring
+  `CLAUDE-SECURITY-<timestamp>/` directory, so nothing is swept into a commit. Pairs with — does
+  not replace — the standing G2 hardening bundle (confirmation-page ownership check) that the
+  pre-launch week already inherits. (High value, Low-Med effort) [G10 run 2 slot 1, 2026-08-15]
 
 ---
 
