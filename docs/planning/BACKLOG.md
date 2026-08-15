@@ -886,6 +886,18 @@ while evaluating candidates; they route 🟤 by the source rule, independent of 
   This also discharges the standing global-CLAUDE.md obligation to audit a project file whenever
   it crosses ~200 lines. Source: <https://code.claude.com/docs/en/memory> (fetched 2026-08-10).
   (High value, Med effort)
+  **↑ Second axis added 2026-08-15 (G10 run 2, slot 2 — evidence, not a new entry).** The
+  argument above is purely about **length**. Anthropic's ["The new rules of context engineering
+  for Claude 5 generation models"](https://claude.com/blog/the-new-rules-of-context-engineering-for-claude-5-generation-models)
+  (2026-07-24) argues the more costly problem is **over-constraint**: it reports that over 80% of
+  Claude Code's own system prompt was removed for newer models with no performance loss, and it
+  replaces rigid directives with judgement — its worked example swaps _"Default to writing no
+  comments. Never write multi-paragraph docstrings"_ for _"Write code that reads like the
+  surrounding code: match its comment density, naming, and idiom."_ So when this entry is worked,
+  trim for **character as well as length**: rules stated as fixed counts (minimums, every-N-lines
+  checkpoints) are the shape the post says to convert to judgement. Note the same critique lands
+  harder on the **global** `~/.claude/CLAUDE.md` than on this repo's file, and this repo has no
+  sink for global-config work — recorded against Convention 7's re-trigger in REVIEW-QUEUE.md.
 
 ### [2026-08-10] From: G5 prod email config round-trip (user)
 
