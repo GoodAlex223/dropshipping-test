@@ -1146,6 +1146,31 @@ Next-up parks (`defer`) or recorded as rows only (`pass`).
   `CLAUDE-SECURITY-<timestamp>/` directory, so nothing is swept into a commit. Pairs with — does
   not replace — the standing G2 hardening bundle (confirmation-page ownership check) that the
   pre-launch week already inherits. (High value, Low-Med effort) [G10 run 2 slot 1, 2026-08-15]
+- 🟤 **Automate the "every statement of a value agrees" check — fold into the docs-freshness
+  linter's host script** — G10's step-5 re-check pass asserted its tallies agreed and **passed
+  while contradicting itself**: it grepped for the _presence_ of the expected value, found it, and
+  never looked for the contradiction sitting ~100 lines away in the same file (PR #39 finding 2).
+  The corrected method is mechanical, which is exactly what makes it automatable: for a value
+  claimed in more than one place (verdict tallies, row counts, recurrence counts, "N conventions"),
+  **enumerate every occurrence and compare them to each other** rather than confirming one. Natural
+  host is the OVERDUE docs-freshness linter's script ([2026-08-01] From: PR #26 review), which is
+  already scoped to parse planning docs — this is a third check beside header↔index-row and the
+  git-timestamp variant. Start with the cheapest high-yield case: a run's tallies stated in
+  `REVIEW-QUEUE.md`, `WEEKLY.md` and `DONE.md` must agree. **Watch the false-positive class** the
+  linter entry already warns about — a value quoted inside a worked example or a superseded note is
+  not a live claim, and G10 has both. (Med value, Low-Med effort) [G10 run 2 / PR #39 review,
+  2026-08-15]
+- 🟤 **Work the cross-project propagation queue as one batch** — `TODO.md` § 🔀 Spawned now holds
+  **6** out-of-tree rows (3 from run 1, 2026-08-10; 3 from run 2, 2026-08-15) and **none has been
+  actioned**. Status is user-maintained by design — this repo cannot verify out-of-tree completion
+  — so this is a prompt, not a defect. It matters because run 2 deliberately routed **four further
+  defers as fold-ins against those rows** rather than filing them separately (claimed-records into
+  run 1 row 2; gate-screenshots into run 1 row 1; the reap convention into the docs template; the
+  code-review threshold rule, which has no reachable sink at all). Those folds only land when the
+  queue is worked, so the backlog of unpropagated learnings compounds silently. One sitting through
+  `~/.claude/POLICIES/{error-handling,code-review,manual-testing,documentation}.md` + `WORKFLOW.md`
+  - `TEMPLATES/docs_template/planning/BACKLOG.md` clears all ten. (Med value, Low effort)
+    [G10 run 2 slot 4, 2026-08-15]
 
 ---
 
