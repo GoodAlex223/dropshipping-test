@@ -10,6 +10,7 @@ import { IMAGE_SIZES } from "@/lib/image-utils";
 import { formatPrice } from "@/lib/format";
 import { getProductBadge, type ProductBadge } from "@/lib/product-badges";
 import { COLOR_SWATCH_CLASSES, rankSizeValues } from "@/lib/product-display";
+import { VARIANT_NAMES } from "@/lib/variant-names";
 import { cn } from "@/lib/utils";
 import { ProductImage } from "./ProductImage";
 
@@ -82,7 +83,8 @@ export { SIZE_ORDER } from "@/lib/product-display";
 
 /** Dedupes Size-variant values and orders them S · M · L · XL · XXL; returns null when there are none. */
 function getSizeLabel(variants: ProductVariantOption[] | undefined): string | null {
-  const sizeValues = variants?.filter((v) => v.name === "Size").map((v) => v.value) ?? [];
+  const sizeValues =
+    variants?.filter((v) => v.name === VARIANT_NAMES.size).map((v) => v.value) ?? [];
   if (sizeValues.length === 0) return null;
   return rankSizeValues(sizeValues).join(" · ");
 }
@@ -133,7 +135,9 @@ export function ProductCard({ product, showCategory = true, onQuickView }: Produ
   };
 
   const colorValues = Array.from(
-    new Set(product.variants?.filter((v) => v.name === "Color").map((v) => v.value) ?? [])
+    new Set(
+      product.variants?.filter((v) => v.name === VARIANT_NAMES.color).map((v) => v.value) ?? []
+    )
   ).filter((value) => value in COLOR_SWATCH_CLASSES);
 
   // Single badge max — precedence rule lives in getProductBadge (@/lib/product-badges).

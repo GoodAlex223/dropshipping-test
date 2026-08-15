@@ -34,7 +34,7 @@ function makeProduct(over: Partial<Product> = {}): Product {
     variants: [
       {
         id: "v-s",
-        name: "Size",
+        name: "Розмір",
         value: "S",
         sku: "MRX-001-S",
         price: "1290",
@@ -43,7 +43,7 @@ function makeProduct(over: Partial<Product> = {}): Product {
       },
       {
         id: "v-l",
-        name: "Size",
+        name: "Розмір",
         value: "L",
         sku: "MRX-001-L",
         price: "1290",
@@ -52,7 +52,7 @@ function makeProduct(over: Partial<Product> = {}): Product {
       },
       {
         id: "v-col",
-        name: "Color",
+        name: "Колір",
         value: "Чорний",
         sku: "MRX-001-C",
         price: "1290",
@@ -137,7 +137,7 @@ describe("ProductDetailClient (TASK-037)", () => {
       variants: [
         {
           id: "v-s",
-          name: "Size",
+          name: "Розмір",
           value: "S",
           sku: "MRX-001-S",
           price: "1290",
@@ -146,7 +146,7 @@ describe("ProductDetailClient (TASK-037)", () => {
         },
         {
           id: "v-col",
-          name: "Color",
+          name: "Колір",
           value: "Чорний",
           sku: "MRX-001-C",
           price: "1290",
@@ -155,7 +155,7 @@ describe("ProductDetailClient (TASK-037)", () => {
         },
         {
           id: "v-col-2",
-          name: "Color",
+          name: "Колір",
           value: "Білий",
           sku: "MRX-001-C2",
           price: "1290",
@@ -180,7 +180,7 @@ describe("ProductDetailClient (TASK-037)", () => {
     const product = makeProduct({
       stock: 0,
       variants: [
-        { id: "v-s", name: "Size", value: "S", sku: "s", price: "1290", stock: 0, options: {} },
+        { id: "v-s", name: "Розмір", value: "S", sku: "s", price: "1290", stock: 0, options: {} },
       ],
     });
     renderWithIntl(<ProductDetailClient product={product} />);
@@ -203,7 +203,7 @@ describe("ProductDetailClient (TASK-037)", () => {
       variants: [
         {
           id: "v-os",
-          name: "Size",
+          name: "Розмір",
           value: "Один розмір",
           sku: "MRX-008-OS",
           price: "450",

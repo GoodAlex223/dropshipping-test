@@ -71,10 +71,10 @@ describe("seed data integrity (mirrors seed.ts fail-fast guards)", () => {
 });
 
 describe("colorway integrity (TASK-037)", () => {
-  it("every product has exactly one Color variant row", () => {
+  it("every product has exactly one Колір variant row", () => {
     for (const p of products) {
-      const colors = (p.variants ?? []).filter((v) => v.name === "Color");
-      expect(colors, `${p.slug} must have exactly one Color row`).toHaveLength(1);
+      const colors = (p.variants ?? []).filter((v) => v.name === "Колір");
+      expect(colors, `${p.slug} must have exactly one Колір row`).toHaveLength(1);
     }
   });
 

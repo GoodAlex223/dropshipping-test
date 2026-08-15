@@ -32,7 +32,7 @@ function whereOf(call = 0) {
 describe("GET /api/products — filters", () => {
   it("filters by size via a Size-variant some-condition", async () => {
     await GET(createNextRequest({ url: "/api/products", searchParams: { size: "M" } }));
-    expect(whereOf().AND).toEqual([{ variants: { some: { name: "Size", value: "M" } } }]);
+    expect(whereOf().AND).toEqual([{ variants: { some: { name: "Розмір", value: "M" } } }]);
   });
 
   it("combines size and color as two independent some-conditions", async () => {
@@ -40,8 +40,8 @@ describe("GET /api/products — filters", () => {
       createNextRequest({ url: "/api/products", searchParams: { size: "M", color: "Чорний" } })
     );
     expect(whereOf().AND).toEqual([
-      { variants: { some: { name: "Size", value: "M" } } },
-      { variants: { some: { name: "Color", value: "Чорний" } } },
+      { variants: { some: { name: "Розмір", value: "M" } } },
+      { variants: { some: { name: "Колір", value: "Чорний" } } },
     ]);
   });
 
@@ -70,7 +70,7 @@ describe("GET /api/products — filters", () => {
       expect.objectContaining({
         category: { slug: "hudi" },
         price: { gte: 500, lte: 1500 },
-        AND: [{ variants: { some: { name: "Size", value: "L" } } }],
+        AND: [{ variants: { some: { name: "Розмір", value: "L" } } }],
       })
     );
   });

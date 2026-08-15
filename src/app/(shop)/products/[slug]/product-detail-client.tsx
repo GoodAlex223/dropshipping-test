@@ -18,6 +18,7 @@ import { ReviewSection, StarRating } from "@/components/reviews";
 import { useCartStore } from "@/stores/cart.store";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/format";
+import { VARIANT_NAMES } from "@/lib/variant-names";
 import { COLOR_SWATCH_CLASSES, SIZE_ORDER, rankSizeValues } from "@/lib/product-display";
 import { trackViewItem, trackAddToCart } from "@/lib/analytics";
 import type { ReviewWithUser, RatingDistribution, StyleSibling, BundleCompanion } from "@/types";
@@ -86,7 +87,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
   // Sizes: the one real cart dimension (spec §1 constraint 2). Ranked S→XXL;
   // first in-stock preselected.
   const sizes = useMemo(() => {
-    const sizeVariants = product.variants.filter((v) => v.name === "Size");
+    const sizeVariants = product.variants.filter((v) => v.name === VARIANT_NAMES.size);
     const ranked = rankSizeValues(sizeVariants.map((v) => v.value));
     return ranked
       .map((value) => sizeVariants.find((v) => v.value === value))
@@ -175,7 +176,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
   const legacyExtraColors = Array.from(
     new Set(
       product.variants
-        .filter((v) => v.name === "Color" && v.value !== product.colorValue)
+        .filter((v) => v.name === VARIANT_NAMES.color && v.value !== product.colorValue)
         .map((v) => v.value)
     )
   ).filter((value) => !product.styleSiblings.some((s) => s.colorValue === value));

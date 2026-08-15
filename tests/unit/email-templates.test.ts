@@ -156,7 +156,7 @@ const baseOrder: OrderEmailData = {
   items: [
     {
       productName: "Худі Mirox Basic",
-      variantInfo: "Size: M",
+      variantInfo: "Розмір: M",
       quantity: 2,
       unitPrice: 1290,
       totalPrice: 2580,

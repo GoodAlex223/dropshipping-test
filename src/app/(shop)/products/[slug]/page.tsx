@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getProductMetadata, getProductJsonLd, getBreadcrumbJsonLd, siteConfig } from "@/lib/seo";
 import { safeSection } from "@/lib/safe-section";
 import { getSalesRanking } from "@/lib/product-queries";
+import { VARIANT_NAMES } from "@/lib/variant-names";
 import type { BundleCompanion, StyleSibling } from "@/types";
 import { ProductDetailClient, ProductNotFound, type Product } from "./product-detail-client";
 
@@ -53,7 +54,7 @@ async function getProduct(slug: string): Promise<Product | null> {
           stock: true,
         },
         // id tiebreaker: seeded rows can share a createdAt timestamp, which
-        // otherwise leaves "the first Color row" (→ colorValue) nondeterministic.
+        // otherwise leaves "the first colorway (Колір) row" (→ colorValue) nondeterministic.
         orderBy: [{ createdAt: "asc" }, { id: "asc" }],
       },
     },
@@ -73,7 +74,7 @@ async function getProduct(slug: string): Promise<Product | null> {
           select: {
             slug: true,
             name: true,
-            variants: { where: { name: "Color" }, select: { value: true }, take: 1 },
+            variants: { where: { name: VARIANT_NAMES.color }, select: { value: true }, take: 1 },
           },
         }),
         [],
@@ -100,10 +101,10 @@ async function getProduct(slug: string): Promise<Product | null> {
     category: { select: { name: true } },
     images: { select: { url: true, alt: true }, orderBy: { position: "asc" as const }, take: 1 },
     variants: {
-      where: { name: { in: ["Size", "Color"] } },
+      where: { name: { in: [VARIANT_NAMES.size, VARIANT_NAMES.color] } },
       select: { id: true, name: true, value: true, stock: true, price: true },
       // Same tiebreaker as the main-product query above: seeded rows can share
-      // a createdAt, which otherwise leaves "the first Color row" (→ colorValue)
+      // a createdAt, which otherwise leaves "the first colorway (Колір) row" (→ colorValue)
       // nondeterministic.
       orderBy: [{ createdAt: "asc" as const }, { id: "asc" as const }],
     },
@@ -163,14 +164,14 @@ async function getProduct(slug: string): Promise<Product | null> {
         image: c.images[0] ?? null,
         category: c.category ?? null,
         sizeVariants: c.variants
-          .filter((v) => v.name === "Size")
+          .filter((v) => v.name === VARIANT_NAMES.size)
           .map((v) => ({
             id: v.id,
             value: v.value,
             stock: v.stock,
             price: v.price?.toString() ?? null,
           })),
-        colorValue: c.variants.find((v) => v.name === "Color")?.value ?? null,
+        colorValue: c.variants.find((v) => v.name === VARIANT_NAMES.color)?.value ?? null,
       }));
     })(),
     [],
@@ -264,7 +265,7 @@ async function getProduct(slug: string): Promise<Product | null> {
     ...product,
     price: product.price.toString(),
     comparePrice: product.comparePrice?.toString() ?? null,
-    colorValue: product.variants.find((v) => v.name === "Color")?.value ?? null,
+    colorValue: product.variants.find((v) => v.name === VARIANT_NAMES.color)?.value ?? null,
     styleSiblings,
     companions,
     variants: product.variants.map((v) => ({
