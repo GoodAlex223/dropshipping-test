@@ -80,9 +80,13 @@ that only pays off post-launch defers by default. Re-scope this lens once the st
 1. **Every slot writes a Reviewed-log row regardless of verdict**, `pass` included — one row per candidate
    considered, so four-to-five rows is the floor (one per slot), not the cadence: run 1 wrote **9**, of which
    slot 4's first-run memory sweep alone was 5.
+   Run 2 wrote **14** (3 / 1 / 2 / 8 by slot), so the spread is real and widening — a run's row count tracks
+   how many candidates it _considered_, not how many slots it has.
    _(2026-08-10; sibling runs twice nearly dropped `pass` rows by composing the log from memory after the
    research. Cadence corrected on the PR #32 review — the original text read "four-to-five rows per run", a
-   figure the very run that seeded it contradicted.)_
+   figure the very run that seeded it contradicted. Run 2's figure added 2026-08-15 by the step-5 re-check,
+   which is the check that catches exactly this: a cadence sentence describing the run that was imagined
+   rather than the runs that happened.)_
 2. **Derive the "already in use" exclusion set from live `enabledPlugins`**, never from a hardcoded list —
    all three settings files: `.claude/settings.json`, `.claude/settings.local.json`, `~/.claude/settings.json`.
    _(2026-08-10; a sibling first-run retro found its hardcoded set had missed several enabled plugins.)_

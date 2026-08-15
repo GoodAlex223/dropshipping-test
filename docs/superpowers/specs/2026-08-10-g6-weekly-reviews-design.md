@@ -310,3 +310,25 @@ four G-group plans sit unindexed in `docs/archive/plans/`. That is the same drif
 propagates outward, and it was already filed as a 🟤 at G4 completion — so the Spawned row now cites it as a
 live worked example and the 🟤 gained a back-reference, rather than a second entry being created for one
 defect.
+
+---
+
+## 11. Run 2 (2026-08-15, WEEKLY G10) — what the design produced on its second execution
+
+This spec is the **frozen first-run design**; the live methodology is
+[`REVIEW-QUEUE.md`](../../planning/REVIEW-QUEUE.md). Recorded here only where run 2 changed something
+this document asserts:
+
+- **Convention 1's cadence evidence was refreshed.** It cited only run 1's 9 rows; run 2 wrote **14**
+  (3 / 1 / 2 / 8 by slot). The conventions list itself is **unchanged at 10 items** and still aligns 1:1
+  with §"Conventions seeded on this first run" above — no convention was added, so nothing propagates back
+  beyond this note. The refresh was produced by step 5's own cadence assertion, which is the check §10 item 6
+  introduced.
+- **The step-5 re-check earned its place.** It caught the stale cadence figure above, and it cleared two
+  candidate mismatches as false positives before anything was "fixed": a naive convention count read 17 in
+  this file (two unrelated numbered lists — §6's execution sequence and §10's corrections) and an extraction
+  slicing from the file-layout code block read 0. Both were tooling artefacts, not drift. That is the
+  `docs-readme-index-audit-false-positives` lesson holding on its first contact with this spec.
+- **Convention 7's re-trigger partially fired** — slot 2 produced a candidate whose sharpest target is the
+  _global_ `~/.claude` tree, for which this repo has no sink. Recorded in `REVIEW-QUEUE.md` § Next-up, not
+  acted on: one occurrence is not the pattern the convention asks for.
