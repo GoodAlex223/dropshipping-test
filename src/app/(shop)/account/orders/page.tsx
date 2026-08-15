@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Package, ChevronLeft, ChevronRight, Eye, ShoppingBag } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -61,6 +61,7 @@ const ORDER_FILTER_STATUSES = [
 
 function OrdersPageContent() {
   const t = useTranslations("account");
+  const format = useFormatter();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -116,7 +117,7 @@ function OrdersPageContent() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("uk-UA", {
+    return format.dateTime(new Date(dateString), {
       year: "numeric",
       month: "short",
       day: "numeric",

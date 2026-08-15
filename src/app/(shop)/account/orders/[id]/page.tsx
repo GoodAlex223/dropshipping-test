@@ -14,7 +14,7 @@ import {
   CreditCard,
   MapPin,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -71,6 +71,7 @@ interface Order {
 
 export default function OrderDetailPage() {
   const t = useTranslations("account");
+  const format = useFormatter();
   // non-null: the pages-compat types in next-env.d.ts make useParams() nullable; App Router always supplies params
   const { id } = useParams<{ id: string }>()!;
   const router = useRouter();
@@ -116,7 +117,7 @@ export default function OrderDetailPage() {
   }, [id, t]);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("uk-UA", {
+    return format.dateTime(new Date(dateString), {
       year: "numeric",
       month: "long",
       day: "numeric",
