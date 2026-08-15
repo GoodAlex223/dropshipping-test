@@ -1089,9 +1089,25 @@ audit's one small fix (light blur shimmer → dark) shipped in-branch.
   checkout-scoped layout and a decision on how far to strip (keep the Кошик stepper link as
   escape hatch?). (Med value, Med effort) [G14 audit, 2026-08-15]
 
----
+### [2026-08-15] From: G10 weekly reviews run 2
 
-## Technical Debt
+**Origin**: the Weekly Reviews batch's second run — see
+[REVIEW-QUEUE.md](REVIEW-QUEUE.md) for the full Reviewed log, verdicts and re-trigger
+conditions. Slot 1's official candidate is the run's single `adopt`; the rest is routed to
+Next-up parks (`defer`) or recorded as rows only (`pass`).
+
+- 🟤 **Run a `claude-security` deep scan in the pre-launch week** — the run-2 `adopt` (slot 1,
+  official). Install `claude-security@claude-plugins-official` (first-party, v0.10.0, Anthropic)
+  and run a scoped scan before real customer traffic. It runs entirely in-session at a chosen
+  effort tier, hands every candidate finding to independent verifiers told to disprove it, and
+  computes the verification tally in code rather than letting the finding-producing model assert
+  it. Target surface: auth (NextAuth v5 + middleware), API routes and their `requireAdmin()` /
+  `requireAuth()` guards, `/api/checkout/create-order` (guest COD, no auth), the HMAC unsubscribe
+  token path, admin routes, and a secrets pass. Preconditions already measured: Python 3.11.2
+  (needs ≥3.9) ✅, git checkout ✅. Reports land in a self-gitignoring
+  `CLAUDE-SECURITY-<timestamp>/` directory, so nothing is swept into a commit. Pairs with — does
+  not replace — the standing G2 hardening bundle (confirmation-page ownership check) that the
+  pre-launch week already inherits. (High value, Low-Med effort) [G10 run 2 slot 1, 2026-08-15]
 
 Known issues that should be addressed eventually.
 
