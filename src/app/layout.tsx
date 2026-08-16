@@ -22,7 +22,7 @@ export const dynamic = "force-dynamic";
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Playfair_Display, Lora, Manrope } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale } from "next-intl/server";
+import { getLocale, getMessages } from "next-intl/server";
 import { Providers } from "@/components/providers";
 import { getDefaultMetadata, getOrganizationJsonLd, getWebsiteJsonLd } from "@/lib/seo";
 import { PRECONNECT_DOMAINS, DNS_PREFETCH_DOMAINS } from "@/components/common/ResourceHints";
@@ -95,6 +95,12 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const locale = await getLocale();
+  const messages = await getMessages();
+  // Admin-only strings stay out of the storefront client payload (G13 spec §2);
+  // the (admin) layout re-provides the full catalog in its own nested provider.
+  const clientMessages = Object.fromEntries(
+    Object.entries(messages).filter(([namespace]) => namespace !== "admin")
+  ) as typeof messages;
   const organizationJsonLd = getOrganizationJsonLd();
   const websiteJsonLd = getWebsiteJsonLd();
 
@@ -130,7 +136,7 @@ export default async function RootLayout({
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} ${playfair.variable} ${lora.variable} ${manrope.variable} antialiased`}
       >
-        <NextIntlClientProvider>
+        <NextIntlClientProvider messages={clientMessages}>
           <Providers>{children}</Providers>
         </NextIntlClientProvider>
       </body>

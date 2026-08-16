@@ -772,5 +772,37 @@
       "home": "Головна",
       "categories": "Категорії"
     }
+  },
+  "admin": {
+    "layout": { "title": "Панель адміністратора" },
+    "nav": {
+      "dashboard": "Огляд",
+      "products": "Товари",
+      "categories": "Категорії",
+      "orders": "Замовлення",
+      "reviews": "Відгуки",
+      "newsletter": "Розсилка",
+      "customers": "Клієнти",
+      "suppliers": "Постачальники",
+      "settings": "Налаштування",
+      "wordmark": "Адмін",
+      "backToStore": "Повернутися до магазину"
+    },
+    "common": {
+      "save": "Зберегти",
+      "cancel": "Скасувати",
+      "delete": "Видалити",
+      "edit": "Редагувати",
+      "create": "Створити",
+      "add": "Додати",
+      "search": "Пошук",
+      "loading": "Завантаження…",
+      "actions": "Дії",
+      "previous": "Назад",
+      "next": "Далі",
+      "error": "Помилка",
+      "areYouSure": "Ви впевнені?",
+      "cannotBeUndone": "Цю дію неможливо скасувати."
+    }
   }
 }
