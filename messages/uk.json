@@ -858,6 +858,62 @@
       "deleteSuccess": "Категорію успішно видалено",
       "deleteError": "Не вдалося видалити категорію"
     },
+    "settings": {
+      "title": "Налаштування",
+      "subtitle": "Керування конфігурацією магазину",
+      "tabs": {
+        "general": "Загальні",
+        "email": "Email",
+        "shipping": "Доставка",
+        "payments": "Платежі"
+      },
+      "general": {
+        "cardTitle": "Інформація про магазин",
+        "cardDescription": "Основна інформація про ваш магазин",
+        "storeNameLabel": "Назва магазину",
+        "storeNamePlaceholder": "Моя крамниця",
+        "contactEmailLabel": "Контактний email",
+        "storeDescriptionLabel": "Опис магазину",
+        "storeDescriptionPlaceholder": "Опишіть ваш магазин…",
+        "supportPhoneLabel": "Телефон підтримки (необов'язково)",
+        "addressLabel": "Адреса компанії (необов'язково)",
+        "addressPlaceholder": "вул. Шевченка, 1, Київ, Україна"
+      },
+      "email": {
+        "cardTitle": "Email-сповіщення",
+        "cardDescription": "Налаштуйте, які листи надсилаються автоматично",
+        "orderConfirmationLabel": "Підтвердження замовлення",
+        "orderConfirmationDescription": "Надсилати email, коли надходить нове замовлення",
+        "shippingUpdatesLabel": "Оновлення доставки",
+        "shippingUpdatesDescription": "Сповіщати клієнтів про зміну статусу замовлення",
+        "marketingEmailsLabel": "Рекламні листи",
+        "marketingEmailsDescription": "Надсилати клієнтам рекламні листи",
+        "lowStockAlertsLabel": "Сповіщення про низький залишок",
+        "lowStockAlertsDescription": "Отримувати сповіщення, коли товари закінчуються"
+      },
+      "shipping": {
+        "cardTitle": "Тарифи доставки",
+        "cardDescription": "Налаштуйте вартість доставки та порогові значення",
+        "freeShippingLabel": "Поріг безкоштовної доставки (грн)",
+        "freeShippingHint": "Замовлення на суму понад цей поріг доставляються безкоштовно",
+        "standardShippingLabel": "Стандартна доставка (грн)",
+        "standardShippingHint": "Стандартний тариф доставки",
+        "expressShippingLabel": "Експрес-доставка (грн)",
+        "expressShippingHint": "Тариф для експрес-доставки"
+      },
+      "payments": {
+        "cardTitle": "Налаштування оплати",
+        "cardDescription": "Керування налаштуваннями платіжного провайдера",
+        "connected": "Підключено",
+        "notConfigured": "Не налаштовано",
+        "envNotice": "З міркувань безпеки налаштування оплати задаються через змінні середовища.",
+        "envDetail": "Оновіть STRIPE_SECRET_KEY та STRIPE_PUBLISHABLE_KEY у файлі .env."
+      },
+      "saveChangesButton": "Зберегти зміни",
+      "saving": "Збереження…",
+      "saveSuccess": "Налаштування збережено",
+      "saveError": "Не вдалося зберегти налаштування"
+    },
     "supplierOrderStatus": {
       "pending": "Очікує",
       "submitted": "Надіслано",
