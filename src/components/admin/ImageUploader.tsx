@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import Image from "next/image";
 import { useDropzone } from "react-dropzone";
 import { Upload, X, Loader2, GripVertical } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -28,6 +29,7 @@ export function ImageUploader({
   maxImages = 10,
   folder = "products",
 }: ImageUploaderProps) {
+  const t = useTranslations("admin.imageUploader");
   const [uploadingCount, setUploadingCount] = useState(0);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
@@ -80,7 +82,7 @@ export function ImageUploader({
       const filesToUpload = acceptedFiles.slice(0, remainingSlots);
 
       if (acceptedFiles.length > remainingSlots) {
-        toast.warning(`Only ${remainingSlots} more images can be added`);
+        toast.warning(t("onlyNMore", { count: remainingSlots }));
       }
 
       if (filesToUpload.length === 0) return;
@@ -96,18 +98,18 @@ export function ImageUploader({
             newImages.push({ url, isNew: true });
           }
         } catch {
-          toast.error(`Failed to upload ${file.name}`);
+          toast.error(t("uploadFailed", { name: file.name }));
         }
       }
 
       if (newImages.length > 0) {
         onChange([...images, ...newImages]);
-        toast.success(`${newImages.length} image(s) uploaded`);
+        toast.success(t("uploaded", { count: newImages.length }));
       }
 
       setUploadingCount(0);
     },
-    [images, maxImages, onChange, uploadFile]
+    [images, maxImages, onChange, uploadFile, t]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -181,7 +183,7 @@ export function ImageUploader({
             >
               <Image
                 src={image.url}
-                alt={image.alt || `Image ${index + 1}`}
+                alt={image.alt || t("imageAlt", { index: index + 1 })}
                 fill
                 className="rounded-lg object-cover"
                 sizes="(max-width: 768px) 50vw, 25vw"
@@ -213,7 +215,7 @@ export function ImageUploader({
               {/* Position Badge */}
               {index === 0 && (
                 <div className="bg-primary text-primary-foreground absolute top-2 left-2 rounded px-2 py-0.5 text-xs font-medium">
-                  Main
+                  {t("mainBadge")}
                 </div>
               )}
             </div>
@@ -238,19 +240,21 @@ export function ImageUploader({
           {uploadingCount > 0 ? (
             <div className="flex flex-col items-center gap-2">
               <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
-              <p className="text-muted-foreground text-sm">Uploading {uploadingCount} file(s)...</p>
+              <p className="text-muted-foreground text-sm">
+                {t("uploading", { count: uploadingCount })}
+              </p>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-2 text-center">
               <Upload className="text-muted-foreground h-8 w-8" />
               <div>
                 <p className="text-sm font-medium">
-                  {isDragActive ? "Drop images here" : "Drag & drop images"}
+                  {isDragActive ? t("dropActive") : t("dragDrop")}
                 </p>
-                <p className="text-muted-foreground text-xs">or click to browse (max 5MB each)</p>
+                <p className="text-muted-foreground text-xs">{t("browseHint")}</p>
               </div>
               <p className="text-muted-foreground text-xs">
-                {images.length}/{maxImages} images
+                {t("countLabel", { count: images.length, max: maxImages })}
               </p>
             </div>
           )}

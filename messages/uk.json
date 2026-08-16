@@ -1259,6 +1259,38 @@
         "comparePriceGreater": "Стара ціна має бути більшою за звичайну"
       }
     },
+    "imageUploader": {
+      "mainBadge": "Головне",
+      "imageAlt": "Зображення {index}",
+      "dropActive": "Відпустіть зображення тут",
+      "dragDrop": "Перетягніть зображення сюди",
+      "browseHint": "або натисніть, щоб обрати (макс. 5MB кожне)",
+      "countLabel": "{count}/{max} {max, plural, one {зображення} few {зображення} many {зображень} other {зображення}}",
+      "uploading": "Завантаження {count, plural, one {# файл} few {# файли} many {# файлів} other {# файлу}}…",
+      "onlyNMore": "Можна додати ще {count, plural, one {# зображення} few {# зображення} many {# зображень} other {# зображення}}",
+      "uploadFailed": "Не вдалося завантажити {name}",
+      "uploaded": "{count, plural, one {Завантажено # зображення} few {Завантажено # зображення} many {Завантажено # зображень} other {Завантажено # зображення}}"
+    },
+    "productImport": {
+      "title": "Імпорт товарів з CSV",
+      "description": "Оберіть CSV-файл, щоб масово імпортувати товари. Завантажте шаблон для правильного формату.",
+      "downloadTemplate": "Завантажити шаблон CSV",
+      "downloadTemplateError": "Не вдалося завантажити шаблон",
+      "dropActive": "Відпустіть CSV-файл тут",
+      "dragDrop": "Перетягніть CSV-файл сюди",
+      "browseHint": "або натисніть, щоб обрати файл",
+      "updateExisting": "Оновлювати наявні товари",
+      "updateExistingHint": "Оновлює товари з однаковим SKU",
+      "resultSucceeded": "{count} успішно",
+      "resultFailed": "{count} не вдалося",
+      "rowError": "Рядок {row} (SKU: {sku}): {error}",
+      "close": "Закрити",
+      "importButton": "Імпортувати товари",
+      "importingLabel": "Імпортування…",
+      "importFailed": "Не вдалося імпортувати",
+      "imported": "{count, plural, one {Імпортовано # товар} few {Імпортовано # товари} many {Імпортовано # товарів} other {Імпортовано # товару}}",
+      "failed": "{count, plural, one {Не вдалося імпортувати # товар} few {Не вдалося імпортувати # товари} many {Не вдалося імпортувати # товарів} other {Не вдалося імпортувати # товару}}"
+    },
     "supplierOrderStatus": {
       "pending": "Очікує",
       "submitted": "Надіслано",

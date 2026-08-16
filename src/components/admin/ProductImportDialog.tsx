@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { Upload, FileText, Download, Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -35,6 +36,8 @@ export function ProductImportDialog({
   onOpenChange,
   onImportComplete,
 }: ProductImportDialogProps) {
+  const t = useTranslations("admin.productImport");
+  const tCommon = useTranslations("admin.common");
   const [file, setFile] = useState<File | null>(null);
   const [updateExisting, setUpdateExisting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
@@ -73,7 +76,7 @@ export function ProductImportDialog({
       document.body.removeChild(a);
     } catch (error) {
       console.error("Error downloading template:", error);
-      toast.error("Failed to download template");
+      toast.error(t("downloadTemplateError"));
     }
   };
 
@@ -96,22 +99,22 @@ export function ProductImportDialog({
       const data: ImportResult = await response.json();
 
       if (!response.ok) {
-        throw new Error((data as unknown as { error: string }).error || "Import failed");
+        throw new Error((data as unknown as { error: string }).error || t("importFailed"));
       }
 
       setResult(data);
 
       if (data.success > 0) {
-        toast.success(`Successfully imported ${data.success} product(s)`);
+        toast.success(t("imported", { count: data.success }));
         onImportComplete();
       }
 
       if (data.failed > 0) {
-        toast.warning(`${data.failed} product(s) failed to import`);
+        toast.warning(t("failed", { count: data.failed }));
       }
     } catch (error) {
       console.error("Import error:", error);
-      toast.error(error instanceof Error ? error.message : "Import failed");
+      toast.error(error instanceof Error ? error.message : t("importFailed"));
     } finally {
       setIsImporting(false);
     }
@@ -130,17 +133,15 @@ export function ProductImportDialog({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Import Products from CSV</DialogTitle>
-          <DialogDescription>
-            Upload a CSV file to bulk import products. Download the template for the correct format.
-          </DialogDescription>
+          <DialogTitle>{t("title")}</DialogTitle>
+          <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           {/* Template Download */}
           <Button variant="outline" size="sm" onClick={handleDownloadTemplate}>
             <Download className="mr-2 h-4 w-4" />
-            Download CSV Template
+            {t("downloadTemplate")}
           </Button>
 
           {/* File Drop Zone */}
@@ -166,9 +167,9 @@ export function ProductImportDialog({
               <div className="flex flex-col items-center gap-2 text-center">
                 <Upload className="text-muted-foreground h-8 w-8" />
                 <p className="text-sm font-medium">
-                  {isDragActive ? "Drop CSV file here" : "Drag & drop CSV file"}
+                  {isDragActive ? t("dropActive") : t("dragDrop")}
                 </p>
-                <p className="text-muted-foreground text-xs">or click to browse</p>
+                <p className="text-muted-foreground text-xs">{t("browseHint")}</p>
               </div>
             )}
           </div>
@@ -176,8 +177,8 @@ export function ProductImportDialog({
           {/* Options */}
           <div className="flex items-center justify-between">
             <div>
-              <Label htmlFor="updateExisting">Update existing products</Label>
-              <p className="text-muted-foreground text-xs">Update products with matching SKUs</p>
+              <Label htmlFor="updateExisting">{t("updateExisting")}</Label>
+              <p className="text-muted-foreground text-xs">{t("updateExistingHint")}</p>
             </div>
             <Switch
               id="updateExisting"
@@ -193,12 +194,12 @@ export function ProductImportDialog({
               <div className="flex items-center gap-4 text-sm">
                 <span className="flex items-center gap-1 text-green-600">
                   <CheckCircle2 className="h-4 w-4" />
-                  {result.success} succeeded
+                  {t("resultSucceeded", { count: result.success })}
                 </span>
                 {result.failed > 0 && (
                   <span className="flex items-center gap-1 text-red-600">
                     <XCircle className="h-4 w-4" />
-                    {result.failed} failed
+                    {t("resultFailed", { count: result.failed })}
                   </span>
                 )}
               </div>
@@ -208,7 +209,7 @@ export function ProductImportDialog({
                   <div className="space-y-1 text-xs">
                     {result.errors.map((err, i) => (
                       <p key={i} className="text-muted-foreground">
-                        Row {err.row} (SKU: {err.sku}): {err.error}
+                        {t("rowError", { row: err.row, sku: err.sku, error: err.error })}
                       </p>
                     ))}
                   </div>
@@ -220,12 +221,12 @@ export function ProductImportDialog({
           {/* Actions */}
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={handleClose} disabled={isImporting}>
-              {result ? "Close" : "Cancel"}
+              {result ? t("close") : tCommon("cancel")}
             </Button>
             {!result && (
               <Button onClick={handleImport} disabled={!file || isImporting}>
                 {isImporting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isImporting ? "Importing..." : "Import Products"}
+                {isImporting ? t("importingLabel") : t("importButton")}
               </Button>
             )}
           </div>
