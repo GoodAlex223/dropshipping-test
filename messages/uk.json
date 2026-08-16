@@ -1358,6 +1358,44 @@
       "deleteSuccess": "Відгук успішно видалено",
       "deleteError": "Не вдалося видалити відгук"
     },
+    "newsletter": {
+      "title": "Підписники розсилки",
+      "subtitle": "Керуйте підписками на email-розсилку.",
+      "export": "Експорт CSV",
+      "searchPlaceholder": "Пошук за email…",
+      "statusFilter": {
+        "placeholder": "Статус",
+        "all": "Усі статуси"
+      },
+      "status": {
+        "PENDING": "Очікує підтвердження",
+        "ACTIVE": "Активний",
+        "UNSUBSCRIBED": "Відписаний"
+      },
+      "headers": {
+        "email": "Email",
+        "status": "Статус",
+        "subscribed": "Дата підписки",
+        "created": "Створено"
+      },
+      "empty": "Підписників не знайдено",
+      "copyEmail": "Скопіювати email",
+      "activate": "Активувати",
+      "unsubscribe": "Відписати",
+      "showingRange": "Показано {from}–{to} із {total, plural, one {# підписника} few {# підписників} many {# підписників} other {# підписника}}",
+      "loadError": "Не вдалося завантажити підписників",
+      "activateSuccess": "Підписника активовано",
+      "unsubscribeSuccess": "Підписника відписано",
+      "updateError": "Не вдалося оновити підписника",
+      "copySuccess": "Email скопійовано в буфер обміну",
+      "deleteDialog": {
+        "title": "Видалити підписника",
+        "confirmText": "Це остаточно видалить цього підписника. Цю дію неможливо скасувати.",
+        "deleting": "Видалення…"
+      },
+      "deleteSuccess": "Підписника успішно видалено",
+      "deleteError": "Не вдалося видалити підписника"
+    },
     "common": {
       "save": "Зберегти",
       "cancel": "Скасувати",

@@ -39,6 +39,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { useDebounce } from "@/hooks/use-debounce";
 
 interface Subscriber {
@@ -62,6 +63,8 @@ interface Pagination {
 function SubscribersContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations("admin.newsletter");
+  const tCommon = useTranslations("admin.common");
 
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [pagination, setPagination] = useState<Pagination | null>(null);
@@ -90,11 +93,11 @@ function SubscribersContent() {
       setSubscribers(data.data);
       setPagination(data.pagination);
     } catch {
-      toast.error("Failed to load subscribers");
+      toast.error(t("loadError"));
     } finally {
       setIsLoading(false);
     }
-  }, [searchParams, debouncedSearch, statusFilter]);
+  }, [searchParams, debouncedSearch, statusFilter, t]);
 
   useEffect(() => {
     fetchSubscribers();
@@ -119,10 +122,10 @@ function SubscribersContent() {
 
       if (!response.ok) throw new Error("Failed to update status");
 
-      toast.success(newStatus === "ACTIVE" ? "Subscriber activated" : "Subscriber unsubscribed");
+      toast.success(newStatus === "ACTIVE" ? t("activateSuccess") : t("unsubscribeSuccess"));
       fetchSubscribers();
     } catch {
-      toast.error("Failed to update subscriber");
+      toast.error(t("updateError"));
     }
   };
 
@@ -137,11 +140,11 @@ function SubscribersContent() {
 
       if (!response.ok) throw new Error("Failed to delete subscriber");
 
-      toast.success("Subscriber deleted");
+      toast.success(t("deleteSuccess"));
       setDeleteId(null);
       fetchSubscribers();
     } catch {
-      toast.error("Failed to delete subscriber");
+      toast.error(t("deleteError"));
     } finally {
       setIsDeleting(false);
     }
@@ -149,7 +152,7 @@ function SubscribersContent() {
 
   const handleCopyEmail = (email: string) => {
     navigator.clipboard.writeText(email);
-    toast.success("Email copied to clipboard");
+    toast.success(t("copySuccess"));
   };
 
   const handleExport = () => {
@@ -159,7 +162,7 @@ function SubscribersContent() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString("uk-UA", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -171,13 +174,12 @@ function SubscribersContent() {
       case "ACTIVE":
         // Token-driven default badge (bg-primary/text-primary-foreground), matching
         // the isActive="default" convention on the products list — not a status-color
-        // map like PAYMENT_STATUS_COLORS, so not exempt; and no green (TASK-037 owns
-        // status green).
-        return <Badge>Active</Badge>;
+        // map, so not exempt; and no green (TASK-037 owns status green).
+        return <Badge>{t("status.ACTIVE")}</Badge>;
       case "PENDING":
-        return <Badge variant="secondary">Pending</Badge>;
+        return <Badge variant="secondary">{t("status.PENDING")}</Badge>;
       case "UNSUBSCRIBED":
-        return <Badge variant="destructive">Unsubscribed</Badge>;
+        return <Badge variant="destructive">{t("status.UNSUBSCRIBED")}</Badge>;
     }
   };
 
@@ -186,12 +188,12 @@ function SubscribersContent() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Newsletter Subscribers</h1>
-          <p className="text-muted-foreground text-sm">Manage email newsletter subscriptions.</p>
+          <h1 className="text-2xl font-bold">{t("title")}</h1>
+          <p className="text-muted-foreground text-sm">{t("subtitle")}</p>
         </div>
         <Button variant="outline" onClick={handleExport}>
           <Download className="mr-2 h-4 w-4" />
-          Export CSV
+          {t("export")}
         </Button>
       </div>
 
@@ -200,7 +202,7 @@ function SubscribersContent() {
         <div className="relative max-w-xs flex-1">
           <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
-            placeholder="Search by email..."
+            placeholder={t("searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
@@ -208,13 +210,13 @@ function SubscribersContent() {
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder={t("statusFilter.placeholder")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All statuses</SelectItem>
-            <SelectItem value="ACTIVE">Active</SelectItem>
-            <SelectItem value="PENDING">Pending</SelectItem>
-            <SelectItem value="UNSUBSCRIBED">Unsubscribed</SelectItem>
+            <SelectItem value="all">{t("statusFilter.all")}</SelectItem>
+            <SelectItem value="ACTIVE">{t("status.ACTIVE")}</SelectItem>
+            <SelectItem value="PENDING">{t("status.PENDING")}</SelectItem>
+            <SelectItem value="UNSUBSCRIBED">{t("status.UNSUBSCRIBED")}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -224,11 +226,11 @@ function SubscribersContent() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Email</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="hidden md:table-cell">Subscribed</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead className="w-[80px]">Actions</TableHead>
+              <TableHead>{t("headers.email")}</TableHead>
+              <TableHead>{t("headers.status")}</TableHead>
+              <TableHead className="hidden md:table-cell">{t("headers.subscribed")}</TableHead>
+              <TableHead>{t("headers.created")}</TableHead>
+              <TableHead className="w-[80px]">{tCommon("actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -256,7 +258,7 @@ function SubscribersContent() {
               <TableRow>
                 <TableCell colSpan={5} className="py-12 text-center">
                   <Mail className="text-muted-foreground mx-auto h-8 w-8" />
-                  <p className="text-muted-foreground mt-2">No subscribers found</p>
+                  <p className="text-muted-foreground mt-2">{t("empty")}</p>
                 </TableCell>
               </TableRow>
             ) : (
@@ -272,21 +274,21 @@ function SubscribersContent() {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon-sm">
-                          <span className="sr-only">Actions</span>
+                          <span className="sr-only">{tCommon("actions")}</span>
                           <span className="text-lg">&#8943;</span>
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => handleCopyEmail(subscriber.email)}>
                           <Copy className="mr-2 h-4 w-4" />
-                          Copy Email
+                          {t("copyEmail")}
                         </DropdownMenuItem>
                         {subscriber.status !== "ACTIVE" && (
                           <DropdownMenuItem
                             onClick={() => handleUpdateStatus(subscriber, "ACTIVE")}
                           >
                             <UserCheck className="mr-2 h-4 w-4" />
-                            Activate
+                            {t("activate")}
                           </DropdownMenuItem>
                         )}
                         {subscriber.status === "ACTIVE" && (
@@ -294,7 +296,7 @@ function SubscribersContent() {
                             onClick={() => handleUpdateStatus(subscriber, "UNSUBSCRIBED")}
                           >
                             <UserX className="mr-2 h-4 w-4" />
-                            Unsubscribe
+                            {t("unsubscribe")}
                           </DropdownMenuItem>
                         )}
                         <DropdownMenuItem
@@ -302,7 +304,7 @@ function SubscribersContent() {
                           onClick={() => setDeleteId(subscriber.id)}
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
+                          {tCommon("delete")}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -318,9 +320,11 @@ function SubscribersContent() {
       {pagination && pagination.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-muted-foreground text-sm">
-            Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
-            {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}{" "}
-            subscribers
+            {t("showingRange", {
+              from: (pagination.page - 1) * pagination.limit + 1,
+              to: Math.min(pagination.page * pagination.limit, pagination.total),
+              total: pagination.total,
+            })}
           </p>
           <div className="flex gap-2">
             <Button
@@ -329,7 +333,7 @@ function SubscribersContent() {
               disabled={!pagination.hasPrev}
               onClick={() => handlePageChange(pagination.page - 1)}
             >
-              Previous
+              {tCommon("previous")}
             </Button>
             <Button
               variant="outline"
@@ -337,7 +341,7 @@ function SubscribersContent() {
               disabled={!pagination.hasNext}
               onClick={() => handlePageChange(pagination.page + 1)}
             >
-              Next
+              {tCommon("next")}
             </Button>
           </div>
         </div>
@@ -347,20 +351,18 @@ function SubscribersContent() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Subscriber</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete this subscriber. This action cannot be undone.
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t("deleteDialog.title")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("deleteDialog.confirmText")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>{tCommon("cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isDeleting ? "Deleting..." : "Delete"}
+              {isDeleting ? t("deleteDialog.deleting") : tCommon("delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
