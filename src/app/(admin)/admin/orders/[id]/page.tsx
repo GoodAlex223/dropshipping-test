@@ -130,6 +130,17 @@ export default function AdminOrderDetailPage() {
     tStatus.has(`orderStatus.${s}` as never) ? tStatus(`orderStatus.${s}` as never) : s;
   const paymentStatusLabel = (s: string) =>
     tStatus.has(`paymentStatus.${s}` as never) ? tStatus(`paymentStatus.${s}` as never) : s;
+  // Reuses the account order-detail methodLabel ternary (cod/card map to
+  // account.orderDetail.payment.method{Cod,Card}) instead of minting new
+  // admin keys — same principle as orderStatusLabel/paymentStatusLabel
+  // above. Anything the admin can see that isn't "cod"/"card" (a genuinely
+  // unknown method string) falls back to the raw value rather than a
+  // catalog key, since the account catalog has no entry for it either.
+  const paymentMethodLabel = (m?: string) => {
+    if (m === "cod") return tStatus("orderDetail.payment.methodCod");
+    if (m === "card") return tStatus("orderDetail.payment.methodCard");
+    return m || t("payment.methodDefault");
+  };
 
   const STATUS_OPTIONS = [
     { value: "PENDING", label: orderStatusLabel("PENDING") },
@@ -749,9 +760,7 @@ export default function AdminOrderDetailPage() {
             <CardContent className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">{t("payment.method")}</span>
-                <span className="capitalize">
-                  {order.paymentMethod || t("payment.methodDefault")}
-                </span>
+                <span>{paymentMethodLabel(order.paymentMethod)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">{t("payment.status")}</span>
