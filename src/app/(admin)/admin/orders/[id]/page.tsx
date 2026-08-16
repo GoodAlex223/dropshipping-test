@@ -46,7 +46,8 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { getOrderStatusStyle } from "@/lib/order-status";
+import { useTranslations } from "next-intl";
+import { getOrderStatusStyle, getPaymentStatusStyle } from "@/lib/order-status";
 
 interface OrderItem {
   id: string;
@@ -117,33 +118,35 @@ interface Order {
   supplierOrders: SupplierOrder[];
 }
 
-const STATUS_OPTIONS = [
-  { value: "PENDING", label: "Pending" },
-  { value: "CONFIRMED", label: "Confirmed" },
-  { value: "PROCESSING", label: "Processing" },
-  { value: "SHIPPED", label: "Shipped" },
-  { value: "DELIVERED", label: "Delivered" },
-  { value: "CANCELLED", label: "Cancelled" },
-  { value: "REFUNDED", label: "Refunded" },
-];
-
-const PAYMENT_STATUS_COLORS: Record<string, string> = {
-  PENDING: "bg-yellow-100 text-yellow-800",
-  PAID: "bg-green-100 text-green-800",
-  FAILED: "bg-red-100 text-red-800",
-  REFUNDED: "bg-gray-100 text-gray-800",
-  PARTIALLY_REFUNDED: "bg-orange-100 text-orange-800",
-};
-
-const ORDER_TIMELINE = [
-  { status: "PENDING", label: "Order Placed", icon: Clock },
-  { status: "CONFIRMED", label: "Order Confirmed", icon: CheckCircle2 },
-  { status: "PROCESSING", label: "Processing", icon: Package },
-  { status: "SHIPPED", label: "Shipped", icon: Truck },
-  { status: "DELIVERED", label: "Delivered", icon: CheckCircle2 },
-];
-
 export default function AdminOrderDetailPage() {
+  const t = useTranslations("admin.orders");
+  const tCommon = useTranslations("admin.common");
+  const tStatus = useTranslations("account");
+  // Unknown enum values degrade to the raw status, never the key path
+  // (parity with main's `?? status`); drift net in i18n-catalogs.test.ts.
+  const orderStatusLabel = (s: string) =>
+    tStatus.has(`orderStatus.${s}` as never) ? tStatus(`orderStatus.${s}` as never) : s;
+  const paymentStatusLabel = (s: string) =>
+    tStatus.has(`paymentStatus.${s}` as never) ? tStatus(`paymentStatus.${s}` as never) : s;
+
+  const STATUS_OPTIONS = [
+    { value: "PENDING", label: orderStatusLabel("PENDING") },
+    { value: "CONFIRMED", label: orderStatusLabel("CONFIRMED") },
+    { value: "PROCESSING", label: orderStatusLabel("PROCESSING") },
+    { value: "SHIPPED", label: orderStatusLabel("SHIPPED") },
+    { value: "DELIVERED", label: orderStatusLabel("DELIVERED") },
+    { value: "CANCELLED", label: orderStatusLabel("CANCELLED") },
+    { value: "REFUNDED", label: orderStatusLabel("REFUNDED") },
+  ];
+
+  const ORDER_TIMELINE = [
+    { status: "PENDING", label: t("timeline.placed"), icon: Clock },
+    { status: "CONFIRMED", label: t("timeline.confirmed"), icon: CheckCircle2 },
+    { status: "PROCESSING", label: t("timeline.processing"), icon: Package },
+    { status: "SHIPPED", label: t("timeline.shipped"), icon: Truck },
+    { status: "DELIVERED", label: t("timeline.delivered"), icon: CheckCircle2 },
+  ];
+
   // non-null: the pages-compat types in next-env.d.ts make useParams() nullable; App Router always supplies params
   const { id } = useParams<{ id: string }>()!;
   const router = useRouter();
@@ -166,9 +169,9 @@ export default function AdminOrderDetailPage() {
         const response = await fetch(`/api/admin/orders/${id}`);
         if (!response.ok) {
           if (response.status === 404) {
-            setError("Order not found");
+            setError(t("notFound"));
           } else {
-            setError("Failed to load order");
+            setError(t("loadFailed"));
           }
           return;
         }
@@ -178,14 +181,14 @@ export default function AdminOrderDetailPage() {
         setTrackingNumber(data.trackingNumber || "");
         setTrackingUrl(data.trackingUrl || "");
       } catch {
-        setError("Failed to load order");
+        setError(t("loadFailed"));
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchOrder();
-  }, [id]);
+  }, [id, t]);
 
   const handleUpdateStatus = async () => {
     if (!order) return;
@@ -217,9 +220,9 @@ export default function AdminOrderDetailPage() {
       });
       setIsDialogOpen(false);
       setUpdateNotes("");
-      toast.success("Order updated successfully");
+      toast.success(t("updateSuccess"));
     } catch {
-      toast.error("Failed to update order");
+      toast.error(t("updateError"));
     } finally {
       setIsUpdating(false);
     }
@@ -237,7 +240,7 @@ export default function AdminOrderDetailPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to forward order");
+        throw new Error(data.error || t("forwardError"));
       }
 
       toast.success(data.message);
@@ -249,14 +252,14 @@ export default function AdminOrderDetailPage() {
         setOrder(refreshedOrder);
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to forward order");
+      toast.error(err instanceof Error ? err.message : t("forwardError"));
     } finally {
       setIsForwarding(false);
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString("uk-UA", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -292,9 +295,9 @@ export default function AdminOrderDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <Package className="text-muted-foreground h-16 w-16" />
-        <h2 className="mt-4 text-lg font-medium">{error || "Order not found"}</h2>
+        <h2 className="mt-4 text-lg font-medium">{error || t("notFound")}</h2>
         <Button className="mt-6" onClick={() => router.push("/admin/orders")}>
-          Back to Orders
+          {t("backToOrders")}
         </Button>
       </div>
     );
@@ -313,19 +316,21 @@ export default function AdminOrderDetailPage() {
             </Link>
           </Button>
           <div>
-            <h1 className="text-2xl font-bold">Order {order.orderNumber}</h1>
-            <p className="text-muted-foreground text-sm">Placed on {formatDate(order.createdAt)}</p>
+            <h1 className="text-2xl font-bold">{t("orderTitle", { num: order.orderNumber })}</h1>
+            <p className="text-muted-foreground text-sm">
+              {t("placedOn", { date: formatDate(order.createdAt) })}
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="secondary" className={`${getOrderStatusStyle(order.status)} text-sm`}>
-            {order.status}
+            {orderStatusLabel(order.status)}
           </Badge>
           <Badge
             variant="secondary"
-            className={`${PAYMENT_STATUS_COLORS[order.paymentStatus]} text-sm`}
+            className={`${getPaymentStatusStyle(order.paymentStatus)} text-sm`}
           >
-            {order.paymentStatus}
+            {paymentStatusLabel(order.paymentStatus)}
           </Badge>
           {order.paymentStatus === "PAID" &&
             !["CANCELLED", "REFUNDED", "DELIVERED"].includes(order.status) && (
@@ -333,30 +338,28 @@ export default function AdminOrderDetailPage() {
                 {isForwarding ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Forwarding...
+                    {t("forwarding")}
                   </>
                 ) : (
                   <>
                     <Send className="mr-2 h-4 w-4" />
-                    Forward to Suppliers
+                    {t("forwardToSuppliers")}
                   </>
                 )}
               </Button>
             )}
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button>Update Status</Button>
+              <Button>{t("updateStatusButton")}</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Update Order Status</DialogTitle>
-                <DialogDescription>
-                  Change the order status and add tracking information.
-                </DialogDescription>
+                <DialogTitle>{t("updateDialog.title")}</DialogTitle>
+                <DialogDescription>{t("updateDialog.description")}</DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label>Status</Label>
+                  <Label>{t("updateDialog.statusLabel")}</Label>
                   <Select value={newStatus} onValueChange={setNewStatus}>
                     <SelectTrigger>
                       <SelectValue />
@@ -373,29 +376,29 @@ export default function AdminOrderDetailPage() {
                 {(newStatus === "SHIPPED" || order.status === "SHIPPED") && (
                   <>
                     <div className="space-y-2">
-                      <Label>Tracking Number</Label>
+                      <Label>{t("updateDialog.trackingNumberLabel")}</Label>
                       <Input
                         value={trackingNumber}
                         onChange={(e) => setTrackingNumber(e.target.value)}
-                        placeholder="Enter tracking number"
+                        placeholder={t("updateDialog.trackingNumberPlaceholder")}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Tracking URL</Label>
+                      <Label>{t("updateDialog.trackingUrlLabel")}</Label>
                       <Input
                         value={trackingUrl}
                         onChange={(e) => setTrackingUrl(e.target.value)}
-                        placeholder="https://..."
+                        placeholder={t("updateDialog.trackingUrlPlaceholder")}
                       />
                     </div>
                   </>
                 )}
                 <div className="space-y-2">
-                  <Label>Notes (optional)</Label>
+                  <Label>{t("updateDialog.notesLabel")}</Label>
                   <Textarea
                     value={updateNotes}
                     onChange={(e) => setUpdateNotes(e.target.value)}
-                    placeholder="Add internal notes about this update..."
+                    placeholder={t("updateDialog.notesPlaceholder")}
                     rows={3}
                   />
                 </div>
@@ -406,18 +409,18 @@ export default function AdminOrderDetailPage() {
                   onClick={() => setIsDialogOpen(false)}
                   disabled={isUpdating}
                 >
-                  Cancel
+                  {tCommon("cancel")}
                 </Button>
                 <Button onClick={handleUpdateStatus} disabled={isUpdating}>
                   {isUpdating ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Updating...
+                      {t("updateDialog.saving")}
                     </>
                   ) : (
                     <>
                       <Save className="mr-2 h-4 w-4" />
-                      Save Changes
+                      {t("updateDialog.saveButton")}
                     </>
                   )}
                 </Button>
@@ -433,14 +436,18 @@ export default function AdminOrderDetailPage() {
           {/* Order Status Timeline */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Order Status</CardTitle>
+              <CardTitle className="text-base">{t("statusCard.title")}</CardTitle>
             </CardHeader>
             <CardContent>
               {order.status === "CANCELLED" || order.status === "REFUNDED" ? (
                 <div className="flex items-center gap-4 text-red-600">
                   <XCircle className="h-8 w-8" />
                   <div>
-                    <p className="font-medium">Order {order.status.toLowerCase()}</p>
+                    <p className="font-medium">
+                      {order.status === "CANCELLED"
+                        ? t("statusCard.cancelledMessage")
+                        : t("statusCard.refundedMessage")}
+                    </p>
                   </div>
                 </div>
               ) : (
@@ -481,7 +488,7 @@ export default function AdminOrderDetailPage() {
                           {isCurrent && order.status === "SHIPPED" && order.trackingNumber && (
                             <div className="mt-2">
                               <p className="text-muted-foreground text-sm">
-                                Tracking: {order.trackingNumber}
+                                {t("trackingLabel")} {order.trackingNumber}
                               </p>
                               {order.trackingUrl && (
                                 <a
@@ -490,7 +497,7 @@ export default function AdminOrderDetailPage() {
                                   rel="noopener noreferrer"
                                   className="text-primary text-sm hover:underline"
                                 >
-                                  Track Package
+                                  {t("statusCard.trackPackage")}
                                 </a>
                               )}
                             </div>
@@ -507,7 +514,9 @@ export default function AdminOrderDetailPage() {
           {/* Order Items */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Items ({order.items.length})</CardTitle>
+              <CardTitle className="text-base">
+                {t("items.title", { count: order.items.length })}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {order.items.map((item) => (
@@ -537,7 +546,9 @@ export default function AdminOrderDetailPage() {
                     {item.variantInfo && (
                       <p className="text-muted-foreground text-sm">{item.variantInfo}</p>
                     )}
-                    <p className="text-muted-foreground text-sm">SKU: {item.productSku}</p>
+                    <p className="text-muted-foreground text-sm">
+                      {t("items.sku")} {item.productSku}
+                    </p>
                     <div className="mt-2 flex items-center justify-between">
                       <p className="text-sm">
                         {formatPrice(item.unitPrice)} × {item.quantity}
@@ -554,7 +565,7 @@ export default function AdminOrderDetailPage() {
           {order.notes && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Internal Notes</CardTitle>
+                <CardTitle className="text-base">{t("internalNotesTitle")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm whitespace-pre-wrap">{order.notes}</p>
@@ -566,7 +577,7 @@ export default function AdminOrderDetailPage() {
           {order.customerNotes && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Customer Notes</CardTitle>
+                <CardTitle className="text-base">{t("customerNotesTitle")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm">{order.customerNotes}</p>
@@ -580,7 +591,7 @@ export default function AdminOrderDetailPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Truck className="h-4 w-4" />
-                  Supplier Orders ({order.supplierOrders.length})
+                  {t("supplierOrders.title", { count: order.supplierOrders.length })}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -603,13 +614,13 @@ export default function AdminOrderDetailPage() {
                       </div>
                       {so.supplierOrderId && (
                         <p className="text-muted-foreground mt-1 text-sm">
-                          Supplier Order: {so.supplierOrderId}
+                          {t("supplierOrders.orderId")} {so.supplierOrderId}
                         </p>
                       )}
                       {so.trackingNumber && (
                         <div className="mt-1 flex items-center gap-2">
                           <p className="text-muted-foreground text-sm">
-                            Tracking: {so.trackingNumber}
+                            {t("trackingLabel")} {so.trackingNumber}
                           </p>
                           {so.trackingUrl && (
                             <a
@@ -625,7 +636,7 @@ export default function AdminOrderDetailPage() {
                       )}
                       {so.cost && (
                         <p className="text-muted-foreground mt-1 text-sm">
-                          Cost: {formatPrice(so.cost)}
+                          {t("supplierOrders.cost")} {formatPrice(so.cost)}
                         </p>
                       )}
                     </div>
@@ -657,30 +668,30 @@ export default function AdminOrderDetailPage() {
           {/* Order Summary */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Order Summary</CardTitle>
+              <CardTitle className="text-base">{t("summary.title")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Subtotal</span>
+                <span className="text-muted-foreground">{t("summary.subtotal")}</span>
                 <span>{formatPrice(order.subtotal)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Shipping</span>
+                <span className="text-muted-foreground">{t("summary.shipping")}</span>
                 <span>{formatPrice(order.shippingCost)}</span>
               </div>
               {parseFloat(order.discount) > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Discount</span>
+                  <span className="text-muted-foreground">{t("summary.discount")}</span>
                   <span className="text-green-600">-{formatPrice(order.discount)}</span>
                 </div>
               )}
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Tax</span>
+                <span className="text-muted-foreground">{t("summary.tax")}</span>
                 <span>{formatPrice(order.tax)}</span>
               </div>
               <Separator />
               <div className="flex justify-between font-semibold">
-                <span>Total</span>
+                <span>{t("summary.total")}</span>
                 <span>{formatPrice(order.total)}</span>
               </div>
             </CardContent>
@@ -691,7 +702,7 @@ export default function AdminOrderDetailPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <User className="h-4 w-4" />
-                Customer
+                {t("customer.title")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -705,7 +716,9 @@ export default function AdminOrderDetailPage() {
               </div>
               {order.user && (
                 <Button variant="outline" size="sm" className="w-full" asChild>
-                  <Link href={`/admin/customers/${order.user.id}`}>View Customer</Link>
+                  <Link href={`/admin/customers/${order.user.id}`}>
+                    {t("customer.viewCustomer")}
+                  </Link>
                 </Button>
               )}
             </CardContent>
@@ -716,7 +729,7 @@ export default function AdminOrderDetailPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <MapPin className="h-4 w-4" />
-                Shipping Address
+                {t("shippingAddress")}
               </CardTitle>
             </CardHeader>
             <CardContent className="text-sm">
@@ -739,33 +752,35 @@ export default function AdminOrderDetailPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <CreditCard className="h-4 w-4" />
-                Payment
+                {t("payment.title")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Method</span>
-                <span className="capitalize">{order.paymentMethod || "Card"}</span>
+                <span className="text-muted-foreground">{t("payment.method")}</span>
+                <span className="capitalize">
+                  {order.paymentMethod || t("payment.methodDefault")}
+                </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Status</span>
+                <span className="text-muted-foreground">{t("payment.status")}</span>
                 <Badge
                   variant="secondary"
-                  className={`${PAYMENT_STATUS_COLORS[order.paymentStatus]} text-xs`}
+                  className={`${getPaymentStatusStyle(order.paymentStatus)} text-xs`}
                 >
-                  {order.paymentStatus}
+                  {paymentStatusLabel(order.paymentStatus)}
                 </Badge>
               </div>
               {order.paidAt && (
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Paid on</span>
+                  <span className="text-muted-foreground">{t("payment.paidOn")}</span>
                   <span>{formatDate(order.paidAt)}</span>
                 </div>
               )}
               {order.paymentIntent && (
                 <div className="pt-2">
                   <p className="text-muted-foreground text-xs">
-                    Payment Intent: {order.paymentIntent}
+                    {t("payment.paymentIntent")} {order.paymentIntent}
                   </p>
                 </div>
               )}

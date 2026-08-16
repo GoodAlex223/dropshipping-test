@@ -951,7 +951,77 @@
         "default": "Замовлення з'являться тут, коли клієнти їх оформлять"
       },
       "showingRange": "Показано {from}–{to} із {total, plural, one {# замовлення} few {# замовлень} many {# замовлень} other {# замовлення}}",
-      "pageOf": "Сторінка {page} з {total}"
+      "pageOf": "Сторінка {page} з {total}",
+      "orderTitle": "Замовлення {num}",
+      "placedOn": "Оформлено {date}",
+      "notFound": "Замовлення не знайдено",
+      "loadFailed": "Не вдалося завантажити замовлення",
+      "backToOrders": "До замовлень",
+      "forwardToSuppliers": "Переслати постачальникам",
+      "forwarding": "Пересилання…",
+      "updateStatusButton": "Оновити статус",
+      "updateDialog": {
+        "title": "Оновити статус замовлення",
+        "description": "Змініть статус замовлення та додайте інформацію про відстеження.",
+        "statusLabel": "Статус",
+        "trackingNumberLabel": "Номер відстеження",
+        "trackingNumberPlaceholder": "Введіть номер відстеження",
+        "trackingUrlLabel": "URL відстеження",
+        "trackingUrlPlaceholder": "https://...",
+        "notesLabel": "Нотатки (необов'язково)",
+        "notesPlaceholder": "Додайте внутрішні нотатки щодо цього оновлення…",
+        "saveButton": "Зберегти зміни",
+        "saving": "Оновлення…"
+      },
+      "statusCard": {
+        "title": "Статус замовлення",
+        "cancelledMessage": "Замовлення скасовано",
+        "refundedMessage": "Замовлення повернуто",
+        "trackPackage": "Відстежити посилку"
+      },
+      "trackingLabel": "Номер відстеження:",
+      "timeline": {
+        "placed": "Замовлення оформлено",
+        "confirmed": "Замовлення підтверджено",
+        "processing": "Обробляється",
+        "shipped": "Відправлено",
+        "delivered": "Доставлено"
+      },
+      "items": {
+        "title": "Товари ({count})",
+        "sku": "Артикул:"
+      },
+      "internalNotesTitle": "Внутрішні нотатки",
+      "customerNotesTitle": "Нотатки клієнта",
+      "supplierOrders": {
+        "title": "Замовлення постачальникам ({count})",
+        "orderId": "Замовлення постачальника:",
+        "cost": "Вартість:"
+      },
+      "summary": {
+        "title": "Разом",
+        "subtotal": "Товари",
+        "shipping": "Доставка",
+        "discount": "Знижка",
+        "tax": "Податок",
+        "total": "До сплати"
+      },
+      "customer": {
+        "title": "Клієнт",
+        "viewCustomer": "Переглянути клієнта"
+      },
+      "shippingAddress": "Адреса доставки",
+      "payment": {
+        "title": "Оплата",
+        "method": "Спосіб",
+        "methodDefault": "Картка",
+        "status": "Статус",
+        "paidOn": "Оплачено",
+        "paymentIntent": "Payment Intent:"
+      },
+      "updateSuccess": "Замовлення успішно оновлено",
+      "updateError": "Не вдалося оновити замовлення",
+      "forwardError": "Не вдалося переслати замовлення"
     },
     "supplierOrderStatus": {
       "pending": "Очікує",

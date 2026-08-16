@@ -39,8 +39,11 @@ afterEach(() => {
 // route id into its fetch URL (non-vacuous: id must actually flow).
 describe("dynamic-route params regression (use(params) → useParams)", () => {
   it("/admin/orders/[id] renders and fetches by route id", async () => {
-    render(<AdminOrderDetailPage />);
-    expect(await screen.findByText("Order not found")).toBeInTheDocument();
+    // renderWithIntl: the page now calls useTranslations (G13 Task 7) —
+    // the products/suppliers detail pages below stay hardcoded EN
+    // (out of scope until their own G13 tasks) and don't need the provider.
+    renderWithIntl(<AdminOrderDetailPage />);
+    expect(await screen.findByText("Замовлення не знайдено")).toBeInTheDocument();
     expect(global.fetch).toHaveBeenCalledWith("/api/admin/orders/test-id");
   });
 
@@ -60,8 +63,9 @@ describe("dynamic-route params regression (use(params) → useParams)", () => {
 
   it("/account/orders/[id] renders and fetches by route id", async () => {
     // renderWithIntl only (not render): the page now calls useTranslations
-    // (TASK-039 Task 5) — the other three admin pages above stay hardcoded
-    // UA (out of scope until G13) and don't need the provider.
+    // (TASK-039 Task 5). The admin orders detail page above was migrated
+    // too (G13 Task 7); products/suppliers detail stay hardcoded EN
+    // (out of scope until their own G13 tasks) and don't need the provider.
     renderWithIntl(<AccountOrderDetailPage />);
     expect(await screen.findByText("Замовлення не знайдено")).toBeInTheDocument();
     expect(global.fetch).toHaveBeenCalledWith("/api/orders/test-id");
