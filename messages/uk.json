@@ -788,6 +788,23 @@
       "wordmark": "Адмін",
       "backToStore": "Повернутися до магазину"
     },
+    "customers": {
+      "title": "Клієнти",
+      "subtitle": "Керування обліковими записами клієнтів",
+      "searchPlaceholder": "Пошук за іменем або email…",
+      "headers": {
+        "customer": "Клієнт",
+        "email": "Email",
+        "orders": "Замовлення",
+        "totalSpent": "Всього витрачено",
+        "joined": "Дата реєстрації"
+      },
+      "empty": "Клієнтів не знайдено",
+      "tryAdjusting": "Спробуйте змінити пошуковий запит",
+      "anonymous": "Без імені",
+      "loadError": "Не вдалося завантажити клієнтів",
+      "showingRange": "Показано {from}–{to} із {total, plural, one {# клієнта} few {# клієнтів} many {# клієнтів} other {# клієнта}}"
+    },
     "supplierOrderStatus": {
       "pending": "Очікує",
       "submitted": "Надіслано",
