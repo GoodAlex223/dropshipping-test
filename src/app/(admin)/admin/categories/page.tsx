@@ -50,7 +50,8 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 interface Category {
   id: string;
@@ -78,7 +79,8 @@ interface PaginatedResponse {
 }
 
 export default function AdminCategoriesPage() {
-  const { toast } = useToast();
+  const t = useTranslations("admin.categories");
+  const tCommon = useTranslations("admin.common");
   const [categories, setCategories] = useState<Category[]>([]);
   const [allCategories, setAllCategories] = useState<
     { id: string; name: string; slug: string; parentId: string | null }[]
@@ -126,17 +128,12 @@ export default function AdminCategoriesPage() {
       const data: PaginatedResponse = await response.json();
       setCategories(data.data);
       setPagination((prev) => ({ ...prev, ...data.pagination }));
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load categories",
-        variant: "destructive",
-      });
+    } catch {
+      toast.error(t("loadError"));
     } finally {
       setIsLoading(false);
     }
-  }, [pagination.page, pagination.limit, search, parentFilter, toast]);
+  }, [pagination.page, pagination.limit, search, parentFilter, t]);
 
   const fetchAllCategories = useCallback(async () => {
     try {
@@ -221,20 +218,13 @@ export default function AdminCategoriesPage() {
         throw new Error(error.error || "Failed to save category");
       }
 
-      toast({
-        title: "Success",
-        description: `Category ${selectedCategory ? "updated" : "created"} successfully`,
-      });
+      toast.success(selectedCategory ? t("updateSuccess") : t("createSuccess"));
 
       setEditDialogOpen(false);
       fetchCategories();
       fetchAllCategories();
     } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to save category",
-        variant: "destructive",
-      });
+      toast.error(error instanceof Error ? error.message : t("saveError"));
     } finally {
       setIsSubmitting(false);
     }
@@ -254,20 +244,13 @@ export default function AdminCategoriesPage() {
         throw new Error(error.error || "Failed to delete category");
       }
 
-      toast({
-        title: "Success",
-        description: "Category deleted successfully",
-      });
+      toast.success(t("deleteSuccess"));
 
       setDeleteDialogOpen(false);
       fetchCategories();
       fetchAllCategories();
     } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to delete category",
-        variant: "destructive",
-      });
+      toast.error(error instanceof Error ? error.message : t("deleteError"));
     } finally {
       setIsSubmitting(false);
     }
@@ -305,12 +288,12 @@ export default function AdminCategoriesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Categories</h1>
-          <p className="text-muted-foreground">Manage product categories and subcategories</p>
+          <h1 className="text-3xl font-bold">{t("title")}</h1>
+          <p className="text-muted-foreground">{t("subtitle")}</p>
         </div>
         <Button onClick={openCreateDialog}>
           <Plus className="mr-2 h-4 w-4" />
-          Add Category
+          {t("addButton")}
         </Button>
       </div>
 
@@ -320,24 +303,24 @@ export default function AdminCategoriesPage() {
           <div className="relative max-w-sm flex-1">
             <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
-              placeholder="Search categories..."
+              placeholder={t("searchPlaceholder")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-9"
             />
           </div>
           <Button type="submit" variant="secondary">
-            Search
+            {tCommon("search")}
           </Button>
         </form>
 
         <Select value={parentFilter} onValueChange={setParentFilter}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by parent" />
+            <SelectValue placeholder={t("filterPlaceholder")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
-            <SelectItem value="root">Root Categories</SelectItem>
+            <SelectItem value="all">{t("allCategories")}</SelectItem>
+            <SelectItem value="root">{t("rootCategories")}</SelectItem>
             {allCategories
               .filter((c) => !c.parentId)
               .map((category) => (
@@ -354,12 +337,12 @@ export default function AdminCategoriesPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Parent</TableHead>
-              <TableHead className="text-center">Products</TableHead>
-              <TableHead className="text-center">Subcategories</TableHead>
-              <TableHead className="text-center">Order</TableHead>
-              <TableHead className="text-center">Status</TableHead>
+              <TableHead>{t("headers.name")}</TableHead>
+              <TableHead>{t("headers.parent")}</TableHead>
+              <TableHead className="text-center">{t("headers.products")}</TableHead>
+              <TableHead className="text-center">{t("headers.subcategories")}</TableHead>
+              <TableHead className="text-center">{t("headers.order")}</TableHead>
+              <TableHead className="text-center">{t("headers.status")}</TableHead>
               <TableHead className="w-[70px]"></TableHead>
             </TableRow>
           </TableHeader>
@@ -393,10 +376,10 @@ export default function AdminCategoriesPage() {
                 <TableCell colSpan={7} className="h-32 text-center">
                   <div className="flex flex-col items-center justify-center">
                     <FolderTree className="text-muted-foreground h-10 w-10" />
-                    <p className="text-muted-foreground mt-2 text-sm">No categories found</p>
+                    <p className="text-muted-foreground mt-2 text-sm">{t("empty")}</p>
                     <Button variant="outline" className="mt-4" onClick={openCreateDialog}>
                       <Plus className="mr-2 h-4 w-4" />
-                      Create First Category
+                      {t("createFirstButton")}
                     </Button>
                   </div>
                 </TableCell>
@@ -450,7 +433,7 @@ export default function AdminCategoriesPage() {
                   <TableCell className="text-center">{category.sortOrder}</TableCell>
                   <TableCell className="text-center">
                     <Badge variant={category.isActive ? "default" : "secondary"}>
-                      {category.isActive ? "Active" : "Inactive"}
+                      {category.isActive ? t("status.active") : t("status.inactive")}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -463,14 +446,14 @@ export default function AdminCategoriesPage() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => openEditDialog(category)}>
                           <Pencil className="mr-2 h-4 w-4" />
-                          Edit
+                          {tCommon("edit")}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => openDeleteDialog(category)}
                           className="text-red-600"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
+                          {tCommon("delete")}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -486,9 +469,11 @@ export default function AdminCategoriesPage() {
       {pagination.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-muted-foreground text-sm">
-            Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
-            {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}{" "}
-            categories
+            {t("showingRange", {
+              from: (pagination.page - 1) * pagination.limit + 1,
+              to: Math.min(pagination.page * pagination.limit, pagination.total),
+              total: pagination.total,
+            })}
           </p>
           <div className="flex gap-2">
             <Button
@@ -497,7 +482,7 @@ export default function AdminCategoriesPage() {
               disabled={pagination.page <= 1}
               onClick={() => setPagination((prev) => ({ ...prev, page: prev.page - 1 }))}
             >
-              Previous
+              {tCommon("previous")}
             </Button>
             <Button
               variant="outline"
@@ -505,7 +490,7 @@ export default function AdminCategoriesPage() {
               disabled={pagination.page >= pagination.totalPages}
               onClick={() => setPagination((prev) => ({ ...prev, page: prev.page + 1 }))}
             >
-              Next
+              {tCommon("next")}
             </Button>
           </div>
         </div>
@@ -515,11 +500,13 @@ export default function AdminCategoriesPage() {
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>{selectedCategory ? "Edit Category" : "Create Category"}</DialogTitle>
+            <DialogTitle>
+              {selectedCategory ? t("form.editTitle") : t("form.createTitle")}
+            </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name *</Label>
+              <Label htmlFor="name">{t("form.nameLabel")}</Label>
               <Input
                 id="name"
                 value={formData.name}
@@ -531,13 +518,13 @@ export default function AdminCategoriesPage() {
                     slug: prev.slug || generateSlug(name),
                   }));
                 }}
-                placeholder="Category name"
+                placeholder={t("form.namePlaceholder")}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="slug">Slug</Label>
+              <Label htmlFor="slug">{t("form.slugLabel")}</Label>
               <Input
                 id="slug"
                 value={formData.slug}
@@ -547,18 +534,18 @@ export default function AdminCategoriesPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">{t("form.descriptionLabel")}</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
-                placeholder="Category description"
+                placeholder={t("form.descriptionPlaceholder")}
                 rows={3}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="image">Image URL</Label>
+              <Label htmlFor="image">{t("form.imageLabel")}</Label>
               <Input
                 id="image"
                 type="url"
@@ -569,7 +556,7 @@ export default function AdminCategoriesPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="parent">Parent Category</Label>
+              <Label htmlFor="parent">{t("form.parentLabel")}</Label>
               <Select
                 value={formData.parentId || "none"}
                 onValueChange={(value) =>
@@ -577,10 +564,10 @@ export default function AdminCategoriesPage() {
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="None (Root Category)" />
+                  <SelectValue placeholder={t("form.noneRootCategory")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">None (Root Category)</SelectItem>
+                  <SelectItem value="none">{t("form.noneRootCategory")}</SelectItem>
                   {getAvailableParents().map((category) => (
                     <SelectItem key={category.id} value={category.id}>
                       {category.name}
@@ -591,7 +578,7 @@ export default function AdminCategoriesPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="sortOrder">Sort Order</Label>
+              <Label htmlFor="sortOrder">{t("form.sortOrderLabel")}</Label>
               <Input
                 id="sortOrder"
                 type="number"
@@ -604,7 +591,7 @@ export default function AdminCategoriesPage() {
             </div>
 
             <div className="flex items-center justify-between">
-              <Label htmlFor="isActive">Active</Label>
+              <Label htmlFor="isActive">{t("form.activeLabel")}</Label>
               <Switch
                 id="isActive"
                 checked={formData.isActive}
@@ -616,10 +603,14 @@ export default function AdminCategoriesPage() {
 
             <div className="flex justify-end gap-2 pt-4">
               <Button type="button" variant="outline" onClick={() => setEditDialogOpen(false)}>
-                Cancel
+                {tCommon("cancel")}
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : selectedCategory ? "Update" : "Create"}
+                {isSubmitting
+                  ? t("form.saving")
+                  : selectedCategory
+                    ? t("form.update")
+                    : tCommon("create")}
               </Button>
             </div>
           </form>
@@ -630,25 +621,27 @@ export default function AdminCategoriesPage() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Category</AlertDialogTitle>
+            <AlertDialogTitle>{t("deleteDialog.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete &quot;{selectedCategory?.name}&quot;?
+              {t("deleteDialog.confirmText", { name: selectedCategory?.name ?? "" })}
               {selectedCategory && selectedCategory._count.products > 0 && (
                 <span className="text-destructive mt-2 block">
-                  This category has {selectedCategory._count.products} products and cannot be
-                  deleted until they are moved or removed.
+                  {t("deleteDialog.hasProductsWarning", {
+                    count: selectedCategory._count.products,
+                  })}
                 </span>
               )}
               {selectedCategory && selectedCategory._count.children > 0 && (
                 <span className="text-destructive mt-2 block">
-                  This category has {selectedCategory._count.children} subcategories and cannot be
-                  deleted until they are moved or removed.
+                  {t("deleteDialog.hasChildrenWarning", {
+                    count: selectedCategory._count.children,
+                  })}
                 </span>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={
@@ -660,7 +653,7 @@ export default function AdminCategoriesPage() {
               }
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isSubmitting ? "Deleting..." : "Delete"}
+              {isSubmitting ? t("deleteDialog.deleting") : tCommon("delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

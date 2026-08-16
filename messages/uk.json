@@ -805,6 +805,59 @@
       "loadError": "Не вдалося завантажити клієнтів",
       "showingRange": "Показано {from}–{to} із {total, plural, one {# клієнта} few {# клієнтів} many {# клієнтів} other {# клієнта}}"
     },
+    "categories": {
+      "title": "Категорії",
+      "subtitle": "Керування категоріями та підкатегоріями товарів",
+      "addButton": "Додати категорію",
+      "searchPlaceholder": "Пошук категорій…",
+      "filterPlaceholder": "Фільтр за батьківською категорією",
+      "allCategories": "Усі категорії",
+      "rootCategories": "Кореневі категорії",
+      "headers": {
+        "name": "Назва",
+        "parent": "Батьківська категорія",
+        "products": "Товари",
+        "subcategories": "Підкатегорії",
+        "order": "Порядок",
+        "status": "Статус"
+      },
+      "status": {
+        "active": "Активний",
+        "inactive": "Неактивний"
+      },
+      "empty": "Категорій не знайдено",
+      "createFirstButton": "Створити першу категорію",
+      "showingRange": "Показано {from}–{to} із {total, plural, one {# категорії} few {# категорій} many {# категорій} other {# категорії}}",
+      "form": {
+        "createTitle": "Створити категорію",
+        "editTitle": "Редагувати категорію",
+        "nameLabel": "Назва *",
+        "namePlaceholder": "Назва категорії",
+        "slugLabel": "Slug",
+        "descriptionLabel": "Опис",
+        "descriptionPlaceholder": "Опис категорії",
+        "imageLabel": "URL зображення",
+        "parentLabel": "Батьківська категорія",
+        "noneRootCategory": "Немає (коренева категорія)",
+        "sortOrderLabel": "Порядок сортування",
+        "activeLabel": "Активний",
+        "saving": "Збереження…",
+        "update": "Оновити"
+      },
+      "deleteDialog": {
+        "title": "Видалити категорію",
+        "confirmText": "Ви впевнені, що хочете видалити «{name}»?",
+        "hasProductsWarning": "Ця категорія містить {count, plural, one {# товар} few {# товари} many {# товарів} other {# товарів}} і не може бути видалена, доки їх не буде переміщено або видалено.",
+        "hasChildrenWarning": "Ця категорія містить {count, plural, one {# підкатегорію} few {# підкатегорії} many {# підкатегорій} other {# підкатегорій}} і не може бути видалена, доки їх не буде переміщено або видалено.",
+        "deleting": "Видалення…"
+      },
+      "loadError": "Не вдалося завантажити категорії",
+      "updateSuccess": "Категорію успішно оновлено",
+      "createSuccess": "Категорію успішно створено",
+      "saveError": "Не вдалося зберегти категорію",
+      "deleteSuccess": "Категорію успішно видалено",
+      "deleteError": "Не вдалося видалити категорію"
+    },
     "supplierOrderStatus": {
       "pending": "Очікує",
       "submitted": "Надіслано",
