@@ -788,6 +788,15 @@
       "wordmark": "Адмін",
       "backToStore": "Повернутися до магазину"
     },
+    "supplierOrderStatus": {
+      "pending": "Очікує",
+      "submitted": "Надіслано",
+      "confirmed": "Підтверджено",
+      "shipped": "Відправлено",
+      "delivered": "Доставлено",
+      "cancelled": "Скасовано",
+      "failed": "Помилка"
+    },
     "common": {
       "save": "Зберегти",
       "cancel": "Скасувати",
