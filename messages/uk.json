@@ -1057,7 +1057,7 @@
       "showingRange": "Показано {from}–{to} із {total, plural, one {# постачальника} few {# постачальників} many {# постачальників} other {# постачальника}}",
       "pageOf": "Сторінка {page} з {total}",
       "form": {
-        "createTitle": "Додати постачальника",
+        "createTitle": "Створити постачальника",
         "editTitle": "Редагувати постачальника",
         "createDescription": "Додайте нового постачальника для керування джерелами товарів.",
         "editDescription": "Оновіть інформацію про постачальника нижче.",
@@ -1088,7 +1088,7 @@
         "activeLabel": "Активний",
         "nameCodeRequired": "Вкажіть назву та код",
         "saving": "Збереження…",
-        "createButton": "Додати постачальника",
+        "createButton": "Створити постачальника",
         "updateButton": "Оновити постачальника"
       },
       "deleteDialog": {
