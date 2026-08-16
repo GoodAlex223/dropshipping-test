@@ -921,6 +921,38 @@
       "saveChangesButton": "Зберегти зміни",
       "saving": "Збереження…"
     },
+    "orders": {
+      "title": "Замовлення",
+      "subtitle": "Керування та відстеження замовлень клієнтів",
+      "searchPlaceholder": "Пошук за номером замовлення, email або іменем клієнта…",
+      "export": "Експортувати CSV",
+      "exporting": "Експортування…",
+      "allStatuses": "Усі статуси",
+      "allPaymentStatuses": "Усі статуси оплати",
+      "dateRange": {
+        "title": "Період",
+        "from": "Від",
+        "to": "До"
+      },
+      "clearFilters": "Скинути фільтри",
+      "headers": {
+        "order": "Замовлення",
+        "customer": "Клієнт",
+        "date": "Дата",
+        "status": "Статус",
+        "payment": "Оплата",
+        "total": "Всього"
+      },
+      "guest": "Гість",
+      "itemsCount": "{count, plural, one {# товар} few {# товари} many {# товарів} other {# товару}}",
+      "empty": {
+        "title": "Замовлень не знайдено",
+        "filtered": "Спробуйте змінити фільтри",
+        "default": "Замовлення з'являться тут, коли клієнти їх оформлять"
+      },
+      "showingRange": "Показано {from}–{to} із {total, plural, one {# замовлення} few {# замовлень} many {# замовлень} other {# замовлення}}",
+      "pageOf": "Сторінка {page} з {total}"
+    },
     "supplierOrderStatus": {
       "pending": "Очікує",
       "submitted": "Надіслано",
