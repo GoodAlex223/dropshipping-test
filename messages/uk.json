@@ -1147,6 +1147,52 @@
         }
       }
     },
+    "products": {
+      "title": "Товари",
+      "subtitle": "Керування каталогом товарів ({count, plural, one {# товар} few {# товари} many {# товарів} other {# товару}})",
+      "importCsv": "Імпортувати CSV",
+      "addButton": "Додати товар",
+      "searchPlaceholder": "Пошук товарів…",
+      "categoryFilter": {
+        "placeholder": "Усі категорії"
+      },
+      "statusFilter": {
+        "placeholder": "Усі статуси",
+        "active": "Активний",
+        "inactive": "Неактивний"
+      },
+      "headers": {
+        "image": "Зображення",
+        "product": "Товар",
+        "sku": "SKU",
+        "category": "Категорія",
+        "price": "Ціна",
+        "stock": "Залишок",
+        "status": "Статус"
+      },
+      "featured": "Рекомендований",
+      "view": "Переглянути",
+      "empty": {
+        "title": "Товарів не знайдено",
+        "addFirstButton": "Додати перший товар"
+      },
+      "showingRange": "Показано {from}–{to} із {total, plural, one {# товар} few {# товари} many {# товарів} other {# товару}}",
+      "pageOf": "Сторінка {page} з {total}",
+      "deleteDialog": {
+        "title": "Видалити товар",
+        "confirmText": "Ви впевнені, що хочете видалити цей товар? Цю дію неможливо скасувати.",
+        "deleting": "Видалення…"
+      },
+      "loadError": "Не вдалося завантажити товари",
+      "deleteSuccess": "Товар успішно видалено",
+      "deleteError": "Не вдалося видалити товар",
+      "editTitle": "Редагувати товар",
+      "notFound": "Товар не знайдено",
+      "loadFailed": "Не вдалося завантажити товар",
+      "backToProducts": "До товарів",
+      "newTitle": "Новий товар",
+      "newDescription": "Додайте новий товар до каталогу"
+    },
     "supplierOrderStatus": {
       "pending": "Очікує",
       "submitted": "Надіслано",

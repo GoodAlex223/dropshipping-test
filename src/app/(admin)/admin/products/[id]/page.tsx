@@ -7,6 +7,7 @@ import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProductForm } from "@/components/admin";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 interface Product {
   id: string;
@@ -28,6 +29,7 @@ interface Product {
 }
 
 export default function EditProductPage() {
+  const t = useTranslations("admin.products");
   // non-null: the pages-compat types in next-env.d.ts make useParams() nullable; App Router always supplies params
   const { id } = useParams<{ id: string }>()!;
   const [product, setProduct] = useState<Product | null>(null);
@@ -40,23 +42,22 @@ export default function EditProductPage() {
         const response = await fetch(`/api/admin/products/${id}`);
         if (!response.ok) {
           if (response.status === 404) {
-            throw new Error("Product not found");
+            throw new Error(t("notFound"));
           }
-          throw new Error("Failed to fetch product");
+          throw new Error(t("loadFailed"));
         }
         const data = await response.json();
         setProduct(data);
       } catch (err) {
-        console.error("Error fetching product:", err);
-        setError(err instanceof Error ? err.message : "Failed to load product");
-        toast.error("Failed to load product");
+        setError(err instanceof Error ? err.message : t("loadFailed"));
+        toast.error(t("loadFailed"));
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchProduct();
-  }, [id]);
+  }, [id, t]);
 
   if (isLoading) {
     return (
@@ -81,10 +82,10 @@ export default function EditProductPage() {
   if (error || !product) {
     return (
       <div className="flex flex-col items-center justify-center py-16">
-        <h2 className="text-xl font-semibold">Product not found</h2>
+        <h2 className="text-xl font-semibold">{t("notFound")}</h2>
         <p className="text-muted-foreground mt-2">{error}</p>
         <Link href="/admin/products" className="mt-4">
-          <Button>Back to Products</Button>
+          <Button>{t("backToProducts")}</Button>
         </Link>
       </div>
     );
@@ -99,7 +100,7 @@ export default function EditProductPage() {
           </Button>
         </Link>
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Edit Product</h2>
+          <h2 className="text-2xl font-bold tracking-tight">{t("editTitle")}</h2>
           <p className="text-muted-foreground">{product.name}</p>
         </div>
       </div>

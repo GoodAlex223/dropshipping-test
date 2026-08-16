@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import { renderWithIntl } from "../helpers/render-with-intl";
 
 const push = vi.fn();
@@ -39,25 +39,24 @@ afterEach(() => {
 // route id into its fetch URL (non-vacuous: id must actually flow).
 describe("dynamic-route params regression (use(params) → useParams)", () => {
   it("/admin/orders/[id] renders and fetches by route id", async () => {
-    // renderWithIntl: the page now calls useTranslations (G13 Task 7) —
-    // the products detail page below stays hardcoded EN (out of scope until
-    // its own G13 task) and doesn't need the provider.
+    // renderWithIntl: the page now calls useTranslations (G13 Task 7).
     renderWithIntl(<AdminOrderDetailPage />);
     expect(await screen.findByText("Замовлення не знайдено")).toBeInTheDocument();
     expect(global.fetch).toHaveBeenCalledWith("/api/admin/orders/test-id");
   });
 
   it("/admin/products/[id] renders and fetches by route id", async () => {
-    render(<EditProductPage />);
-    // "Product not found" appears twice in the error state (h2 + error <p>)
-    expect((await screen.findAllByText("Product not found")).length).toBeGreaterThan(0);
+    // renderWithIntl: the page now calls useTranslations (G13 Task 10) — all
+    // four pages in this file are now translated.
+    // "Товар не знайдено" appears twice in the error state (h2 + error <p>,
+    // since the 404 branch's thrown Error message is also t("notFound")).
+    renderWithIntl(<EditProductPage />);
+    expect((await screen.findAllByText("Товар не знайдено")).length).toBeGreaterThan(0);
     expect(global.fetch).toHaveBeenCalledWith("/api/admin/products/test-id");
   });
 
   it("/admin/suppliers/[id] renders and fetches by route id", async () => {
-    // renderWithIntl: the page now calls useTranslations (G13 Task 9) — the
-    // products detail page above stays hardcoded EN (out of scope until its
-    // own G13 task) and doesn't need the provider.
+    // renderWithIntl: the page now calls useTranslations (G13 Task 9).
     // 404 path: toast.error + redirect back to the list — no crash is the point
     renderWithIntl(<SupplierDetailPage />);
     await waitFor(() => expect(push).toHaveBeenCalledWith("/admin/suppliers"));
@@ -65,11 +64,8 @@ describe("dynamic-route params regression (use(params) → useParams)", () => {
   });
 
   it("/account/orders/[id] renders and fetches by route id", async () => {
-    // renderWithIntl only (not render): the page now calls useTranslations
-    // (TASK-039 Task 5). The admin orders detail (G13 Task 7) and suppliers
-    // detail (G13 Task 9) pages above were migrated too; the products detail
-    // page stays hardcoded EN (out of scope until its own G13 task) and
-    // doesn't need the provider.
+    // renderWithIntl: the page calls useTranslations (TASK-039 Task 5). All
+    // four pages in this file now call useTranslations/getTranslations.
     renderWithIntl(<AccountOrderDetailPage />);
     expect(await screen.findByText("Замовлення не знайдено")).toBeInTheDocument();
     expect(global.fetch).toHaveBeenCalledWith("/api/orders/test-id");
