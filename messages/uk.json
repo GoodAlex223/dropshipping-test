@@ -953,7 +953,7 @@
       "title": "Замовлення",
       "subtitle": "Керування та відстеження замовлень клієнтів",
       "searchPlaceholder": "Пошук за номером замовлення, email або іменем клієнта…",
-      "export": "Експортувати CSV",
+      "export": "Експорт CSV",
       "exporting": "Експортування…",
       "allStatuses": "Усі статуси",
       "allPaymentStatuses": "Усі статуси оплати",
@@ -1017,7 +1017,7 @@
       },
       "items": {
         "title": "Товари ({count})",
-        "sku": "Артикул:"
+        "sku": "SKU:"
       },
       "internalNotesTitle": "Внутрішні нотатки",
       "customerNotesTitle": "Нотатки клієнта",
@@ -1155,8 +1155,8 @@
         },
         "productsTable": {
           "product": "Товар",
-          "sku": "Артикул",
-          "supplierSku": "Артикул постачальника",
+          "sku": "SKU",
+          "supplierSku": "SKU постачальника",
           "ourPrice": "Наша ціна",
           "supplierPrice": "Ціна постачальника",
           "stock": "Залишок"
@@ -1204,7 +1204,7 @@
         "title": "Товарів не знайдено",
         "addFirstButton": "Додати перший товар"
       },
-      "showingRange": "Показано {from}–{to} із {total, plural, one {# товар} few {# товари} many {# товарів} other {# товару}}",
+      "showingRange": "Показано {from}–{to} із {total, plural, one {# товару} few {# товарів} many {# товарів} other {# товару}}",
       "pageOf": "Сторінка {page} з {total}",
       "deleteDialog": {
         "title": "Видалити товар",
@@ -1294,7 +1294,7 @@
       "dragDrop": "Перетягніть зображення сюди",
       "browseHint": "або натисніть, щоб обрати (макс. 5MB кожне)",
       "countLabel": "{count}/{max} {max, plural, one {зображення} few {зображення} many {зображень} other {зображення}}",
-      "uploading": "Завантаження {count, plural, one {# файл} few {# файли} many {# файлів} other {# файлу}}…",
+      "uploading": "Завантаження {count, plural, one {# файлу} few {# файлів} many {# файлів} other {# файлу}}…",
       "onlyNMore": "Можна додати ще {count, plural, one {# зображення} few {# зображення} many {# зображень} other {# зображення}}",
       "uploadFailed": "Не вдалося завантажити {name}",
       "uploaded": "{count, plural, one {Завантажено # зображення} few {Завантажено # зображення} many {Завантажено # зображень} other {Завантажено # зображення}}"
