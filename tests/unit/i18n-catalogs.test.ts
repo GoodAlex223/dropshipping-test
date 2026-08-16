@@ -294,8 +294,9 @@ describe("Prisma enum → account status label coverage", () => {
   // with a raw-status runtime fallback; this block is the drift net that fails
   // BEFORE a new Prisma enum value ships unlabeled. (Sole net since PR #37
   // review round 2 deleted src/content/account.ts and its map-coverage tests —
-  // the maps had no production consumers; admin renders raw enum values until
-  // G13 sources labels from the catalog.)
+  // the maps had no production consumers; admin now sources labels from the
+  // catalog since G13, reusing these same account.orderStatus/paymentStatus
+  // keys.)
   const orderStatusLabels = uk.account.orderStatus as Record<string, string>;
   const paymentStatusLabels = uk.account.paymentStatus as Record<string, string>;
 

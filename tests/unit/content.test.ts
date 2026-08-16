@@ -72,8 +72,9 @@ describe("home content", () => {
 
 // "account content" describe block removed (PR #37 review round 2) —
 // src/content/account.ts deleted: its two label maps had no production
-// consumers (admin renders raw enum values until G13; the account pages
-// read the catalog). The Prisma-enum label coverage lives in
+// consumers (admin now sources labels from the catalog since G13, reusing
+// these same account.* keys; the account pages read the catalog too). The
+// Prisma-enum label coverage lives in
 // i18n-catalogs.test.ts's drift net against messages/uk.json. The
 // customer-copy `account.orders.card.more` plural and
 // `account.orderDetail.payment.methodLabel` ternary moved out back in

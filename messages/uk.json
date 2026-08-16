@@ -788,6 +788,34 @@
       "wordmark": "Адмін",
       "backToStore": "Повернутися до магазину"
     },
+    "dashboard": {
+      "title": "Дашборд",
+      "subtitle": "Огляд ефективності вашого магазину.",
+      "stats": {
+        "totalRevenue": "Всього доходу",
+        "orders": "Замовлення",
+        "products": "Товари",
+        "customers": "Клієнти",
+        "subscribers": "Підписники",
+        "changeFromLastMonth": "+0% порівняно з минулим місяцем",
+        "activeProducts": "Активні товари",
+        "registeredUsers": "Зареєстровані користувачі",
+        "activeSubscribers": "Активні підписники розсилки"
+      },
+      "recentOrders": {
+        "title": "Останні замовлення",
+        "empty": "Замовлень поки немає.",
+        "description": "Замовлення з'являться тут, щойно клієнти почнуть здійснювати покупки."
+      },
+      "quickActions": {
+        "title": "Швидкі дії",
+        "subtitle": "Типові завдання",
+        "addProducts": "Додати нові товари",
+        "manageCategories": "Керувати категоріями",
+        "configureSuppliers": "Налаштувати постачальників",
+        "updateSettings": "Оновити налаштування магазину"
+      }
+    },
     "customers": {
       "title": "Клієнти",
       "subtitle": "Керування обліковими записами клієнтів",
