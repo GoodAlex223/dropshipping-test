@@ -42,7 +42,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatPrice } from "@/lib/format";
+import { getSupplierOrderStatusStyle } from "@/lib/supplier-order-status";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 interface Product {
   id: string;
@@ -85,20 +87,27 @@ interface Supplier {
   updatedAt: string;
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  pending: "bg-yellow-100 text-yellow-800",
-  submitted: "bg-blue-100 text-blue-800",
-  confirmed: "bg-purple-100 text-purple-800",
-  shipped: "bg-indigo-100 text-indigo-800",
-  delivered: "bg-green-100 text-green-800",
-  cancelled: "bg-red-100 text-red-800",
-  failed: "bg-red-100 text-red-800",
+// apiType is a plain string driven by a fixed <SelectItem> vocabulary in the
+// list page's create/edit form (Task 8) — map it onto that form's labels,
+// falling back to the raw value for any legacy/out-of-band value.
+const API_TYPE_LABEL_KEYS: Record<string, string> = {
+  bearer: "form.apiTypeBearer",
+  "api-key": "form.apiTypeApiKeyHeader",
+  basic: "form.apiTypeBasic",
+  custom: "form.apiTypeCustom",
 };
 
 export default function SupplierDetailPage() {
   // non-null: the pages-compat types in next-env.d.ts make useParams() nullable; App Router always supplies params
   const { id } = useParams<{ id: string }>()!;
   const router = useRouter();
+  const t = useTranslations("admin.suppliers");
+  const tCommon = useTranslations("admin.common");
+  const tSupplierStatus = useTranslations("admin.supplierOrderStatus");
+  const apiTypeLabel = (value: string) => {
+    const key = API_TYPE_LABEL_KEYS[value];
+    return key && t.has(key as never) ? t(key as never) : value;
+  };
 
   const [supplier, setSupplier] = useState<Supplier | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -116,7 +125,7 @@ export default function SupplierDetailPage() {
         const response = await fetch(`/api/admin/suppliers/${id}`);
         if (!response.ok) {
           if (response.status === 404) {
-            toast.error("Supplier not found");
+            toast.error(t("detail.notFound"));
             router.push("/admin/suppliers");
             return;
           }
@@ -124,16 +133,15 @@ export default function SupplierDetailPage() {
         }
         const data = await response.json();
         setSupplier(data);
-      } catch (error) {
-        console.error("Error fetching supplier:", error);
-        toast.error("Failed to load supplier");
+      } catch {
+        toast.error(t("detail.loadError"));
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchSupplier();
-  }, [id, router]);
+  }, [id, router, t]);
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -144,14 +152,13 @@ export default function SupplierDetailPage() {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Failed to delete supplier");
+        throw new Error(data.error || t("deleteError"));
       }
 
-      toast.success("Supplier deleted successfully");
+      toast.success(t("deleteSuccess"));
       router.push("/admin/suppliers");
     } catch (error) {
-      console.error("Error deleting supplier:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to delete supplier");
+      toast.error(error instanceof Error ? error.message : t("deleteError"));
     } finally {
       setIsDeleting(false);
       setDeleteDialogOpen(false);
@@ -169,7 +176,7 @@ export default function SupplierDetailPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to test connection");
+        throw new Error(data.error || t("testConnectionError"));
       }
 
       setTestResult({ success: data.success, message: data.message });
@@ -180,8 +187,7 @@ export default function SupplierDetailPage() {
         toast.error(data.message);
       }
     } catch (error) {
-      console.error("Error testing connection:", error);
-      const message = error instanceof Error ? error.message : "Connection test failed";
+      const message = error instanceof Error ? error.message : t("testConnectionError");
       setTestResult({ success: false, message });
       toast.error(message);
     } finally {
@@ -190,7 +196,7 @@ export default function SupplierDetailPage() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString("uk-UA", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -235,10 +241,12 @@ export default function SupplierDetailPage() {
             <div className="flex items-center gap-2">
               <h2 className="text-2xl font-bold tracking-tight">{supplier.name}</h2>
               <Badge variant={supplier.isActive ? "default" : "secondary"}>
-                {supplier.isActive ? "Active" : "Inactive"}
+                {supplier.isActive ? t("statusFilter.active") : t("statusFilter.inactive")}
               </Badge>
             </div>
-            <p className="text-muted-foreground">Code: {supplier.code}</p>
+            <p className="text-muted-foreground">
+              {t("detail.codeLabel", { code: supplier.code })}
+            </p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -247,7 +255,7 @@ export default function SupplierDetailPage() {
             onClick={() => router.push(`/admin/suppliers?edit=${supplier.id}`)}
           >
             <Pencil className="mr-2 h-4 w-4" />
-            Edit
+            {tCommon("edit")}
           </Button>
           <Button
             variant="destructive"
@@ -255,7 +263,7 @@ export default function SupplierDetailPage() {
             disabled={!canDelete}
           >
             <Trash2 className="mr-2 h-4 w-4" />
-            Delete
+            {tCommon("delete")}
           </Button>
         </div>
       </div>
@@ -265,7 +273,7 @@ export default function SupplierDetailPage() {
         {/* Contact Info */}
         <Card>
           <CardHeader>
-            <CardTitle>Contact Information</CardTitle>
+            <CardTitle>{t("detail.contactInfo.title")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {supplier.email && (
@@ -299,7 +307,7 @@ export default function SupplierDetailPage() {
               </div>
             )}
             {!supplier.email && !supplier.phone && !supplier.website && (
-              <p className="text-muted-foreground text-sm">No contact information available</p>
+              <p className="text-muted-foreground text-sm">{t("detail.contactInfo.empty")}</p>
             )}
             {supplier.notes && (
               <div className="border-t pt-3">
@@ -313,7 +321,7 @@ export default function SupplierDetailPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              API Configuration
+              {t("form.apiConfigTitle")}
               {supplier.apiEndpoint ? (
                 <Wifi className="h-4 w-4 text-blue-500" />
               ) : (
@@ -322,23 +330,25 @@ export default function SupplierDetailPage() {
             </CardTitle>
             <CardDescription>
               {supplier.apiEndpoint
-                ? "This supplier has API integration configured"
-                : "No API integration configured"}
+                ? t("detail.apiConfig.configuredDescription")
+                : t("detail.apiConfig.notConfiguredDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {supplier.apiEndpoint ? (
               <div className="space-y-4">
                 <div>
-                  <p className="text-sm font-medium">Endpoint</p>
+                  <p className="text-sm font-medium">{t("detail.apiConfig.endpointLabel")}</p>
                   <p className="text-muted-foreground font-mono text-sm break-all">
                     {supplier.apiEndpoint}
                   </p>
                 </div>
                 {supplier.apiType && (
                   <div>
-                    <p className="text-sm font-medium">Authentication Type</p>
-                    <p className="text-muted-foreground text-sm capitalize">{supplier.apiType}</p>
+                    <p className="text-sm font-medium">{t("detail.apiConfig.authTypeLabel")}</p>
+                    <p className="text-muted-foreground text-sm capitalize">
+                      {apiTypeLabel(supplier.apiType)}
+                    </p>
                   </div>
                 )}
                 <div className="flex items-center gap-2">
@@ -346,12 +356,12 @@ export default function SupplierDetailPage() {
                     {isTesting ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Testing...
+                        {t("detail.testing")}
                       </>
                     ) : (
                       <>
                         <Wifi className="mr-2 h-4 w-4" />
-                        Test Connection
+                        {t("testConnection")}
                       </>
                     )}
                   </Button>
@@ -375,7 +385,7 @@ export default function SupplierDetailPage() {
               </div>
             ) : (
               <p className="text-muted-foreground text-sm">
-                Configure an API endpoint to enable automatic order forwarding.
+                {t("detail.apiConfig.notConfiguredHint")}
               </p>
             )}
           </CardContent>
@@ -391,7 +401,7 @@ export default function SupplierDetailPage() {
             </div>
             <div>
               <p className="text-2xl font-bold">{supplier._count.products}</p>
-              <p className="text-muted-foreground text-sm">Products</p>
+              <p className="text-muted-foreground text-sm">{t("headers.products")}</p>
             </div>
           </CardContent>
         </Card>
@@ -402,7 +412,7 @@ export default function SupplierDetailPage() {
             </div>
             <div>
               <p className="text-2xl font-bold">{supplier._count.supplierOrders}</p>
-              <p className="text-muted-foreground text-sm">Orders</p>
+              <p className="text-muted-foreground text-sm">{t("headers.orders")}</p>
             </div>
           </CardContent>
         </Card>
@@ -411,27 +421,27 @@ export default function SupplierDetailPage() {
       {/* Recent Products */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Products</CardTitle>
-          <CardDescription>
-            Products supplied by this supplier (showing most recent 10)
-          </CardDescription>
+          <CardTitle>{t("detail.recentProducts.title")}</CardTitle>
+          <CardDescription>{t("detail.recentProducts.description")}</CardDescription>
         </CardHeader>
         <CardContent>
           {supplier.products.length === 0 ? (
             <p className="text-muted-foreground py-4 text-center text-sm">
-              No products linked to this supplier
+              {t("detail.recentProducts.empty")}
             </p>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Product</TableHead>
-                  <TableHead>SKU</TableHead>
-                  <TableHead>Supplier SKU</TableHead>
-                  <TableHead className="text-right">Our Price</TableHead>
-                  <TableHead className="text-right">Supplier Price</TableHead>
-                  <TableHead className="text-center">Stock</TableHead>
-                  <TableHead className="text-center">Status</TableHead>
+                  <TableHead>{t("detail.productsTable.product")}</TableHead>
+                  <TableHead>{t("detail.productsTable.sku")}</TableHead>
+                  <TableHead>{t("detail.productsTable.supplierSku")}</TableHead>
+                  <TableHead className="text-right">{t("detail.productsTable.ourPrice")}</TableHead>
+                  <TableHead className="text-right">
+                    {t("detail.productsTable.supplierPrice")}
+                  </TableHead>
+                  <TableHead className="text-center">{t("detail.productsTable.stock")}</TableHead>
+                  <TableHead className="text-center">{t("headers.status")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -468,7 +478,7 @@ export default function SupplierDetailPage() {
                     </TableCell>
                     <TableCell className="text-center">
                       <Badge variant={product.isActive ? "default" : "outline"}>
-                        {product.isActive ? "Active" : "Inactive"}
+                        {product.isActive ? t("statusFilter.active") : t("statusFilter.inactive")}
                       </Badge>
                     </TableCell>
                   </TableRow>
@@ -482,24 +492,24 @@ export default function SupplierDetailPage() {
       {/* Recent Supplier Orders */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Orders</CardTitle>
-          <CardDescription>Orders sent to this supplier (showing most recent 10)</CardDescription>
+          <CardTitle>{t("detail.recentOrders.title")}</CardTitle>
+          <CardDescription>{t("detail.recentOrders.description")}</CardDescription>
         </CardHeader>
         <CardContent>
           {supplier.supplierOrders.length === 0 ? (
             <p className="text-muted-foreground py-4 text-center text-sm">
-              No orders sent to this supplier yet
+              {t("detail.recentOrders.empty")}
             </p>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Order #</TableHead>
-                  <TableHead>Supplier Order ID</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Tracking</TableHead>
-                  <TableHead className="text-right">Cost</TableHead>
-                  <TableHead>Date</TableHead>
+                  <TableHead>{t("detail.ordersTable.orderNumber")}</TableHead>
+                  <TableHead>{t("detail.ordersTable.supplierOrderId")}</TableHead>
+                  <TableHead>{t("headers.status")}</TableHead>
+                  <TableHead>{t("detail.ordersTable.tracking")}</TableHead>
+                  <TableHead className="text-right">{t("detail.ordersTable.cost")}</TableHead>
+                  <TableHead>{t("detail.ordersTable.date")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -517,8 +527,10 @@ export default function SupplierDetailPage() {
                       {order.supplierOrderId || "-"}
                     </TableCell>
                     <TableCell>
-                      <Badge className={STATUS_COLORS[order.status] || "bg-gray-100 text-gray-800"}>
-                        {order.status}
+                      <Badge className={getSupplierOrderStatusStyle(order.status)}>
+                        {tSupplierStatus.has(order.status as never)
+                          ? tSupplierStatus(order.status as never)
+                          : order.status}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -542,22 +554,25 @@ export default function SupplierDetailPage() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Supplier</AlertDialogTitle>
+            <AlertDialogTitle>{t("deleteDialog.title")}</AlertDialogTitle>
             <AlertDialogDescription>
               {canDelete
-                ? "Are you sure you want to delete this supplier? This action cannot be undone."
-                : `Cannot delete this supplier because it has ${supplier._count.products} products and ${supplier._count.supplierOrders} orders linked to it.`}
+                ? t("deleteDialog.confirmText")
+                : t("detail.deleteBlocked", {
+                    products: supplier._count.products,
+                    orders: supplier._count.supplierOrders,
+                  })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
             {canDelete && (
               <AlertDialogAction
                 onClick={handleDelete}
                 disabled={isDeleting}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
-                {isDeleting ? "Deleting..." : "Delete"}
+                {isDeleting ? t("deleteDialog.deleting") : tCommon("delete")}
               </AlertDialogAction>
             )}
           </AlertDialogFooter>

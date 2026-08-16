@@ -40,8 +40,8 @@ afterEach(() => {
 describe("dynamic-route params regression (use(params) → useParams)", () => {
   it("/admin/orders/[id] renders and fetches by route id", async () => {
     // renderWithIntl: the page now calls useTranslations (G13 Task 7) —
-    // the products/suppliers detail pages below stay hardcoded EN
-    // (out of scope until their own G13 tasks) and don't need the provider.
+    // the products detail page below stays hardcoded EN (out of scope until
+    // its own G13 task) and doesn't need the provider.
     renderWithIntl(<AdminOrderDetailPage />);
     expect(await screen.findByText("Замовлення не знайдено")).toBeInTheDocument();
     expect(global.fetch).toHaveBeenCalledWith("/api/admin/orders/test-id");
@@ -55,17 +55,21 @@ describe("dynamic-route params regression (use(params) → useParams)", () => {
   });
 
   it("/admin/suppliers/[id] renders and fetches by route id", async () => {
-    render(<SupplierDetailPage />);
+    // renderWithIntl: the page now calls useTranslations (G13 Task 9) — the
+    // products detail page above stays hardcoded EN (out of scope until its
+    // own G13 task) and doesn't need the provider.
     // 404 path: toast.error + redirect back to the list — no crash is the point
+    renderWithIntl(<SupplierDetailPage />);
     await waitFor(() => expect(push).toHaveBeenCalledWith("/admin/suppliers"));
     expect(global.fetch).toHaveBeenCalledWith("/api/admin/suppliers/test-id");
   });
 
   it("/account/orders/[id] renders and fetches by route id", async () => {
     // renderWithIntl only (not render): the page now calls useTranslations
-    // (TASK-039 Task 5). The admin orders detail page above was migrated
-    // too (G13 Task 7); products/suppliers detail stay hardcoded EN
-    // (out of scope until their own G13 tasks) and don't need the provider.
+    // (TASK-039 Task 5). The admin orders detail (G13 Task 7) and suppliers
+    // detail (G13 Task 9) pages above were migrated too; the products detail
+    // page stays hardcoded EN (out of scope until its own G13 task) and
+    // doesn't need the provider.
     renderWithIntl(<AccountOrderDetailPage />);
     expect(await screen.findByText("Замовлення не знайдено")).toBeInTheDocument();
     expect(global.fetch).toHaveBeenCalledWith("/api/orders/test-id");

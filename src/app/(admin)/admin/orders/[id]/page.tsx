@@ -48,6 +48,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { getOrderStatusStyle, getPaymentStatusStyle } from "@/lib/order-status";
+import { getSupplierOrderStatusStyle } from "@/lib/supplier-order-status";
 
 interface OrderItem {
   id: string;
@@ -122,6 +123,7 @@ export default function AdminOrderDetailPage() {
   const t = useTranslations("admin.orders");
   const tCommon = useTranslations("admin.common");
   const tStatus = useTranslations("account");
+  const tSupplierStatus = useTranslations("admin.supplierOrderStatus");
   // Unknown enum values degrade to the raw status, never the key path
   // (parity with main's `?? status`); drift net in i18n-catalogs.test.ts.
   const orderStatusLabel = (s: string) =>
@@ -640,21 +642,10 @@ export default function AdminOrderDetailPage() {
                         </p>
                       )}
                     </div>
-                    <Badge
-                      variant="secondary"
-                      className={
-                        so.status === "delivered"
-                          ? "bg-green-100 text-green-800"
-                          : so.status === "shipped"
-                            ? "bg-blue-100 text-blue-800"
-                            : so.status === "failed"
-                              ? "bg-red-100 text-red-800"
-                              : so.status === "pending"
-                                ? "bg-yellow-100 text-yellow-800"
-                                : "bg-gray-100 text-gray-800"
-                      }
-                    >
-                      {so.status}
+                    <Badge variant="secondary" className={getSupplierOrderStatusStyle(so.status)}>
+                      {tSupplierStatus.has(so.status as never)
+                        ? tSupplierStatus(so.status as never)
+                        : so.status}
                     </Badge>
                   </div>
                 ))}
