@@ -50,6 +50,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { useDebounce } from "@/hooks/use-debounce";
 
 interface Review {
@@ -74,6 +75,8 @@ interface Pagination {
 }
 
 function ReviewsContent() {
+  const t = useTranslations("admin.reviews");
+  const tCommon = useTranslations("admin.common");
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -113,11 +116,11 @@ function ReviewsContent() {
       setReviews(data.data);
       setPagination(data.pagination);
     } catch {
-      toast.error("Failed to load reviews");
+      toast.error(t("loadError"));
     } finally {
       setIsLoading(false);
     }
-  }, [searchParams, debouncedSearch, ratingFilter, visibilityFilter]);
+  }, [searchParams, debouncedSearch, ratingFilter, visibilityFilter, t]);
 
   useEffect(() => {
     fetchReviews();
@@ -139,10 +142,10 @@ function ReviewsContent() {
 
       if (!response.ok) throw new Error("Failed to update visibility");
 
-      toast.success(review.isHidden ? "Review is now visible" : "Review hidden");
+      toast.success(review.isHidden ? t("nowVisible") : t("nowHidden"));
       fetchReviews();
     } catch {
-      toast.error("Failed to update review visibility");
+      toast.error(t("visibilityError"));
     }
   };
 
@@ -165,16 +168,16 @@ function ReviewsContent() {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Failed to save reply");
+        throw new Error(data.error || t("replyError"));
       }
 
-      toast.success("Reply saved successfully");
+      toast.success(t("replySuccess"));
       setReplyDialogOpen(false);
       setReplyReview(null);
       setReplyText("");
       fetchReviews();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to save reply");
+      toast.error(err instanceof Error ? err.message : t("replyError"));
     } finally {
       setIsReplying(false);
     }
@@ -191,18 +194,18 @@ function ReviewsContent() {
 
       if (!response.ok) throw new Error("Failed to delete review");
 
-      toast.success("Review deleted");
+      toast.success(t("deleteSuccess"));
       setDeleteId(null);
       fetchReviews();
     } catch {
-      toast.error("Failed to delete review");
+      toast.error(t("deleteError"));
     } finally {
       setIsDeleting(false);
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString("uk-UA", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -213,10 +216,8 @@ function ReviewsContent() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold">Reviews</h1>
-        <p className="text-muted-foreground text-sm">
-          Manage customer reviews, reply to feedback, and moderate content.
-        </p>
+        <h1 className="text-2xl font-bold">{t("title")}</h1>
+        <p className="text-muted-foreground text-sm">{t("subtitle")}</p>
       </div>
 
       {/* Filters */}
@@ -224,7 +225,7 @@ function ReviewsContent() {
         <div className="relative max-w-xs flex-1">
           <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
-            placeholder="Search reviews..."
+            placeholder={t("searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
@@ -232,25 +233,25 @@ function ReviewsContent() {
         </div>
         <Select value={ratingFilter} onValueChange={setRatingFilter}>
           <SelectTrigger className="w-[130px]">
-            <SelectValue placeholder="Rating" />
+            <SelectValue placeholder={t("ratingFilter.placeholder")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All ratings</SelectItem>
-            <SelectItem value="5">5 stars</SelectItem>
-            <SelectItem value="4">4 stars</SelectItem>
-            <SelectItem value="3">3 stars</SelectItem>
-            <SelectItem value="2">2 stars</SelectItem>
-            <SelectItem value="1">1 star</SelectItem>
+            <SelectItem value="all">{t("ratingFilter.all")}</SelectItem>
+            <SelectItem value="5">{t("ratingFilter.five")}</SelectItem>
+            <SelectItem value="4">{t("ratingFilter.four")}</SelectItem>
+            <SelectItem value="3">{t("ratingFilter.three")}</SelectItem>
+            <SelectItem value="2">{t("ratingFilter.two")}</SelectItem>
+            <SelectItem value="1">{t("ratingFilter.one")}</SelectItem>
           </SelectContent>
         </Select>
         <Select value={visibilityFilter} onValueChange={setVisibilityFilter}>
           <SelectTrigger className="w-[130px]">
-            <SelectValue placeholder="Visibility" />
+            <SelectValue placeholder={t("visibilityFilter.placeholder")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="false">Visible</SelectItem>
-            <SelectItem value="true">Hidden</SelectItem>
+            <SelectItem value="all">{t("visibilityFilter.all")}</SelectItem>
+            <SelectItem value="false">{t("visibilityFilter.visible")}</SelectItem>
+            <SelectItem value="true">{t("visibilityFilter.hidden")}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -260,13 +261,13 @@ function ReviewsContent() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Product</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Rating</TableHead>
-              <TableHead className="hidden md:table-cell">Comment</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead className="w-[80px]">Actions</TableHead>
+              <TableHead>{t("headers.product")}</TableHead>
+              <TableHead>{t("headers.customer")}</TableHead>
+              <TableHead>{t("headers.rating")}</TableHead>
+              <TableHead className="hidden md:table-cell">{t("headers.comment")}</TableHead>
+              <TableHead>{t("headers.status")}</TableHead>
+              <TableHead>{t("headers.date")}</TableHead>
+              <TableHead className="w-[80px]">{tCommon("actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -300,7 +301,7 @@ function ReviewsContent() {
               <TableRow>
                 <TableCell colSpan={7} className="py-12 text-center">
                   <MessageSquare className="text-muted-foreground mx-auto h-8 w-8" />
-                  <p className="text-muted-foreground mt-2">No reviews found</p>
+                  <p className="text-muted-foreground mt-2">{t("empty")}</p>
                 </TableCell>
               </TableRow>
             ) : (
@@ -317,7 +318,7 @@ function ReviewsContent() {
                   </TableCell>
                   <TableCell>
                     <div>
-                      <p className="text-sm">{review.user.name || "Anonymous"}</p>
+                      <p className="text-sm">{review.user.name || t("anonymous")}</p>
                       <p className="text-muted-foreground text-xs">{review.user.email}</p>
                     </div>
                   </TableCell>
@@ -333,13 +334,13 @@ function ReviewsContent() {
                   <TableCell>
                     <div className="flex flex-col gap-1">
                       {review.isHidden ? (
-                        <Badge variant="secondary">Hidden</Badge>
+                        <Badge variant="secondary">{t("visibilityFilter.hidden")}</Badge>
                       ) : (
-                        <Badge variant="outline">Visible</Badge>
+                        <Badge variant="outline">{t("visibilityFilter.visible")}</Badge>
                       )}
                       {review.adminReply && (
                         <Badge variant="default" className="text-xs">
-                          Replied
+                          {t("replied")}
                         </Badge>
                       )}
                     </div>
@@ -349,25 +350,25 @@ function ReviewsContent() {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon-sm">
-                          <span className="sr-only">Actions</span>
+                          <span className="sr-only">{tCommon("actions")}</span>
                           <span className="text-lg">&#8943;</span>
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => handleOpenReplyDialog(review)}>
                           <MessageSquare className="mr-2 h-4 w-4" />
-                          {review.adminReply ? "Edit Reply" : "Reply"}
+                          {review.adminReply ? t("editReply") : t("reply")}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleToggleVisibility(review)}>
                           {review.isHidden ? (
                             <>
                               <Eye className="mr-2 h-4 w-4" />
-                              Show
+                              {t("show")}
                             </>
                           ) : (
                             <>
                               <EyeOff className="mr-2 h-4 w-4" />
-                              Hide
+                              {t("hide")}
                             </>
                           )}
                         </DropdownMenuItem>
@@ -376,7 +377,7 @@ function ReviewsContent() {
                           onClick={() => setDeleteId(review.id)}
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
+                          {tCommon("delete")}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -392,9 +393,11 @@ function ReviewsContent() {
       {pagination && pagination.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-muted-foreground text-sm">
-            Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
-            {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}{" "}
-            reviews
+            {t("showingRange", {
+              from: (pagination.page - 1) * pagination.limit + 1,
+              to: Math.min(pagination.page * pagination.limit, pagination.total),
+              total: pagination.total,
+            })}
           </p>
           <div className="flex gap-2">
             <Button
@@ -403,7 +406,7 @@ function ReviewsContent() {
               disabled={!pagination.hasPrev}
               onClick={() => handlePageChange(pagination.page - 1)}
             >
-              Previous
+              {tCommon("previous")}
             </Button>
             <Button
               variant="outline"
@@ -411,7 +414,7 @@ function ReviewsContent() {
               disabled={!pagination.hasNext}
               onClick={() => handlePageChange(pagination.page + 1)}
             >
-              Next
+              {tCommon("next")}
             </Button>
           </div>
         </div>
@@ -421,16 +424,18 @@ function ReviewsContent() {
       <Dialog open={replyDialogOpen} onOpenChange={setReplyDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{replyReview?.adminReply ? "Edit Reply" : "Reply to Review"}</DialogTitle>
-            <DialogDescription>
-              Your reply will be visible on the product page below the customer&apos;s review.
-            </DialogDescription>
+            <DialogTitle>
+              {replyReview?.adminReply ? t("replyDialog.editTitle") : t("replyDialog.newTitle")}
+            </DialogTitle>
+            <DialogDescription>{t("replyDialog.description")}</DialogDescription>
           </DialogHeader>
 
           {replyReview && (
             <div className="bg-muted/50 rounded-md p-3">
               <div className="mb-1 flex items-center gap-2">
-                <span className="text-sm font-medium">{replyReview.user.name || "Anonymous"}</span>
+                <span className="text-sm font-medium">
+                  {replyReview.user.name || t("anonymous")}
+                </span>
                 <div className="flex items-center gap-0.5">
                   <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                   <span className="text-xs">{replyReview.rating}</span>
@@ -444,14 +449,14 @@ function ReviewsContent() {
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="admin-reply">Your reply</Label>
+              <Label htmlFor="admin-reply">{t("replyDialog.label")}</Label>
               <span className="text-muted-foreground text-xs">{replyText.length}/1000</span>
             </div>
             <Textarea
               id="admin-reply"
               value={replyText}
               onChange={(e) => setReplyText(e.target.value)}
-              placeholder="Write your response..."
+              placeholder={t("replyDialog.placeholder")}
               rows={4}
               maxLength={1000}
               disabled={isReplying}
@@ -464,14 +469,14 @@ function ReviewsContent() {
               onClick={() => setReplyDialogOpen(false)}
               disabled={isReplying}
             >
-              Cancel
+              {tCommon("cancel")}
             </Button>
             <Button
               onClick={handleSubmitReply}
               disabled={isReplying || replyText.trim().length === 0}
             >
               {isReplying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isReplying ? "Saving..." : "Save Reply"}
+              {isReplying ? t("replyDialog.saving") : t("replyDialog.saveButton")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -481,20 +486,18 @@ function ReviewsContent() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Review</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete this review. This action cannot be undone.
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t("deleteDialog.title")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("deleteDialog.confirmText")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>{tCommon("cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isDeleting ? "Deleting..." : "Delete"}
+              {isDeleting ? t("deleteDialog.deleting") : tCommon("delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
