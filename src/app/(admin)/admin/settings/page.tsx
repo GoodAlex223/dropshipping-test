@@ -20,7 +20,7 @@ export default function AdminSettingsPage() {
   // Store settings
   const [storeSettings, setStoreSettings] = useState({
     storeName: process.env.NEXT_PUBLIC_STORE_NAME || BRAND_NAME,
-    storeDescription: "Your one-stop shop for quality products",
+    storeDescription: t("defaults.storeDescription"),
     contactEmail: "support@store.com",
     supportPhone: "",
     address: "",
@@ -46,9 +46,9 @@ export default function AdminSettingsPage() {
     try {
       // In a real app, this would save to the backend
       await new Promise((resolve) => setTimeout(resolve, 500));
-      toast.success(t("saveSuccess"));
+      toast.success(t("general.saveSuccess"));
     } catch {
-      toast.error(t("saveError"));
+      toast.error(t("general.saveError"));
     } finally {
       setIsSaving(false);
     }
@@ -58,9 +58,9 @@ export default function AdminSettingsPage() {
     setIsSaving(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 500));
-      toast.success(t("saveSuccess"));
+      toast.success(t("email.saveSuccess"));
     } catch {
-      toast.error(t("saveError"));
+      toast.error(t("email.saveError"));
     } finally {
       setIsSaving(false);
     }
@@ -70,9 +70,9 @@ export default function AdminSettingsPage() {
     setIsSaving(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 500));
-      toast.success(t("saveSuccess"));
+      toast.success(t("shipping.saveSuccess"));
     } catch {
-      toast.error(t("saveError"));
+      toast.error(t("shipping.saveError"));
     } finally {
       setIsSaving(false);
     }

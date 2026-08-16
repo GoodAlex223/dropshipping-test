@@ -877,7 +877,9 @@
         "storeDescriptionPlaceholder": "Опишіть ваш магазин…",
         "supportPhoneLabel": "Телефон підтримки (необов'язково)",
         "addressLabel": "Адреса компанії (необов'язково)",
-        "addressPlaceholder": "вул. Шевченка, 1, Київ, Україна"
+        "addressPlaceholder": "вул. Шевченка, 1, Київ, Україна",
+        "saveSuccess": "Налаштування магазину збережено",
+        "saveError": "Не вдалося зберегти налаштування магазину"
       },
       "email": {
         "cardTitle": "Email-сповіщення",
@@ -889,7 +891,9 @@
         "marketingEmailsLabel": "Рекламні листи",
         "marketingEmailsDescription": "Надсилати клієнтам рекламні листи",
         "lowStockAlertsLabel": "Сповіщення про низький залишок",
-        "lowStockAlertsDescription": "Отримувати сповіщення, коли товари закінчуються"
+        "lowStockAlertsDescription": "Отримувати сповіщення, коли товари закінчуються",
+        "saveSuccess": "Налаштування email збережено",
+        "saveError": "Не вдалося зберегти налаштування email"
       },
       "shipping": {
         "cardTitle": "Тарифи доставки",
@@ -899,7 +903,9 @@
         "standardShippingLabel": "Стандартна доставка (грн)",
         "standardShippingHint": "Стандартний тариф доставки",
         "expressShippingLabel": "Експрес-доставка (грн)",
-        "expressShippingHint": "Тариф для експрес-доставки"
+        "expressShippingHint": "Тариф для експрес-доставки",
+        "saveSuccess": "Налаштування доставки збережено",
+        "saveError": "Не вдалося зберегти налаштування доставки"
       },
       "payments": {
         "cardTitle": "Налаштування оплати",
@@ -909,10 +915,11 @@
         "envNotice": "З міркувань безпеки налаштування оплати задаються через змінні середовища.",
         "envDetail": "Оновіть STRIPE_SECRET_KEY та STRIPE_PUBLISHABLE_KEY у файлі .env."
       },
+      "defaults": {
+        "storeDescription": "Ваш магазин якісних товарів — усе в одному місці"
+      },
       "saveChangesButton": "Зберегти зміни",
-      "saving": "Збереження…",
-      "saveSuccess": "Налаштування збережено",
-      "saveError": "Не вдалося зберегти налаштування"
+      "saving": "Збереження…"
     },
     "supplierOrderStatus": {
       "pending": "Очікує",
