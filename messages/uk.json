@@ -1193,6 +1193,72 @@
       "newTitle": "Новий товар",
       "newDescription": "Додайте новий товар до каталогу"
     },
+    "productForm": {
+      "cardTitles": {
+        "basicInfo": "Основна інформація",
+        "pricing": "Ціноутворення",
+        "inventory": "Склад",
+        "identifiers": "Ідентифікатори товару",
+        "status": "Статус",
+        "organization": "Організація"
+      },
+      "labels": {
+        "name": "Назва товару *",
+        "slug": "URL-слаг",
+        "shortDesc": "Короткий опис",
+        "description": "Повний опис",
+        "price": "Ціна *",
+        "comparePrice": "Стара ціна",
+        "costPrice": "Собівартість",
+        "sku": "SKU *",
+        "stock": "Кількість на складі *",
+        "brand": "Бренд",
+        "barcode": "GTIN / Штрихкод",
+        "mpn": "MPN",
+        "active": "Активний",
+        "featured": "Рекомендований",
+        "category": "Категорія *"
+      },
+      "placeholders": {
+        "name": "Введіть назву товару",
+        "slug": "product-url-slug",
+        "shortDesc": "Короткий опис товару (макс. 500 символів)",
+        "description": "Детальний опис товару",
+        "amount": "0.00",
+        "sku": "PROD-001",
+        "stock": "0",
+        "brand": "напр. Nike",
+        "barcode": "напр. 0123456789012",
+        "mpn": "Номер деталі виробника",
+        "category": "Оберіть категорію"
+      },
+      "hints": {
+        "comparePrice": "Оригінальна ціна для відображення знижки",
+        "costPrice": "Ваша собівартість (для обліку прибутку)",
+        "identifiers": "Використовується для фіда Google Shopping та ідентифікації товару.",
+        "barcode": "UPC, EAN, ISBN або JAN",
+        "active": "Товар видимий для клієнтів",
+        "featured": "Показувати на головній сторінці"
+      },
+      "generateFromName": "Згенерувати з назви",
+      "generateSku": "Згенерувати",
+      "submitCreate": "Створити товар",
+      "submitUpdate": "Оновити товар",
+      "toasts": {
+        "loadCategoriesError": "Не вдалося завантажити категорії",
+        "createSuccess": "Товар успішно створено",
+        "updateSuccess": "Товар успішно оновлено",
+        "saveError": "Не вдалося зберегти товар"
+      },
+      "errors": {
+        "nameRequired": "Вкажіть назву",
+        "pricePositive": "Ціна має бути додатним числом",
+        "skuRequired": "Вкажіть SKU",
+        "stockNonNegative": "Залишок має бути цілим невід'ємним числом",
+        "categoryRequired": "Оберіть категорію",
+        "comparePriceGreater": "Стара ціна має бути більшою за звичайну"
+      }
+    },
     "supplierOrderStatus": {
       "pending": "Очікує",
       "submitted": "Надіслано",
