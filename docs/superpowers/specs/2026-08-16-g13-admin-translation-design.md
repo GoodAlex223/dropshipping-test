@@ -12,11 +12,14 @@ The admin panel is 100% hardcoded English (~555 source literals across 18 files;
 next-intl imports), status badges render raw enum values (`PARTIALLY_REFUNDED`), and
 three Mirox alignment residuals are scheduled into this group (bright
 `PAYMENT_STATUS_COLORS` chips ×2 pages, missing `supplier-order-status` module, settings
-"$" labels). Additionally discovered during design: the shadcn `use-toast` hook renders
-nothing (no consuming `<Toaster>` is mounted — only sonner's), so all 12 toast calls in
-categories/customers/settings are silent no-ops, and the same hook's unstable `toast`
-reference causes the BACKLOG'd infinite re-fetch loop on the Customers and Categories
-pages (confirmed live 2026-08-16; exactly those two dependency arrays).
+"$" labels). Additionally discovered during design (premise corrected 2026-08-16 after
+reading the hook): `src/hooks/use-toast.ts` is not the shadcn store hook but a 22-line
+wrapper delegating to the mounted sonner toaster — its toasts do display. However it
+recreates `toast` on every render (plain function in the hook body, no memoization),
+and that unstable reference causes the BACKLOG'd infinite re-fetch loop on the
+Customers and Categories pages (confirmed live 2026-08-16; exactly those two dependency
+arrays). Also in scope: 6 admin files format dates with `toLocaleDateString("en-US")` —
+user-visible English that switches to `"uk-UA"` with the sweep.
 
 ## Decision log (user, 2026-08-16)
 
@@ -81,6 +84,8 @@ for strings only admins use (program has a PageSpeed-95+ budget).
 - ProductForm's three «грн» input adornments stay literal (currency symbol, not copy)
   but get the BACKLOG'd `pl-7` crowding fix (Cyrillic «грн» wider than "$") in passing.
 - Dashboard revenue already uses `formatPrice()` — no currency work.
+- The 6 `toLocaleDateString("en-US", …)` call sites in admin (customers, newsletter,
+  orders list + detail, reviews, suppliers detail) switch to `"uk-UA"`.
 
 ### 4. Alignment residuals (Mirox monochrome policy)
 
@@ -104,12 +109,13 @@ for strings only admins use (program has a PageSpeed-95+ budget).
 
 ### 5. Toast unification
 
-- categories/customers/settings migrate to the sonner API (`toast.success` /
-  `toast.error`) used by the other 10 admin files; `title`/`description` pairs
-  collapse sensibly (description becomes sonner's second-arg `description` where it
-  adds information).
-- Delete `src/hooks/use-toast.ts` (dead: only these 3 files import it; its output
-  never rendered). Correct the root `CLAUDE.md` hooks line that names it.
+- categories/customers/settings migrate to the direct sonner API used by the other
+  10 admin files. Behavior-preserving mapping (matches what the wrapper did):
+  `toast({ title, description, variant: "destructive" })` → `toast.error(title, { description })`;
+  any other `toast({ title, description })` → `toast.success(title, { description })`.
+- Delete `src/hooks/use-toast.ts` (after migration nothing imports it; it was only
+  an unstable-identity indirection over sonner). Correct the root `CLAUDE.md` hooks
+  line that names it.
 - The Customers/Categories infinite loop dies by construction: no hook, no unstable
   dependency. Their fetch callbacks keep only stable deps
   (pagination/search/filter state).
