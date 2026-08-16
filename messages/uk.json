@@ -1023,6 +1023,87 @@
       "updateError": "Не вдалося оновити замовлення",
       "forwardError": "Не вдалося переслати замовлення"
     },
+    "suppliers": {
+      "title": "Постачальники",
+      "subtitle": "Керування постачальниками товарів ({count, plural, one {# постачальник} few {# постачальники} many {# постачальників} other {# постачальника}})",
+      "addButton": "Додати постачальника",
+      "searchPlaceholder": "Пошук постачальників…",
+      "statusFilter": {
+        "placeholder": "Усі статуси",
+        "active": "Активний",
+        "inactive": "Неактивний"
+      },
+      "apiFilter": {
+        "placeholder": "Статус API",
+        "all": "Усі",
+        "withApi": "З API",
+        "withoutApi": "Без API"
+      },
+      "headers": {
+        "supplier": "Постачальник",
+        "code": "Код",
+        "contact": "Контакт",
+        "products": "Товари",
+        "orders": "Замовлення",
+        "api": "API",
+        "status": "Статус"
+      },
+      "empty": {
+        "title": "Постачальників не знайдено",
+        "addFirstButton": "Додати першого постачальника"
+      },
+      "viewDetails": "Переглянути деталі",
+      "testConnection": "Перевірити з'єднання",
+      "showingRange": "Показано {from}–{to} із {total, plural, one {# постачальника} few {# постачальників} many {# постачальників} other {# постачальника}}",
+      "pageOf": "Сторінка {page} з {total}",
+      "form": {
+        "createTitle": "Додати постачальника",
+        "editTitle": "Редагувати постачальника",
+        "createDescription": "Додайте нового постачальника для керування джерелами товарів.",
+        "editDescription": "Оновіть інформацію про постачальника нижче.",
+        "nameLabel": "Назва *",
+        "namePlaceholder": "Назва постачальника",
+        "codeLabel": "Код *",
+        "codePlaceholder": "SUP001",
+        "emailLabel": "Email",
+        "emailPlaceholder": "contact@supplier.com",
+        "phoneLabel": "Телефон",
+        "phonePlaceholder": "+1 234 567 8900",
+        "websiteLabel": "Вебсайт",
+        "websitePlaceholder": "https://supplier.com",
+        "apiConfigTitle": "Налаштування API",
+        "apiEndpointLabel": "Кінцева точка API",
+        "apiEndpointPlaceholder": "https://api.supplier.com/v1",
+        "apiKeyLabel": "API-ключ",
+        "apiKeyHint": "(залиште порожнім, щоб зберегти поточний)",
+        "apiKeyPlaceholder": "••••••••",
+        "apiTypeLabel": "Тип API",
+        "apiTypePlaceholder": "Оберіть тип",
+        "apiTypeBearer": "Bearer-токен",
+        "apiTypeApiKeyHeader": "Заголовок API-ключа",
+        "apiTypeBasic": "Базова автентифікація",
+        "apiTypeCustom": "Інший",
+        "notesLabel": "Нотатки",
+        "notesPlaceholder": "Додаткові нотатки про цього постачальника…",
+        "activeLabel": "Активний",
+        "nameCodeRequired": "Вкажіть назву та код",
+        "saving": "Збереження…",
+        "createButton": "Додати постачальника",
+        "updateButton": "Оновити постачальника"
+      },
+      "deleteDialog": {
+        "title": "Видалити постачальника",
+        "confirmText": "Ви впевнені, що хочете видалити цього постачальника? Цю дію неможливо скасувати.",
+        "deleting": "Видалення…"
+      },
+      "loadError": "Не вдалося завантажити постачальників",
+      "createSuccess": "Постачальника успішно створено",
+      "updateSuccess": "Постачальника успішно оновлено",
+      "saveError": "Не вдалося зберегти постачальника",
+      "deleteSuccess": "Постачальника успішно видалено",
+      "deleteError": "Не вдалося видалити постачальника",
+      "testConnectionError": "Не вдалося перевірити з'єднання"
+    },
     "supplierOrderStatus": {
       "pending": "Очікує",
       "submitted": "Надіслано",

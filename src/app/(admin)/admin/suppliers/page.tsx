@@ -65,6 +65,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 interface Supplier {
   id: string;
@@ -121,6 +122,8 @@ const initialFormData: SupplierFormData = {
 };
 
 function SuppliersContent() {
+  const t = useTranslations("admin.suppliers");
+  const tCommon = useTranslations("admin.common");
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -170,13 +173,12 @@ function SuppliersContent() {
       const data: PaginatedResponse = await response.json();
       setSuppliers(data.data);
       setPagination(data.pagination);
-    } catch (error) {
-      console.error("Error fetching suppliers:", error);
-      toast.error("Failed to load suppliers");
+    } catch {
+      toast.error(t("loadError"));
     } finally {
       setIsLoading(false);
     }
-  }, [search, statusFilter, apiFilter, searchParams]);
+  }, [search, statusFilter, apiFilter, searchParams, t]);
 
   useEffect(() => {
     fetchSuppliers();
@@ -230,7 +232,7 @@ function SuppliersContent() {
 
   const handleSave = async () => {
     if (!formData.name || !formData.code) {
-      toast.error("Name and code are required");
+      toast.error(t("form.nameCodeRequired"));
       return;
     }
 
@@ -264,17 +266,14 @@ function SuppliersContent() {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Failed to save supplier");
+        throw new Error(data.error || t("saveError"));
       }
 
-      toast.success(
-        editingSupplier ? "Supplier updated successfully" : "Supplier created successfully"
-      );
+      toast.success(editingSupplier ? t("updateSuccess") : t("createSuccess"));
       setDialogOpen(false);
       fetchSuppliers();
     } catch (error) {
-      console.error("Error saving supplier:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to save supplier");
+      toast.error(error instanceof Error ? error.message : t("saveError"));
     } finally {
       setIsSaving(false);
     }
@@ -291,14 +290,13 @@ function SuppliersContent() {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Failed to delete supplier");
+        throw new Error(data.error || t("deleteError"));
       }
 
-      toast.success("Supplier deleted successfully");
+      toast.success(t("deleteSuccess"));
       fetchSuppliers();
     } catch (error) {
-      console.error("Error deleting supplier:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to delete supplier");
+      toast.error(error instanceof Error ? error.message : t("deleteError"));
     } finally {
       setIsDeleting(false);
       setDeleteId(null);
@@ -315,7 +313,7 @@ function SuppliersContent() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to test connection");
+        throw new Error(data.error || t("testConnectionError"));
       }
 
       setTestResults((prev) => ({
@@ -329,8 +327,7 @@ function SuppliersContent() {
         toast.error(data.message);
       }
     } catch (error) {
-      console.error("Error testing connection:", error);
-      const message = error instanceof Error ? error.message : "Connection test failed";
+      const message = error instanceof Error ? error.message : t("testConnectionError");
       setTestResults((prev) => ({
         ...prev,
         [supplierId]: { success: false, message },
@@ -345,14 +342,12 @@ function SuppliersContent() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Suppliers</h2>
-          <p className="text-muted-foreground">
-            Manage your product suppliers ({pagination.total} suppliers)
-          </p>
+          <h2 className="text-2xl font-bold tracking-tight">{t("title")}</h2>
+          <p className="text-muted-foreground">{t("subtitle", { count: pagination.total })}</p>
         </div>
         <Button onClick={openCreateDialog}>
           <Plus className="mr-2 h-4 w-4" />
-          Add Supplier
+          {t("addButton")}
         </Button>
       </div>
 
@@ -362,14 +357,14 @@ function SuppliersContent() {
           <div className="relative flex-1">
             <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
-              placeholder="Search suppliers..."
+              placeholder={t("searchPlaceholder")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-9"
             />
           </div>
           <Button type="submit" variant="secondary">
-            Search
+            {tCommon("search")}
           </Button>
         </form>
 
@@ -382,12 +377,12 @@ function SuppliersContent() {
             }}
           >
             <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="All Status" />
+              <SelectValue placeholder={t("statusFilter.placeholder")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="true">Active</SelectItem>
-              <SelectItem value="false">Inactive</SelectItem>
+              <SelectItem value="all">{t("statusFilter.placeholder")}</SelectItem>
+              <SelectItem value="true">{t("statusFilter.active")}</SelectItem>
+              <SelectItem value="false">{t("statusFilter.inactive")}</SelectItem>
             </SelectContent>
           </Select>
 
@@ -399,12 +394,12 @@ function SuppliersContent() {
             }}
           >
             <SelectTrigger className="w-[160px]">
-              <SelectValue placeholder="API Status" />
+              <SelectValue placeholder={t("apiFilter.placeholder")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="true">With API</SelectItem>
-              <SelectItem value="false">Without API</SelectItem>
+              <SelectItem value="all">{t("apiFilter.all")}</SelectItem>
+              <SelectItem value="true">{t("apiFilter.withApi")}</SelectItem>
+              <SelectItem value="false">{t("apiFilter.withoutApi")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -415,13 +410,13 @@ function SuppliersContent() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Supplier</TableHead>
-              <TableHead>Code</TableHead>
-              <TableHead>Contact</TableHead>
-              <TableHead className="text-center">Products</TableHead>
-              <TableHead className="text-center">Orders</TableHead>
-              <TableHead className="text-center">API</TableHead>
-              <TableHead className="text-center">Status</TableHead>
+              <TableHead>{t("headers.supplier")}</TableHead>
+              <TableHead>{t("headers.code")}</TableHead>
+              <TableHead>{t("headers.contact")}</TableHead>
+              <TableHead className="text-center">{t("headers.products")}</TableHead>
+              <TableHead className="text-center">{t("headers.orders")}</TableHead>
+              <TableHead className="text-center">{t("headers.api")}</TableHead>
+              <TableHead className="text-center">{t("headers.status")}</TableHead>
               <TableHead className="w-[70px]"></TableHead>
             </TableRow>
           </TableHeader>
@@ -429,7 +424,7 @@ function SuppliersContent() {
             {isLoading ? (
               <TableRow>
                 <TableCell colSpan={8} className="h-24 text-center">
-                  Loading...
+                  {tCommon("loading")}
                 </TableCell>
               </TableRow>
             ) : suppliers.length === 0 ? (
@@ -437,9 +432,9 @@ function SuppliersContent() {
                 <TableCell colSpan={8} className="h-24 text-center">
                   <div className="flex flex-col items-center gap-2">
                     <Truck className="text-muted-foreground h-8 w-8" />
-                    <p className="text-muted-foreground">No suppliers found</p>
+                    <p className="text-muted-foreground">{t("empty.title")}</p>
                     <Button size="sm" onClick={openCreateDialog}>
-                      Add your first supplier
+                      {t("empty.addFirstButton")}
                     </Button>
                   </div>
                 </TableCell>
@@ -492,7 +487,7 @@ function SuppliersContent() {
                         ) : (
                           <Wifi className="h-4 w-4 text-blue-500" />
                         )}
-                        <span className="text-sm">{supplier.apiType || "API"}</span>
+                        <span className="text-sm">{supplier.apiType || t("headers.api")}</span>
                       </div>
                     ) : (
                       <WifiOff className="text-muted-foreground mx-auto h-4 w-4" />
@@ -500,7 +495,7 @@ function SuppliersContent() {
                   </TableCell>
                   <TableCell className="text-center">
                     <Badge variant={supplier.isActive ? "default" : "outline"}>
-                      {supplier.isActive ? "Active" : "Inactive"}
+                      {supplier.isActive ? t("statusFilter.active") : t("statusFilter.inactive")}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -515,11 +510,11 @@ function SuppliersContent() {
                           onClick={() => router.push(`/admin/suppliers/${supplier.id}`)}
                         >
                           <Eye className="mr-2 h-4 w-4" />
-                          View Details
+                          {t("viewDetails")}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => openEditDialog(supplier)}>
                           <Pencil className="mr-2 h-4 w-4" />
-                          Edit
+                          {tCommon("edit")}
                         </DropdownMenuItem>
                         {supplier.apiEndpoint && (
                           <DropdownMenuItem
@@ -527,7 +522,7 @@ function SuppliersContent() {
                             disabled={testingId === supplier.id}
                           >
                             <Wifi className="mr-2 h-4 w-4" />
-                            Test Connection
+                            {t("testConnection")}
                           </DropdownMenuItem>
                         )}
                         <DropdownMenuSeparator />
@@ -539,7 +534,7 @@ function SuppliersContent() {
                           }
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
+                          {tCommon("delete")}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -555,9 +550,11 @@ function SuppliersContent() {
       {pagination.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-muted-foreground text-sm">
-            Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
-            {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}{" "}
-            suppliers
+            {t("showingRange", {
+              from: (pagination.page - 1) * pagination.limit + 1,
+              to: Math.min(pagination.page * pagination.limit, pagination.total),
+              total: pagination.total,
+            })}
           </p>
           <div className="flex items-center gap-2">
             <Button
@@ -567,10 +564,10 @@ function SuppliersContent() {
               disabled={!pagination.hasPrev}
             >
               <ChevronLeft className="h-4 w-4" />
-              Previous
+              {tCommon("previous")}
             </Button>
             <span className="text-sm">
-              Page {pagination.page} of {pagination.totalPages}
+              {t("pageOf", { page: pagination.page, total: pagination.totalPages })}
             </span>
             <Button
               variant="outline"
@@ -578,7 +575,7 @@ function SuppliersContent() {
               onClick={() => handlePageChange(pagination.page + 1)}
               disabled={!pagination.hasNext}
             >
-              Next
+              {tCommon("next")}
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
@@ -589,27 +586,27 @@ function SuppliersContent() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingSupplier ? "Edit Supplier" : "Create Supplier"}</DialogTitle>
+            <DialogTitle>
+              {editingSupplier ? t("form.editTitle") : t("form.createTitle")}
+            </DialogTitle>
             <DialogDescription>
-              {editingSupplier
-                ? "Update the supplier information below."
-                : "Add a new supplier to manage product sourcing."}
+              {editingSupplier ? t("form.editDescription") : t("form.createDescription")}
             </DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Name *</Label>
+                <Label htmlFor="name">{t("form.nameLabel")}</Label>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Supplier name"
+                  placeholder={t("form.namePlaceholder")}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="code">Code *</Label>
+                <Label htmlFor="code">{t("form.codeLabel")}</Label>
                 <Input
                   id="code"
                   value={formData.code}
@@ -619,7 +616,7 @@ function SuppliersContent() {
                       code: e.target.value.toUpperCase(),
                     })
                   }
-                  placeholder="SUP001"
+                  placeholder={t("form.codePlaceholder")}
                   className="uppercase"
                 />
               </div>
@@ -627,56 +624,54 @@ function SuppliersContent() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t("form.emailLabel")}</Label>
                 <Input
                   id="email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="contact@supplier.com"
+                  placeholder={t("form.emailPlaceholder")}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone</Label>
+                <Label htmlFor="phone">{t("form.phoneLabel")}</Label>
                 <Input
                   id="phone"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder="+1 234 567 8900"
+                  placeholder={t("form.phonePlaceholder")}
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="website">Website</Label>
+              <Label htmlFor="website">{t("form.websiteLabel")}</Label>
               <Input
                 id="website"
                 value={formData.website}
                 onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                placeholder="https://supplier.com"
+                placeholder={t("form.websitePlaceholder")}
               />
             </div>
 
             <div className="border-t pt-4">
-              <h4 className="mb-3 font-medium">API Configuration</h4>
+              <h4 className="mb-3 font-medium">{t("form.apiConfigTitle")}</h4>
               <div className="grid gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="apiEndpoint">API Endpoint</Label>
+                  <Label htmlFor="apiEndpoint">{t("form.apiEndpointLabel")}</Label>
                   <Input
                     id="apiEndpoint"
                     value={formData.apiEndpoint}
                     onChange={(e) => setFormData({ ...formData, apiEndpoint: e.target.value })}
-                    placeholder="https://api.supplier.com/v1"
+                    placeholder={t("form.apiEndpointPlaceholder")}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="apiKey">
-                      API Key{" "}
+                      {t("form.apiKeyLabel")}{" "}
                       {editingSupplier && (
-                        <span className="text-muted-foreground">
-                          (leave empty to keep existing)
-                        </span>
+                        <span className="text-muted-foreground">{t("form.apiKeyHint")}</span>
                       )}
                     </Label>
                     <Input
@@ -684,23 +679,23 @@ function SuppliersContent() {
                       type="password"
                       value={formData.apiKey}
                       onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
-                      placeholder="••••••••"
+                      placeholder={t("form.apiKeyPlaceholder")}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="apiType">API Type</Label>
+                    <Label htmlFor="apiType">{t("form.apiTypeLabel")}</Label>
                     <Select
                       value={formData.apiType}
                       onValueChange={(value) => setFormData({ ...formData, apiType: value })}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select type" />
+                        <SelectValue placeholder={t("form.apiTypePlaceholder")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="bearer">Bearer Token</SelectItem>
-                        <SelectItem value="api-key">API Key Header</SelectItem>
-                        <SelectItem value="basic">Basic Auth</SelectItem>
-                        <SelectItem value="custom">Custom</SelectItem>
+                        <SelectItem value="bearer">{t("form.apiTypeBearer")}</SelectItem>
+                        <SelectItem value="api-key">{t("form.apiTypeApiKeyHeader")}</SelectItem>
+                        <SelectItem value="basic">{t("form.apiTypeBasic")}</SelectItem>
+                        <SelectItem value="custom">{t("form.apiTypeCustom")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -709,12 +704,12 @@ function SuppliersContent() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="notes">Notes</Label>
+              <Label htmlFor="notes">{t("form.notesLabel")}</Label>
               <Textarea
                 id="notes"
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                placeholder="Additional notes about this supplier..."
+                placeholder={t("form.notesPlaceholder")}
                 rows={3}
               />
             </div>
@@ -725,24 +720,24 @@ function SuppliersContent() {
                 checked={formData.isActive}
                 onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
               />
-              <Label htmlFor="isActive">Active</Label>
+              <Label htmlFor="isActive">{t("form.activeLabel")}</Label>
             </div>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
-              Cancel
+              {tCommon("cancel")}
             </Button>
             <Button onClick={handleSave} disabled={isSaving}>
               {isSaving ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
+                  {t("form.saving")}
                 </>
               ) : editingSupplier ? (
-                "Update Supplier"
+                t("form.updateButton")
               ) : (
-                "Create Supplier"
+                t("form.createButton")
               )}
             </Button>
           </DialogFooter>
@@ -753,19 +748,17 @@ function SuppliersContent() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Supplier</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this supplier? This action cannot be undone.
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t("deleteDialog.title")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("deleteDialog.confirmText")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isDeleting ? "Deleting..." : "Delete"}
+              {isDeleting ? t("deleteDialog.deleting") : tCommon("delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
