@@ -315,3 +315,36 @@ describe("prettier reaches a fixed point on every doc", () => {
     expect(twice, `prettier --write is not idempotent on ${file}`).toBe(once);
   });
 });
+
+// Four parser guards, each earned by a false positive it removed. Without all
+// four this check reports 18 broken links against a tree that has 4:
+//   1. fenced code blocks   — the Directory Structure diagram is not links
+//   2. inline code spans    — archive/plans/2026-07-27_task-057-design-adoption.md:1506
+//                             quotes a link destined for a file in specs/, where
+//                             the path is correct; resolving it against the
+//                             quoting file's own directory is simply wrong
+//   3. <...> autolink form  — [text](<path/(with)/parens>) is valid markdown
+//   4. decodeURIComponent   — "Mirox%20Cart.dc.html" is a real file with a space
+function extractLinks(md: string): string[] {
+  const clean = md.replace(/```[\s\S]*?```/g, "").replace(/`[^`\n]*`/g, "");
+  return [...clean.matchAll(/\[[^\]]*\]\((?:<([^>]+)>|([^)\s]+))\)/g)].map((m) => m[1] ?? m[2]);
+}
+
+describe("every relative link in docs/** resolves", () => {
+  const checks = walkDocs().flatMap((file) =>
+    extractLinks(readFileSync(file, "utf8"))
+      .filter((t) => !/^(https?:|mailto:|#)/.test(t))
+      .map((target) => ({ file, target, path: target.split("#")[0] }))
+      .filter((c) => c.path !== "")
+      .map((c) => ({ ...c, abs: resolve(dirname(c.file), decodeURIComponent(c.path)) }))
+  );
+
+  it("finds a non-empty set of relative links", () => {
+    expect(checks.length).toBeGreaterThan(0);
+  });
+
+  it("every relative link target exists", () => {
+    const broken = checks.filter((c) => !existsSync(c.abs)).map((c) => `${c.file} -> ${c.target}`);
+    expect(broken, `Broken relative links:\n${broken.join("\n")}`).toEqual([]);
+  });
+});

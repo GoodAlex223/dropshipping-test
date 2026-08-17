@@ -6,7 +6,7 @@ Implementation plans for tasks currently in progress.
 
 ## Creating a Plan
 
-1. Use template: `.claude/TEMPLATES/plan.md`
+1. Use template: `~/.claude/TEMPLATES/plan.md` (user-level, not tracked in this repo)
 2. Save as: `YYYY-MM-DD_task-name.md`
 3. Fill in all required sections before starting work
 
@@ -57,5 +57,5 @@ _No active implementation plans._
 
 ---
 
-_Template: [../../.claude/TEMPLATES/plan.md](../../.claude/TEMPLATES/plan.md)_
+_Template: `plan.md` in the user-level `~/.claude/TEMPLATES/` directory (not tracked in this repo)._
 _Archive: [../archive/plans/](../archive/plans/)_

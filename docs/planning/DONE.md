@@ -238,7 +238,7 @@ Completed tasks with implementation details and learnings.
 **Plan**: [docs/archive/plans/2026-08-04_g1-cart-drawer-restyle.md](../archive/plans/2026-08-04_g1-cart-drawer-restyle.md)
 **Spec**: [2026-08-04-cart-drawer-restyle-design.md](../superpowers/specs/2026-08-04-cart-drawer-restyle-design.md)
 **PR**: [#28](https://github.com/GoodAlex223/dropshipping-test/pull/28) — merged `0eccaf7` (2026-08-04)
-**Audit**: [2026-08-04-storefront-staleness-audit.md](../audits/2026-08-04-storefront-staleness-audit.md) — G2/G4 definitive scope + TASK-056 content gaps
+**Audit**: [2026-08-04-storefront-staleness-audit.md](audits/2026-08-04-storefront-staleness-audit.md) — G2/G4 definitive scope + TASK-056 content gaps
 
 **Summary**: Cart page and CartDrawer converted to the Mirox design language with Ukrainian copy per `Mirox Cart.dc.html`, opened by the definitive storefront staleness audit (15 routes: 3 ✅ / 2 🟠 / 12 🔴; catches incl. checkout's missing Ukraine country option and two dead `/account/*` links). New `src/content/cart.ts` content module (reuses `pluralizeUk`); `CartItem` gained optional `color`/`size` and **cart-line names reverted to plain product names** (supersedes TASK-037's `${name} — ${variant.value}` combined-name convention — the separate fields now carry the variant, rendered as «Колір: X · Розмір: Y» on both surfaces). All three `addItem` callers updated; `BundleCompanion.colorValue` added. Cart page: responsive card rows replace the table/mobile-cards split, joined steppers (qty input removed per handoff), sticky «Разом» summary, dashed empty state, Clear-Cart dialog + stock warnings kept and translated; **no promo field** (TASK-043 — user flagged it as the launch acquisition-tracking channel). Shipping row deliberately neutral («Розраховується при оформленні») until G2 ships NP-style methods. Header cart trigger sr-only → «Кошик».
 
@@ -669,7 +669,7 @@ All MVP implementation (TASK-001 through TASK-016), post-MVP features (TASK-017 
 ### [2026-01-05] - Phase 1: Foundation
 
 **Task Reference**: TODO.md TASK-001, TASK-002, TASK-003
-**Plan Document**: [docs/plans/2026-01-05_dropshipping-mvp-plan.md](../plans/2026-01-05_dropshipping-mvp-plan.md)
+**Plan Document**: [docs/archive/plans/2026-01-05_dropshipping-mvp-plan.md](../archive/plans/2026-01-05_dropshipping-mvp-plan.md)
 
 **Implementation**:
 
@@ -849,7 +849,7 @@ All MVP implementation (TASK-001 through TASK-016), post-MVP features (TASK-017 
 ### [2026-01-07] - Phase 5.3: Deployment
 
 **Task Reference**: TODO.md TASK-012
-**Plan Document**: [docs/plans/2026-01-05_dropshipping-mvp-plan.md](../plans/2026-01-05_dropshipping-mvp-plan.md)
+**Plan Document**: [docs/archive/plans/2026-01-05_dropshipping-mvp-plan.md](../archive/plans/2026-01-05_dropshipping-mvp-plan.md)
 
 **Implementation**:
 
