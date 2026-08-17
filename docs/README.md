@@ -157,7 +157,10 @@ When creating new documentation:
 
 1. Create the document in the appropriate directory
 2. Add an entry to this index
-3. Include "Last Updated" date in the document
+3. Include a `**Last Updated**: YYYY-MM-DD` line in the document — **except** design specs under
+   `superpowers/specs/`, which carry `**Date**:` (the authoring date, which must not track edits).
+   `tests/unit/docs-freshness.test.ts` compares this line against the index row above; a document
+   with no `**Last Updated**` line is skipped, never failed.
 4. Link from related documents
 
 ### Updating Documentation
@@ -167,6 +170,8 @@ When updating existing documentation:
 1. Update the "Last Updated" date in the document
 2. Update the "Last Updated" column in this index
 3. If the document's purpose changed, update description here
+4. Bump this file's own `**Last Updated**` too — the linter requires it to be at least as new as
+   every date it lists
 
 ### Archiving Documentation
 
