@@ -465,7 +465,7 @@ describe("docs/README.md's own header is at least as new as every date it lists"
 - [ ] **Step 2: Run the test to verify it passes immediately**
 
 Run: `npx vitest run tests/unit/docs-freshness.test.ts`
-Expected: **PASS**, 12 tests. This check is green on arrival — the index header is `2026-08-17`, the newest listed `Last Updated` is `2026-08-16`. That is the expected state, not a missed bug; Step 3 is what proves the check works.
+Expected: **PASS**, 17 tests (14 already in the file + your 3). This check is green on arrival — the index header is `2026-08-17`, the newest listed `Last Updated` is `2026-08-16`. That is the expected state, not a missed bug; Step 3 is what proves the check works.
 
 - [ ] **Step 3: Run the deliberately-broken control**
 
@@ -537,6 +537,8 @@ describe("prettier reaches a fixed point on every doc", () => {
 
 Run: `npx vitest run tests/unit/docs-freshness.test.ts`
 Expected: **PASS**. Verified during design: the tree is currently idempotent and `--check` clean.
+
+The reported test count jumps sharply here and that is correct, not a bug: `it.each(docs)` registers **one test per doc**, and `docs/` currently holds 71 `.md` files — so expect roughly 17 + 1 + 71 ≈ 89 tests, not a handful. Do not "fix" the fan-out into a single loop inside one test; per-file tests are what make the failure message name the offending file.
 
 If it is slow, that is expected — it formats every doc twice. Do not add a timeout override unless it actually exceeds Vitest's default; report the duration instead.
 
