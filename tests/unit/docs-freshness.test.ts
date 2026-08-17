@@ -260,3 +260,30 @@ describe("every doc in an indexed directory has a docs/README.md row", () => {
     expect(missing, `Docs with no docs/README.md row:\n${missing.join("\n")}`).toEqual([]);
   });
 });
+
+describe("docs/README.md's own header is at least as new as every date it lists", () => {
+  const own = readStamp(INDEX).lastUpdated;
+
+  const listed = indexRows.flatMap((row) => {
+    const di = row.header.indexOf(DATE_COLUMN);
+    if (di < 0) return [];
+    const d = (row.cells[di] ?? "").match(/\d{4}-\d{2}-\d{2}/)?.[0];
+    return d ? [{ line: row.line, date: d }] : [];
+  });
+
+  it("the index declares its own **Last Updated**", () => {
+    expect(own).not.toBeNull();
+  });
+
+  it("finds a non-empty set of listed dates", () => {
+    expect(listed.length).toBeGreaterThan(0);
+  });
+
+  it("no listed date is newer than the index's own header", () => {
+    // ISO yyyy-mm-dd compares correctly as a string.
+    const ahead = listed
+      .filter((l) => l.date > own!)
+      .map((l) => `${INDEX}:${l.line} lists ${l.date}, but the index header says ${own}`);
+    expect(ahead, `Index header lags its rows:\n${ahead.join("\n")}`).toEqual([]);
+  });
+});
