@@ -211,25 +211,10 @@ Expected: **PASS**, 5 tests.
 
 - [ ] **Step 5: Run the deliberately-broken control**
 
-Prove the guard has teeth, then restore:
+**Commit first** (next step), then run the controls — `git checkout --` can then
+restore exactly the committed state without discarding anything.
 
-```bash
-# Control A — the check must catch drift it was built for
-sed -i '38s/2026-08-17/2026-08-15/' docs/README.md
-npx vitest run tests/unit/docs-freshness.test.ts   # EXPECT: FAIL, naming DONE.md
-sed -i '38s/2026-08-15/2026-08-17/' docs/README.md
-
-# Control B — non-vacuity: an unreadable index must fail loudly, not pass empty
-sed -i 's/^| \[planning\//| [XXplanning\//' docs/README.md
-npx vitest run tests/unit/docs-freshness.test.ts   # EXPECT: FAIL (fewer comparable rows / missing targets)
-git checkout docs/README.md && sed -i '38s/2026-08-15/2026-08-17/' docs/README.md
-
-npx vitest run tests/unit/docs-freshness.test.ts   # EXPECT: PASS again
-```
-
-Record both FAIL outputs in the commit message.
-
-- [ ] **Step 6: Commit**
+- [ ] **Step 6: Commit, then run the deliberately-broken controls**
 
 ```bash
 npx prettier --write docs/README.md
@@ -246,6 +231,30 @@ by the G13 close-out while this linter sat OVERDUE.
 
 Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 ```
+
+Now prove both guards have teeth. Paste both FAIL outputs into the task report:
+
+```bash
+# Control A — the drift check must catch the drift it was built for
+sed -i '38s/2026-08-17/2026-08-15/' docs/README.md
+npx vitest run tests/unit/docs-freshness.test.ts   # EXPECT: FAIL, naming DONE.md
+git checkout -- docs/README.md
+
+# Control B — non-vacuity. Do NOT try this by mangling row links: rows whose
+# target stops existing are dropped by design, and ~7 comparable rows survive,
+# so the guard would still pass and the control would prove nothing. Instead
+# point DATE_COLUMN at a header no table uses, which empties `comparable`.
+sed -i 's/const DATE_COLUMN = "Last Updated";/const DATE_COLUMN = "Last Modified";/' tests/unit/docs-freshness.test.ts
+npx vitest run tests/unit/docs-freshness.test.ts   # EXPECT: FAIL on "finds a non-empty set of comparable rows"
+git checkout -- tests/unit/docs-freshness.test.ts
+
+npx vitest run tests/unit/docs-freshness.test.ts   # EXPECT: PASS, 5 tests
+git status --porcelain                             # EXPECT: empty — controls left nothing behind
+```
+
+If Control B does **not** fail, the non-vacuity guard is not wired to
+`comparable` — fix it before continuing. A guard that cannot fail is
+indistinguishable from one that passes.
 
 ---
 
@@ -367,20 +376,10 @@ Add to `docs/README.md`'s **Archived Plans** table, in filename order, keeping t
 Run: `npx vitest run tests/unit/docs-freshness.test.ts`
 Expected: **PASS**, 9 tests. Note the rows are in a table with no `Last Updated` column, so Task 1's check correctly ignores them.
 
-- [ ] **Step 5: Run the deliberately-broken control**
+- [ ] **Step 5: Commit, then run the deliberately-broken controls**
 
-```bash
-# Delete one row; the check must name exactly that file
-sed -i '/2026-08-16_g13-admin-translation\.md/d' docs/README.md
-npx vitest run tests/unit/docs-freshness.test.ts   # EXPECT: FAIL naming g13
-git checkout docs/README.md   # then re-apply Step 3 + Task 1's :38 fix
-
-# Ghost exemption; the check must reject it
-# (temporarily add "docs/archive/plans/NOPE.md" to INDEX_EXEMPT)
-npx vitest run tests/unit/docs-freshness.test.ts   # EXPECT: FAIL on the ghost test
-```
-
-- [ ] **Step 6: Commit**
+Commit **before** the controls: they restore with `git checkout --`, which would
+otherwise discard Step 3's nine uncommitted rows.
 
 ```bash
 npx prettier --write docs/README.md
@@ -395,6 +394,24 @@ Scope is an explicit directory allowlist with one exact-path exemption;
 without it the check fires 13 rows of which 4 are wrong.
 
 Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
+```
+
+Then both controls, pasting each FAIL output into the task report:
+
+```bash
+# Control A — a deleted row must be named
+sed -i '/2026-08-16_g13-admin-translation\.md/d' docs/README.md
+npx vitest run tests/unit/docs-freshness.test.ts   # EXPECT: FAIL naming g13
+git checkout -- docs/README.md
+
+# Control B — a ghost exemption must be rejected, so the exemption set
+# cannot rot into a list that silently widens what the check ignores
+sed -i 's|const INDEX_EXEMPT = new Set(\["docs/archive/plans/README.md"\]);|const INDEX_EXEMPT = new Set(["docs/archive/plans/README.md", "docs/archive/plans/NOPE.md"]);|' tests/unit/docs-freshness.test.ts
+npx vitest run tests/unit/docs-freshness.test.ts   # EXPECT: FAIL on "every exemption still exists on disk"
+git checkout -- tests/unit/docs-freshness.test.ts
+
+npx vitest run tests/unit/docs-freshness.test.ts   # EXPECT: PASS
+git status --porcelain                             # EXPECT: empty
 ```
 
 ---
@@ -653,20 +670,10 @@ _Template: `plan.md` in the user-level `~/.claude/TEMPLATES/` directory (not tra
 Run: `npx vitest run tests/unit/docs-freshness.test.ts`
 Expected: **PASS**, all tests.
 
-- [ ] **Step 5: Run the deliberately-broken control**
+- [ ] **Step 5: Commit, then run the deliberately-broken controls**
 
-```bash
-# A genuinely broken link must be caught
-sed -i '241s|audits/|..\/audits\/|' docs/planning/DONE.md
-npx vitest run tests/unit/docs-freshness.test.ts   # EXPECT: FAIL naming DONE.md
-git checkout docs/planning/DONE.md   # then re-apply Step 3's three DONE.md fixes
-
-# The inline-code-span guard must be load-bearing: remove it and the count rises
-# (temporarily delete the `.replace(/`[^`\n]*`/g, "")` line)
-npx vitest run tests/unit/docs-freshness.test.ts   # EXPECT: FAIL naming task-057-design-adoption
-```
-
-- [ ] **Step 6: Commit**
+Commit **before** the controls: they restore with `git checkout --`, which would
+otherwise discard Step 3's uncommitted link fixes.
 
 ```bash
 npx prettier --write docs/planning/DONE.md docs/plans/README.md
@@ -680,6 +687,23 @@ shifted to :672/:852, which is exactly why a linter beats a filed coordinate.
 Four parser guards keep this at 4 findings instead of 18.
 
 Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
+```
+
+Then both controls, pasting each FAIL output into the task report:
+
+```bash
+# Control A — a genuinely broken link must be caught
+sed -i '241s|](audits/|](../audits/|' docs/planning/DONE.md
+npx vitest run tests/unit/docs-freshness.test.ts   # EXPECT: FAIL naming DONE.md
+git checkout -- docs/planning/DONE.md
+
+# Control B — the inline-code-span guard must be load-bearing. Delete only that
+# one .replace(...) call from extractLinks and the count rises by one.
+npx vitest run tests/unit/docs-freshness.test.ts   # EXPECT: FAIL naming 2026-07-27_task-057-design-adoption.md
+git checkout -- tests/unit/docs-freshness.test.ts
+
+npx vitest run tests/unit/docs-freshness.test.ts   # EXPECT: PASS
+git status --porcelain                             # EXPECT: empty
 ```
 
 ---
