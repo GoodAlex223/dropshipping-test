@@ -209,12 +209,10 @@ In `docs/README.md:38`, change the `Last Updated` cell for the `planning/DONE.md
 Run: `npx vitest run tests/unit/docs-freshness.test.ts`
 Expected: **PASS**, 5 tests.
 
-- [ ] **Step 5: Run the deliberately-broken control**
+- [ ] **Step 5: Commit, then run the deliberately-broken controls**
 
-**Commit first** (next step), then run the controls — `git checkout --` can then
-restore exactly the committed state without discarding anything.
-
-- [ ] **Step 6: Commit, then run the deliberately-broken controls**
+Commit **before** the controls: they restore with `git checkout --`, which would
+otherwise discard Step 3's uncommitted fix.
 
 ```bash
 npx prettier --write docs/README.md
