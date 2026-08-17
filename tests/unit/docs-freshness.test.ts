@@ -1,5 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { readFileSync, readdirSync, statSync, existsSync, writeFileSync, unlinkSync } from "node:fs";
+import {
+  readFileSync,
+  readdirSync,
+  statSync,
+  existsSync,
+  writeFileSync,
+  unlinkSync,
+} from "node:fs";
 import { join, dirname, resolve, relative } from "node:path";
 import { tmpdir } from "node:os";
 
@@ -176,7 +183,10 @@ describe("parseTables / readStamp / rowTarget — synthetic-input coverage", () 
   it("readStamp: returns **Date** and **Last Updated** independently, never conflated", () => {
     // Pins Decision 1: a file can carry both stamps, and `date`/`lastUpdated`
     // must never bleed into each other.
-    const file = join(tmpdir(), `docs-freshness-readstamp-${Date.now()}-${Math.random().toString(36).slice(2)}.md`);
+    const file = join(
+      tmpdir(),
+      `docs-freshness-readstamp-${Date.now()}-${Math.random().toString(36).slice(2)}.md`
+    );
     writeFileSync(file, "**Date**: 2020-01-01\n**Last Updated**: 2021-02-03\n", "utf8");
     try {
       expect(readStamp(file)).toEqual({ date: "2020-01-01", lastUpdated: "2021-02-03" });
