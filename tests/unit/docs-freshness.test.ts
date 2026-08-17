@@ -47,20 +47,29 @@ function blankFences(md: string): string {
   return md.replace(/```[\s\S]*?```/g, (block) => block.replace(/[^\n]/g, ""));
 }
 
-// Not every `|` on a table line is a cell separator. Two kinds are content:
-// a backslash-escaped `\|`, and any pipe inside an inline code span — both are
-// legal in a GFM table cell and both survive `prettier --write`. Splitting on
-// them naively invents extra columns, which makes the malformed-row assertion
-// below fail on perfectly valid markdown: a false positive of exactly the kind
-// this file exists to prevent. Mask those pipes to a sentinel, split on what
-// remains, then restore. U+0000 cannot occur in these docs.
+// Exactly ONE kind of `|` on a table line is content rather than a separator:
+// a backslash-escaped `\|`. Splitting on it invents a column and would trip the
+// malformed-row assertion below on valid markdown, so it is masked to a
+// sentinel, split around, then restored — dropping the backslash, so
+// `literal \| pipe` yields `literal | pipe`.
+//
+// A raw `|` inside an inline code span is NOT content. GFM requires the escape
+// "including inside other inline spans", and this repo's own prettier/remark-gfm
+// confirms it: a row containing a code span with a raw pipe renders as FOUR
+// cells against a three-cell header, on GitHub and under `prettier --write`
+// alike. Such a row is genuinely malformed and MUST still split — masking it
+// would convert a true positive into a false negative and silence the very
+// assertion below that exists to catch a stray unescaped `|`. House style
+// already follows the rule: all 19 table rows under docs/ that carry a pipe
+// inside a code span write it as the escaped form.
+//
+// (A previous revision masked code spans too, on a premise stated as fact and
+// since disproved by running prettier against it. Corrected 2026-08-17.)
 const PIPE_SENTINEL = "\u0000";
 
 function splitCells(line: string): string[] {
-  const masked = line
+  return line
     .replace(/\\\|/g, PIPE_SENTINEL)
-    .replace(/`[^`\n]*`/g, (span) => span.replace(/\|/g, PIPE_SENTINEL));
-  return masked
     .replace(/^\|/, "")
     .replace(/\|$/, "")
     .split("|")
@@ -233,28 +242,38 @@ describe("parseTables / readStamp / rowTarget — synthetic-input coverage", () 
     expect(rows[0].cells).toEqual(["1", "2", "3"]);
   });
 
-  it("parseTables: a pipe inside an inline code span or escaped as \\| is cell content, not a separator", () => {
-    // Both forms are legal GFM table content and both survive `prettier
-    // --write`, so a naive split invents columns and trips the malformed-row
-    // assertion on valid markdown — a false positive of exactly the kind this
-    // file exists to prevent. Found by code review after the branch was
-    // otherwise complete; latent at the time (the suite was green), because no
-    // doc happened to use either form inside a table yet.
-    const md = [
-      "| Document | Purpose | Last Updated |",
-      "| --- | --- | --- |",
-      "| [a.md](a.md) | uses `a|b` in prose | 2026-01-01 |",
-      "| [b.md](b.md) | literal \\| pipe | 2026-01-02 |",
-    ].join("\n");
-    const rows = parseTables(md);
-    expect(rows).toHaveLength(2);
-    expect(rows[0].cells).toHaveLength(3);
-    expect(rows[0].cells[1]).toBe("uses `a|b` in prose");
-    expect(rows[0].cells[2]).toBe("2026-01-01");
-    expect(rows[1].cells).toHaveLength(3);
-    expect(rows[1].cells[1]).toBe("literal | pipe");
-    // The link in cell 0 must still resolve for rowTarget's sake.
-    expect(rows[0].cells[0]).toBe("[a.md](a.md)");
+  it("parseTables: an escaped pipe is cell content, but a raw pipe in a code span still splits", () => {
+    // GFM requires pipes in table cells to be escaped "including inside other
+    // inline spans". Verified against this repo's prettier/remark-gfm: the
+    // escaped form survives as one cell; a code span holding a RAW pipe is
+    // rendered as an extra column by prettier and by GitHub. So the parser must
+    // treat only the escaped form as content. Masking code spans would turn a
+    // real malformed row into a silent pass — the failure mode the assertion
+    // below exists to prevent.
+    const escaped = ["| A | B |", "| --- | --- |", "| x | literal \\| pipe |"].join("\n");
+    const rowsEscaped = parseTables(escaped);
+    expect(rowsEscaped).toHaveLength(1);
+    expect(rowsEscaped[0].cells).toHaveLength(2);
+    expect(rowsEscaped[0].cells[1]).toBe("literal | pipe");
+
+    // The raw-pipe-in-code-span row is malformed and must be SEEN as malformed:
+    // three cells against a two-cell header.
+    const rawInSpan = ["| A | B |", "| --- | --- |", "| x | uses `a|b` here |"].join("\n");
+    const rowsRaw = parseTables(rawInSpan);
+    expect(rowsRaw).toHaveLength(1);
+    expect(rowsRaw[0].cells).toHaveLength(3);
+    expect(rowsRaw[0].cells.length).not.toBe(rowsRaw[0].header.length);
+  });
+
+  it("no doc contains the pipe sentinel, so masking cannot corrupt a cell", () => {
+    // splitCells assumes U+0000 never occurs in these docs. That was this
+    // file's only unasserted assumption — and an editing slip did briefly put a
+    // literal NUL into this very file, which is the argument for asserting it.
+    const carriers = walkDocs().filter((f) => readFileSync(f, "utf8").includes(PIPE_SENTINEL));
+    expect(
+      carriers,
+      `Docs containing U+0000, which splitCells uses as its mask:\n${carriers.join("\n")}`
+    ).toEqual([]);
   });
 
   it("parseTables: a fenced code block's table-shaped content is not read as rows, and line numbers after the fence are unaffected", () => {
