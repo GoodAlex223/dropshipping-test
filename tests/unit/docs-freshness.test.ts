@@ -47,8 +47,28 @@ function blankFences(md: string): string {
   return md.replace(/```[\s\S]*?```/g, (block) => block.replace(/[^\n]/g, ""));
 }
 
-// A plain for-loop rather than forEach: `header` is reassigned across
-// iterations, and TS narrows it far more reliably outside a closure.
+// Not every `|` on a table line is a cell separator. Two kinds are content:
+// a backslash-escaped `\|`, and any pipe inside an inline code span — both are
+// legal in a GFM table cell and both survive `prettier --write`. Splitting on
+// them naively invents extra columns, which makes the malformed-row assertion
+// below fail on perfectly valid markdown: a false positive of exactly the kind
+// this file exists to prevent. Mask those pipes to a sentinel, split on what
+// remains, then restore. U+0000 cannot occur in these docs.
+const PIPE_SENTINEL = "\u0000";
+
+function splitCells(line: string): string[] {
+  const masked = line
+    .replace(/\\\|/g, PIPE_SENTINEL)
+    .replace(/`[^`\n]*`/g, (span) => span.replace(/\|/g, PIPE_SENTINEL));
+  return masked
+    .replace(/^\|/, "")
+    .replace(/\|$/, "")
+    .split("|")
+    .map((c) => c.split(PIPE_SENTINEL).join("|").trim());
+}
+
+// A plain for-loop rather than forEach so the line index is in scope for
+// TableRow.line without threading it through a callback.
 function parseTables(md: string): TableRow[] {
   const rows: TableRow[] = [];
   let header: string[] | null = null;
@@ -60,11 +80,7 @@ function parseTables(md: string): TableRow[] {
       continue;
     }
     if (/^\|[\s:|-]+\|$/.test(t)) continue; // separator row
-    const cells = t
-      .replace(/^\|/, "")
-      .replace(/\|$/, "")
-      .split("|")
-      .map((c) => c.trim());
+    const cells = splitCells(t);
     if (header === null) {
       header = cells;
       continue;
@@ -100,8 +116,16 @@ describe("docs/README.md index rows agree with each doc's own **Last Updated**",
   // THE load-bearing guard. A row is comparable only when its target file
   // actually declares **Last Updated**. Specs carry **Date** (an immutable
   // authoring date) and are therefore never compared; archived plans and
-  // several planning docs carry no stamp at all. Dropping this guard takes the
-  // audit from 1 finding to 27, of which 26 are false. Spec §1.1 / Decision 1.
+  // several planning docs carry no stamp at all. Spec §1.1 / Decision 1.
+  //
+  // Scale of what it suppresses, measured at d845473 (this branch's merge base,
+  // before its own fixes): dropping the stamp guard AND selecting date columns
+  // positionally took the audit from 1 real finding to 27 fires, 26 of them
+  // false. Treat that as a dated historical measurement, not a live invariant —
+  // the exact number depends on which guard you drop and on how many docs exist,
+  // and this branch both fixed the one real finding and added ~1000 doc lines.
+  // Re-measuring at HEAD gives a different figure and a guarded result of 0,
+  // which is the point: 0 is what a clean tree looks like.
   const comparable = indexRows.flatMap((row) => {
     const di = row.header.indexOf(DATE_COLUMN);
     if (di < 0) return [];
@@ -207,6 +231,30 @@ describe("parseTables / readStamp / rowTarget — synthetic-input coverage", () 
     expect(rows).toHaveLength(1);
     expect(rows[0].header).toEqual(["A", "B"]);
     expect(rows[0].cells).toEqual(["1", "2", "3"]);
+  });
+
+  it("parseTables: a pipe inside an inline code span or escaped as \\| is cell content, not a separator", () => {
+    // Both forms are legal GFM table content and both survive `prettier
+    // --write`, so a naive split invents columns and trips the malformed-row
+    // assertion on valid markdown — a false positive of exactly the kind this
+    // file exists to prevent. Found by code review after the branch was
+    // otherwise complete; latent at the time (the suite was green), because no
+    // doc happened to use either form inside a table yet.
+    const md = [
+      "| Document | Purpose | Last Updated |",
+      "| --- | --- | --- |",
+      "| [a.md](a.md) | uses `a|b` in prose | 2026-01-01 |",
+      "| [b.md](b.md) | literal \\| pipe | 2026-01-02 |",
+    ].join("\n");
+    const rows = parseTables(md);
+    expect(rows).toHaveLength(2);
+    expect(rows[0].cells).toHaveLength(3);
+    expect(rows[0].cells[1]).toBe("uses `a|b` in prose");
+    expect(rows[0].cells[2]).toBe("2026-01-01");
+    expect(rows[1].cells).toHaveLength(3);
+    expect(rows[1].cells[1]).toBe("literal | pipe");
+    // The link in cell 0 must still resolve for rowTarget's sake.
+    expect(rows[0].cells[0]).toBe("[a.md](a.md)");
   });
 
   it("parseTables: a fenced code block's table-shaped content is not read as rows, and line numbers after the fence are unaffected", () => {
@@ -438,8 +486,13 @@ describe("prettier reaches a fixed point on every doc", () => {
   );
 });
 
-// Four parser guards, each earned by a false positive it removed. Without all
-// four this check reports 18 broken links against a tree that has 4:
+// Four parser guards, each earned by a specific false positive it removed.
+// Measured at d845473 (this branch's merge base): with only the fence guard the
+// check reported 18 broken links against a tree that had 4 real ones. As with
+// the header-audit figure above, that is a dated historical measurement, not a
+// live invariant — it moves with the doc corpus, and this branch fixed all 4,
+// so the guarded result at HEAD is 0. What stays true is the reason each guard
+// exists:
 //   1. fenced code blocks   — the Directory Structure diagram is not links
 //   2. inline code spans    — archive/plans/2026-07-27_task-057-design-adoption.md:1506
 //                             quotes a link destined for a file in specs/, where

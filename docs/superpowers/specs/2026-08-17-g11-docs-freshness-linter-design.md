@@ -13,9 +13,12 @@ document is the first instance of.
 ## 1. Problem
 
 A doc's own `**Last Updated**` header and its row in `docs/README.md` drift apart. Human review has
-caught this **nine** times — PRs #16, #17, #19, #21, #23, #26, #27 (twice, where the fix that
-corrected the header re-created the drift in the row), #30 (twice) and #33. The entry to automate it
-has been OVERDUE since 2026-08-03.
+caught it on **nine separate PRs** — #16, #17, #19, #21, #23, #26, #27, #30, #33 — which is
+**eleven occurrences**, because #27 and #30 each drifted twice (in #27 the round that fixed the
+header re-created the drift in the row). Both figures appear in the record because the two BACKLOG
+entries behind this count differently: `[2026-07-18]` numbers occurrences and reached "#8/#9",
+while `[2026-08-01]` numbers PRs and reached "7th recurrence". Nine is the PR count; it is the one
+this document uses. The entry to automate it has been OVERDUE since 2026-08-03.
 
 **A tenth recurrence is live in the tree right now**, created by the G13 close-out on 2026-08-17
 while this entry sat unbuilt: `docs/README.md:38` claims `planning/DONE.md` was last updated
@@ -32,8 +35,8 @@ Measured against the tree at `d845473`:
 
 A first pass during PR #19 flagged 17 rows with 16 false; PR #27 measured ~20. Today it is 27. **The
 false-positive guards are not a refinement of this feature — they are 96% of it.** Shipping the
-naive check would train the team to ignore a red suite, which is strictly worse than the nine manual
-catches.
+naive check would train the team to ignore a red suite, which is strictly worse than the manual
+catches it replaces.
 
 The same lesson repeated twice inside this design session. A first-draft link checker fired **18**
 broken links, of which **13 were its own parser's defects** (percent-encoded spaces in

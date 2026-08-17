@@ -397,8 +397,7 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
       **Update (2026-08-08, PR #30 — recurrences #8/#9):** the class recurred twice more in PR #30 (`docs/README.md`'s own header, and the BACKLOG header + index-row pair); both halves were caught in one review pass and fixed together in one commit (`9aae7bc`), avoiding #27's "fix moved the drift" mode. Ninth manual catch. Promote.
       **Promoted 2026-08-11** → WEEKLY [G11](WEEKLY.md) (week of 2026-08-10), the week's single 🟤 slot — ends the manual-catch streak at 9.
       **RESOLVED in G11 (PR #NN, merged `<sha>`, 2026-08-17)**: `tests/unit/docs-freshness.test.ts`
-      (17 tests, Tasks 1-3; the file's other 74 tests are Task 4's per-doc prettier fan-out and
-      Task 5's link checks) implements the index-row ↔ header freshness check with both
+      implements the index-row ↔ header freshness check with both
       false-positive guards this entry specified — the archive table's `Status`-column exclusion
       (compare by column header name, not index) and the `superpowers/specs/` skip-not-fail rule.
 

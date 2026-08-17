@@ -378,6 +378,13 @@ Expected: **PASS**, 9 tests. Note the rows are in a table with no `Last Updated`
 
 - [ ] **Step 5: Commit, then run the deliberately-broken controls**
 
+> **Superseded 2026-08-17 (post-merge code review).** The commit-message template
+> below asserts "the check fires 13 rows of which 4 are wrong". That figure was
+> never right for the scope that shipped: the allowlist plus the single
+> exact-path exemption gives **10 fires / 1 exemption**. The wording is left as
+> written because commit `9494fef` was already made with it — this note is the
+> correction, and the spec carries the matching one at §3.1 Check 3.
+
 Commit **before** the controls: they restore with `git checkout --`, which would
 otherwise discard Step 3's nine uncommitted rows.
 
