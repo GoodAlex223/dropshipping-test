@@ -355,16 +355,18 @@ If the list differs, stop and reconcile before editing anything — a tenth entr
 
 - [ ] **Step 3: Add the 9 rows**
 
-Add to `docs/README.md`'s **Archived Plans** table, in filename order, keeping the existing 4-column shape (`Plan | Task | Status | Completed`). Verify each `Completed` date against [DONE.md](../DONE.md) before writing it — do not infer from the filename:
+Add to `docs/README.md`'s **Archived Plans** table, in filename order, keeping the existing 4-column shape (`Plan | Task | Status | Completed`).
+
+**The `Completed` dates below are already verified** against `docs/planning/DONE.md`, whose authoritative value is the bracketed date in each entry's `### [YYYY-MM-DD]` heading — **not** the plan's filename date, which differs for `task-030` (file `2026-02-10`, completed `2026-02-11`) and for four of the G-groups. Use these values verbatim; if you re-derive any of them and get a different answer, stop and report rather than "correcting" the table:
 
 ```markdown
-| [2026-02-10_task-030-documentation-finalization.md](archive/plans/2026-02-10_task-030-documentation-finalization.md) | TASK-030 Documentation Finalization | COMPLETE | 2026-02-10 |
+| [2026-02-10_task-030-documentation-finalization.md](archive/plans/2026-02-10_task-030-documentation-finalization.md) | TASK-030 Documentation Finalization | COMPLETE | 2026-02-11 |
 | [2026-08-04_g1-cart-drawer-restyle.md](archive/plans/2026-08-04_g1-cart-drawer-restyle.md) | G1 Cart & Drawer Restyle | COMPLETE | 2026-08-04 |
 | [2026-08-06_g2-checkout-restyle.md](archive/plans/2026-08-06_g2-checkout-restyle.md) | G2 Checkout Restyle → COD | COMPLETE | 2026-08-07 |
 | [2026-08-08_g3-params-fix.md](archive/plans/2026-08-08_g3-params-fix.md) | G3 Dynamic Route Params Fix | COMPLETE | 2026-08-08 |
 | [2026-08-08_g4-peripheral-surfaces.md](archive/plans/2026-08-08_g4-peripheral-surfaces.md) | G4 Peripheral Surfaces Sweep | COMPLETE | 2026-08-09 |
 | [2026-08-10_g5-transactional-emails.md](archive/plans/2026-08-10_g5-transactional-emails.md) | G5 Transactional Emails | COMPLETE | 2026-08-10 |
-| [2026-08-14_task-039-i18n-foundation.md](archive/plans/2026-08-14_task-039-i18n-foundation.md) | TASK-039 i18n Foundation | COMPLETE | 2026-08-15 |
+| [2026-08-14_task-039-i18n-foundation.md](archive/plans/2026-08-14_task-039-i18n-foundation.md) | G9 TASK-039 i18n Foundation | COMPLETE | 2026-08-15 |
 | [2026-08-15_g14-rebrand-residuals.md](archive/plans/2026-08-15_g14-rebrand-residuals.md) | G14 Rebrand Residuals | COMPLETE | 2026-08-15 |
 | [2026-08-16_g13-admin-translation.md](archive/plans/2026-08-16_g13-admin-translation.md) | G13 Admin Translation & Alignment | COMPLETE | 2026-08-17 |
 ```

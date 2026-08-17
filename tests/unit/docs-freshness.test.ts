@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
+import { readFileSync, readdirSync, statSync, existsSync, writeFileSync, unlinkSync } from "node:fs";
 import { join, dirname, resolve, relative } from "node:path";
+import { tmpdir } from "node:os";
 
 const DOCS = "docs";
 const INDEX = "docs/README.md";
@@ -129,5 +130,64 @@ describe("docs/README.md tables are well-formed", () => {
       .filter((r) => r.cells.length !== r.header.length)
       .map((r) => `${INDEX}:${r.line} has ${r.cells.length} cells, header has ${r.header.length}`);
     expect(malformed, `Malformed table rows:\n${malformed.join("\n")}`).toEqual([]);
+  });
+});
+
+describe("parseTables / readStamp / rowTarget — synthetic-input coverage", () => {
+  // Two tables separated by a heading line: each row must carry its OWN
+  // table's header (not the first table's), and `line` must be the correct
+  // 1-indexed source line for each data row, not the header/separator lines.
+  it("parseTables: two tables separated by a heading line each keep their own header, with correct 1-indexed line numbers", () => {
+    const md = [
+      "| A | B |",
+      "| --- | --- |",
+      "| 1 | 2 |",
+      "",
+      "## Heading",
+      "",
+      "| C | D |",
+      "| --- | --- |",
+      "| 3 | 4 |",
+    ].join("\n");
+    const rows = parseTables(md);
+    expect(rows).toEqual([
+      { line: 3, header: ["A", "B"], cells: ["1", "2"] },
+      { line: 9, header: ["C", "D"], cells: ["3", "4"] },
+    ]);
+  });
+
+  it("parseTables: a separator row is not returned as a data row", () => {
+    const md = ["| A | B |", "| --- | --- |", "| 1 | 2 |"].join("\n");
+    const rows = parseTables(md);
+    expect(rows).toHaveLength(1);
+    expect(rows[0].cells).toEqual(["1", "2"]);
+  });
+
+  it("parseTables: a row with more cells than its header is still returned", () => {
+    // The malformed-table check depends on seeing the mismatch, not on the
+    // parser silently truncating or dropping the extra cell.
+    const md = ["| A | B |", "| --- | --- |", "| 1 | 2 | 3 |"].join("\n");
+    const rows = parseTables(md);
+    expect(rows).toHaveLength(1);
+    expect(rows[0].header).toEqual(["A", "B"]);
+    expect(rows[0].cells).toEqual(["1", "2", "3"]);
+  });
+
+  it("readStamp: returns **Date** and **Last Updated** independently, never conflated", () => {
+    // Pins Decision 1: a file can carry both stamps, and `date`/`lastUpdated`
+    // must never bleed into each other.
+    const file = join(tmpdir(), `docs-freshness-readstamp-${Date.now()}-${Math.random().toString(36).slice(2)}.md`);
+    writeFileSync(file, "**Date**: 2020-01-01\n**Last Updated**: 2021-02-03\n", "utf8");
+    try {
+      expect(readStamp(file)).toEqual({ date: "2020-01-01", lastUpdated: "2021-02-03" });
+    } finally {
+      unlinkSync(file);
+    }
+  });
+
+  it("rowTarget: null for no link, null for an https:// target, repo-relative path for a relative link", () => {
+    expect(rowTarget("no link here")).toBeNull();
+    expect(rowTarget("[External](https://example.com/page)")).toBeNull();
+    expect(rowTarget("[planning/DONE.md](planning/DONE.md)")).toBe("docs/planning/DONE.md");
   });
 });
