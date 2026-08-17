@@ -136,6 +136,7 @@ src/
 │   ├── format.ts           # formatPrice() — the only sanctioned UAH price formatter (uk-UA, Intl.NumberFormat)
 │   ├── variant-names.ts    # VARIANT_NAMES = { size: «Розмір», color: «Колір» } — canonical ProductVariant.name DATA values (G14); consumed by all storefront variant lookups AND prisma/seed-data/products.ts (relative import); changing a value requires a data migration (precedent: 20260815095848)
 │   ├── order-status.ts     # OrderStatus badge style lookup only (monochrome policy); customer label copy lives in the messages catalog (account.orderStatus/paymentStatus) — admin sources labels from the catalog since G13 (reusing `account.*`; supplier statuses via `admin.supplierOrderStatus`)
+│   ├── supplier-order-status.ts # SupplierOrder.status badge style lookup (monochrome policy), G13 — deliberately parallel to order-status.ts, do NOT merge the two: these are lowercase service-layer convention values (pending/submitted/confirmed/shipped/delivered/cancelled/failed) set by supplier.service.ts, not a Prisma enum; labels come from the catalog via `admin.supplierOrderStatus` behind a `t.has()` guard
 │   ├── newsletter.ts       # Newsletter utilities (token generation, URL builders, HMAC unsubscribe)
 │   ├── og-fonts.ts         # Fetches Cyrillic-subset Manrope TTFs for next/og (Satori) OG image routes; fails safe to []
 │   ├── queue.ts            # BullMQ queue setup
