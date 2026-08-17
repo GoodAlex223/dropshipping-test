@@ -35,8 +35,8 @@ Central index for all project documentation.
 | [planning/README.md](planning/README.md)                                                                             | Planning overview                                                             | 2026-01-05   |
 | [planning/WEEKLY.md](planning/WEEKLY.md)                                                                             | Current week's plan                                                           | 2026-08-15   |
 | [planning/TODO.md](planning/TODO.md)                                                                                 | Active tasks                                                                  | 2026-08-15   |
-| [planning/DONE.md](planning/DONE.md)                                                                                 | Completed tasks                                                               | 2026-08-15   |
-| [planning/BACKLOG.md](planning/BACKLOG.md)                                                                           | Unprioritized ideas                                                           | 2026-08-15   |
+| [planning/DONE.md](planning/DONE.md)                                                                                 | Completed tasks                                                               | 2026-08-17   |
+| [planning/BACKLOG.md](planning/BACKLOG.md)                                                                           | Unprioritized ideas                                                           | 2026-08-17   |
 | [planning/ROADMAP.md](planning/ROADMAP.md)                                                                           | Long-term vision                                                              | 2026-07-14   |
 | [planning/GOALS.md](planning/GOALS.md)                                                                               | Objectives & metrics                                                          | 2026-01-26   |
 | [planning/MILESTONES.md](planning/MILESTONES.md)                                                                     | Key targets                                                                   | 2026-01-26   |
@@ -68,6 +68,7 @@ Central index for all project documentation.
 | [superpowers/specs/2026-08-11-launch-feedback-loop-design.md](superpowers/specs/2026-08-11-launch-feedback-loop-design.md)                     | G8 design: launch feedback loop — `/feedback` page + coded-outcome API + `FEEDBACK_EMAIL` Resend send (TASK-058), `SiteAnnouncement` marquee with reduced-motion reset rejoin (TASK-059)                                                                   | 2026-08-11   |
 | [superpowers/specs/2026-08-14-task-039-i18n-foundation-design.md](superpowers/specs/2026-08-14-task-039-i18n-foundation-design.md)             | G9/TASK-039 design: i18n foundation — next-intl cookie mode (UA default, RU toggle), full-sweep byte-identical extraction, agent RU draft + user gate review, SEO fixed-set ruling, §7.4 verification approach                                             | 2026-08-14   |
 | [superpowers/specs/2026-08-16-g13-admin-translation-design.md](superpowers/specs/2026-08-16-g13-admin-translation-design.md)                   | G13 design: admin panel → catalog-driven Ukrainian — `admin.*` namespace (UA-only by decision; RU falls back to UA via deep-merge), root/(admin) provider payload split, monochrome payment + supplier status modules, sonner toast unification            | 2026-08-16   |
+| [superpowers/specs/2026-08-17-g11-docs-freshness-linter-design.md](superpowers/specs/2026-08-17-g11-docs-freshness-linter-design.md)           | G11 design: docs-freshness linter — index-row ↔ `**Last Updated**` header check with its load-bearing false-positive guards, reverse coverage check, README self-header rule, prettier fixed-point + link checks                                           | 2026-08-17   |
 | [design/design_handoff_mirox/README.md](design/design_handoff_mirox/README.md)                                                                 | **Design handoff** — 7 HTML screen prototypes (Home/Catalog/Product/Cart/Checkout/Contacts/Mobile) + design spec, reconstructed from the client mockup and client-approved                                                                                 | 2026-07-27   |
 | [reference/client-brief.md](reference/client-brief.md)                                                                                         | **Client brief (verbatim)** — Mirox Shop requirement lists #1 and #2, RU + EN                                                                                                                                                                              | 2026-07-19   |
 
@@ -75,30 +76,39 @@ Central index for all project documentation.
 
 ## Implementation Plans
 
-| Plan                | Task | Status | Started |
-| ------------------- | ---- | ------ | ------- |
-| _(no active plans)_ | —    | —      | —       |
+| Plan                                                                                                             | Task                      | Status | Started    |
+| ---------------------------------------------------------------------------------------------------------------- | ------------------------- | ------ | ---------- |
+| [planning/plans/2026-08-17_g11-docs-freshness-linter.md](planning/plans/2026-08-17_g11-docs-freshness-linter.md) | G11 Docs-Freshness Linter | ACTIVE | 2026-08-17 |
 
 ### Archived Plans
 
-| Plan                                                                                                             | Task                                 | Status   | Completed  |
-| ---------------------------------------------------------------------------------------------------------------- | ------------------------------------ | -------- | ---------- |
-| [2026-01-05_dropshipping-mvp-plan.md](archive/plans/2026-01-05_dropshipping-mvp-plan.md)                         | Dropshipping Website MVP             | COMPLETE | 2026-01-13 |
-| [2026-01-22_seo-technical-setup.md](archive/plans/2026-01-22_seo-technical-setup.md)                             | SEO Technical Setup                  | COMPLETE | 2026-01-22 |
-| [2026-02-01_analytics-integration.md](archive/plans/2026-02-01_analytics-integration.md)                         | GA4 Analytics Integration            | COMPLETE | 2026-02-01 |
-| [2026-02-02_task-019-social-sharing.md](archive/plans/2026-02-02_task-019-social-sharing.md)                     | Social Sharing                       | COMPLETE | 2026-02-02 |
-| [2026-02-04_task-026-fix-vercel-deploy-ci.md](archive/plans/2026-02-04_task-026-fix-vercel-deploy-ci.md)         | CI/CD Deployment Pipeline            | COMPLETE | 2026-02-07 |
-| [2026-02-09_task-027-dependency-audit.md](archive/plans/2026-02-09_task-027-dependency-audit.md)                 | Dependency Audit                     | COMPLETE | 2026-02-09 |
-| [2026-07-14_task-033-resumption.md](archive/plans/2026-07-14_task-033-resumption.md)                             | Post-Freeze Resumption               | COMPLETE | 2026-07-14 |
-| [2026-07-15_task-038a-prework.md](archive/plans/2026-07-15_task-038a-prework.md)                                 | TASK-038a Prework                    | COMPLETE | 2026-07-16 |
-| [2026-07-16_task-038b-payments-delivery-spike.md](archive/plans/2026-07-16_task-038b-payments-delivery-spike.md) | TASK-038b Payments & Delivery Spike  | COMPLETE | 2026-07-17 |
-| [2026-07-17_task-034-design-system.md](archive/plans/2026-07-17_task-034-design-system.md)                       | TASK-034 Mirox Design System         | COMPLETE | 2026-07-18 |
-| [2026-07-19_task-035-homepage-rebrand.md](archive/plans/2026-07-19_task-035-homepage-rebrand.md)                 | TASK-035 Homepage Rebrand            | COMPLETE | 2026-07-21 |
-| [2026-07-24_homepage-polish-art-direction.md](archive/plans/2026-07-24_homepage-polish-art-direction.md)         | Homepage Polish & Art Direction      | COMPLETE | 2026-07-27 |
-| [2026-07-27_task-057-design-adoption.md](archive/plans/2026-07-27_task-057-design-adoption.md)                   | TASK-057 Mirox Design Adoption       | COMPLETE | 2026-07-31 |
-| [2026-07-31_task-036-catalog-redesign-filters.md](archive/plans/2026-07-31_task-036-catalog-redesign-filters.md) | TASK-036 Catalog Redesign + Filters  | COMPLETE | 2026-08-01 |
-| [2026-08-01_task-037-product-page-redesign.md](archive/plans/2026-08-01_task-037-product-page-redesign.md)       | TASK-037 Product Page Redesign       | COMPLETE | 2026-08-03 |
-| [2026-08-11_g8-launch-feedback-loop.md](archive/plans/2026-08-11_g8-launch-feedback-loop.md)                     | G8 TASK-058/059 Launch Feedback Loop | COMPLETE | 2026-08-14 |
+| Plan                                                                                                                 | Task                                 | Status   | Completed  |
+| -------------------------------------------------------------------------------------------------------------------- | ------------------------------------ | -------- | ---------- |
+| [2026-01-05_dropshipping-mvp-plan.md](archive/plans/2026-01-05_dropshipping-mvp-plan.md)                             | Dropshipping Website MVP             | COMPLETE | 2026-01-13 |
+| [2026-01-22_seo-technical-setup.md](archive/plans/2026-01-22_seo-technical-setup.md)                                 | SEO Technical Setup                  | COMPLETE | 2026-01-22 |
+| [2026-02-01_analytics-integration.md](archive/plans/2026-02-01_analytics-integration.md)                             | GA4 Analytics Integration            | COMPLETE | 2026-02-01 |
+| [2026-02-02_task-019-social-sharing.md](archive/plans/2026-02-02_task-019-social-sharing.md)                         | Social Sharing                       | COMPLETE | 2026-02-02 |
+| [2026-02-04_task-026-fix-vercel-deploy-ci.md](archive/plans/2026-02-04_task-026-fix-vercel-deploy-ci.md)             | CI/CD Deployment Pipeline            | COMPLETE | 2026-02-07 |
+| [2026-02-09_task-027-dependency-audit.md](archive/plans/2026-02-09_task-027-dependency-audit.md)                     | Dependency Audit                     | COMPLETE | 2026-02-09 |
+| [2026-02-10_task-030-documentation-finalization.md](archive/plans/2026-02-10_task-030-documentation-finalization.md) | TASK-030 Documentation Finalization  | COMPLETE | 2026-02-11 |
+| [2026-07-14_task-033-resumption.md](archive/plans/2026-07-14_task-033-resumption.md)                                 | Post-Freeze Resumption               | COMPLETE | 2026-07-14 |
+| [2026-07-15_task-038a-prework.md](archive/plans/2026-07-15_task-038a-prework.md)                                     | TASK-038a Prework                    | COMPLETE | 2026-07-16 |
+| [2026-07-16_task-038b-payments-delivery-spike.md](archive/plans/2026-07-16_task-038b-payments-delivery-spike.md)     | TASK-038b Payments & Delivery Spike  | COMPLETE | 2026-07-17 |
+| [2026-07-17_task-034-design-system.md](archive/plans/2026-07-17_task-034-design-system.md)                           | TASK-034 Mirox Design System         | COMPLETE | 2026-07-18 |
+| [2026-07-19_task-035-homepage-rebrand.md](archive/plans/2026-07-19_task-035-homepage-rebrand.md)                     | TASK-035 Homepage Rebrand            | COMPLETE | 2026-07-21 |
+| [2026-07-24_homepage-polish-art-direction.md](archive/plans/2026-07-24_homepage-polish-art-direction.md)             | Homepage Polish & Art Direction      | COMPLETE | 2026-07-27 |
+| [2026-07-27_task-057-design-adoption.md](archive/plans/2026-07-27_task-057-design-adoption.md)                       | TASK-057 Mirox Design Adoption       | COMPLETE | 2026-07-31 |
+| [2026-07-31_task-036-catalog-redesign-filters.md](archive/plans/2026-07-31_task-036-catalog-redesign-filters.md)     | TASK-036 Catalog Redesign + Filters  | COMPLETE | 2026-08-01 |
+| [2026-08-01_task-037-product-page-redesign.md](archive/plans/2026-08-01_task-037-product-page-redesign.md)           | TASK-037 Product Page Redesign       | COMPLETE | 2026-08-03 |
+| [2026-08-04_g1-cart-drawer-restyle.md](archive/plans/2026-08-04_g1-cart-drawer-restyle.md)                           | G1 Cart & Drawer Restyle             | COMPLETE | 2026-08-04 |
+| [2026-08-06_g2-checkout-restyle.md](archive/plans/2026-08-06_g2-checkout-restyle.md)                                 | G2 Checkout Restyle → COD            | COMPLETE | 2026-08-07 |
+| [2026-08-08_g3-params-fix.md](archive/plans/2026-08-08_g3-params-fix.md)                                             | G3 Dynamic Route Params Fix          | COMPLETE | 2026-08-08 |
+| [2026-08-08_g4-peripheral-surfaces.md](archive/plans/2026-08-08_g4-peripheral-surfaces.md)                           | G4 Peripheral Surfaces Sweep         | COMPLETE | 2026-08-09 |
+| [2026-08-10_g5-transactional-emails.md](archive/plans/2026-08-10_g5-transactional-emails.md)                         | G5 Transactional Emails              | COMPLETE | 2026-08-10 |
+| [2026-08-11_g8-launch-feedback-loop.md](archive/plans/2026-08-11_g8-launch-feedback-loop.md)                         | G8 TASK-058/059 Launch Feedback Loop | COMPLETE | 2026-08-14 |
+| [2026-08-14_task-039-i18n-foundation.md](archive/plans/2026-08-14_task-039-i18n-foundation.md)                       | G9 TASK-039 i18n Foundation          | COMPLETE | 2026-08-15 |
+| [2026-08-15_g14-rebrand-residuals.md](archive/plans/2026-08-15_g14-rebrand-residuals.md)                             | G14 Rebrand Residuals                | COMPLETE | 2026-08-15 |
+| [2026-08-16_g13-admin-translation.md](archive/plans/2026-08-16_g13-admin-translation.md)                             | G13 Admin Translation & Alignment    | COMPLETE | 2026-08-17 |
 
 See [archive/README.md](archive/README.md) for more historical plans.
 
@@ -147,7 +157,10 @@ When creating new documentation:
 
 1. Create the document in the appropriate directory
 2. Add an entry to this index
-3. Include "Last Updated" date in the document
+3. Include a `**Last Updated**: YYYY-MM-DD` line in the document — **except** design specs under
+   `superpowers/specs/`, which carry `**Date**:` (the authoring date, which must not track edits).
+   `tests/unit/docs-freshness.test.ts` compares this line against the index row above; a document
+   with no `**Last Updated**` line is skipped, never failed.
 4. Link from related documents
 
 ### Updating Documentation
@@ -157,6 +170,8 @@ When updating existing documentation:
 1. Update the "Last Updated" date in the document
 2. Update the "Last Updated" column in this index
 3. If the document's purpose changed, update description here
+4. Bump this file's own `**Last Updated**` too — the linter requires it to be at least as new as
+   every date it lists
 
 ### Archiving Documentation
 

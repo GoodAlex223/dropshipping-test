@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-08-15
+**Last Updated**: 2026-08-17
 
 ---
 
@@ -217,7 +217,7 @@ Improvements to existing functionality.
 - [ ] Automated doc freshness check — Script to compare doc "Last Updated" dates with git file timestamps to identify stale documentation
 - [ ] API docs generation — Auto-generate endpoints.md from route files or OpenAPI spec to prevent docs drifting from code
 - [ ] Schema docs generation — Auto-generate schema.md from prisma/schema.prisma to keep database docs in sync
-- [ ] Link checker in CI — Add CI step to validate internal doc links are not broken after documentation changes
+- [x] ~~Link checker in CI — Add CI step to validate internal doc links are not broken after documentation changes~~ **RESOLVED in G11 (merged `<sha>`, 2026-08-17)**: delivered as a unit test (`tests/unit/docs-freshness.test.ts`, Task 5) rather than a CI step as originally specified. Task 5 validates all 290 relative links across all 71 docs under `docs/**` — not index-row targets specifically, a different and narrower check already covered by Task 1. Same effect (a broken internal doc link fails the check), different mechanism — `npm run test:run` catches it, not a dedicated CI job.
 - [ ] Repo file reference validation — Verify that documentation references to actual repo files (e.g., `next.config.mjs` in PROJECT.md) match real filenames; caught `next.config.ts` typo in TASK-030 code review
 
 ### [2026-02-11] From: TASK-031 Code Quality Sweep
@@ -330,7 +330,7 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 - 🟤 **Re-evaluate Fondy only on written proof of a licensed route** — disqualified on the NBU register showing ТОВ «ФК "ЕЛАЄНС"» licence 21/778-рк revoked 2024-07-22. A secondary source claims Fondy "resumed under partner-bank licences"; it could not be confirmed from any primary source and was not relied on. If the client produces written evidence, that outranks the decision doc and Fondy returns to the matrix — otherwise do not plan TASK-048 against it. (Low value, Low effort) `[relates-to: TASK-048]`
 - 🟤 **Verify Fondy/NP facts from an unblocked network** — `fondy.ua` is TCP-unreachable and `developers.novaposhta.ua` is Cloudflare-blocked from this environment. This shaped what could be verified: Fondy's eight ❓ claims are a _research_ limitation, not a fact about the service. Anyone on a different network can close those gaps. Also the root cause of the spike's worst research defect — pages cited but never loaded. (Med value, Low effort)
 - 🟤 **Fold `docs/README.md` indexing into the authoring task, not the completion task** — index drift has now recurred across **three consecutive PRs** (#16 `04a2593`, #17 `3207425`, #18 deferred to Task 8). The common cause is structural, not carelessness: indexing is scheduled in a completion step that runs _after_ review, so every review sees an un-indexed tree and the gap is either flagged as a finding or deferred again. Move "index new docs in docs/README.md" into the task that creates the doc. (Med value, Low effort)
-- 🟤 **Two stale plan links in `DONE.md` (`:245`, `:425`)** — both point to `docs/plans/2026-01-05_dropshipping-mvp-plan.md`, but that plan was archived to `docs/archive/plans/` and `docs/plans/` now holds only a README. Pre-existing (predates TASK-038b; found by a link-resolution check during this completion, left unfixed to keep the completion commit scoped). Same class as the `docs/README.md` drift above: an archive move that didn't update its referrers. (Low value, Low effort)
+- [x] 🟤 ~~**Two stale plan links in `DONE.md` (`:245`, `:425`)**~~ — both point to `docs/plans/2026-01-05_dropshipping-mvp-plan.md`, but that plan was archived to `docs/archive/plans/` and `docs/plans/` now holds only a README. Pre-existing (predates TASK-038b; found by a link-resolution check during this completion, left unfixed to keep the completion commit scoped). Same class as the `docs/README.md` drift above: an archive move that didn't update its referrers. (Low value, Low effort) **RESOLVED in G11 (merged `<sha>`, 2026-08-17)**: Task 5's link check found both links already broken and fixed them — but by the time it ran, `DONE.md` had grown enough that the two lines had drifted from this entry's `:245`/`:425` citation to `:672`/`:852`. That drift is itself the argument for automating the check instead of filing line-number coordinates that rot.
 - 🟤 **Adopt "fan out per topic, not per item" as the default workflow shape** — see the OOM group below; the per-claim fan-out (~120 agents) both caused the crashes and produced _worse_ output than the 3 per-topic foreground agents that replaced it, which caught cross-claim issues a per-claim agent structurally cannot see (e.g. Fondy's revoked licence invalidating eight sibling claims at once). Worth writing into the workflow-authoring defaults. (Med value, Low effort)
 
 ### [2026-07-17] From: TASK-038b workflow crashes — devcontainer OOM investigation
@@ -392,10 +392,14 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 
 **Origin**: PR #19 code-review rounds (separate intake event from Task 12's verification pass). 🟤 Auto-Generated.
 
-- 🟤 **Automate the `docs/README.md` index-freshness check — this defect class has now recurred three consecutive times** — PR #16 (`04a2593`), PR #17 (`3207425`) and PR #19 (`8a98850`) each shipped with the sole review findings being stale index rows, despite `docs/README.md` stating the indexing rule in its own body. Three manual catches in a row is the signal to automate. Shape it like `tests/unit/no-bright-colors.test.ts` (a plain unit test, no new tooling). **Critical design note — a naive implementation is worse than nothing:** a first pass during PR #19 flagged 17 rows, and 16 were false positives. The check MUST understand two shapes before it can be trusted: (1) only tables whose column header is literally `Last Updated` hold dates — the `archive/plans/` tables carry a separate **Status** column (`COMPLETE`/`ACTIVE`) that is not a date at all; (2) specs under `superpowers/specs/` carry `**Date**:`, not `**Last Updated**:`, so "no stamp found" must mean _skip_, never _fail_. Compare a row's date only against a file that actually declares `**Last Updated**:`. Retiring this class is worth more than a fourth manual catch. (Med value, Low effort) `[relates-to: docs-hygiene entries from PR #16/#17]`
-  **Update (2026-08-03, PR #27 — recurrence #7, now OVERDUE):** the class recurred in PR #23, #26 and twice in #27 — where the round that fixed the BACKLOG header re-created the drift in the index row (the "fix moved the drift" failure mode a check would have caught). PR #27's final review measured the naive full audit firing on ~20 rows, all of them the known false-positive classes above — confirming the guards are the load-bearing part of the design and providing that row set as a ready-made test fixture. Promote this entry instead of making an 8th manual catch.
-  **Update (2026-08-08, PR #30 — recurrences #8/#9):** the class recurred twice more in PR #30 (`docs/README.md`'s own header, and the BACKLOG header + index-row pair); both halves were caught in one review pass and fixed together in one commit (`9aae7bc`), avoiding #27's "fix moved the drift" mode. Ninth manual catch. Promote.
-  **Promoted 2026-08-11** → WEEKLY [G11](WEEKLY.md) (week of 2026-08-10), the week's single 🟤 slot — ends the manual-catch streak at 9.
+- [x] 🟤 ~~**Automate the `docs/README.md` index-freshness check — this defect class has now recurred three consecutive times**~~ — PR #16 (`04a2593`), PR #17 (`3207425`) and PR #19 (`8a98850`) each shipped with the sole review findings being stale index rows, despite `docs/README.md` stating the indexing rule in its own body. Three manual catches in a row is the signal to automate. Shape it like `tests/unit/no-bright-colors.test.ts` (a plain unit test, no new tooling). **Critical design note — a naive implementation is worse than nothing:** a first pass during PR #19 flagged 17 rows, and 16 were false positives. The check MUST understand two shapes before it can be trusted: (1) only tables whose column header is literally `Last Updated` hold dates — the `archive/plans/` tables carry a separate **Status** column (`COMPLETE`/`ACTIVE`) that is not a date at all; (2) specs under `superpowers/specs/` carry `**Date**:`, not `**Last Updated**:`, so "no stamp found" must mean _skip_, never _fail_. Compare a row's date only against a file that actually declares `**Last Updated**:`. Retiring this class is worth more than a fourth manual catch. (Med value, Low effort) `[relates-to: docs-hygiene entries from PR #16/#17]`
+      **Update (2026-08-03, PR #27 — recurrence #7, now OVERDUE):** the class recurred in PR #23, #26 and twice in #27 — where the round that fixed the BACKLOG header re-created the drift in the index row (the "fix moved the drift" failure mode a check would have caught). PR #27's final review measured the naive full audit firing on ~20 rows, all of them the known false-positive classes above — confirming the guards are the load-bearing part of the design and providing that row set as a ready-made test fixture. Promote this entry instead of making an 8th manual catch.
+      **Update (2026-08-08, PR #30 — recurrences #8/#9):** the class recurred twice more in PR #30 (`docs/README.md`'s own header, and the BACKLOG header + index-row pair); both halves were caught in one review pass and fixed together in one commit (`9aae7bc`), avoiding #27's "fix moved the drift" mode. Ninth manual catch. Promote.
+      **Promoted 2026-08-11** → WEEKLY [G11](WEEKLY.md) (week of 2026-08-10), the week's single 🟤 slot — ends the manual-catch streak at 9.
+      **RESOLVED in G11 (merged `<sha>`, 2026-08-17)**: `tests/unit/docs-freshness.test.ts`
+      implements the index-row ↔ header freshness check with both
+      false-positive guards this entry specified — the archive table's `Status`-column exclusion
+      (compare by column header name, not index) and the `superpowers/specs/` skip-not-fail rule.
 
 ### [2026-07-18] From: TASK-034 post-merge deploy verification
 
@@ -489,7 +493,7 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 
 **Origin**: code review on PR #26 (TASK-036), user-posted — one process observation about the review itself, plus one pre-existing code finding the review surfaced and correctly ruled out of the PR's scope. All 🟤 Auto-Generated (reviewer-surfaced, not user-raised — same routing as the `[2026-07-31] From: PR #24` group).
 
-- 🟤 **Automate the `docs/README.md` ↔ doc-header `Last Updated` consistency check (7th recurrence)** — the same drift pair (a doc's own `**Last Updated**` header bumped without the matching `docs/README.md` index row, or vice versa, plus README's own header) has now been caught by human review on PRs #16, #17, #19, #21, #23, #26 and #33. Both sides carry a machine-parseable `**Last Updated**:`/table-cell date, so this belongs in automation, not review: a pre-commit (lint-staged) or CI docs-lint script that, for any staged `docs/**/*.md`, verifies the index row and the header agree — plus bumping README's own header when the index changes.
+- [x] 🟤 ~~**Automate the `docs/README.md` ↔ doc-header `Last Updated` consistency check (7th recurrence)**~~ — the same drift pair (a doc's own `**Last Updated**` header bumped without the matching `docs/README.md` index row, or vice versa, plus README's own header) has now been caught by human review on PRs #16, #17, #19, #21, #23, #26 and #33. Both sides carry a machine-parseable `**Last Updated**:`/table-cell date, so this belongs in automation, not review: a pre-commit (lint-staged) or CI docs-lint script that, for any staged `docs/**/*.md`, verifies the index row and the header agree — plus bumping README's own header when the index changes.
 
   **Scoping decision required before building** — the check does _not_ generalise to every indexed doc. Spec files under `docs/superpowers/specs/` carry `**Date**:` (authoring date, must **not** track edits), not `**Last Updated**:`. PR #26 itself produced a legitimate instance: the TASK-036 spec's index row was bumped to `2026-08-01` for its §8a revision round while the spec's own header correctly stays `**Date**: 2026-07-31`. A naive header↔row comparison would false-positive on exactly the row that commit fixed. Pick one before implementing: (a) give spec docs their own `**Last Updated**` line distinct from `**Date**`, or (b) scope the linter to docs that actually carry `**Last Updated**` and exempt `superpowers/specs/**`. Note the archive table also carries an extra `Status` column — parse by header name, not column index. This is the documented false-positive class behind `docs-readme-index-audit-false-positives`; sweeping the whole table is a known dead end.
 
@@ -520,6 +524,14 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
   that also warranted fixing and which the reviewer conceded on re-examination. Whatever the fix is
   (reword so doc findings can reach 100, add a separate doc-drift gate, or emit sub-threshold
   findings to chat by design), it has to account for the quantization, not just the number.
+
+  **RESOLVED (index↔header half) in G11 (merged `<sha>`, 2026-08-17)**:
+  `tests/unit/docs-freshness.test.ts` (Tasks 1-3) automates the header↔index-row comparison,
+  scoped per the Scoping decision above — option (b): the linter compares only docs that
+  declare `**Last Updated**` and exempts `superpowers/specs/**` (skip-not-fail), and the
+  archive table is parsed by column header name, not index. It also enforces `docs/README.md`'s
+  own header stays at least as new as every date it lists. The rubric-severity complementary
+  option remains a separate, still-open follow-up.
 
 - 🟤 **`/api/products` passes unvalidated `parseFloat()` output into the Prisma `price` filter** — `src/app/api/products/route.ts:69-74` does `if (minPrice) { where.price = { ..., gte: parseFloat(minPrice) } }` (same shape for `maxPrice`/`lte`). The truthiness guard rejects an empty string but not a non-numeric one, so `?minPrice=abc` yields `parseFloat("abc")` → `NaN`, which reaches a Prisma `Decimal @db.Decimal(10, 2)` comparison. **Verified**: the code path, that the lines are byte-identical to `main` (pre-existing — predates TASK-036, which is why PR #26's review correctly ruled it out of scope), and that root `CLAUDE.md`'s documented "Query param validation pattern" prescribes the opposite (`!isNaN(num) && num >= min && num <= max`, then conditional spread). **Not verified**: the observable runtime behaviour of `NaN` in a Prisma Decimal `gte` — it may throw `PrismaClientValidationError` (500) or be coerced; confirm before choosing between "ignore the param" and "400 Bad Request". PR #26 added the analogous guard on the _client_ side only (`parseNumericParam` in `products-content.tsx`, commit `a7faf75`), so the API is reachable unguarded by any direct caller or crawler. (Low value, Low effort) `[possible-dup-of: "Fix getPagination() NaN propagation" — BACKLOG.md:292, under [2026-02-10] From: TASK-029 → Origin: feat/task-028-test-coverage branch]` — same NaN-propagation class in the same file, but a distinct defect: that one is `parseInt` → `Math.max(1, NaN)` → `NaN` page/limit in `getPagination()`; this one is `parseFloat` → `NaN` in the price `where`. Worth fixing in one pass, but neither entry covers the other.
 
@@ -836,16 +848,18 @@ deliberately not fixed in-branch plus a docs-index gap found during Task 15's fr
   Export the code sets from a shared module (or the routes) and iterate those in both the routes'
   types and the coverage tests so they self-true. Final-review minor #3 on PR #31. (Low value,
   Low effort)
-- 🟤 **WEEKLY-group archived plans missing from docs/README.md's Archived Plans table** — the
-  table indexes TASK-NNN plans through TASK-037, but G1/G2/G3's archived plans (and now G4's
-  `2026-08-08_g4-peripheral-surfaces.md`) are absent. Surfaced by Task 15's docs-freshness pass
-  and left per follow-existing-convention; decide the convention (index WEEKLY-group plans too,
-  or note the table's TASK-only scope) and apply in one sweep. (Low value, Low effort)
-  **Re-surfaced 2026-08-10 by the PR #32 review** as an instance of the same drift class G6's
-  Spawned row 3 propagates outward (the bidirectional docs-index check). Verified still open:
-  `docs/README.md:96` is the last archived-plan row (TASK-037) and four G-group plans sit in
-  `docs/archive/plans/`. Kept as the single in-tree entry — the Spawned row cites it as its
-  worked example rather than duplicating it.
+- [x] 🟤 ~~**WEEKLY-group archived plans missing from docs/README.md's Archived Plans table**~~ — the
+      table indexes TASK-NNN plans through TASK-037, but G1/G2/G3's archived plans (and now G4's
+      `2026-08-08_g4-peripheral-surfaces.md`) are absent. Surfaced by Task 15's docs-freshness pass
+      and left per follow-existing-convention; decide the convention (index WEEKLY-group plans too,
+      or note the table's TASK-only scope) and apply in one sweep. (Low value, Low effort)
+      **Re-surfaced 2026-08-10 by the PR #32 review** as an instance of the same drift class G6's
+      Spawned row 3 propagates outward (the bidirectional docs-index check). Verified still open:
+      `docs/README.md:96` is the last archived-plan row (TASK-037) and four G-group plans sit in
+      `docs/archive/plans/`. Kept as the single in-tree entry — the Spawned row cites it as its
+      worked example rather than duplicating it.
+      **RESOLVED in G11 (merged `<sha>`, 2026-08-17)**: Task 2 added all 9 missing
+      WEEKLY-group rows (G1–G5, G8–G9, G13–G14) to the Archived Plans table in one sweep.
 
 ### [2026-08-10] From: G6 Weekly Reviews (first run)
 
@@ -1180,6 +1194,13 @@ Next-up parks (`defer`) or recorded as rows only (`pass`).
 - [ ] 🟤 **`ProductForm` textarea triggers a React ref-forwarding warning** — dev console on `/admin/products/new`: "Function components cannot be given refs" via `src/components/ui/textarea.tsx` under react-hook-form's `register`. Pre-existing, observed at the G13 gate; harmless in prod but masks real warnings. Likely fix: `React.forwardRef` in the shadcn textarea (re-apply after any CLI regen, cf. the `ui/sonner.tsx` precedent). (Low value, Low effort) [G13 browser gate, 2026-08-17]
 - [ ] 🟤 **Two UA copy nits deferred to the TASK-056 client sign-off window** — (a) «Активний» renders against feminine nouns (e.g. «категорія») under the uniform-badge convention; (b) reviews visibility pair «Видимий»/«Приховано» mixes adjective and impersonal-participle forms. Both deliberate G13 final-review deferrals — resolve alongside the RU-draft nuance review (messages/README flags the gender-resolution class). (Low value, Low effort) [G13 final review triage, 2026-08-17]
 - [ ] 🟤 **Admin API responses are English prose surfaced by the UA admin via echo toasts** — G13 deliberately translated client-side only (spec decision 3); server-originated strings (`apiError("Failed to fetch categories")`, `"Slug already in use"`, `"Circular parent reference detected"`, … across `src/app/api/admin/`) still reach admins verbatim in English wherever a page does `toast.error(data.message)`, and the admin-exclusive Zod schemas in `src/lib/validations/index.ts` (categorySchema, supplierSchema, adminReviewReplySchema, adminReviewVisibilitySchema, updateSubscriberStatusSchema, updateOrderStatusSchema) carry EN messages that surface the same way. Follow-up: migrate admin routes to the coded-outcomes pattern (machine `code` + `admin.*` byCode maps, like the public newsletter/feedback APIs) or UA-translate the admin-exclusive schema messages. Rare error paths, admin-only audience. (Med value, Med effort) [G13 spec §7 / PR #40 review condition, 2026-08-17]
+
+### [2026-08-17] From: G11 docs-freshness linter
+
+**Origin**: final whole-branch review of G11 (`feat/g11-docs-freshness-linter`). One follow-up split out of the `[2026-08-01] From: PR #26 review` entry closed by this branch (its rubric-severity half was never built, only its index↔header half shipped), plus one new gap the linter's own scope revealed while verifying it. Both 🟤 Auto-Generated.
+
+- [ ] 🟤 **Reword the code-review skill's severity rubric so doc-drift findings can clear the gate** — split out as its own anchor because the parent entry (`[2026-08-01] From: PR #26 review`) is now marked `[x]` + strikethrough for its index↔header half, and a future BACKLOG reap would otherwise treat the whole entry as closed and sweep this still-open half to the 🪦 section along with it. The mechanism recorded on the parent stands: the code-review rubric only emits 0/25/50/75/100, so an 80 gate is in practice a 100 gate — doc-drift findings top out at 75 by construction and nothing between 75 and 100 is reachable. This is the `code-review-threshold-understates-doc-findings` memory's pattern, at its **20th recorded recurrence** as of this branch's own review (most recently G13/PR #40, 2026-08-17) — the recurrence count itself is the evidence this needs a durable anchor rather than another chat mention. (Med value, Low-Med effort)
+- [ ] 🟤 **`docs/archive/README.md`'s own Archived Plans table is a second, unlinted freshness surface** — `docs/archive/README.md:31-38` carries its own "Completed Plans" table (7 rows), stalled at `2026-02-10`, while `docs/archive/plans/` holds 25 archived plan files today — roughly 18 postdate the table and are missing from it (added through G1–G14, 2026-08-04 through 2026-08-16). `docs/README.md` points readers to this file "for more historical plans", but G11's linter (`tests/unit/docs-freshness.test.ts`) only ever parses `docs/README.md`'s own tables via `INDEX = "docs/README.md"` — this second index sits entirely outside its walk, invisible to both Check 3 (reverse coverage) and Check 4 (header-vs-rows). Same defect class this branch just retired; genuinely separate scope, since it is a second host file, not a second row in the one already covered. Natural next increment for this linter. (Low-Med value, Low effort)
 
 ---
 
