@@ -61,9 +61,11 @@ _Group IDs continue from last week (G1–G7 are permanently taken by DONE.md and
 
 🟤 Auto · docs tooling · **3 SP** · Fri
 
+> **✅ Shipped 2026-08-17** — merged `745e039` (`--no-ff`, local; no PR). Five guarded checks + the 14 real drift instances they found, incl. **recurrence #10 created by the G13 close-out the day before**. Naive audit fires 27 rows / 26 false; guarded, exactly the real one. Closes 5 BACKLOG entries. Details: [DONE.md](DONE.md).
+>
 > The week's single 🟤 group — OVERDUE at 9 manual catches across PRs #16→#33. The design is pre-specified by the entry's own updates: the false-positive guards ARE the load-bearing part, and PR #27's ~20-row naive-audit set is the ready-made test fixture. Shape: a plain unit test à la `no-bright-colors.test.ts`, no new tooling.
 
-- [ ] Build the doc-header ↔ `docs/README.md` index-row consistency check, bidirectional + README's own header: guards for spec files' `**Date**:` (no stamp = skip, never fail) and archive tables' Status column (parse by header name); scoping decision (a) specs get their own `Last Updated` line vs (b) exempt `superpowers/specs/**` resolved in-plan; optional adds if cheap — prettier fixed-point assertion, the [2026-02-10] git-timestamp staleness variant (3) — BACKLOG [2026-07-18] TASK-034 PR #19 reviews + [2026-08-01] PR #26 update [HIGH]
+- [x] Build the doc-header ↔ `docs/README.md` index-row consistency check, bidirectional + README's own header: guards for spec files' `**Date**:` (no stamp = skip, never fail) and archive tables' Status column (parse by header name); scoping decision (a) specs get their own `Last Updated` line vs (b) exempt `superpowers/specs/**` resolved in-plan; optional adds if cheap — prettier fixed-point assertion, the [2026-02-10] git-timestamp staleness variant (3) — BACKLOG [2026-07-18] TASK-034 PR #19 reviews + [2026-08-01] PR #26 update [HIGH]
 
 ### G12. Categories-to-Catalog Redesign [batch] 🏆
 
@@ -125,7 +127,7 @@ _Group IDs continue from last week (G1–G7 are permanently taken by DONE.md and
 ### Weekend — Spillover (accepted at planning time)
 
 - ✅ **[G13](#g13-admin-translation--alignment-solo)** 🔵 — ran Sat–Sun 2026-08-16/17: spec + 15-task SDD plan + implementation + reviews Sat; browser gate, PR #40, review round, merge Sun. The close-out's spillover trigger ("delivery runs past Sun Aug 16") fired — this line is that record.
-- **[G11](#g11-docs-freshness-linter-solo)** 🟤 — the OVERDUE linter.
+- ✅ **[G11](#g11-docs-freshness-linter-solo)** 🟤 — the OVERDUE linter. (Shipped Sun 2026-08-17, merged `745e039` — **no PR**: the branch was never pushed, so the SHA is the status's resolvable pointer.)
 - ✅ **[G10](#g10-weekly-reviews-batch)** ⚪ — part 2: non-Claude slot + propagation scan. (Ran Sat 2026-08-15 in the same session as part 1.)
 - 🏆 **[G12](#g12-categories-to-catalog-redesign-batch-)** 🔵 — stretch, behind everything above.
 - Week close-out: statuses → `✅ PR #N`, spillover check (**add the Spillover header line if delivery runs past Sun Aug 16**), seed the pre-launch week (client ask + polish + carried finds).
@@ -139,7 +141,7 @@ _Group IDs continue from last week (G1–G7 are permanently taken by DONE.md and
 | G8  | Launch Feedback Loop `[batch]`                      | storefront/comms   | 🔵 User     | 2      | 5        | Tue–Wed       | ✅ PR #35                                                             |
 | G9  | TASK-039 i18n Foundation `[solo]`                   | i18n/content       | 🔵 User     | 3      | 8        | Wed–Thu       | ✅ PR [#37](https://github.com/GoodAlex223/dropshipping-test/pull/37) |
 | G10 | Weekly Reviews `[batch]`                            | recurring reviews  | ⚪ Overhead | 4      | 5        | Thu–Fri       | ✅ PR [#39](https://github.com/GoodAlex223/dropshipping-test/pull/39) |
-| G11 | Docs-Freshness Linter `[solo]`                      | docs tooling       | 🟤 Auto     | 1      | 3        | Fri           | ☐ Planned                                                             |
+| G11 | Docs-Freshness Linter `[solo]`                      | docs tooling       | 🟤 Auto     | 1      | 3        | Fri→spill     | ✅ `745e039`                                                          |
 | G12 | Categories-to-Catalog Redesign `[batch]` 🏆         | storefront/catalog | 🔵 User     | 3      | 5        | Fri (stretch) | ☐ Planned                                                             |
 | G13 | Admin Translation & Alignment `[solo]`              | admin panel        | 🔵 User     | 3      | 8        | Fri→spill     | ✅ PR [#40](https://github.com/GoodAlex223/dropshipping-test/pull/40) |
 | G14 | Rebrand Residuals: Variants + Design Gaps `[batch]` | storefront/data    | 🔵 User     | 2      | 5        | Thu           | ✅ PR [#38](https://github.com/GoodAlex223/dropshipping-test/pull/38) |

@@ -217,7 +217,7 @@ Improvements to existing functionality.
 - [ ] Automated doc freshness check — Script to compare doc "Last Updated" dates with git file timestamps to identify stale documentation
 - [ ] API docs generation — Auto-generate endpoints.md from route files or OpenAPI spec to prevent docs drifting from code
 - [ ] Schema docs generation — Auto-generate schema.md from prisma/schema.prisma to keep database docs in sync
-- [x] ~~Link checker in CI — Add CI step to validate internal doc links are not broken after documentation changes~~ **RESOLVED in G11 (merged `<sha>`, 2026-08-17)**: delivered as a unit test (`tests/unit/docs-freshness.test.ts`, Task 5) rather than a CI step as originally specified. Task 5 validates all 290 relative links across all 71 docs under `docs/**` — not index-row targets specifically, a different and narrower check already covered by Task 1. Same effect (a broken internal doc link fails the check), different mechanism — `npm run test:run` catches it, not a dedicated CI job.
+- [x] ~~Link checker in CI — Add CI step to validate internal doc links are not broken after documentation changes~~ **RESOLVED in G11 (merged `745e039`, 2026-08-17)**: delivered as a unit test (`tests/unit/docs-freshness.test.ts`, Task 5) rather than a CI step as originally specified. Task 5 validates all 290 relative links across all 71 docs under `docs/**` — not index-row targets specifically, a different and narrower check already covered by Task 1. Same effect (a broken internal doc link fails the check), different mechanism — `npm run test:run` catches it, not a dedicated CI job.
 - [ ] Repo file reference validation — Verify that documentation references to actual repo files (e.g., `next.config.mjs` in PROJECT.md) match real filenames; caught `next.config.ts` typo in TASK-030 code review
 
 ### [2026-02-11] From: TASK-031 Code Quality Sweep
@@ -330,7 +330,7 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 - 🟤 **Re-evaluate Fondy only on written proof of a licensed route** — disqualified on the NBU register showing ТОВ «ФК "ЕЛАЄНС"» licence 21/778-рк revoked 2024-07-22. A secondary source claims Fondy "resumed under partner-bank licences"; it could not be confirmed from any primary source and was not relied on. If the client produces written evidence, that outranks the decision doc and Fondy returns to the matrix — otherwise do not plan TASK-048 against it. (Low value, Low effort) `[relates-to: TASK-048]`
 - 🟤 **Verify Fondy/NP facts from an unblocked network** — `fondy.ua` is TCP-unreachable and `developers.novaposhta.ua` is Cloudflare-blocked from this environment. This shaped what could be verified: Fondy's eight ❓ claims are a _research_ limitation, not a fact about the service. Anyone on a different network can close those gaps. Also the root cause of the spike's worst research defect — pages cited but never loaded. (Med value, Low effort)
 - 🟤 **Fold `docs/README.md` indexing into the authoring task, not the completion task** — index drift has now recurred across **three consecutive PRs** (#16 `04a2593`, #17 `3207425`, #18 deferred to Task 8). The common cause is structural, not carelessness: indexing is scheduled in a completion step that runs _after_ review, so every review sees an un-indexed tree and the gap is either flagged as a finding or deferred again. Move "index new docs in docs/README.md" into the task that creates the doc. (Med value, Low effort)
-- [x] 🟤 ~~**Two stale plan links in `DONE.md` (`:245`, `:425`)**~~ — both point to `docs/plans/2026-01-05_dropshipping-mvp-plan.md`, but that plan was archived to `docs/archive/plans/` and `docs/plans/` now holds only a README. Pre-existing (predates TASK-038b; found by a link-resolution check during this completion, left unfixed to keep the completion commit scoped). Same class as the `docs/README.md` drift above: an archive move that didn't update its referrers. (Low value, Low effort) **RESOLVED in G11 (merged `<sha>`, 2026-08-17)**: Task 5's link check found both links already broken and fixed them — but by the time it ran, `DONE.md` had grown enough that the two lines had drifted from this entry's `:245`/`:425` citation to `:672`/`:852`. That drift is itself the argument for automating the check instead of filing line-number coordinates that rot.
+- [x] 🟤 ~~**Two stale plan links in `DONE.md` (`:245`, `:425`)**~~ — both point to `docs/plans/2026-01-05_dropshipping-mvp-plan.md`, but that plan was archived to `docs/archive/plans/` and `docs/plans/` now holds only a README. Pre-existing (predates TASK-038b; found by a link-resolution check during this completion, left unfixed to keep the completion commit scoped). Same class as the `docs/README.md` drift above: an archive move that didn't update its referrers. (Low value, Low effort) **RESOLVED in G11 (merged `745e039`, 2026-08-17)**: Task 5's link check found both links already broken and fixed them — but by the time it ran, `DONE.md` had grown enough that the two lines had drifted from this entry's `:245`/`:425` citation to `:672`/`:852`. That drift is itself the argument for automating the check instead of filing line-number coordinates that rot.
 - 🟤 **Adopt "fan out per topic, not per item" as the default workflow shape** — see the OOM group below; the per-claim fan-out (~120 agents) both caused the crashes and produced _worse_ output than the 3 per-topic foreground agents that replaced it, which caught cross-claim issues a per-claim agent structurally cannot see (e.g. Fondy's revoked licence invalidating eight sibling claims at once). Worth writing into the workflow-authoring defaults. (Med value, Low effort)
 
 ### [2026-07-17] From: TASK-038b workflow crashes — devcontainer OOM investigation
@@ -396,7 +396,7 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
       **Update (2026-08-03, PR #27 — recurrence #7, now OVERDUE):** the class recurred in PR #23, #26 and twice in #27 — where the round that fixed the BACKLOG header re-created the drift in the index row (the "fix moved the drift" failure mode a check would have caught). PR #27's final review measured the naive full audit firing on ~20 rows, all of them the known false-positive classes above — confirming the guards are the load-bearing part of the design and providing that row set as a ready-made test fixture. Promote this entry instead of making an 8th manual catch.
       **Update (2026-08-08, PR #30 — recurrences #8/#9):** the class recurred twice more in PR #30 (`docs/README.md`'s own header, and the BACKLOG header + index-row pair); both halves were caught in one review pass and fixed together in one commit (`9aae7bc`), avoiding #27's "fix moved the drift" mode. Ninth manual catch. Promote.
       **Promoted 2026-08-11** → WEEKLY [G11](WEEKLY.md) (week of 2026-08-10), the week's single 🟤 slot — ends the manual-catch streak at 9.
-      **RESOLVED in G11 (merged `<sha>`, 2026-08-17)**: `tests/unit/docs-freshness.test.ts`
+      **RESOLVED in G11 (merged `745e039`, 2026-08-17)**: `tests/unit/docs-freshness.test.ts`
       implements the index-row ↔ header freshness check with both
       false-positive guards this entry specified — the archive table's `Status`-column exclusion
       (compare by column header name, not index) and the `superpowers/specs/` skip-not-fail rule.
@@ -525,7 +525,7 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
   (reword so doc findings can reach 100, add a separate doc-drift gate, or emit sub-threshold
   findings to chat by design), it has to account for the quantization, not just the number.
 
-  **RESOLVED (index↔header half) in G11 (merged `<sha>`, 2026-08-17)**:
+  **RESOLVED (index↔header half) in G11 (merged `745e039`, 2026-08-17)**:
   `tests/unit/docs-freshness.test.ts` (Tasks 1-3) automates the header↔index-row comparison,
   scoped per the Scoping decision above — option (b): the linter compares only docs that
   declare `**Last Updated**` and exempts `superpowers/specs/**` (skip-not-fail), and the
@@ -858,7 +858,7 @@ deliberately not fixed in-branch plus a docs-index gap found during Task 15's fr
       `docs/README.md:96` is the last archived-plan row (TASK-037) and four G-group plans sit in
       `docs/archive/plans/`. Kept as the single in-tree entry — the Spawned row cites it as its
       worked example rather than duplicating it.
-      **RESOLVED in G11 (merged `<sha>`, 2026-08-17)**: Task 2 added all 9 missing
+      **RESOLVED in G11 (merged `745e039`, 2026-08-17)**: Task 2 added all 9 missing
       WEEKLY-group rows (G1–G5, G8–G9, G13–G14) to the Archived Plans table in one sweep.
 
 ### [2026-08-10] From: G6 Weekly Reviews (first run)
@@ -905,10 +905,12 @@ while evaluating candidates; they route 🟤 by the source rule, independent of 
   step 5 of `REVIEW-QUEUE.md`'s run recipe, which only binds that batch — but the same class
   produced G3/G4's docs-freshness recurrences (#8/#9) and the six-times-caught index-row drift, so
   it is not G6-specific. Decide where it belongs repo-wide: a line in the completion workflow, an
-  extension of the OVERDUE docs-freshness linter's scope, or both. Note the reviewer's framing,
+  extension of the docs-freshness linter's scope, or both (that linter **shipped in G11**, merged
+  `745e039` 2026-08-17, as `tests/unit/docs-freshness.test.ts` — no longer OVERDUE, and its shared
+  `walkDocs`/`parseTables`/`readStamp` seams are the intended attachment point). Note the reviewer's framing,
   which is the reason this is not just "remember harder": a convention a run can state and then
   violate one slot later is not yet a control. (Med value, Low effort)
-  `[relates-to: docs-freshness linter (OVERDUE), [2026-08-09] G4 completion entries]`
+  `[relates-to: docs-freshness linter (SHIPPED in G11, `745e039`), [2026-08-09] G4 completion entries]`
 - 🟤 **Shrink CLAUDE.md to durable rules and move the rest into path-scoped `.claude/rules/`**
   — _the run's one `adopt`._ Measured: project `CLAUDE.md` is **350 lines** against Anthropic's
   documented "target under 200 lines per CLAUDE.md file… longer files consume more context and
@@ -1167,8 +1169,9 @@ Next-up parks (`defer`) or recorded as rows only (`pass`).
   The corrected method is mechanical, which is exactly what makes it automatable: for a value
   claimed in more than one place (verdict tallies, row counts, recurrence counts, "N conventions"),
   **enumerate every occurrence and compare them to each other** rather than confirming one. Natural
-  host is the OVERDUE docs-freshness linter's script ([2026-08-01] From: PR #26 review), which is
-  already scoped to parse planning docs — this is a third check beside header↔index-row and the
+  host is the docs-freshness linter ([2026-08-01] From: PR #26 review), **shipped in G11** as
+  `tests/unit/docs-freshness.test.ts` (merged `745e039`, 2026-08-17) and already scoped to parse
+  planning docs — this is a third check beside header↔index-row and the
   git-timestamp variant. Start with the cheapest high-yield case: a run's tallies stated in
   `REVIEW-QUEUE.md`, `WEEKLY.md` and `DONE.md` must agree. **Watch the false-positive class** the
   linter entry already warns about — a value quoted inside a worked example or a superseded note is
@@ -1201,6 +1204,9 @@ Next-up parks (`defer`) or recorded as rows only (`pass`).
 
 - [ ] 🟤 **Reword the code-review skill's severity rubric so doc-drift findings can clear the gate** — split out as its own anchor because the parent entry (`[2026-08-01] From: PR #26 review`) is now marked `[x]` + strikethrough for its index↔header half, and a future BACKLOG reap would otherwise treat the whole entry as closed and sweep this still-open half to the 🪦 section along with it. The mechanism recorded on the parent stands: the code-review rubric only emits 0/25/50/75/100, so an 80 gate is in practice a 100 gate — doc-drift findings top out at 75 by construction and nothing between 75 and 100 is reachable. This is the `code-review-threshold-understates-doc-findings` memory's pattern, at its **20th recorded recurrence** as of this branch's own review (most recently G13/PR #40, 2026-08-17) — the recurrence count itself is the evidence this needs a durable anchor rather than another chat mention. (Med value, Low-Med effort)
 - [ ] 🟤 **`docs/archive/README.md`'s own Archived Plans table is a second, unlinted freshness surface** — `docs/archive/README.md:31-38` carries its own "Completed Plans" table (7 rows), stalled at `2026-02-10`, while `docs/archive/plans/` holds 25 archived plan files today — roughly 18 postdate the table and are missing from it (added through G1–G14, 2026-08-04 through 2026-08-16). `docs/README.md` points readers to this file "for more historical plans", but G11's linter (`tests/unit/docs-freshness.test.ts`) only ever parses `docs/README.md`'s own tables via `INDEX = "docs/README.md"` — this second index sits entirely outside its walk, invisible to both Check 3 (reverse coverage) and Check 4 (header-vs-rows). Same defect class this branch just retired; genuinely separate scope, since it is a second host file, not a second row in the one already covered. Natural next increment for this linter. (Low-Med value, Low effort)
+- [ ] 🟤 **The docs-freshness suite's runtime grows linearly with `docs/`, and it is already ~50s of a ~190s suite** — `tests/unit/docs-freshness.test.ts`'s prettier fixed-point check formats every doc **twice** (`it.each` over 71 docs = 142 format calls). The final whole-branch review triaged it as not merge-blocking, since it buys a check `format:check` structurally cannot provide (PR #32 `53fa347` failed CI on a file the formatter had just fixed), and an explicit `30_000` per-test timeout was added so growth surfaces as slowness rather than a spurious red. But the trend is one-way. Options when it becomes a complaint: split that one `describe` behind an env flag so it runs in CI but not in local `--watch`, or sample rather than sweep. Do **not** batch the fan-out into a single test — the per-file cases are what make a failure name the offending file. (Low value, Low effort) `[relates-to: the [2026-08-17] G11 group above]`
+- [ ] 🟤 **Non-vacuity floors in the docs-freshness linter are `> 0`, which tolerates a near-total coverage collapse** — every derived set carries `expect(set.length).toBeGreaterThan(0)`, which is literal spec compliance and catches the "renamed directory silently disarms the guard" case it was written for. But 1-of-14 comparable rows, or 1-of-64 in-scope docs, still passes. If the guard should resist quiet erosion rather than only total erasure, pin approximate lower bounds (e.g. `toBeGreaterThan(40)` for in-scope docs) with enough slack that ordinary growth never trips them. Raised as a recommendation by the final whole-branch review, deliberately not applied in-branch. (Low value, Low effort)
+- [ ] 🟤 **`parseTables`' guards are exercised only against `docs/README.md`** — the fenced-code and escaped-pipe handling in `splitCells`/`blankFences` is pinned by synthetic unit tests, but in production `parseTables` is called on exactly one file (the index). Every other doc reaches the linter only through the link and prettier checks. That is correct for today's design — the header↔row check has no reason to parse other files — but it means the parsing hardening bought during the code-review round is latent everywhere except one file, and a future check that parses more docs inherits untested breadth rather than proven breadth. Worth knowing before extending the parser's reach (the git-timestamp and value-agreement checks in §7 of the spec would both do so). (Low value, Low effort)
 
 ---
 

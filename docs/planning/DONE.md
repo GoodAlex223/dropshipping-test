@@ -8,6 +8,27 @@ Completed tasks with implementation details and learnings.
 
 ## 2026-08 (August)
 
+### [2026-08-17] G11 - Docs-Freshness Linter (WEEKLY solo, 🟤 Auto)
+
+**Plan**: [2026-08-17_g11-docs-freshness-linter.md](../archive/plans/2026-08-17_g11-docs-freshness-linter.md) — 6 tasks, executed subagent-driven (fresh implementer + reviewer per task)
+**Spec**: [2026-08-17-g11-docs-freshness-linter-design.md](../superpowers/specs/2026-08-17-g11-docs-freshness-linter-design.md) — 4 user decisions logged 2026-08-17
+**Merge**: `745e039` (2026-08-17, `--no-ff`, merged locally) — **no PR**: the branch was never pushed, so the SHA is the only durable reference. Reviewed by `/code-review` against the local branch instead; 6 sub-threshold findings, all real, all fixed (`e8237b4`, `900982b`, `435a757`, `6cfdf58`).
+
+**Summary**: Retires a documentation-drift class that human review had caught on **nine separate PRs** (#16, #17, #19, #21, #23, #26, #27, #30, #33 — eleven occurrences, since #27 and #30 each drifted twice). `tests/unit/docs-freshness.test.ts` adds five guarded checks in the `no-bright-colors.test.ts` mould — plain Vitest, no new tooling. The false-positive guards are the feature: measured at the merge base, a naive audit fires **27 rows of which 26 are false**, and a naive link check fires 18 against a tree with 4 real breaks. Guarded, both report exactly the real ones. Ships with the 14 instances of drift it found already fixed, including **recurrence #10 — created by the G13 close-out the day before, while this entry sat OVERDUE**.
+
+**Key changes**:
+
+- **Check 1 — index row ↔ doc header.** Only files declaring `**Last Updated**:` are compared; no stamp = skip, never fail. This single guard removes 26 of 27 naive fires. Specs are exempt _by construction_: they carry `**Date**:`, which no code path reads for a comparison (pinned by a regression test with its own non-vacuity floor).
+- **Check 2 — columns selected by header name**, literally `Last Updated`, never by index. Excludes the archive table's `Status` (`COMPLETE`/`ACTIVE`, not a date) and `Completed`/`Started` (event dates). Plus a malformed-row assertion.
+- **Check 3 — reverse coverage.** Every `.md` in an allowlisted directory needs an index row; exemptions listed by exact path (exactly one). A self-truing meta-assertion requires every doc under `docs/` to be indexed, exempt, or on a named out-of-scope list, so a new subdirectory fails loudly instead of vanishing.
+- **Check 4 — the index's own header** must be ≥ every date it lists (recurrences #8/#9's half of the class).
+- **Check 5 — prettier fixed-point** (`format(format(x)) === format(x)`; `--check` is already in CI, idempotency is not — PR #32 `53fa347` failed CI on a file the formatter had just fixed) **and no broken relative links** (4 parser guards: fenced blocks, inline code spans, `<…>` autolinks, `decodeURIComponent`).
+- **Drift fixed**: `DONE.md`'s index row (#10); 9 unindexed archived plans (closes BACKLOG [2026-08-09] and settles the convention — WEEKLY-group plans _are_ indexed); 4 broken links, 2 of which were BACKLOG [2026-07-18] open since July, whose filed line numbers `:245`/`:425` had drifted to `:672`/`:852`.
+- **Conventions recorded in `docs/README.md`'s own instructions**, not just the spec: specs carry `**Date**` and are skipped; the index's own stamp bumps with its rows.
+- Closes 5 BACKLOG entries. Suite 701 → **877 | 1 todo**.
+
+**Learnings**: a control that cannot fail is indistinguishable from one that passes — three separate instances this run, two of them in artifacts I authored (a non-vacuity control that left 7 rows behind and so never fired; a paraphrased prettier-oscillation fixture that had drifted to prettier's own fixed point; and a shipped assertion that passed vacuously whenever the stamp it compared was null). Each was caught only by _making_ it fail, never by reading it. **An underspecified predicate manufactures disagreement**: "the naive audit count" produced 27/25/36/39 across four instruments, and "how many rows use an escaped pipe" produced 14/19/19/43 across four predicates — the fix in every case was to delete or date the number, never to reconcile it. **A count corrected in the same commit that invalidates it is still wrong** (the test total moved 91→94→95→96 across the commits meant to fix it). And a guard built to catch false positives can itself ship one: the code-span pipe mask converted a true positive into a false negative on a premise stated as fact and never run — GFM requires the escape _inside_ code spans, which prettier confirms in one command.
+
 ### [2026-08-17] G13 - Admin Translation & Alignment (WEEKLY solo, 🔵 User)
 
 **Plan**: [2026-08-16_g13-admin-translation.md](../archive/plans/2026-08-16_g13-admin-translation.md) — 15 tasks, executed subagent-driven (fresh implementer + reviewer per task)

@@ -76,9 +76,9 @@ Central index for all project documentation.
 
 ## Implementation Plans
 
-| Plan                                                                                                             | Task                      | Status | Started    |
-| ---------------------------------------------------------------------------------------------------------------- | ------------------------- | ------ | ---------- |
-| [planning/plans/2026-08-17_g11-docs-freshness-linter.md](planning/plans/2026-08-17_g11-docs-freshness-linter.md) | G11 Docs-Freshness Linter | ACTIVE | 2026-08-17 |
+| Plan                | Task | Status | Started |
+| ------------------- | ---- | ------ | ------- |
+| _(no active plans)_ | —    | —      | —       |
 
 ### Archived Plans
 
@@ -109,6 +109,7 @@ Central index for all project documentation.
 | [2026-08-14_task-039-i18n-foundation.md](archive/plans/2026-08-14_task-039-i18n-foundation.md)                       | G9 TASK-039 i18n Foundation          | COMPLETE | 2026-08-15 |
 | [2026-08-15_g14-rebrand-residuals.md](archive/plans/2026-08-15_g14-rebrand-residuals.md)                             | G14 Rebrand Residuals                | COMPLETE | 2026-08-15 |
 | [2026-08-16_g13-admin-translation.md](archive/plans/2026-08-16_g13-admin-translation.md)                             | G13 Admin Translation & Alignment    | COMPLETE | 2026-08-17 |
+| [2026-08-17_g11-docs-freshness-linter.md](archive/plans/2026-08-17_g11-docs-freshness-linter.md)                     | G11 Docs-Freshness Linter            | COMPLETE | 2026-08-17 |
 
 See [archive/README.md](archive/README.md) for more historical plans.
 

@@ -344,6 +344,7 @@ prisma/
 - Always add Zod validation schemas for new API endpoints in `src/lib/validations/` (index.ts for core schemas, separate files for specialized domains like google-shopping.ts)
 - Use `requireAdmin()` or `requireAuth()` for protected API routes, never roll custom auth checks
 - Keep UI primitives in `src/components/ui/` unchanged (shadcn/ui managed)
+- **Docs freshness is enforced by a test** (`tests/unit/docs-freshness.test.ts`, G11): if you bump a doc's `**Last Updated**`, bump its `docs/README.md` index row in the same commit (and the index's own header, which must be ≥ every date it lists); every `.md` in an indexed directory needs an index row; relative links must resolve; `prettier --write` must be idempotent. Design specs under `docs/superpowers/specs/` carry `**Date**:` (authoring date, never edited, never compared) — a file with no `**Last Updated**` is skipped, never failed. Archiving a plan is two edits: move the file _and_ move its index row.
 - Environment variables: never commit `.env` files; use `.env.example` as reference; note Docker Compose port mappings (host 5433→container 5432 for Postgres, host 6380→container 6379 for Redis); Google OAuth, Meilisearch, and Sentry marked as NOT YET IMPLEMENTED
 - Use `next/image` for all images; avoid native `<img>` tags (ESLint enforced)
 - **Performance**: Add blur placeholders to all product/category images using `DEFAULT_BLUR_DATA_URL` and `IMAGE_SIZES` from `image-utils.ts`; Web Vitals are automatically tracked via `WebVitalsReporter` in providers
