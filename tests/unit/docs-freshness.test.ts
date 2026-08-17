@@ -201,3 +201,62 @@ describe("parseTables / readStamp / rowTarget — synthetic-input coverage", () 
     expect(rowTarget("[planning/DONE.md](planning/DONE.md)")).toBe("docs/planning/DONE.md");
   });
 });
+
+// Directories whose every .md must appear in the index. Walked recursively, so
+// docs/planning/audits/ and docs/planning/plans/ are covered by docs/planning.
+// Deliberately NOT listed: docs/design/** (its own README indexes the handoff
+// set) and docs/plans/ (a legacy guide directory holding only a README).
+const INDEXED_DIRS = [
+  "docs/planning",
+  "docs/superpowers/specs",
+  "docs/archive/plans",
+  "docs/api",
+  "docs/database",
+  "docs/deployment",
+  "docs/testing",
+];
+
+// Root-level docs that are indexed. docs/README.md is the index itself and is
+// not listed here, so it never needs an exemption.
+const INDEXED_ROOT_DOCS = [
+  "docs/ARCHITECTURE.md",
+  "docs/PROJECT_CONTEXT.md",
+  "docs/TESTING_CHECKLIST.md",
+];
+
+// By exact path, never a glob. One entry: archive/plans/README.md is the
+// archive directory's own guide, reached from docs/README.md's prose link to
+// archive/README.md rather than from a table row.
+const INDEX_EXEMPT = new Set(["docs/archive/plans/README.md"]);
+
+describe("every doc in an indexed directory has a docs/README.md row", () => {
+  const linked = new Set(
+    parseTables(readFileSync(INDEX, "utf8"))
+      .map((r) => rowTarget(r.cells[0] ?? ""))
+      .filter((t): t is string => t !== null)
+  );
+
+  const inScope = [...INDEXED_DIRS.flatMap((d) => walkDocs(d)), ...INDEXED_ROOT_DOCS].filter(
+    (f) => !INDEX_EXEMPT.has(f)
+  );
+
+  it("finds a non-empty set of in-scope docs", () => {
+    expect(inScope.length).toBeGreaterThan(0);
+  });
+
+  it("finds a non-empty set of indexed targets", () => {
+    expect(linked.size).toBeGreaterThan(0);
+  });
+
+  it("every exemption still exists on disk", () => {
+    // Stops the exemption set rotting into a list of ghosts that quietly
+    // widens what the check ignores.
+    const ghosts = [...INDEX_EXEMPT].filter((f) => !existsSync(f));
+    expect(ghosts, `Exempt paths no longer on disk:\n${ghosts.join("\n")}`).toEqual([]);
+  });
+
+  it("every in-scope doc is indexed", () => {
+    const missing = inScope.filter((f) => !linked.has(f));
+    expect(missing, `Docs with no docs/README.md row:\n${missing.join("\n")}`).toEqual([]);
+  });
+});

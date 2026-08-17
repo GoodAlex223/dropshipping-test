@@ -82,24 +82,33 @@ Central index for all project documentation.
 
 ### Archived Plans
 
-| Plan                                                                                                             | Task                                 | Status   | Completed  |
-| ---------------------------------------------------------------------------------------------------------------- | ------------------------------------ | -------- | ---------- |
-| [2026-01-05_dropshipping-mvp-plan.md](archive/plans/2026-01-05_dropshipping-mvp-plan.md)                         | Dropshipping Website MVP             | COMPLETE | 2026-01-13 |
-| [2026-01-22_seo-technical-setup.md](archive/plans/2026-01-22_seo-technical-setup.md)                             | SEO Technical Setup                  | COMPLETE | 2026-01-22 |
-| [2026-02-01_analytics-integration.md](archive/plans/2026-02-01_analytics-integration.md)                         | GA4 Analytics Integration            | COMPLETE | 2026-02-01 |
-| [2026-02-02_task-019-social-sharing.md](archive/plans/2026-02-02_task-019-social-sharing.md)                     | Social Sharing                       | COMPLETE | 2026-02-02 |
-| [2026-02-04_task-026-fix-vercel-deploy-ci.md](archive/plans/2026-02-04_task-026-fix-vercel-deploy-ci.md)         | CI/CD Deployment Pipeline            | COMPLETE | 2026-02-07 |
-| [2026-02-09_task-027-dependency-audit.md](archive/plans/2026-02-09_task-027-dependency-audit.md)                 | Dependency Audit                     | COMPLETE | 2026-02-09 |
-| [2026-07-14_task-033-resumption.md](archive/plans/2026-07-14_task-033-resumption.md)                             | Post-Freeze Resumption               | COMPLETE | 2026-07-14 |
-| [2026-07-15_task-038a-prework.md](archive/plans/2026-07-15_task-038a-prework.md)                                 | TASK-038a Prework                    | COMPLETE | 2026-07-16 |
-| [2026-07-16_task-038b-payments-delivery-spike.md](archive/plans/2026-07-16_task-038b-payments-delivery-spike.md) | TASK-038b Payments & Delivery Spike  | COMPLETE | 2026-07-17 |
-| [2026-07-17_task-034-design-system.md](archive/plans/2026-07-17_task-034-design-system.md)                       | TASK-034 Mirox Design System         | COMPLETE | 2026-07-18 |
-| [2026-07-19_task-035-homepage-rebrand.md](archive/plans/2026-07-19_task-035-homepage-rebrand.md)                 | TASK-035 Homepage Rebrand            | COMPLETE | 2026-07-21 |
-| [2026-07-24_homepage-polish-art-direction.md](archive/plans/2026-07-24_homepage-polish-art-direction.md)         | Homepage Polish & Art Direction      | COMPLETE | 2026-07-27 |
-| [2026-07-27_task-057-design-adoption.md](archive/plans/2026-07-27_task-057-design-adoption.md)                   | TASK-057 Mirox Design Adoption       | COMPLETE | 2026-07-31 |
-| [2026-07-31_task-036-catalog-redesign-filters.md](archive/plans/2026-07-31_task-036-catalog-redesign-filters.md) | TASK-036 Catalog Redesign + Filters  | COMPLETE | 2026-08-01 |
-| [2026-08-01_task-037-product-page-redesign.md](archive/plans/2026-08-01_task-037-product-page-redesign.md)       | TASK-037 Product Page Redesign       | COMPLETE | 2026-08-03 |
-| [2026-08-11_g8-launch-feedback-loop.md](archive/plans/2026-08-11_g8-launch-feedback-loop.md)                     | G8 TASK-058/059 Launch Feedback Loop | COMPLETE | 2026-08-14 |
+| Plan                                                                                                                 | Task                                 | Status   | Completed  |
+| -------------------------------------------------------------------------------------------------------------------- | ------------------------------------ | -------- | ---------- |
+| [2026-01-05_dropshipping-mvp-plan.md](archive/plans/2026-01-05_dropshipping-mvp-plan.md)                             | Dropshipping Website MVP             | COMPLETE | 2026-01-13 |
+| [2026-01-22_seo-technical-setup.md](archive/plans/2026-01-22_seo-technical-setup.md)                                 | SEO Technical Setup                  | COMPLETE | 2026-01-22 |
+| [2026-02-01_analytics-integration.md](archive/plans/2026-02-01_analytics-integration.md)                             | GA4 Analytics Integration            | COMPLETE | 2026-02-01 |
+| [2026-02-02_task-019-social-sharing.md](archive/plans/2026-02-02_task-019-social-sharing.md)                         | Social Sharing                       | COMPLETE | 2026-02-02 |
+| [2026-02-04_task-026-fix-vercel-deploy-ci.md](archive/plans/2026-02-04_task-026-fix-vercel-deploy-ci.md)             | CI/CD Deployment Pipeline            | COMPLETE | 2026-02-07 |
+| [2026-02-09_task-027-dependency-audit.md](archive/plans/2026-02-09_task-027-dependency-audit.md)                     | Dependency Audit                     | COMPLETE | 2026-02-09 |
+| [2026-02-10_task-030-documentation-finalization.md](archive/plans/2026-02-10_task-030-documentation-finalization.md) | TASK-030 Documentation Finalization  | COMPLETE | 2026-02-11 |
+| [2026-07-14_task-033-resumption.md](archive/plans/2026-07-14_task-033-resumption.md)                                 | Post-Freeze Resumption               | COMPLETE | 2026-07-14 |
+| [2026-07-15_task-038a-prework.md](archive/plans/2026-07-15_task-038a-prework.md)                                     | TASK-038a Prework                    | COMPLETE | 2026-07-16 |
+| [2026-07-16_task-038b-payments-delivery-spike.md](archive/plans/2026-07-16_task-038b-payments-delivery-spike.md)     | TASK-038b Payments & Delivery Spike  | COMPLETE | 2026-07-17 |
+| [2026-07-17_task-034-design-system.md](archive/plans/2026-07-17_task-034-design-system.md)                           | TASK-034 Mirox Design System         | COMPLETE | 2026-07-18 |
+| [2026-07-19_task-035-homepage-rebrand.md](archive/plans/2026-07-19_task-035-homepage-rebrand.md)                     | TASK-035 Homepage Rebrand            | COMPLETE | 2026-07-21 |
+| [2026-07-24_homepage-polish-art-direction.md](archive/plans/2026-07-24_homepage-polish-art-direction.md)             | Homepage Polish & Art Direction      | COMPLETE | 2026-07-27 |
+| [2026-07-27_task-057-design-adoption.md](archive/plans/2026-07-27_task-057-design-adoption.md)                       | TASK-057 Mirox Design Adoption       | COMPLETE | 2026-07-31 |
+| [2026-07-31_task-036-catalog-redesign-filters.md](archive/plans/2026-07-31_task-036-catalog-redesign-filters.md)     | TASK-036 Catalog Redesign + Filters  | COMPLETE | 2026-08-01 |
+| [2026-08-01_task-037-product-page-redesign.md](archive/plans/2026-08-01_task-037-product-page-redesign.md)           | TASK-037 Product Page Redesign       | COMPLETE | 2026-08-03 |
+| [2026-08-04_g1-cart-drawer-restyle.md](archive/plans/2026-08-04_g1-cart-drawer-restyle.md)                           | G1 Cart & Drawer Restyle             | COMPLETE | 2026-08-04 |
+| [2026-08-06_g2-checkout-restyle.md](archive/plans/2026-08-06_g2-checkout-restyle.md)                                 | G2 Checkout Restyle → COD            | COMPLETE | 2026-08-07 |
+| [2026-08-08_g3-params-fix.md](archive/plans/2026-08-08_g3-params-fix.md)                                             | G3 Dynamic Route Params Fix          | COMPLETE | 2026-08-08 |
+| [2026-08-08_g4-peripheral-surfaces.md](archive/plans/2026-08-08_g4-peripheral-surfaces.md)                           | G4 Peripheral Surfaces Sweep         | COMPLETE | 2026-08-09 |
+| [2026-08-10_g5-transactional-emails.md](archive/plans/2026-08-10_g5-transactional-emails.md)                         | G5 Transactional Emails              | COMPLETE | 2026-08-10 |
+| [2026-08-11_g8-launch-feedback-loop.md](archive/plans/2026-08-11_g8-launch-feedback-loop.md)                         | G8 TASK-058/059 Launch Feedback Loop | COMPLETE | 2026-08-14 |
+| [2026-08-14_task-039-i18n-foundation.md](archive/plans/2026-08-14_task-039-i18n-foundation.md)                       | G9 TASK-039 i18n Foundation          | COMPLETE | 2026-08-15 |
+| [2026-08-15_g14-rebrand-residuals.md](archive/plans/2026-08-15_g14-rebrand-residuals.md)                             | G14 Rebrand Residuals                | COMPLETE | 2026-08-15 |
+| [2026-08-16_g13-admin-translation.md](archive/plans/2026-08-16_g13-admin-translation.md)                             | G13 Admin Translation & Alignment    | COMPLETE | 2026-08-17 |
 
 See [archive/README.md](archive/README.md) for more historical plans.
 
