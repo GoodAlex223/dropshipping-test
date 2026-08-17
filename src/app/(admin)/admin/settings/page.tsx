@@ -10,16 +10,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 export default function AdminSettingsPage() {
-  const { toast } = useToast();
+  const t = useTranslations("admin.settings");
   const [isSaving, setIsSaving] = useState(false);
 
   // Store settings
   const [storeSettings, setStoreSettings] = useState({
     storeName: process.env.NEXT_PUBLIC_STORE_NAME || BRAND_NAME,
-    storeDescription: "Your one-stop shop for quality products",
+    storeDescription: t("defaults.storeDescription"),
     contactEmail: "support@store.com",
     supportPhone: "",
     address: "",
@@ -45,16 +46,9 @@ export default function AdminSettingsPage() {
     try {
       // In a real app, this would save to the backend
       await new Promise((resolve) => setTimeout(resolve, 500));
-      toast({
-        title: "Settings saved",
-        description: "Store settings have been updated successfully.",
-      });
+      toast.success(t("general.saveSuccess"));
     } catch {
-      toast({
-        title: "Error",
-        description: "Failed to save settings. Please try again.",
-        variant: "destructive",
-      });
+      toast.error(t("general.saveError"));
     } finally {
       setIsSaving(false);
     }
@@ -64,16 +58,9 @@ export default function AdminSettingsPage() {
     setIsSaving(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 500));
-      toast({
-        title: "Settings saved",
-        description: "Email notification settings have been updated.",
-      });
+      toast.success(t("email.saveSuccess"));
     } catch {
-      toast({
-        title: "Error",
-        description: "Failed to save settings. Please try again.",
-        variant: "destructive",
-      });
+      toast.error(t("email.saveError"));
     } finally {
       setIsSaving(false);
     }
@@ -83,16 +70,9 @@ export default function AdminSettingsPage() {
     setIsSaving(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 500));
-      toast({
-        title: "Settings saved",
-        description: "Shipping settings have been updated.",
-      });
+      toast.success(t("shipping.saveSuccess"));
     } catch {
-      toast({
-        title: "Error",
-        description: "Failed to save settings. Please try again.",
-        variant: "destructive",
-      });
+      toast.error(t("shipping.saveError"));
     } finally {
       setIsSaving(false);
     }
@@ -102,27 +82,27 @@ export default function AdminSettingsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">Settings</h1>
-        <p className="text-muted-foreground">Manage your store configuration</p>
+        <h1 className="text-3xl font-bold">{t("title")}</h1>
+        <p className="text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       <Tabs defaultValue="general" className="space-y-6">
         <TabsList>
           <TabsTrigger value="general" className="gap-2">
             <Store className="h-4 w-4" />
-            General
+            {t("tabs.general")}
           </TabsTrigger>
           <TabsTrigger value="email" className="gap-2">
             <Mail className="h-4 w-4" />
-            Email
+            {t("tabs.email")}
           </TabsTrigger>
           <TabsTrigger value="shipping" className="gap-2">
             <Truck className="h-4 w-4" />
-            Shipping
+            {t("tabs.shipping")}
           </TabsTrigger>
           <TabsTrigger value="payments" className="gap-2">
             <CreditCard className="h-4 w-4" />
-            Payments
+            {t("tabs.payments")}
           </TabsTrigger>
         </TabsList>
 
@@ -130,24 +110,24 @@ export default function AdminSettingsPage() {
         <TabsContent value="general" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Store Information</CardTitle>
-              <CardDescription>Basic information about your store</CardDescription>
+              <CardTitle>{t("general.cardTitle")}</CardTitle>
+              <CardDescription>{t("general.cardDescription")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="storeName">Store Name</Label>
+                  <Label htmlFor="storeName">{t("general.storeNameLabel")}</Label>
                   <Input
                     id="storeName"
                     value={storeSettings.storeName}
                     onChange={(e) =>
                       setStoreSettings((prev) => ({ ...prev, storeName: e.target.value }))
                     }
-                    placeholder="My Store"
+                    placeholder={t("general.storeNamePlaceholder")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="contactEmail">Contact Email</Label>
+                  <Label htmlFor="contactEmail">{t("general.contactEmailLabel")}</Label>
                   <Input
                     id="contactEmail"
                     type="email"
@@ -161,21 +141,21 @@ export default function AdminSettingsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="storeDescription">Store Description</Label>
+                <Label htmlFor="storeDescription">{t("general.storeDescriptionLabel")}</Label>
                 <Textarea
                   id="storeDescription"
                   value={storeSettings.storeDescription}
                   onChange={(e) =>
                     setStoreSettings((prev) => ({ ...prev, storeDescription: e.target.value }))
                   }
-                  placeholder="Describe your store..."
+                  placeholder={t("general.storeDescriptionPlaceholder")}
                   rows={3}
                 />
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="supportPhone">Support Phone (optional)</Label>
+                  <Label htmlFor="supportPhone">{t("general.supportPhoneLabel")}</Label>
                   <Input
                     id="supportPhone"
                     value={storeSettings.supportPhone}
@@ -186,14 +166,14 @@ export default function AdminSettingsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="address">Business Address (optional)</Label>
+                  <Label htmlFor="address">{t("general.addressLabel")}</Label>
                   <Input
                     id="address"
                     value={storeSettings.address}
                     onChange={(e) =>
                       setStoreSettings((prev) => ({ ...prev, address: e.target.value }))
                     }
-                    placeholder="123 Main St, City, Country"
+                    placeholder={t("general.addressPlaceholder")}
                   />
                 </div>
               </div>
@@ -201,7 +181,7 @@ export default function AdminSettingsPage() {
               <div className="flex justify-end pt-4">
                 <Button onClick={handleSaveGeneral} disabled={isSaving}>
                   <Save className="mr-2 h-4 w-4" />
-                  {isSaving ? "Saving..." : "Save Changes"}
+                  {isSaving ? t("saving") : t("saveChangesButton")}
                 </Button>
               </div>
             </CardContent>
@@ -214,16 +194,16 @@ export default function AdminSettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bell className="h-5 w-5" />
-                Email Notifications
+                {t("email.cardTitle")}
               </CardTitle>
-              <CardDescription>Configure which emails are sent automatically</CardDescription>
+              <CardDescription>{t("email.cardDescription")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Order Confirmation</Label>
+                  <Label>{t("email.orderConfirmationLabel")}</Label>
                   <p className="text-muted-foreground text-sm">
-                    Send email when a new order is placed
+                    {t("email.orderConfirmationDescription")}
                   </p>
                 </div>
                 <Switch
@@ -236,9 +216,9 @@ export default function AdminSettingsPage() {
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Shipping Updates</Label>
+                  <Label>{t("email.shippingUpdatesLabel")}</Label>
                   <p className="text-muted-foreground text-sm">
-                    Notify customers when order status changes
+                    {t("email.shippingUpdatesDescription")}
                   </p>
                 </div>
                 <Switch
@@ -251,9 +231,9 @@ export default function AdminSettingsPage() {
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Marketing Emails</Label>
+                  <Label>{t("email.marketingEmailsLabel")}</Label>
                   <p className="text-muted-foreground text-sm">
-                    Send promotional emails to customers
+                    {t("email.marketingEmailsDescription")}
                   </p>
                 </div>
                 <Switch
@@ -266,9 +246,9 @@ export default function AdminSettingsPage() {
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Low Stock Alerts</Label>
+                  <Label>{t("email.lowStockAlertsLabel")}</Label>
                   <p className="text-muted-foreground text-sm">
-                    Get notified when products are running low
+                    {t("email.lowStockAlertsDescription")}
                   </p>
                 </div>
                 <Switch
@@ -282,7 +262,7 @@ export default function AdminSettingsPage() {
               <div className="flex justify-end pt-4">
                 <Button onClick={handleSaveEmail} disabled={isSaving}>
                   <Save className="mr-2 h-4 w-4" />
-                  {isSaving ? "Saving..." : "Save Changes"}
+                  {isSaving ? t("saving") : t("saveChangesButton")}
                 </Button>
               </div>
             </CardContent>
@@ -293,13 +273,13 @@ export default function AdminSettingsPage() {
         <TabsContent value="shipping" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Shipping Rates</CardTitle>
-              <CardDescription>Configure shipping costs and thresholds</CardDescription>
+              <CardTitle>{t("shipping.cardTitle")}</CardTitle>
+              <CardDescription>{t("shipping.cardDescription")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-3">
                 <div className="space-y-2">
-                  <Label htmlFor="freeShipping">Free Shipping Threshold ($)</Label>
+                  <Label htmlFor="freeShipping">{t("shipping.freeShippingLabel")}</Label>
                   <Input
                     id="freeShipping"
                     type="number"
@@ -313,13 +293,11 @@ export default function AdminSettingsPage() {
                       }))
                     }
                   />
-                  <p className="text-muted-foreground text-xs">
-                    Orders above this amount get free shipping
-                  </p>
+                  <p className="text-muted-foreground text-xs">{t("shipping.freeShippingHint")}</p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="standardRate">Standard Shipping ($)</Label>
+                  <Label htmlFor="standardRate">{t("shipping.standardShippingLabel")}</Label>
                   <Input
                     id="standardRate"
                     type="number"
@@ -333,11 +311,13 @@ export default function AdminSettingsPage() {
                       }))
                     }
                   />
-                  <p className="text-muted-foreground text-xs">Default shipping rate</p>
+                  <p className="text-muted-foreground text-xs">
+                    {t("shipping.standardShippingHint")}
+                  </p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="expressRate">Express Shipping ($)</Label>
+                  <Label htmlFor="expressRate">{t("shipping.expressShippingLabel")}</Label>
                   <Input
                     id="expressRate"
                     type="number"
@@ -351,14 +331,16 @@ export default function AdminSettingsPage() {
                       }))
                     }
                   />
-                  <p className="text-muted-foreground text-xs">Rate for express delivery</p>
+                  <p className="text-muted-foreground text-xs">
+                    {t("shipping.expressShippingHint")}
+                  </p>
                 </div>
               </div>
 
               <div className="flex justify-end pt-4">
                 <Button onClick={handleSaveShipping} disabled={isSaving}>
                   <Save className="mr-2 h-4 w-4" />
-                  {isSaving ? "Saving..." : "Save Changes"}
+                  {isSaving ? t("saving") : t("saveChangesButton")}
                 </Button>
               </div>
             </CardContent>
@@ -371,9 +353,9 @@ export default function AdminSettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5" />
-                Payment Configuration
+                {t("payments.cardTitle")}
               </CardTitle>
-              <CardDescription>Manage payment provider settings</CardDescription>
+              <CardDescription>{t("payments.cardDescription")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="bg-muted/50 rounded-lg border p-4">
@@ -385,8 +367,8 @@ export default function AdminSettingsPage() {
                     <p className="font-medium">Stripe</p>
                     <p className="text-muted-foreground text-sm">
                       {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-                        ? "Connected"
-                        : "Not configured"}
+                        ? t("payments.connected")
+                        : t("payments.notConfigured")}
                     </p>
                   </div>
                 </div>
@@ -394,12 +376,8 @@ export default function AdminSettingsPage() {
 
               <div className="text-muted-foreground rounded-lg border border-dashed p-6 text-center">
                 <CreditCard className="mx-auto h-8 w-8 opacity-50" />
-                <p className="mt-2 text-sm">
-                  Payment settings are configured through environment variables for security.
-                </p>
-                <p className="mt-1 text-xs">
-                  Update STRIPE_SECRET_KEY and STRIPE_PUBLISHABLE_KEY in your .env file.
-                </p>
+                <p className="mt-2 text-sm">{t("payments.envNotice")}</p>
+                <p className="mt-1 text-xs">{t("payments.envDetail")}</p>
               </div>
             </CardContent>
           </Card>

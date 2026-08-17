@@ -32,9 +32,13 @@ import { join } from "node:path";
 //   TASK-057 Task 11's admin pass spot-fixed two hardcoded-light-background
 //   offenders it found while clicking through (newsletter's "Active" badge,
 //   suppliers/[id]'s stat-icon circles) without adding admin to SCAN_PATHS — a
-//   point fix, not a sweep. What remains bright is PAYMENT_STATUS_COLORS
-//   (PaymentStatus, admin-only) and the supplier-order status map — both
-//   deliberate, both backlogged.
+//   point fix, not a sweep. G13 (TASK-039) deleted both PAYMENT_STATUS_COLORS
+//   and the supplier-order status map outright, replacing them with
+//   catalog-driven monochrome lookups. What remains bright in admin now is
+//   the pre-existing decorative set: the orders/[id] timeline's green-500,
+//   the reviews page's yellow-400 star rating, and the supplier
+//   connection-test CheckCircle2 icons (suppliers list + suppliers/[id]) —
+//   none of it status-badge chrome, all of it outside SCAN_PATHS regardless.
 // - src/components/ui/ — shadcn primitives. Token-driven and managed by the shadcn
 //   CLI, not hand-edited.
 // - src/app/showcase and the .bold/.luxury/.organic theme blocks — the showcase

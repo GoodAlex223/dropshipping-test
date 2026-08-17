@@ -2,71 +2,73 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Package, ShoppingCart, Users, DollarSign, Mail } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { formatPrice } from "@/lib/format";
+import { getTranslations } from "next-intl/server";
 
 export default async function AdminDashboardPage() {
+  const t = await getTranslations("admin.dashboard");
   const subscriberCount = await prisma.subscriber.count({
     where: { status: "ACTIVE" },
   });
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">Dashboard</h2>
-        <p className="text-muted-foreground">Overview of your store performance.</p>
+        <h2 className="text-2xl font-bold tracking-tight">{t("title")}</h2>
+        <p className="text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("stats.totalRevenue")}</CardTitle>
             <DollarSign className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatPrice(0)}</div>
-            <p className="text-muted-foreground text-xs">+0% from last month</p>
+            <p className="text-muted-foreground text-xs">{t("stats.changeFromLastMonth")}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Orders</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("stats.orders")}</CardTitle>
             <ShoppingCart className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">0</div>
-            <p className="text-muted-foreground text-xs">+0% from last month</p>
+            <p className="text-muted-foreground text-xs">{t("stats.changeFromLastMonth")}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Products</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("stats.products")}</CardTitle>
             <Package className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">5</div>
-            <p className="text-muted-foreground text-xs">Active products</p>
+            <p className="text-muted-foreground text-xs">{t("stats.activeProducts")}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Customers</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("stats.customers")}</CardTitle>
             <Users className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">1</div>
-            <p className="text-muted-foreground text-xs">Registered users</p>
+            <p className="text-muted-foreground text-xs">{t("stats.registeredUsers")}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Subscribers</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("stats.subscribers")}</CardTitle>
             <Mail className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{subscriberCount}</div>
-            <p className="text-muted-foreground text-xs">Active newsletter subscribers</p>
+            <p className="text-muted-foreground text-xs">{t("stats.activeSubscribers")}</p>
           </CardContent>
         </Card>
       </div>
@@ -74,26 +76,24 @@ export default async function AdminDashboardPage() {
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Recent Orders</CardTitle>
-            <CardDescription>No orders yet.</CardDescription>
+            <CardTitle>{t("recentOrders.title")}</CardTitle>
+            <CardDescription>{t("recentOrders.empty")}</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground text-sm">
-              Orders will appear here once customers start purchasing.
-            </p>
+            <p className="text-muted-foreground text-sm">{t("recentOrders.description")}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Common tasks</CardDescription>
+            <CardTitle>{t("quickActions.title")}</CardTitle>
+            <CardDescription>{t("quickActions.subtitle")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p className="text-sm">- Add new products</p>
-            <p className="text-sm">- Manage categories</p>
-            <p className="text-sm">- Configure suppliers</p>
-            <p className="text-sm">- Update store settings</p>
+            <p className="text-sm">- {t("quickActions.addProducts")}</p>
+            <p className="text-sm">- {t("quickActions.manageCategories")}</p>
+            <p className="text-sm">- {t("quickActions.configureSuppliers")}</p>
+            <p className="text-sm">- {t("quickActions.updateSettings")}</p>
           </CardContent>
         </Card>
       </div>

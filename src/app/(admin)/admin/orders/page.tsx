@@ -34,8 +34,9 @@ import {
 } from "@/components/ui/table";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslations } from "next-intl";
 import { useDebounce } from "@/hooks/use-debounce";
-import { getOrderStatusStyle } from "@/lib/order-status";
+import { getOrderStatusStyle, getPaymentStatusStyle } from "@/lib/order-status";
 import { formatPrice } from "@/lib/format";
 
 interface Order {
@@ -66,15 +67,14 @@ interface OrdersResponse {
   };
 }
 
-const PAYMENT_STATUS_COLORS: Record<string, string> = {
-  PENDING: "bg-yellow-100 text-yellow-800",
-  PAID: "bg-green-100 text-green-800",
-  FAILED: "bg-red-100 text-red-800",
-  REFUNDED: "bg-gray-100 text-gray-800",
-  PARTIALLY_REFUNDED: "bg-orange-100 text-orange-800",
-};
-
 function AdminOrdersContent() {
+  const t = useTranslations("admin.orders");
+  const tCommon = useTranslations("admin.common");
+  const tStatus = useTranslations("account");
+  const orderStatusLabel = (s: string) =>
+    tStatus.has(`orderStatus.${s}` as never) ? tStatus(`orderStatus.${s}` as never) : s;
+  const paymentStatusLabel = (s: string) =>
+    tStatus.has(`paymentStatus.${s}` as never) ? tStatus(`paymentStatus.${s}` as never) : s;
   const router = useRouter();
   const searchParams = useSearchParams();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -193,7 +193,7 @@ function AdminOrdersContent() {
     search || status !== "all" || paymentStatus !== "all" || dateFrom || dateTo;
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString("uk-UA", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -206,12 +206,12 @@ function AdminOrdersContent() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Orders</h1>
-          <p className="text-muted-foreground">Manage and track customer orders</p>
+          <h1 className="text-2xl font-bold">{t("title")}</h1>
+          <p className="text-muted-foreground">{t("subtitle")}</p>
         </div>
         <Button onClick={handleExport} disabled={isExporting} variant="outline">
           <Download className="mr-2 h-4 w-4" />
-          {isExporting ? "Exporting..." : "Export CSV"}
+          {isExporting ? t("exporting") : t("export")}
         </Button>
       </div>
 
@@ -224,7 +224,7 @@ function AdminOrdersContent() {
               <div className="relative">
                 <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
                 <Input
-                  placeholder="Search by order #, email, or customer name..."
+                  placeholder={t("searchPlaceholder")}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="pl-9"
@@ -241,16 +241,16 @@ function AdminOrdersContent() {
               }}
             >
               <SelectTrigger className="w-[160px]">
-                <SelectValue placeholder="Status" />
+                <SelectValue placeholder={t("headers.status")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="PENDING">Pending</SelectItem>
-                <SelectItem value="CONFIRMED">Confirmed</SelectItem>
-                <SelectItem value="PROCESSING">Processing</SelectItem>
-                <SelectItem value="SHIPPED">Shipped</SelectItem>
-                <SelectItem value="DELIVERED">Delivered</SelectItem>
-                <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                <SelectItem value="all">{t("allStatuses")}</SelectItem>
+                <SelectItem value="PENDING">{orderStatusLabel("PENDING")}</SelectItem>
+                <SelectItem value="CONFIRMED">{orderStatusLabel("CONFIRMED")}</SelectItem>
+                <SelectItem value="PROCESSING">{orderStatusLabel("PROCESSING")}</SelectItem>
+                <SelectItem value="SHIPPED">{orderStatusLabel("SHIPPED")}</SelectItem>
+                <SelectItem value="DELIVERED">{orderStatusLabel("DELIVERED")}</SelectItem>
+                <SelectItem value="CANCELLED">{orderStatusLabel("CANCELLED")}</SelectItem>
               </SelectContent>
             </Select>
 
@@ -263,14 +263,14 @@ function AdminOrdersContent() {
               }}
             >
               <SelectTrigger className="w-[160px]">
-                <SelectValue placeholder="Payment" />
+                <SelectValue placeholder={t("headers.payment")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Payments</SelectItem>
-                <SelectItem value="PENDING">Pending</SelectItem>
-                <SelectItem value="PAID">Paid</SelectItem>
-                <SelectItem value="FAILED">Failed</SelectItem>
-                <SelectItem value="REFUNDED">Refunded</SelectItem>
+                <SelectItem value="all">{t("allPaymentStatuses")}</SelectItem>
+                <SelectItem value="PENDING">{paymentStatusLabel("PENDING")}</SelectItem>
+                <SelectItem value="PAID">{paymentStatusLabel("PAID")}</SelectItem>
+                <SelectItem value="FAILED">{paymentStatusLabel("FAILED")}</SelectItem>
+                <SelectItem value="REFUNDED">{paymentStatusLabel("REFUNDED")}</SelectItem>
               </SelectContent>
             </Select>
 
@@ -283,11 +283,11 @@ function AdminOrdersContent() {
               </SheetTrigger>
               <SheetContent>
                 <SheetHeader>
-                  <SheetTitle>Date Range</SheetTitle>
+                  <SheetTitle>{t("dateRange.title")}</SheetTitle>
                 </SheetHeader>
                 <div className="mt-6 space-y-4">
                   <div>
-                    <label className="text-sm font-medium">From</label>
+                    <label className="text-sm font-medium">{t("dateRange.from")}</label>
                     <Input
                       type="date"
                       value={dateFrom}
@@ -298,7 +298,7 @@ function AdminOrdersContent() {
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium">To</label>
+                    <label className="text-sm font-medium">{t("dateRange.to")}</label>
                     <Input
                       type="date"
                       value={dateTo}
@@ -315,7 +315,7 @@ function AdminOrdersContent() {
             {hasActiveFilters && (
               <Button variant="ghost" size="sm" onClick={clearFilters}>
                 <X className="mr-2 h-4 w-4" />
-                Clear
+                {t("clearFilters")}
               </Button>
             )}
           </div>
@@ -334,23 +334,21 @@ function AdminOrdersContent() {
           ) : orders.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12">
               <Package className="text-muted-foreground h-16 w-16" />
-              <h3 className="mt-4 text-lg font-medium">No orders found</h3>
+              <h3 className="mt-4 text-lg font-medium">{t("empty.title")}</h3>
               <p className="text-muted-foreground mt-2 text-sm">
-                {hasActiveFilters
-                  ? "Try adjusting your filters"
-                  : "Orders will appear here when customers place them"}
+                {hasActiveFilters ? t("empty.filtered") : t("empty.default")}
               </p>
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Order</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Payment</TableHead>
-                  <TableHead className="text-right">Total</TableHead>
+                  <TableHead>{t("headers.order")}</TableHead>
+                  <TableHead>{t("headers.customer")}</TableHead>
+                  <TableHead>{t("headers.date")}</TableHead>
+                  <TableHead>{t("headers.status")}</TableHead>
+                  <TableHead>{t("headers.payment")}</TableHead>
+                  <TableHead className="text-right">{t("headers.total")}</TableHead>
                   <TableHead className="w-[80px]"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -360,27 +358,29 @@ function AdminOrdersContent() {
                     <TableCell>
                       <div>
                         <p className="font-medium">{order.orderNumber}</p>
-                        <p className="text-muted-foreground text-sm">{order.itemCount} items</p>
+                        <p className="text-muted-foreground text-sm">
+                          {t("itemsCount", { count: order.itemCount })}
+                        </p>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div>
-                        <p className="font-medium">{order.user?.name || "Guest"}</p>
+                        <p className="font-medium">{order.user?.name || t("guest")}</p>
                         <p className="text-muted-foreground text-sm">{order.email}</p>
                       </div>
                     </TableCell>
                     <TableCell className="text-sm">{formatDate(order.createdAt)}</TableCell>
                     <TableCell>
                       <Badge variant="secondary" className={getOrderStatusStyle(order.status)}>
-                        {order.status}
+                        {orderStatusLabel(order.status)}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <Badge
                         variant="secondary"
-                        className={PAYMENT_STATUS_COLORS[order.paymentStatus]}
+                        className={getPaymentStatusStyle(order.paymentStatus)}
                       >
-                        {order.paymentStatus}
+                        {paymentStatusLabel(order.paymentStatus)}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right font-medium">
@@ -405,9 +405,11 @@ function AdminOrdersContent() {
       {pagination.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-muted-foreground text-sm">
-            Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
-            {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}{" "}
-            orders
+            {t("showingRange", {
+              from: (pagination.page - 1) * pagination.limit + 1,
+              to: Math.min(pagination.page * pagination.limit, pagination.total),
+              total: pagination.total,
+            })}
           </p>
           <div className="flex items-center gap-2">
             <Button
@@ -417,10 +419,10 @@ function AdminOrdersContent() {
               disabled={!pagination.hasPrev}
             >
               <ChevronLeft className="h-4 w-4" />
-              Previous
+              {tCommon("previous")}
             </Button>
             <span className="text-sm">
-              Page {pagination.page} of {pagination.totalPages}
+              {t("pageOf", { page: pagination.page, total: pagination.totalPages })}
             </span>
             <Button
               variant="outline"
@@ -428,7 +430,7 @@ function AdminOrdersContent() {
               onClick={() => handlePageChange(pagination.page + 1)}
               disabled={!pagination.hasNext}
             >
-              Next
+              {tCommon("next")}
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>

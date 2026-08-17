@@ -54,6 +54,7 @@ import {
 import { ProductImportDialog } from "@/components/admin";
 import { formatPrice } from "@/lib/format";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 interface Product {
   id: string;
@@ -89,6 +90,8 @@ interface PaginatedResponse {
 }
 
 function ProductsContent() {
+  const t = useTranslations("admin.products");
+  const tCommon = useTranslations("admin.common");
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -128,13 +131,12 @@ function ProductsContent() {
       const data: PaginatedResponse = await response.json();
       setProducts(data.data);
       setPagination(data.pagination);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      toast.error("Failed to load products");
+    } catch {
+      toast.error(t("loadError"));
     } finally {
       setIsLoading(false);
     }
-  }, [search, categoryId, status, searchParams]);
+  }, [search, categoryId, status, searchParams, t]);
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -189,14 +191,13 @@ function ProductsContent() {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Failed to delete product");
+        throw new Error(data.error || t("deleteError"));
       }
 
-      toast.success("Product deleted successfully");
+      toast.success(t("deleteSuccess"));
       fetchProducts();
     } catch (error) {
-      console.error("Error deleting product:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to delete product");
+      toast.error(error instanceof Error ? error.message : t("deleteError"));
     } finally {
       setIsDeleting(false);
       setDeleteId(null);
@@ -207,20 +208,18 @@ function ProductsContent() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Products</h2>
-          <p className="text-muted-foreground">
-            Manage your product catalog ({pagination.total} products)
-          </p>
+          <h2 className="text-2xl font-bold tracking-tight">{t("title")}</h2>
+          <p className="text-muted-foreground">{t("subtitle", { count: pagination.total })}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => setImportDialogOpen(true)}>
             <Upload className="mr-2 h-4 w-4" />
-            Import CSV
+            {t("importCsv")}
           </Button>
           <Link href="/admin/products/new">
             <Button>
               <Plus className="mr-2 h-4 w-4" />
-              Add Product
+              {t("addButton")}
             </Button>
           </Link>
         </div>
@@ -232,14 +231,14 @@ function ProductsContent() {
           <div className="relative flex-1">
             <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
-              placeholder="Search products..."
+              placeholder={t("searchPlaceholder")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-9"
             />
           </div>
           <Button type="submit" variant="secondary">
-            Search
+            {tCommon("search")}
           </Button>
         </form>
 
@@ -253,10 +252,10 @@ function ProductsContent() {
             }}
           >
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="All Categories" />
+              <SelectValue placeholder={t("categoryFilter.placeholder")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
+              <SelectItem value="all">{t("categoryFilter.placeholder")}</SelectItem>
               {categories.map((cat) => (
                 <SelectItem key={cat.id} value={cat.id}>
                   {cat.name}
@@ -274,12 +273,12 @@ function ProductsContent() {
             }}
           >
             <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="All Status" />
+              <SelectValue placeholder={t("statusFilter.placeholder")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="true">Active</SelectItem>
-              <SelectItem value="false">Inactive</SelectItem>
+              <SelectItem value="all">{t("statusFilter.placeholder")}</SelectItem>
+              <SelectItem value="true">{t("statusFilter.active")}</SelectItem>
+              <SelectItem value="false">{t("statusFilter.inactive")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -290,13 +289,13 @@ function ProductsContent() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[80px]">Image</TableHead>
-              <TableHead>Product</TableHead>
-              <TableHead>SKU</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead className="text-right">Price</TableHead>
-              <TableHead className="text-center">Stock</TableHead>
-              <TableHead className="text-center">Status</TableHead>
+              <TableHead className="w-[80px]">{t("headers.image")}</TableHead>
+              <TableHead>{t("headers.product")}</TableHead>
+              <TableHead>{t("headers.sku")}</TableHead>
+              <TableHead>{t("headers.category")}</TableHead>
+              <TableHead className="text-right">{t("headers.price")}</TableHead>
+              <TableHead className="text-center">{t("headers.stock")}</TableHead>
+              <TableHead className="text-center">{t("headers.status")}</TableHead>
               <TableHead className="w-[70px]"></TableHead>
             </TableRow>
           </TableHeader>
@@ -304,7 +303,7 @@ function ProductsContent() {
             {isLoading ? (
               <TableRow>
                 <TableCell colSpan={8} className="h-24 text-center">
-                  Loading...
+                  {tCommon("loading")}
                 </TableCell>
               </TableRow>
             ) : products.length === 0 ? (
@@ -312,9 +311,9 @@ function ProductsContent() {
                 <TableCell colSpan={8} className="h-24 text-center">
                   <div className="flex flex-col items-center gap-2">
                     <Package className="text-muted-foreground h-8 w-8" />
-                    <p className="text-muted-foreground">No products found</p>
+                    <p className="text-muted-foreground">{t("empty.title")}</p>
                     <Link href="/admin/products/new">
-                      <Button size="sm">Add your first product</Button>
+                      <Button size="sm">{t("empty.addFirstButton")}</Button>
                     </Link>
                   </div>
                 </TableCell>
@@ -342,7 +341,7 @@ function ProductsContent() {
                       <p className="font-medium">{product.name}</p>
                       {product.isFeatured && (
                         <Badge variant="secondary" className="mt-1">
-                          Featured
+                          {t("featured")}
                         </Badge>
                       )}
                     </div>
@@ -367,7 +366,7 @@ function ProductsContent() {
                   </TableCell>
                   <TableCell className="text-center">
                     <Badge variant={product.isActive ? "default" : "outline"}>
-                      {product.isActive ? "Active" : "Inactive"}
+                      {product.isActive ? t("statusFilter.active") : t("statusFilter.inactive")}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -381,13 +380,13 @@ function ProductsContent() {
                         <DropdownMenuItem asChild>
                           <Link href={`/products/${product.slug}`}>
                             <Eye className="mr-2 h-4 w-4" />
-                            View
+                            {t("view")}
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link href={`/admin/products/${product.id}`}>
                             <Pencil className="mr-2 h-4 w-4" />
-                            Edit
+                            {tCommon("edit")}
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
@@ -397,7 +396,7 @@ function ProductsContent() {
                           disabled={product._count.orderItems > 0}
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
+                          {tCommon("delete")}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -413,9 +412,11 @@ function ProductsContent() {
       {pagination.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-muted-foreground text-sm">
-            Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
-            {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}{" "}
-            products
+            {t("showingRange", {
+              from: (pagination.page - 1) * pagination.limit + 1,
+              to: Math.min(pagination.page * pagination.limit, pagination.total),
+              total: pagination.total,
+            })}
           </p>
           <div className="flex items-center gap-2">
             <Button
@@ -425,10 +426,10 @@ function ProductsContent() {
               disabled={!pagination.hasPrev}
             >
               <ChevronLeft className="h-4 w-4" />
-              Previous
+              {tCommon("previous")}
             </Button>
             <span className="text-sm">
-              Page {pagination.page} of {pagination.totalPages}
+              {t("pageOf", { page: pagination.page, total: pagination.totalPages })}
             </span>
             <Button
               variant="outline"
@@ -436,7 +437,7 @@ function ProductsContent() {
               onClick={() => handlePageChange(pagination.page + 1)}
               disabled={!pagination.hasNext}
             >
-              Next
+              {tCommon("next")}
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
@@ -447,19 +448,17 @@ function ProductsContent() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Product</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this product? This action cannot be undone.
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t("deleteDialog.title")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("deleteDialog.confirmText")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isDeleting ? "Deleting..." : "Delete"}
+              {isDeleting ? t("deleteDialog.deleting") : tCommon("delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

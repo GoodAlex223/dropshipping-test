@@ -8,10 +8,14 @@
 Nuance-flagged for review (gate + client): `home.hero.*`, `brand.*`,
 `site.announcement.*`, `home.whyChooseUs.*`, testimonial/claims copy.
 
-Conventions: namespaces mirror UI domains; `admin.*` reserved for G13; ICU
-plurals carry all four branches (one/few/many/other); keys are camelCase;
-byCode keys are the verbatim API codes. Extraction is byte-identical from the
-pre-i18n literals — verified by `scripts/i18n-byte-diff.mjs`.
+Conventions: namespaces mirror UI domains; `admin.*` populated in G13 — **UA-only
+by decision** (2026-08-16): RU deliberately has no admin keys; the deep-merge
+fallback renders UA for RU-toggled admins. The root layout strips `admin.*`
+from the storefront client payload; the `(admin)` layout re-provides the full
+catalog (provider split, G13 spec §2). ICU plurals carry all four branches
+(one/few/many/other); keys are camelCase; byCode keys are the verbatim API
+codes. Extraction is byte-identical from the pre-i18n literals — verified by
+`scripts/i18n-byte-diff.mjs`.
 
 ## RU draft nuances (flag for gate + client review)
 

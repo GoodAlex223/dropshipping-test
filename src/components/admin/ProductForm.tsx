@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,42 +23,46 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
-const productFormSchema = z
-  .object({
-    name: z.string().min(1, "Name is required").max(255),
-    slug: z.string().max(255).optional(),
-    description: z.string().optional(),
-    shortDesc: z.string().max(500).optional(),
-    price: z.string().refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, {
-      message: "Price must be a positive number",
-    }),
-    comparePrice: z.string().optional(),
-    costPrice: z.string().optional(),
-    sku: z.string().min(1, "SKU is required"),
-    barcode: z.string().optional(),
-    brand: z.string().optional(),
-    mpn: z.string().optional(),
-    stock: z.string().refine((val) => !isNaN(parseInt(val)) && parseInt(val) >= 0, {
-      message: "Stock must be a non-negative integer",
-    }),
-    categoryId: z.string().min(1, "Category is required"),
-    isActive: z.boolean(),
-    isFeatured: z.boolean(),
-  })
-  .refine(
-    (data) => {
-      if (!data.comparePrice) return true;
-      const compare = parseFloat(data.comparePrice);
-      const price = parseFloat(data.price);
-      return isNaN(compare) || isNaN(price) || compare > price;
-    },
-    {
-      message: "Compare price must be greater than regular price",
-      path: ["comparePrice"],
-    }
-  );
+type TProductForm = ReturnType<typeof useTranslations<"admin.productForm">>;
 
-type ProductFormData = z.infer<typeof productFormSchema>;
+function buildProductFormSchema(t: TProductForm) {
+  return z
+    .object({
+      name: z.string().min(1, t("errors.nameRequired")).max(255),
+      slug: z.string().max(255).optional(),
+      description: z.string().optional(),
+      shortDesc: z.string().max(500).optional(),
+      price: z.string().refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, {
+        message: t("errors.pricePositive"),
+      }),
+      comparePrice: z.string().optional(),
+      costPrice: z.string().optional(),
+      sku: z.string().min(1, t("errors.skuRequired")),
+      barcode: z.string().optional(),
+      brand: z.string().optional(),
+      mpn: z.string().optional(),
+      stock: z.string().refine((val) => !isNaN(parseInt(val)) && parseInt(val) >= 0, {
+        message: t("errors.stockNonNegative"),
+      }),
+      categoryId: z.string().min(1, t("errors.categoryRequired")),
+      isActive: z.boolean(),
+      isFeatured: z.boolean(),
+    })
+    .refine(
+      (data) => {
+        if (!data.comparePrice) return true;
+        const compare = parseFloat(data.comparePrice);
+        const price = parseFloat(data.price);
+        return isNaN(compare) || isNaN(price) || compare > price;
+      },
+      {
+        message: t("errors.comparePriceGreater"),
+        path: ["comparePrice"],
+      }
+    );
+}
+
+type ProductFormData = z.infer<ReturnType<typeof buildProductFormSchema>>;
 
 interface Category {
   id: string;
@@ -91,6 +96,9 @@ interface ProductFormProps {
 
 export function ProductForm({ product, isEdit = false }: ProductFormProps) {
   const router = useRouter();
+  const t = useTranslations("admin.productForm");
+  const tCommon = useTranslations("admin.common");
+  const productFormSchema = useMemo(() => buildProductFormSchema(t), [t]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingCategories, setIsFetchingCategories] = useState(true);
@@ -135,14 +143,14 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
         setCategories(data);
       } catch (error) {
         console.error("Error fetching categories:", error);
-        toast.error("Failed to load categories");
+        toast.error(t("toasts.loadCategoriesError"));
       } finally {
         setIsFetchingCategories(false);
       }
     };
 
     fetchCategories();
-  }, []);
+  }, [t]);
 
   const onSubmit = async (data: ProductFormData) => {
     setIsLoading(true);
@@ -177,16 +185,16 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to save product");
+        throw new Error(errorData.error || t("toasts.saveError"));
       }
 
       const savedProduct = await response.json();
-      toast.success(isEdit ? "Product updated successfully" : "Product created successfully");
+      toast.success(isEdit ? t("toasts.updateSuccess") : t("toasts.createSuccess"));
       router.push(`/admin/products/${savedProduct.id}`);
       router.refresh();
     } catch (error) {
       console.error("Error saving product:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to save product");
+      toast.error(error instanceof Error ? error.message : t("toasts.saveError"));
     } finally {
       setIsLoading(false);
     }
@@ -216,15 +224,15 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
         <div className="space-y-6 lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
+              <CardTitle>{t("cardTitles.basicInfo")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Product Name *</Label>
+                <Label htmlFor="name">{t("labels.name")}</Label>
                 <Input
                   id="name"
                   {...register("name")}
-                  placeholder="Enter product name"
+                  placeholder={t("placeholders.name")}
                   disabled={isLoading}
                 />
                 {errors.name && <p className="text-destructive text-sm">{errors.name.message}</p>}
@@ -232,26 +240,26 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="slug">URL Slug</Label>
+                  <Label htmlFor="slug">{t("labels.slug")}</Label>
                   <Button type="button" variant="ghost" size="sm" onClick={generateSlug}>
-                    Generate from name
+                    {t("generateFromName")}
                   </Button>
                 </div>
                 <Input
                   id="slug"
                   {...register("slug")}
-                  placeholder="product-url-slug"
+                  placeholder={t("placeholders.slug")}
                   disabled={isLoading}
                 />
                 {errors.slug && <p className="text-destructive text-sm">{errors.slug.message}</p>}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="shortDesc">Short Description</Label>
+                <Label htmlFor="shortDesc">{t("labels.shortDesc")}</Label>
                 <Textarea
                   id="shortDesc"
                   {...register("shortDesc")}
-                  placeholder="Brief product description (max 500 characters)"
+                  placeholder={t("placeholders.shortDesc")}
                   rows={2}
                   disabled={isLoading}
                 />
@@ -261,11 +269,11 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Full Description</Label>
+                <Label htmlFor="description">{t("labels.description")}</Label>
                 <Textarea
                   id="description"
                   {...register("description")}
-                  placeholder="Detailed product description"
+                  placeholder={t("placeholders.description")}
                   rows={6}
                   disabled={isLoading}
                 />
@@ -275,12 +283,12 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
 
           <Card>
             <CardHeader>
-              <CardTitle>Pricing</CardTitle>
+              <CardTitle>{t("cardTitles.pricing")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-3">
                 <div className="space-y-2">
-                  <Label htmlFor="price">Price *</Label>
+                  <Label htmlFor="price">{t("labels.price")}</Label>
                   <div className="relative">
                     <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">
                       грн
@@ -291,8 +299,8 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
                       step="0.01"
                       min="0"
                       {...register("price")}
-                      className="pl-7"
-                      placeholder="0.00"
+                      className="pl-12"
+                      placeholder={t("placeholders.amount")}
                       disabled={isLoading}
                     />
                   </div>
@@ -302,7 +310,7 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="comparePrice">Compare Price</Label>
+                  <Label htmlFor="comparePrice">{t("labels.comparePrice")}</Label>
                   <div className="relative">
                     <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">
                       грн
@@ -313,22 +321,20 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
                       step="0.01"
                       min="0"
                       {...register("comparePrice")}
-                      className="pl-7"
-                      placeholder="0.00"
+                      className="pl-12"
+                      placeholder={t("placeholders.amount")}
                       disabled={isLoading}
                     />
                   </div>
                   {errors.comparePrice ? (
                     <p className="text-destructive text-sm">{errors.comparePrice.message}</p>
                   ) : (
-                    <p className="text-muted-foreground text-xs">
-                      Original price for showing discounts
-                    </p>
+                    <p className="text-muted-foreground text-xs">{t("hints.comparePrice")}</p>
                   )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="costPrice">Cost Price</Label>
+                  <Label htmlFor="costPrice">{t("labels.costPrice")}</Label>
                   <div className="relative">
                     <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">
                       грн
@@ -339,12 +345,12 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
                       step="0.01"
                       min="0"
                       {...register("costPrice")}
-                      className="pl-7"
-                      placeholder="0.00"
+                      className="pl-12"
+                      placeholder={t("placeholders.amount")}
                       disabled={isLoading}
                     />
                   </div>
-                  <p className="text-muted-foreground text-xs">Your cost (for profit tracking)</p>
+                  <p className="text-muted-foreground text-xs">{t("hints.costPrice")}</p>
                 </div>
               </div>
             </CardContent>
@@ -352,34 +358,34 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
 
           <Card>
             <CardHeader>
-              <CardTitle>Inventory</CardTitle>
+              <CardTitle>{t("cardTitles.inventory")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="sku">SKU *</Label>
+                    <Label htmlFor="sku">{t("labels.sku")}</Label>
                     <Button type="button" variant="ghost" size="sm" onClick={generateSku}>
-                      Generate
+                      {t("generateSku")}
                     </Button>
                   </div>
                   <Input
                     id="sku"
                     {...register("sku")}
-                    placeholder="PROD-001"
+                    placeholder={t("placeholders.sku")}
                     disabled={isLoading}
                   />
                   {errors.sku && <p className="text-destructive text-sm">{errors.sku.message}</p>}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="stock">Stock Quantity *</Label>
+                  <Label htmlFor="stock">{t("labels.stock")}</Label>
                   <Input
                     id="stock"
                     type="number"
                     min="0"
                     {...register("stock")}
-                    placeholder="0"
+                    placeholder={t("placeholders.stock")}
                     disabled={isLoading}
                   />
                   {errors.stock && (
@@ -392,38 +398,36 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
 
           <Card>
             <CardHeader>
-              <CardTitle>Product Identifiers</CardTitle>
+              <CardTitle>{t("cardTitles.identifiers")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-muted-foreground text-sm">
-                Used for Google Shopping feed and product identification.
-              </p>
+              <p className="text-muted-foreground text-sm">{t("hints.identifiers")}</p>
               <div className="grid gap-4 sm:grid-cols-3">
                 <div className="space-y-2">
-                  <Label htmlFor="brand">Brand</Label>
+                  <Label htmlFor="brand">{t("labels.brand")}</Label>
                   <Input
                     id="brand"
                     {...register("brand")}
-                    placeholder="e.g. Nike"
+                    placeholder={t("placeholders.brand")}
                     disabled={isLoading}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="barcode">GTIN / Barcode</Label>
+                  <Label htmlFor="barcode">{t("labels.barcode")}</Label>
                   <Input
                     id="barcode"
                     {...register("barcode")}
-                    placeholder="e.g. 0123456789012"
+                    placeholder={t("placeholders.barcode")}
                     disabled={isLoading}
                   />
-                  <p className="text-muted-foreground text-xs">UPC, EAN, ISBN, or JAN</p>
+                  <p className="text-muted-foreground text-xs">{t("hints.barcode")}</p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="mpn">MPN</Label>
+                  <Label htmlFor="mpn">{t("labels.mpn")}</Label>
                   <Input
                     id="mpn"
                     {...register("mpn")}
-                    placeholder="Manufacturer Part Number"
+                    placeholder={t("placeholders.mpn")}
                     disabled={isLoading}
                   />
                 </div>
@@ -436,13 +440,13 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Status</CardTitle>
+              <CardTitle>{t("cardTitles.status")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <Label htmlFor="isActive">Active</Label>
-                  <p className="text-muted-foreground text-sm">Product is visible to customers</p>
+                  <Label htmlFor="isActive">{t("labels.active")}</Label>
+                  <p className="text-muted-foreground text-sm">{t("hints.active")}</p>
                 </div>
                 <Switch
                   id="isActive"
@@ -456,8 +460,8 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
 
               <div className="flex items-center justify-between">
                 <div>
-                  <Label htmlFor="isFeatured">Featured</Label>
-                  <p className="text-muted-foreground text-sm">Show on homepage</p>
+                  <Label htmlFor="isFeatured">{t("labels.featured")}</Label>
+                  <p className="text-muted-foreground text-sm">{t("hints.featured")}</p>
                 </div>
                 <Switch
                   id="isFeatured"
@@ -471,11 +475,11 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
 
           <Card>
             <CardHeader>
-              <CardTitle>Organization</CardTitle>
+              <CardTitle>{t("cardTitles.organization")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="categoryId">Category *</Label>
+                <Label htmlFor="categoryId">{t("labels.category")}</Label>
                 <Select
                   value={categoryId}
                   onValueChange={(value) => setValue("categoryId", value)}
@@ -483,7 +487,9 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
                 >
                   <SelectTrigger>
                     <SelectValue
-                      placeholder={isFetchingCategories ? "Loading..." : "Select category"}
+                      placeholder={
+                        isFetchingCategories ? tCommon("loading") : t("placeholders.category")
+                      }
                     />
                   </SelectTrigger>
                   <SelectContent>
@@ -504,7 +510,7 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
           <div className="flex flex-col gap-2">
             <Button type="submit" disabled={isLoading} className="w-full">
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isEdit ? "Update Product" : "Create Product"}
+              {isEdit ? t("submitUpdate") : t("submitCreate")}
             </Button>
             <Button
               type="button"
@@ -513,7 +519,7 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
               disabled={isLoading}
               className="w-full"
             >
-              Cancel
+              {tCommon("cancel")}
             </Button>
           </div>
         </div>

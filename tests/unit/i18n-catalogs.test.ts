@@ -59,10 +59,16 @@ describe("message catalogs", () => {
 
   it("ru covers every uk key (full draft — Task 9 flips this to hard)", () => {
     const ruKeys = new Set(leaves(ru as Tree).map(([k]) => k));
+    // admin.* is UA-only by decision (G13, 2026-08-16): RU deep-merge falls back to UA — see docs/superpowers/specs/2026-08-16-g13-admin-translation-design.md
     const missing = leaves(uk as Tree)
       .map(([k]) => k)
+      .filter((k) => !k.startsWith("admin."))
       .filter((k) => !ruKeys.has(k));
     expect(missing).toEqual([]);
+  });
+
+  it("has no admin namespace in ru — admin is UA-only by G13 decision", () => {
+    expect("admin" in ru).toBe(false);
   });
 
   it("ru reuses every ICU argument its uk counterpart declares", () => {
@@ -288,8 +294,9 @@ describe("Prisma enum → account status label coverage", () => {
   // with a raw-status runtime fallback; this block is the drift net that fails
   // BEFORE a new Prisma enum value ships unlabeled. (Sole net since PR #37
   // review round 2 deleted src/content/account.ts and its map-coverage tests —
-  // the maps had no production consumers; admin renders raw enum values until
-  // G13 sources labels from the catalog.)
+  // the maps had no production consumers; admin now sources labels from the
+  // catalog since G13, reusing these same account.orderStatus/paymentStatus
+  // keys.)
   const orderStatusLabels = uk.account.orderStatus as Record<string, string>;
   const paymentStatusLabels = uk.account.paymentStatus as Record<string, string>;
 

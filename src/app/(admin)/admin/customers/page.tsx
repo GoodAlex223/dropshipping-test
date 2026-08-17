@@ -13,7 +13,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { formatPrice } from "@/lib/format";
 
 interface Customer {
@@ -39,7 +40,8 @@ interface PaginatedResponse {
 }
 
 export default function AdminCustomersPage() {
-  const { toast } = useToast();
+  const t = useTranslations("admin.customers");
+  const tCommon = useTranslations("admin.common");
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -64,17 +66,12 @@ export default function AdminCustomersPage() {
       const data: PaginatedResponse = await response.json();
       setCustomers(data.data);
       setPagination((prev) => ({ ...prev, ...data.pagination }));
-    } catch (error) {
-      console.error("Error fetching customers:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load customers",
-        variant: "destructive",
-      });
+    } catch {
+      toast.error(t("loadError"));
     } finally {
       setIsLoading(false);
     }
-  }, [pagination.page, pagination.limit, search, toast]);
+  }, [pagination.page, pagination.limit, search, t]);
 
   useEffect(() => {
     fetchCustomers();
@@ -97,7 +94,7 @@ export default function AdminCustomersPage() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString("uk-UA", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -108,8 +105,8 @@ export default function AdminCustomersPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">Customers</h1>
-        <p className="text-muted-foreground">Manage your customer accounts</p>
+        <h1 className="text-3xl font-bold">{t("title")}</h1>
+        <p className="text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       {/* Search */}
@@ -117,14 +114,14 @@ export default function AdminCustomersPage() {
         <div className="relative max-w-sm flex-1">
           <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
-            placeholder="Search by name or email..."
+            placeholder={t("searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
           />
         </div>
         <Button type="submit" variant="secondary">
-          Search
+          {tCommon("search")}
         </Button>
       </form>
 
@@ -133,11 +130,11 @@ export default function AdminCustomersPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Customer</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead className="text-center">Orders</TableHead>
-              <TableHead className="text-right">Total Spent</TableHead>
-              <TableHead>Joined</TableHead>
+              <TableHead>{t("headers.customer")}</TableHead>
+              <TableHead>{t("headers.email")}</TableHead>
+              <TableHead className="text-center">{t("headers.orders")}</TableHead>
+              <TableHead className="text-right">{t("headers.totalSpent")}</TableHead>
+              <TableHead>{t("headers.joined")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -169,11 +166,9 @@ export default function AdminCustomersPage() {
                 <TableCell colSpan={5} className="h-32 text-center">
                   <div className="flex flex-col items-center justify-center">
                     <Users className="text-muted-foreground h-10 w-10" />
-                    <p className="text-muted-foreground mt-2 text-sm">No customers found</p>
+                    <p className="text-muted-foreground mt-2 text-sm">{t("empty")}</p>
                     {search && (
-                      <p className="text-muted-foreground mt-1 text-xs">
-                        Try adjusting your search terms
-                      </p>
+                      <p className="text-muted-foreground mt-1 text-xs">{t("tryAdjusting")}</p>
                     )}
                   </div>
                 </TableCell>
@@ -187,7 +182,7 @@ export default function AdminCustomersPage() {
                         <AvatarImage src={customer.image || undefined} />
                         <AvatarFallback>{getInitials(customer.name)}</AvatarFallback>
                       </Avatar>
-                      <span className="font-medium">{customer.name || "Anonymous"}</span>
+                      <span className="font-medium">{customer.name || t("anonymous")}</span>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -222,9 +217,11 @@ export default function AdminCustomersPage() {
       {pagination.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-muted-foreground text-sm">
-            Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
-            {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}{" "}
-            customers
+            {t("showingRange", {
+              from: (pagination.page - 1) * pagination.limit + 1,
+              to: Math.min(pagination.page * pagination.limit, pagination.total),
+              total: pagination.total,
+            })}
           </p>
           <div className="flex gap-2">
             <Button
@@ -233,7 +230,7 @@ export default function AdminCustomersPage() {
               disabled={pagination.page <= 1}
               onClick={() => setPagination((prev) => ({ ...prev, page: prev.page - 1 }))}
             >
-              Previous
+              {tCommon("previous")}
             </Button>
             <Button
               variant="outline"
@@ -241,7 +238,7 @@ export default function AdminCustomersPage() {
               disabled={pagination.page >= pagination.totalPages}
               onClick={() => setPagination((prev) => ({ ...prev, page: prev.page + 1 }))}
             >
-              Next
+              {tCommon("next")}
             </Button>
           </div>
         </div>
