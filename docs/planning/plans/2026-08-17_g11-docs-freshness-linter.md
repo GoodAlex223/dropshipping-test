@@ -52,6 +52,16 @@ interface Stamp {
 
 Create `tests/unit/docs-freshness.test.ts`:
 
+> **Planning-time snapshot — do not read as shipped code (noted 2026-08-17).** The
+> listing below is what was specified before implementation, and the shipped file
+> has since diverged: it gained `blankFences()` and `splitCells()`, and two of the
+> comments here were retracted as wrong — the "1 finding to 27, of which 26 are
+> false" figure is now dated to `d845473` rather than stated in the present tense,
+> and the `for`-loop's "TS narrows it far more reliably outside a closure"
+> rationale is false (a `forEach` compiles clean under this tsconfig). Both are
+> corrected in `tests/unit/docs-freshness.test.ts` and in the spec; this block is
+> the only place they survive verbatim. Read the test file for current code.
+
 ```ts
 import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
