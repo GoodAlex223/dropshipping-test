@@ -60,8 +60,9 @@ function blankFences(md: string): string {
 // alike. Such a row is genuinely malformed and MUST still split — masking it
 // would convert a true positive into a false negative and silence the very
 // assertion below that exists to catch a stray unescaped `|`. House style
-// already follows the rule: all 19 table rows under docs/ that carry a pipe
-// inside a code span write it as the escaped form.
+// already follows the rule: every table row under docs/ that carries a pipe
+// inside a code span writes it as the escaped form. (No count here on purpose —
+// it moves with the corpus, and nothing would catch it going stale.)
 //
 // (A previous revision masked code spans too, on a premise stated as fact and
 // since disproved by running prettier against it. Corrected 2026-08-17.)

@@ -217,7 +217,7 @@ Improvements to existing functionality.
 - [ ] Automated doc freshness check — Script to compare doc "Last Updated" dates with git file timestamps to identify stale documentation
 - [ ] API docs generation — Auto-generate endpoints.md from route files or OpenAPI spec to prevent docs drifting from code
 - [ ] Schema docs generation — Auto-generate schema.md from prisma/schema.prisma to keep database docs in sync
-- [x] ~~Link checker in CI — Add CI step to validate internal doc links are not broken after documentation changes~~ **RESOLVED in G11 (PR #NN, merged `<sha>`, 2026-08-17)**: delivered as a unit test (`tests/unit/docs-freshness.test.ts`, Task 5) rather than a CI step as originally specified. Task 5 validates all 290 relative links across all 71 docs under `docs/**` — not index-row targets specifically, a different and narrower check already covered by Task 1. Same effect (a broken internal doc link fails the check), different mechanism — `npm run test:run` catches it, not a dedicated CI job.
+- [x] ~~Link checker in CI — Add CI step to validate internal doc links are not broken after documentation changes~~ **RESOLVED in G11 (merged `<sha>`, 2026-08-17)**: delivered as a unit test (`tests/unit/docs-freshness.test.ts`, Task 5) rather than a CI step as originally specified. Task 5 validates all 290 relative links across all 71 docs under `docs/**` — not index-row targets specifically, a different and narrower check already covered by Task 1. Same effect (a broken internal doc link fails the check), different mechanism — `npm run test:run` catches it, not a dedicated CI job.
 - [ ] Repo file reference validation — Verify that documentation references to actual repo files (e.g., `next.config.mjs` in PROJECT.md) match real filenames; caught `next.config.ts` typo in TASK-030 code review
 
 ### [2026-02-11] From: TASK-031 Code Quality Sweep
@@ -330,7 +330,7 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 - 🟤 **Re-evaluate Fondy only on written proof of a licensed route** — disqualified on the NBU register showing ТОВ «ФК "ЕЛАЄНС"» licence 21/778-рк revoked 2024-07-22. A secondary source claims Fondy "resumed under partner-bank licences"; it could not be confirmed from any primary source and was not relied on. If the client produces written evidence, that outranks the decision doc and Fondy returns to the matrix — otherwise do not plan TASK-048 against it. (Low value, Low effort) `[relates-to: TASK-048]`
 - 🟤 **Verify Fondy/NP facts from an unblocked network** — `fondy.ua` is TCP-unreachable and `developers.novaposhta.ua` is Cloudflare-blocked from this environment. This shaped what could be verified: Fondy's eight ❓ claims are a _research_ limitation, not a fact about the service. Anyone on a different network can close those gaps. Also the root cause of the spike's worst research defect — pages cited but never loaded. (Med value, Low effort)
 - 🟤 **Fold `docs/README.md` indexing into the authoring task, not the completion task** — index drift has now recurred across **three consecutive PRs** (#16 `04a2593`, #17 `3207425`, #18 deferred to Task 8). The common cause is structural, not carelessness: indexing is scheduled in a completion step that runs _after_ review, so every review sees an un-indexed tree and the gap is either flagged as a finding or deferred again. Move "index new docs in docs/README.md" into the task that creates the doc. (Med value, Low effort)
-- [x] 🟤 ~~**Two stale plan links in `DONE.md` (`:245`, `:425`)**~~ — both point to `docs/plans/2026-01-05_dropshipping-mvp-plan.md`, but that plan was archived to `docs/archive/plans/` and `docs/plans/` now holds only a README. Pre-existing (predates TASK-038b; found by a link-resolution check during this completion, left unfixed to keep the completion commit scoped). Same class as the `docs/README.md` drift above: an archive move that didn't update its referrers. (Low value, Low effort) **RESOLVED in G11 (PR #NN, merged `<sha>`, 2026-08-17)**: Task 5's link check found both links already broken and fixed them — but by the time it ran, `DONE.md` had grown enough that the two lines had drifted from this entry's `:245`/`:425` citation to `:672`/`:852`. That drift is itself the argument for automating the check instead of filing line-number coordinates that rot.
+- [x] 🟤 ~~**Two stale plan links in `DONE.md` (`:245`, `:425`)**~~ — both point to `docs/plans/2026-01-05_dropshipping-mvp-plan.md`, but that plan was archived to `docs/archive/plans/` and `docs/plans/` now holds only a README. Pre-existing (predates TASK-038b; found by a link-resolution check during this completion, left unfixed to keep the completion commit scoped). Same class as the `docs/README.md` drift above: an archive move that didn't update its referrers. (Low value, Low effort) **RESOLVED in G11 (merged `<sha>`, 2026-08-17)**: Task 5's link check found both links already broken and fixed them — but by the time it ran, `DONE.md` had grown enough that the two lines had drifted from this entry's `:245`/`:425` citation to `:672`/`:852`. That drift is itself the argument for automating the check instead of filing line-number coordinates that rot.
 - 🟤 **Adopt "fan out per topic, not per item" as the default workflow shape** — see the OOM group below; the per-claim fan-out (~120 agents) both caused the crashes and produced _worse_ output than the 3 per-topic foreground agents that replaced it, which caught cross-claim issues a per-claim agent structurally cannot see (e.g. Fondy's revoked licence invalidating eight sibling claims at once). Worth writing into the workflow-authoring defaults. (Med value, Low effort)
 
 ### [2026-07-17] From: TASK-038b workflow crashes — devcontainer OOM investigation
@@ -396,7 +396,7 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
       **Update (2026-08-03, PR #27 — recurrence #7, now OVERDUE):** the class recurred in PR #23, #26 and twice in #27 — where the round that fixed the BACKLOG header re-created the drift in the index row (the "fix moved the drift" failure mode a check would have caught). PR #27's final review measured the naive full audit firing on ~20 rows, all of them the known false-positive classes above — confirming the guards are the load-bearing part of the design and providing that row set as a ready-made test fixture. Promote this entry instead of making an 8th manual catch.
       **Update (2026-08-08, PR #30 — recurrences #8/#9):** the class recurred twice more in PR #30 (`docs/README.md`'s own header, and the BACKLOG header + index-row pair); both halves were caught in one review pass and fixed together in one commit (`9aae7bc`), avoiding #27's "fix moved the drift" mode. Ninth manual catch. Promote.
       **Promoted 2026-08-11** → WEEKLY [G11](WEEKLY.md) (week of 2026-08-10), the week's single 🟤 slot — ends the manual-catch streak at 9.
-      **RESOLVED in G11 (PR #NN, merged `<sha>`, 2026-08-17)**: `tests/unit/docs-freshness.test.ts`
+      **RESOLVED in G11 (merged `<sha>`, 2026-08-17)**: `tests/unit/docs-freshness.test.ts`
       implements the index-row ↔ header freshness check with both
       false-positive guards this entry specified — the archive table's `Status`-column exclusion
       (compare by column header name, not index) and the `superpowers/specs/` skip-not-fail rule.
@@ -525,7 +525,7 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
   (reword so doc findings can reach 100, add a separate doc-drift gate, or emit sub-threshold
   findings to chat by design), it has to account for the quantization, not just the number.
 
-  **RESOLVED (index↔header half) in G11 (PR #NN, merged `<sha>`, 2026-08-17)**:
+  **RESOLVED (index↔header half) in G11 (merged `<sha>`, 2026-08-17)**:
   `tests/unit/docs-freshness.test.ts` (Tasks 1-3) automates the header↔index-row comparison,
   scoped per the Scoping decision above — option (b): the linter compares only docs that
   declare `**Last Updated**` and exempts `superpowers/specs/**` (skip-not-fail), and the
@@ -858,7 +858,7 @@ deliberately not fixed in-branch plus a docs-index gap found during Task 15's fr
       `docs/README.md:96` is the last archived-plan row (TASK-037) and four G-group plans sit in
       `docs/archive/plans/`. Kept as the single in-tree entry — the Spawned row cites it as its
       worked example rather than duplicating it.
-      **RESOLVED in G11 (PR #NN, merged `<sha>`, 2026-08-17)**: Task 2 added all 9 missing
+      **RESOLVED in G11 (merged `<sha>`, 2026-08-17)**: Task 2 added all 9 missing
       WEEKLY-group rows (G1–G5, G8–G9, G13–G14) to the Archived Plans table in one sweep.
 
 ### [2026-08-10] From: G6 Weekly Reviews (first run)

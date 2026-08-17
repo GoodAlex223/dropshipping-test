@@ -752,7 +752,7 @@ Under "Updating Documentation", append:
 
 - [ ] **Step 2: Mark the resolved BACKLOG entries**
 
-Three entries are closed by this work. Follow the existing in-place resolution style (strikethrough heading + a bold **RESOLVED in G11 (PR #NN, merged `<sha>`, 2026-08-17)** clause), leaving the body intact:
+Three entries are closed by this work. Follow the existing in-place resolution style (strikethrough heading + a bold **RESOLVED in G11 (merged `<sha>`, 2026-08-17)** clause), leaving the body intact:
 
 1. `[2026-07-18] From: TASK-034 PR #19 reviews` — "Automate the `docs/README.md` index-freshness check"
 2. `[2026-08-01] From: PR #26 review` — "Automate the `docs/README.md` ↔ doc-header `Last Updated` consistency check (7th recurrence)"
@@ -760,7 +760,9 @@ Three entries are closed by this work. Follow the existing in-place resolution s
 
 Also mark the "Two stale plan links in `DONE.md`" entry (`[2026-07-18] From: TASK-034 Task 12`) resolved by Task 5, and the `[2026-02-10]` "Link checker in CI" item checked off.
 
-Leave the PR/SHA placeholders to be filled at close-out; do **not** invent a SHA.
+Leave the `<sha>` placeholder to be filled at close-out; do **not** invent a SHA. This work ships
+**without a PR**, so the commit SHA is the only reference there is — record no PR number, and do not
+reintroduce a `PR #NN` placeholder that can never resolve.
 
 - [ ] **Step 3: Full verification sweep**
 
@@ -804,3 +806,4 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 - **`Edit` fails on NBSP-bearing lines** in this repo — use `sed` with `\xc2\xa0` byte patterns if you hit one.
 - **Do not widen an exemption set to make a test pass.** Every exemption added beyond the one in Task 2 must be justified in a comment and raised for review — hiding real drift behind an exemption is the failure mode this whole task exists to prevent.
 - **If a control does not fail, the check is not trustworthy.** Report it rather than proceeding; a check that cannot fail is indistinguishable from one that passes.
+- **This group ships without a PR, so a commit SHA is the only durable reference.** The close-out convention `Status → ✅ PR #N` has no PR number to use here; write `✅ <sha>` instead, in both WEEKLY.md's Summary-Table Status cell and its Daily-Schedule entry. The rule's point is that the status carry a _resolvable pointer_ — a SHA satisfies it, a bare `✅` does not. Read the SHA from `git rev-parse` after the work lands; never compose one ahead of it.
