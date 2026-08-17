@@ -280,6 +280,7 @@ describe("docs/README.md's own header is at least as new as every date it lists"
   });
 
   it("no listed date is newer than the index's own header", () => {
+    expect(own, `${INDEX} declares no **Last Updated** header to compare against`).not.toBeNull();
     // ISO yyyy-mm-dd compares correctly as a string.
     const ahead = listed
       .filter((l) => l.date > own!)
