@@ -1172,6 +1172,12 @@ Next-up parks (`defer`) or recorded as rows only (`pass`).
   - `TEMPLATES/docs_template/planning/BACKLOG.md` clears all ten. (Med value, Low effort)
     [G10 run 2 slot 4, 2026-08-15]
 
+### [2026-08-17] From: PR #40 code review (G13 admin translation)
+
+**Origin**: PR #40 review comment (2026-08-17) — the review accepted G13's client-only scope with the condition that this deferral lands as a durable record. 🟤 Auto-Generated.
+
+- [ ] 🟤 **Admin API responses are English prose surfaced by the UA admin via echo toasts** — G13 deliberately translated client-side only (spec decision 3); server-originated strings (`apiError("Failed to fetch categories")`, `"Slug already in use"`, `"Circular parent reference detected"`, … across `src/app/api/admin/`) still reach admins verbatim in English wherever a page does `toast.error(data.message)`, and the admin-exclusive Zod schemas in `src/lib/validations/index.ts` (categorySchema, supplierSchema, adminReviewReplySchema, adminReviewVisibilitySchema, updateSubscriberStatusSchema, updateOrderStatusSchema) carry EN messages that surface the same way. Follow-up: migrate admin routes to the coded-outcomes pattern (machine `code` + `admin.*` byCode maps, like the public newsletter/feedback APIs) or UA-translate the admin-exclusive schema messages. Rare error paths, admin-only audience. (Med value, Med effort) [G13 spec §7 / PR #40 review condition, 2026-08-17]
+
 ---
 
 ## Technical Debt
