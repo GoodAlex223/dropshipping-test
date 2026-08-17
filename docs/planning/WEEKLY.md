@@ -81,9 +81,9 @@ _Group IDs continue from last week (G1–G7 are permanently taken by DONE.md and
 
 > User steer 2026-08-11: "we have not finished with translations of pages (Admin pages)". Admin was deliberately excluded from G4's customer-first sweep and is still fully English (AdminSidebar: "Dashboard/Products/Orders…"). **Runs AFTER G9** so admin strings land once, directly in whatever mechanism G9 picks (locale files vs content module). Subsumes three 🟤 alignment residuals (bright `PAYMENT_STATUS_COLORS` chips, the parallel supplier-status module, settings "$" labels).
 
-- [ ] Admin chrome + all list pages → Ukrainian: AdminSidebar, dashboard, products/categories/orders/customers/suppliers/reviews/newsletter/settings — labels, table headers, empty states, search placeholders, toasts (4) — user steer 2026-08-11 [HIGH]
-- [ ] Admin forms + dialogs → Ukrainian: ProductForm, category/supplier forms, delete confirms, validation messages (2) — user steer 2026-08-11
-- [ ] Mirox alignment residuals: monochrome `PAYMENT_STATUS_COLORS` chips (both admin orders pages), parallel `supplier-order-status` module (lowercase vocab, deliberately not reusing `order-status.ts`), settings "$"→грн labels (2) — BACKLOG [2026-07-18] TASK-034 Task 12 + [2026-07-29] TASK-057 groups
+- [x] Admin chrome + all list pages → Ukrainian: AdminSidebar, dashboard, products/categories/orders/customers/suppliers/reviews/newsletter/settings — labels, table headers, empty states, search placeholders, toasts (4) — user steer 2026-08-11 [HIGH]
+- [x] Admin forms + dialogs → Ukrainian: ProductForm, category/supplier forms, delete confirms, validation messages (2) — user steer 2026-08-11
+- [x] Mirox alignment residuals: monochrome `PAYMENT_STATUS_COLORS` chips (both admin orders pages), parallel `supplier-order-status` module (lowercase vocab, deliberately not reusing `order-status.ts`), settings "$"→грн labels (2) — BACKLOG [2026-07-18] TASK-034 Task 12 + [2026-07-29] TASK-057 groups
 
 ### G14. Rebrand Residuals: Variant Names + Design-Gap Audit [batch]
 
@@ -120,7 +120,11 @@ _Group IDs continue from last week (G1–G7 are permanently taken by DONE.md and
 
 ### Friday — Admin sweep + linter + reviews close + stretch
 
-- **[G13](#g13-admin-translation--alignment-solo)** 🔵 — admin sweep, on G9's landed mechanism; weekend spill expected and accepted.
+- ✅ **[G13](#g13-admin-translation--alignment-solo)** 🔵 — admin sweep, on G9's landed mechanism; weekend spill expected and accepted. (Shipped Sun 2026-08-17, PR #40 merged `56328f0` — the accepted spill, one day past the week window.)
+
+### Weekend — Spillover (accepted at planning time)
+
+- ✅ **[G13](#g13-admin-translation--alignment-solo)** 🔵 — ran Sat–Sun 2026-08-16/17: spec + 15-task SDD plan + implementation + reviews Sat; browser gate, PR #40, review round, merge Sun. The close-out's spillover trigger ("delivery runs past Sun Aug 16") fired — this line is that record.
 - **[G11](#g11-docs-freshness-linter-solo)** 🟤 — the OVERDUE linter.
 - ✅ **[G10](#g10-weekly-reviews-batch)** ⚪ — part 2: non-Claude slot + propagation scan. (Ran Sat 2026-08-15 in the same session as part 1.)
 - 🏆 **[G12](#g12-categories-to-catalog-redesign-batch-)** 🔵 — stretch, behind everything above.
@@ -137,7 +141,7 @@ _Group IDs continue from last week (G1–G7 are permanently taken by DONE.md and
 | G10 | Weekly Reviews `[batch]`                            | recurring reviews  | ⚪ Overhead | 4      | 5        | Thu–Fri       | ✅ PR [#39](https://github.com/GoodAlex223/dropshipping-test/pull/39) |
 | G11 | Docs-Freshness Linter `[solo]`                      | docs tooling       | 🟤 Auto     | 1      | 3        | Fri           | ☐ Planned                                                             |
 | G12 | Categories-to-Catalog Redesign `[batch]` 🏆         | storefront/catalog | 🔵 User     | 3      | 5        | Fri (stretch) | ☐ Planned                                                             |
-| G13 | Admin Translation & Alignment `[solo]`              | admin panel        | 🔵 User     | 3      | 8        | Fri→spill     | ☐ Planned                                                             |
+| G13 | Admin Translation & Alignment `[solo]`              | admin panel        | 🔵 User     | 3      | 8        | Fri→spill     | ✅ PR [#40](https://github.com/GoodAlex223/dropshipping-test/pull/40) |
 | G14 | Rebrand Residuals: Variants + Design Gaps `[batch]` | storefront/data    | 🔵 User     | 2      | 5        | Thu           | ✅ PR [#38](https://github.com/GoodAlex223/dropshipping-test/pull/38) |
 | P2  | Prod re-seed after variant rename (user-gated)      | ops/data           | 🟡 Ops      | 1      | 1        | on G14 done   | ⛔ Superseded (G14 migration)                                         |
 |     | **Total**                                           |                    |             | **19** | **40**   |               |                                                                       |

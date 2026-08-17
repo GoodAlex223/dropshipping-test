@@ -2,11 +2,29 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-08-15
+**Last Updated**: 2026-08-17
 
 ---
 
 ## 2026-08 (August)
+
+### [2026-08-17] G13 - Admin Translation & Alignment (WEEKLY solo, 🔵 User)
+
+**Plan**: [2026-08-16_g13-admin-translation.md](../archive/plans/2026-08-16_g13-admin-translation.md) — 15 tasks, executed subagent-driven (fresh implementer + reviewer per task)
+**Spec**: [2026-08-16-g13-admin-translation-design.md](../superpowers/specs/2026-08-16-g13-admin-translation-design.md) — 5 user decisions logged 2026-08-16
+**PR**: [#40](https://github.com/GoodAlex223/dropshipping-test/pull/40) — merged `56328f0` (2026-08-17, `--merge`). Review round 1: no code issues across five passes; 3 doc-propagation gaps fixed in-branch by the reviewer (`84a4b81`); the review's accept-condition (BACKLOG record for the admin-API-i18n deferral) satisfied pre-merge (`a4ffd37`)
+
+**Summary**: The admin panel — deliberately excluded from the G4/G9 customer-first sweeps — is now fully catalog-driven Ukrainian: `admin.*` namespace (520 leaf keys, 16 sub-namespaces), **UA-only by decision** (RU deep-merges over UK, so RU-toggled admins fall back to UA; pinned by a `ru`-has-no-admin test). Closes the last EN chrome surface of the TASK-039 arc plus the three Mirox alignment residuals scheduled into the group, and kills the BACKLOG'd customers/categories infinite-refetch loop. 27 commits; 15 per-task reviews (5 one-round fix loops), whole-branch final review (4 Importants, all fixed), 13-route browser gate with screenshot artifact (1 finding — raw "Cod" payment method — fixed).
+
+**Key changes**:
+
+- Provider payload split: root layout serves the catalog minus `admin.*` (storefront HTML verified admin-string-free with a positive control); the `(admin)` layout re-provides the full catalog via a nested provider
+- Status badges render catalog labels instead of raw enums: order/payment reuse `account.orderStatus`/`account.paymentStatus`; new `src/lib/supplier-order-status.ts` (monochrome, `t.has`-guarded — the vocab is a plain String) covers both supplier sites incl. one the plan missed; both bright `PAYMENT_STATUS_COLORS` copies deleted (3 payment sites monochrome)
+- Toast unification: the 3 `use-toast` pages migrated to direct sonner; the dead wrapper deleted; the customers/categories infinite-refetch loop dead by construction (red regression test recorded 317 fetch calls on the old code)
+- ProductForm: catalog-sourced Zod messages via memoized schema builder; `pl-7`→`pl-12` fixes the «грн» adornment crowding (BACKLOG'd since TASK-057)
+- Settings labels «(грн)»; `en-US`→`uk-UA` dates in 6 admin files; RU-parity test gains an `admin.*` carve-out + companion pin; docs propagated in-branch (root/app CLAUDE.md, messages/README, TODO.md, docs/README index)
+
+**Learnings**: propagation greps must sweep `docs/planning/` + `docs/README.md`, not just CLAUDE.md files (the PR reviewer caught what the in-branch sweep missed); satisfy review-accept conditions with durable writes before merge, not prospective claims; SDD implementers stall ending turns on backgrounded npm runs — mandate a single foreground gate call in every dispatch.
 
 ### [2026-08-15] G10 - Weekly Reviews: Run 2 (WEEKLY batch, ⚪ Overhead)
 
