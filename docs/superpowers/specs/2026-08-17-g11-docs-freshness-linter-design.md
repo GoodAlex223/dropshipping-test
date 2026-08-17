@@ -35,10 +35,17 @@ false-positive guards are not a refinement of this feature — they are 96% of i
 naive check would train the team to ignore a red suite, which is strictly worse than the nine manual
 catches.
 
-The same lesson repeated inside this design session: a first-draft link checker fired **18** broken
-links, of which **13 were its own parser's defects** (percent-encoded spaces in
-`Mirox%20Cart.dc.html`, and `<…>` autolink syntax wrapping paths that contain parentheses). The true
-count is 5.
+The same lesson repeated twice inside this design session. A first-draft link checker fired **18**
+broken links, of which **13 were its own parser's defects** (percent-encoded spaces in
+`Mirox%20Cart.dc.html`, and `<…>` autolink syntax wrapping paths that contain parentheses). Fixing
+those left 5 — and a fourth link-parser guard, discovered while gathering line numbers for the implementation
+plan, removed one more: `docs/archive/plans/2026-07-27_task-057-design-adoption.md:1506` holds a
+link **inside an inline code span**, quoting text destined for a different file, where the path is
+correct. The true count is **4**.
+
+That second discovery is the strongest evidence for §5's method: the figure moved twice under
+inspection, and only running the checker moved it. Neither correction came from re-reading the
+BACKLOG.
 
 ---
 
@@ -122,16 +129,18 @@ and #9. Verified passing today: `2026-08-17` ≥ `2026-08-16`.
   byte-identical. PR #32 `53fa347` hit a state `--write` could not reach a fixed point on — an
   inline code span carrying list-marker syntax across a wrapped line — and CI failed on a file the
   formatter had just "fixed". Verified today: idempotent, and `--check` is clean.
-- _Links:_ every relative link in `docs/**` must resolve. _Guard:_ the parser must
-  `decodeURIComponent` the target and accept `[text](<path with (parens)>)` autolink form, and must
-  strip fenced code blocks so directory-structure diagrams are not treated as links. Without all
-  three it reports 18 instead of 5.
+- _Links:_ every relative link in `docs/**` must resolve. _Guard:_ four parser requirements, each
+  earned by a false positive it removed — `decodeURIComponent` the target; accept the
+  `[text](<path with (parens)>)` autolink form; strip fenced code blocks, so directory-structure
+  diagrams are not read as links; and **strip inline code spans**, so a link quoted as literal text
+  for insertion into another file is not resolved against the quoting file's own location. Without
+  all four the check reports 18 instead of 4.
 
 ---
 
 ## 4. In-branch drift fixes
 
-The linter is red on arrival by design. Fifteen fixes, all genuine drift, all in this branch (one
+The linter is red on arrival by design. Fourteen fixes, all genuine drift, all in this branch (one
 PR, docs fixes committed ahead of the linter so the two are independently reviewable):
 
 1. **1 header↔row drift** — `docs/README.md:38`, `2026-08-15` → `2026-08-17` (recurrence #10).
@@ -139,20 +148,25 @@ PR, docs fixes committed ahead of the linter so the two are independently review
    `2026-08-06_g2`, `2026-08-08_g3`, `2026-08-08_g4`, `2026-08-10_g5`, `2026-08-14_task-039`,
    `2026-08-15_g14`, `2026-08-16_g13`. Each row's `Completed` date is **sourced from DONE.md or the
    merge commit**, never inferred from the filename. Closes BACKLOG [2026-08-09].
-3. **5 broken links** —
-   - `docs/planning/DONE.md` ×2 → `../plans/2026-01-05_dropshipping-mvp-plan.md`; the plan was
-     archived to `archive/plans/`. This is BACKLOG [2026-07-18] "Two stale plan links in DONE.md",
-     open since July and independently rediscovered by this check.
-   - `docs/planning/DONE.md` → `../audits/…`; `audits/` is a child of `planning/`, so the `../` is
-     wrong.
-   - `docs/archive/plans/2026-07-27_task-057-design-adoption.md` → a sibling-relative link to a spec
-     that lives in `docs/superpowers/specs/`.
-   - `docs/plans/README.md` → `../../.claude/TEMPLATES/plan.md`. The template is real but lives at
+3. **4 broken links** —
+   - `docs/planning/DONE.md:672` and `:852` → `../plans/2026-01-05_dropshipping-mvp-plan.md`; the
+     plan was archived to `archive/plans/`. This is BACKLOG [2026-07-18] "Two stale plan links in
+     DONE.md", open since July and independently rediscovered by this check — the line numbers in
+     that entry (`:245`, `:425`) have since shifted, which is itself why a linter beats a filed
+     coordinate.
+   - `docs/planning/DONE.md:241` → `../audits/2026-08-04-storefront-staleness-audit.md`; `audits/`
+     is a child of `planning/`, so the `../` is wrong.
+   - `docs/plans/README.md:60` → `../../.claude/TEMPLATES/plan.md`. The template is real but lives at
      the **user-global** `/root/.claude/TEMPLATES/plan.md`; there is no `.claude/TEMPLATES/` in this
      repo. **Reworded to prose, not repathed** — a repo-relative link to a machine-local file would
-     be broken for every other checkout.
-     Already applied while writing this spec, and therefore not part of the fifteen: **this spec's own
-     index row**, required by Check 3 because `superpowers/specs/` is allowlisted.
+     be broken for every other checkout. (`:9` names the same template in prose already and is not a
+     link, so it needs no change.)
+
+**Not fixes, and deliberately so.** `docs/archive/plans/2026-07-27_task-057-design-adoption.md:1506`
+resolves as broken only to a parser that reads inline code spans — the link is quoted text destined
+for a file in `superpowers/specs/`, where the path is correct. It is handled by Check 5's guard, not
+by editing the archived plan. Separately, **this spec's own index row** was added while writing this
+document and is therefore not counted among the fourteen.
 
 ---
 
@@ -179,7 +193,7 @@ A check that cannot fail is indistinguishable from one that passes, so green out
       recorded.
 - [ ] Guarded audit fires **0** rows; naive-equivalent behaviour is not reachable from the shipped
       code (no code path compares against `**Date**:`).
-- [ ] All 15 §4 fixes applied; `prettier --check "docs/**/*.md"` clean.
+- [ ] All 14 §4 fixes applied; `prettier --check "docs/**/*.md"` clean.
 - [ ] `npm run typecheck` and `npm run lint` clean.
 
 ---
