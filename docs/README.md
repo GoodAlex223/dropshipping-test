@@ -76,9 +76,9 @@ Central index for all project documentation.
 
 ## Implementation Plans
 
-| Plan                | Task | Status | Started |
-| ------------------- | ---- | ------ | ------- |
-| _(no active plans)_ | —    | —      | —       |
+| Plan                                                                                                             | Task                      | Status | Started    |
+| ---------------------------------------------------------------------------------------------------------------- | ------------------------- | ------ | ---------- |
+| [planning/plans/2026-08-17_g11-docs-freshness-linter.md](planning/plans/2026-08-17_g11-docs-freshness-linter.md) | G11 Docs-Freshness Linter | ACTIVE | 2026-08-17 |
 
 ### Archived Plans
 
