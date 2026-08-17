@@ -9,6 +9,7 @@ import {
 } from "node:fs";
 import { join, dirname, resolve, relative } from "node:path";
 import { tmpdir } from "node:os";
+import * as prettier from "prettier";
 
 const DOCS = "docs";
 const INDEX = "docs/README.md";
@@ -286,5 +287,31 @@ describe("docs/README.md's own header is at least as new as every date it lists"
       .filter((l) => l.date > own!)
       .map((l) => `${INDEX}:${l.line} lists ${l.date}, but the index header says ${own}`);
     expect(ahead, `Index header lags its rows:\n${ahead.join("\n")}`).toEqual([]);
+  });
+});
+
+// format:check already runs `prettier --check` over **/*.md in CI, so a plain
+// check adds nothing. What that misses is idempotency: PR #32 (53fa347) hit a
+// state `--write` could not reach a fixed point on (an inline code span
+// carrying list-marker syntax across a wrapped line), and CI failed on a file
+// the formatter had just "fixed". To reproduce the control for this check,
+// don't re-derive a shape by hand — it may no longer oscillate on a newer
+// prettier. Use the real pre-fix text instead:
+//   git show 53fa347^:docs/planning/TODO.md > docs/design/design_handoff_mirox/image-prompts.md
+// (that target is deliberately outside INDEXED_DIRS and carries no
+// **Last Updated**/**Date** stamp, so only this describe's check reacts to it)
+// then `git checkout -- docs/design/design_handoff_mirox/image-prompts.md` after.
+describe("prettier reaches a fixed point on every doc", () => {
+  const docs = walkDocs();
+
+  it("finds a non-empty set of docs", () => {
+    expect(docs.length).toBeGreaterThan(0);
+  });
+
+  it.each(docs)("%s formats to a fixed point", async (file) => {
+    const options = { ...(await prettier.resolveConfig(file)), filepath: file };
+    const once = await prettier.format(readFileSync(file, "utf8"), options);
+    const twice = await prettier.format(once, options);
+    expect(twice, `prettier --write is not idempotent on ${file}`).toBe(once);
   });
 });
