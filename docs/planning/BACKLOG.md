@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-08-15
+**Last Updated**: 2026-08-17
 
 ---
 
@@ -217,7 +217,7 @@ Improvements to existing functionality.
 - [ ] Automated doc freshness check — Script to compare doc "Last Updated" dates with git file timestamps to identify stale documentation
 - [ ] API docs generation — Auto-generate endpoints.md from route files or OpenAPI spec to prevent docs drifting from code
 - [ ] Schema docs generation — Auto-generate schema.md from prisma/schema.prisma to keep database docs in sync
-- [x] ~~Link checker in CI — Add CI step to validate internal doc links are not broken after documentation changes~~ **RESOLVED in G11 (PR #NN, merged `<sha>`, 2026-08-17)**: delivered as a unit test (`tests/unit/docs-freshness.test.ts`, Task 5 — index-row targets must resolve to real files) rather than a CI step as originally specified. Same effect (a broken internal doc link fails the check), different mechanism — `npm run test:run` catches it, not a dedicated CI job.
+- [x] ~~Link checker in CI — Add CI step to validate internal doc links are not broken after documentation changes~~ **RESOLVED in G11 (PR #NN, merged `<sha>`, 2026-08-17)**: delivered as a unit test (`tests/unit/docs-freshness.test.ts`, Task 5) rather than a CI step as originally specified. Task 5 validates all 290 relative links across all 71 docs under `docs/**` — not index-row targets specifically, a different and narrower check already covered by Task 1. Same effect (a broken internal doc link fails the check), different mechanism — `npm run test:run` catches it, not a dedicated CI job.
 - [ ] Repo file reference validation — Verify that documentation references to actual repo files (e.g., `next.config.mjs` in PROJECT.md) match real filenames; caught `next.config.ts` typo in TASK-030 code review
 
 ### [2026-02-11] From: TASK-031 Code Quality Sweep
@@ -397,7 +397,8 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
       **Update (2026-08-08, PR #30 — recurrences #8/#9):** the class recurred twice more in PR #30 (`docs/README.md`'s own header, and the BACKLOG header + index-row pair); both halves were caught in one review pass and fixed together in one commit (`9aae7bc`), avoiding #27's "fix moved the drift" mode. Ninth manual catch. Promote.
       **Promoted 2026-08-11** → WEEKLY [G11](WEEKLY.md) (week of 2026-08-10), the week's single 🟤 slot — ends the manual-catch streak at 9.
       **RESOLVED in G11 (PR #NN, merged `<sha>`, 2026-08-17)**: `tests/unit/docs-freshness.test.ts`
-      (91 tests, Tasks 1-3) implements the index-row ↔ header freshness check with both
+      (17 tests, Tasks 1-3; the file's other 74 tests are Task 4's per-doc prettier fan-out and
+      Task 5's link checks) implements the index-row ↔ header freshness check with both
       false-positive guards this entry specified — the archive table's `Status`-column exclusion
       (compare by column header name, not index) and the `superpowers/specs/` skip-not-fail rule.
 
@@ -1194,6 +1195,13 @@ Next-up parks (`defer`) or recorded as rows only (`pass`).
 - [ ] 🟤 **`ProductForm` textarea triggers a React ref-forwarding warning** — dev console on `/admin/products/new`: "Function components cannot be given refs" via `src/components/ui/textarea.tsx` under react-hook-form's `register`. Pre-existing, observed at the G13 gate; harmless in prod but masks real warnings. Likely fix: `React.forwardRef` in the shadcn textarea (re-apply after any CLI regen, cf. the `ui/sonner.tsx` precedent). (Low value, Low effort) [G13 browser gate, 2026-08-17]
 - [ ] 🟤 **Two UA copy nits deferred to the TASK-056 client sign-off window** — (a) «Активний» renders against feminine nouns (e.g. «категорія») under the uniform-badge convention; (b) reviews visibility pair «Видимий»/«Приховано» mixes adjective and impersonal-participle forms. Both deliberate G13 final-review deferrals — resolve alongside the RU-draft nuance review (messages/README flags the gender-resolution class). (Low value, Low effort) [G13 final review triage, 2026-08-17]
 - [ ] 🟤 **Admin API responses are English prose surfaced by the UA admin via echo toasts** — G13 deliberately translated client-side only (spec decision 3); server-originated strings (`apiError("Failed to fetch categories")`, `"Slug already in use"`, `"Circular parent reference detected"`, … across `src/app/api/admin/`) still reach admins verbatim in English wherever a page does `toast.error(data.message)`, and the admin-exclusive Zod schemas in `src/lib/validations/index.ts` (categorySchema, supplierSchema, adminReviewReplySchema, adminReviewVisibilitySchema, updateSubscriberStatusSchema, updateOrderStatusSchema) carry EN messages that surface the same way. Follow-up: migrate admin routes to the coded-outcomes pattern (machine `code` + `admin.*` byCode maps, like the public newsletter/feedback APIs) or UA-translate the admin-exclusive schema messages. Rare error paths, admin-only audience. (Med value, Med effort) [G13 spec §7 / PR #40 review condition, 2026-08-17]
+
+### [2026-08-17] From: G11 docs-freshness linter
+
+**Origin**: final whole-branch review of G11 (`feat/g11-docs-freshness-linter`). One follow-up split out of the `[2026-08-01] From: PR #26 review` entry closed by this branch (its rubric-severity half was never built, only its index↔header half shipped), plus one new gap the linter's own scope revealed while verifying it. Both 🟤 Auto-Generated.
+
+- [ ] 🟤 **Reword the code-review skill's severity rubric so doc-drift findings can clear the gate** — split out as its own anchor because the parent entry (`[2026-08-01] From: PR #26 review`) is now marked `[x]` + strikethrough for its index↔header half, and a future BACKLOG reap would otherwise treat the whole entry as closed and sweep this still-open half to the 🪦 section along with it. The mechanism recorded on the parent stands: the code-review rubric only emits 0/25/50/75/100, so an 80 gate is in practice a 100 gate — doc-drift findings top out at 75 by construction and nothing between 75 and 100 is reachable. This is the `code-review-threshold-understates-doc-findings` memory's pattern, at its **20th recorded recurrence** as of this branch's own review (most recently G13/PR #40, 2026-08-17) — the recurrence count itself is the evidence this needs a durable anchor rather than another chat mention. (Med value, Low-Med effort)
+- [ ] 🟤 **`docs/archive/README.md`'s own Archived Plans table is a second, unlinted freshness surface** — `docs/archive/README.md:31-38` carries its own "Completed Plans" table (7 rows), stalled at `2026-02-10`, while `docs/archive/plans/` holds 25 archived plan files today — roughly 18 postdate the table and are missing from it (added through G1–G14, 2026-08-04 through 2026-08-16). `docs/README.md` points readers to this file "for more historical plans", but G11's linter (`tests/unit/docs-freshness.test.ts`) only ever parses `docs/README.md`'s own tables via `INDEX = "docs/README.md"` — this second index sits entirely outside its walk, invisible to both Check 3 (reverse coverage) and Check 4 (header-vs-rows). Same defect class this branch just retired; genuinely separate scope, since it is a second host file, not a second row in the one already covered. Natural next increment for this linter. (Low-Med value, Low effort)
 
 ---
 

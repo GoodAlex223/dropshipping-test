@@ -36,12 +36,23 @@ function walkDocs(path: string = DOCS): string[] {
   return readdirSync(path).flatMap((entry) => walkDocs(join(path, entry)));
 }
 
+// Blank out fenced code blocks character-by-character, never line-by-line —
+// deleting lines would shift every subsequent TableRow.line, which is used in
+// failure messages and must stay accurate. Non-greedy across `[\s\S]` so
+// multiple fences in one doc are handled separately; an unclosed fence simply
+// doesn't match and is left as ordinary text (same behavior as extractLinks'
+// fence handling near the bottom of this file — that helper discards
+// newlines too, which is fine there since it has no line numbers to protect).
+function blankFences(md: string): string {
+  return md.replace(/```[\s\S]*?```/g, (block) => block.replace(/[^\n]/g, ""));
+}
+
 // A plain for-loop rather than forEach: `header` is reassigned across
 // iterations, and TS narrows it far more reliably outside a closure.
 function parseTables(md: string): TableRow[] {
   const rows: TableRow[] = [];
   let header: string[] | null = null;
-  const lines = md.split("\n");
+  const lines = blankFences(md).split("\n");
   for (let i = 0; i < lines.length; i++) {
     const t = lines[i].trim();
     if (!t.startsWith("|")) {
@@ -120,6 +131,23 @@ describe("docs/README.md index rows agree with each doc's own **Last Updated**",
     // Guards Decision 1 by construction: every comparable row's target must
     // declare **Last Updated**. If a future edit made the check fall back to
     // **Date**, spec rows would enter `comparable` and this would fail.
+    //
+    // Non-vacuity floor for THIS assertion, added in the final whole-branch
+    // review (M5): its discriminating power depends on spec rows being
+    // CANDIDATES for `comparable` at all — i.e. rows whose target is under
+    // superpowers/specs/ and whose table has a literal "Last Updated" column
+    // with a date in it. If specs ever moved to a table without that column,
+    // "no spec rows entered comparable" would pass forever regardless of the
+    // code — the same shape as the vacuous-pass bug fixed at 04afe43.
+    const specCandidateRows = indexRows.filter((row) => {
+      const di = row.header.indexOf(DATE_COLUMN);
+      if (di < 0) return false;
+      const target = rowTarget(row.cells[0] ?? "");
+      if (!target || !target.includes("superpowers/specs/")) return false;
+      return /\d{4}-\d{2}-\d{2}/.test(row.cells[di] ?? "");
+    });
+    expect(specCandidateRows.length).toBeGreaterThan(0);
+
     const specRows = comparable.filter((c) => c.target.includes("superpowers/specs/"));
     expect(specRows.map((c) => c.target)).toEqual([]);
   });
@@ -181,6 +209,35 @@ describe("parseTables / readStamp / rowTarget — synthetic-input coverage", () 
     expect(rows[0].cells).toEqual(["1", "2", "3"]);
   });
 
+  it("parseTables: a fenced code block's table-shaped content is not read as rows, and line numbers after the fence are unaffected", () => {
+    // Guards M6 of the final whole-branch review: docs/README.md's "Adding
+    // New Documentation" section is exactly the place someone would add a
+    // ```markdown example of a table row, which — unguarded — would either
+    // trip the malformed-row check or, with an illustrative date, cause a
+    // false drift failure. Without the fence guard this test would find 3
+    // rows (the fenced example's header/row leaking in); with it, 2.
+    const md = [
+      "| A | B |",
+      "| --- | --- |",
+      "| 1 | 2 |",
+      "",
+      "```markdown",
+      "| Doc | Last Updated |",
+      "| --- | --- |",
+      "| example.md | 2020-01-01 |",
+      "```",
+      "",
+      "| C | D |",
+      "| --- | --- |",
+      "| 3 | 4 |",
+    ].join("\n");
+    const rows = parseTables(md);
+    expect(rows).toEqual([
+      { line: 3, header: ["A", "B"], cells: ["1", "2"] },
+      { line: 13, header: ["C", "D"], cells: ["3", "4"] },
+    ]);
+  });
+
   it("readStamp: returns **Date** and **Last Updated** independently, never conflated", () => {
     // Pins Decision 1: a file can carry both stamps, and `date`/`lastUpdated`
     // must never bleed into each other.
@@ -205,8 +262,7 @@ describe("parseTables / readStamp / rowTarget — synthetic-input coverage", () 
 
 // Directories whose every .md must appear in the index. Walked recursively, so
 // docs/planning/audits/ and docs/planning/plans/ are covered by docs/planning.
-// Deliberately NOT listed: docs/design/** (its own README indexes the handoff
-// set) and docs/plans/ (a legacy guide directory holding only a README).
+// See OUT_OF_SCOPE_DIRS below for directories deliberately excluded instead.
 const INDEXED_DIRS = [
   "docs/planning",
   "docs/superpowers/specs",
@@ -215,10 +271,12 @@ const INDEXED_DIRS = [
   "docs/database",
   "docs/deployment",
   "docs/testing",
+  "docs/reference",
 ];
 
 // Root-level docs that are indexed. docs/README.md is the index itself and is
-// not listed here, so it never needs an exemption.
+// not listed here — it's accounted for instead via OUT_OF_SCOPE_DIRS below, so
+// the meta-assertion at the bottom of the next describe block covers it too.
 const INDEXED_ROOT_DOCS = [
   "docs/ARCHITECTURE.md",
   "docs/PROJECT_CONTEXT.md",
@@ -230,6 +288,31 @@ const INDEXED_ROOT_DOCS = [
 // archive/README.md rather than from a table row.
 const INDEX_EXEMPT = new Set(["docs/archive/plans/README.md"]);
 
+// Directories (or single files) excluded from the index by decision, not
+// oversight — each entry records WHY, so the meta-assertion below can tell
+// "known and excluded" apart from "silently uncovered." A path matches an
+// entry if it equals the key or sits anywhere under it. Overlap with
+// INDEXED_DIRS is harmless (e.g. docs/archive/plans/ sits under the
+// docs/archive entry here too) — a file only needs to be explained by ONE
+// category, checked as an OR below, never partitioned.
+const OUT_OF_SCOPE_DIRS: Record<string, string> = {
+  "docs/design":
+    "handoff artifact directory (design_handoff_mirox/), deliberately out of the index's " +
+    "scope — NOT because its own README indexes the set (verified false: the two sibling docs " +
+    "are named only inside inline code spans, which Check 5b's link-extraction guard " +
+    "deliberately strips, so they were never markdown links in the first place)",
+  "docs/plans": "legacy guide directory holding only a README",
+  "docs/archive":
+    "the archive/ root itself — archive/README.md is a directory guide, reached from " +
+    "docs/README.md's prose link, not a table row (archive/plans/ is separately in scope via " +
+    "INDEXED_DIRS, so this entry only ever explains docs/archive/README.md in practice)",
+  "docs/README.md": "the index itself; it does not index itself",
+};
+
+function isOutOfScope(file: string): boolean {
+  return Object.keys(OUT_OF_SCOPE_DIRS).some((dir) => file === dir || file.startsWith(`${dir}/`));
+}
+
 describe("every doc in an indexed directory has a docs/README.md row", () => {
   const linked = new Set(
     parseTables(readFileSync(INDEX, "utf8"))
@@ -237,9 +320,8 @@ describe("every doc in an indexed directory has a docs/README.md row", () => {
       .filter((t): t is string => t !== null)
   );
 
-  const inScope = [...INDEXED_DIRS.flatMap((d) => walkDocs(d)), ...INDEXED_ROOT_DOCS].filter(
-    (f) => !INDEX_EXEMPT.has(f)
-  );
+  const underIndexedDirs = [...INDEXED_DIRS.flatMap((d) => walkDocs(d)), ...INDEXED_ROOT_DOCS];
+  const inScope = underIndexedDirs.filter((f) => !INDEX_EXEMPT.has(f));
 
   it("finds a non-empty set of in-scope docs", () => {
     expect(inScope.length).toBeGreaterThan(0);
@@ -256,9 +338,36 @@ describe("every doc in an indexed directory has a docs/README.md row", () => {
     expect(ghosts, `Exempt paths no longer on disk:\n${ghosts.join("\n")}`).toEqual([]);
   });
 
+  it("every INDEXED_ROOT_DOCS entry still exists on disk", () => {
+    // Symmetric to the exemption ghost check above. Without it, a deleted
+    // root doc fails only in "every in-scope doc is indexed" below, with the
+    // misleading message "Docs with no docs/README.md row" — misleading
+    // because the doc has no row for the mundane reason that it no longer
+    // exists, not because someone forgot to index it.
+    const ghosts = INDEXED_ROOT_DOCS.filter((f) => !existsSync(f));
+    expect(ghosts, `INDEXED_ROOT_DOCS entries no longer on disk:\n${ghosts.join("\n")}`).toEqual(
+      []
+    );
+  });
+
   it("every in-scope doc is indexed", () => {
     const missing = inScope.filter((f) => !linked.has(f));
     expect(missing, `Docs with no docs/README.md row:\n${missing.join("\n")}`).toEqual([]);
+  });
+
+  it("every .md under docs/ is indexed, exempt, or explicitly out of scope", () => {
+    // Self-truing meta-assertion, added in the final whole-branch review: a
+    // newly-added docs subdirectory that nobody remembers to add to
+    // INDEXED_DIRS (or to OUT_OF_SCOPE_DIRS, if excluded on purpose) fails
+    // loudly here instead of silently vanishing from every check above —
+    // "in-scope" and "out-of-scope" are both opt-IN lists, so a new directory
+    // defaults to neither, which is exactly the failure mode this closes.
+    const known = new Set([...underIndexedDirs, ...INDEX_EXEMPT]);
+    const uncovered = walkDocs().filter((f) => !known.has(f) && !isOutOfScope(f));
+    expect(
+      uncovered,
+      `Docs neither indexed nor explicitly out of scope:\n${uncovered.join("\n")}`
+    ).toEqual([]);
   });
 });
 
@@ -301,6 +410,9 @@ describe("docs/README.md's own header is at least as new as every date it lists"
 // (that target is deliberately outside INDEXED_DIRS and carries no
 // **Last Updated**/**Date** stamp, so only this describe's check reacts to it)
 // then `git checkout -- docs/design/design_handoff_mirox/image-prompts.md` after.
+// If that SHA ever becomes unreachable (rebase, shallow clone, history
+// rewrite), reconstruct the control by hand instead: the defect's shape was a
+// list continuation losing its two-space indent across a wrapped line.
 describe("prettier reaches a fixed point on every doc", () => {
   const docs = walkDocs();
 
@@ -308,12 +420,22 @@ describe("prettier reaches a fixed point on every doc", () => {
     expect(docs.length).toBeGreaterThan(0);
   });
 
-  it.each(docs)("%s formats to a fixed point", async (file) => {
-    const options = { ...(await prettier.resolveConfig(file)), filepath: file };
-    const once = await prettier.format(readFileSync(file, "utf8"), options);
-    const twice = await prettier.format(once, options);
-    expect(twice, `prettier --write is not idempotent on ${file}`).toBe(once);
-  });
+  // Explicit 30s timeout (3rd arg): the default per-test 5000ms leaves only
+  // ~4x headroom over the largest doc today (~1.3s), against files that only
+  // grow and CI runners that are typically slower than local. Left as one
+  // `it.each` case per doc, not batched into a single test — batching would
+  // guarantee hitting whatever timeout is set, since it'd sum every doc's
+  // format time into one test instead of budgeting per file.
+  it.each(docs)(
+    "%s formats to a fixed point",
+    async (file) => {
+      const options = { ...(await prettier.resolveConfig(file)), filepath: file };
+      const once = await prettier.format(readFileSync(file, "utf8"), options);
+      const twice = await prettier.format(once, options);
+      expect(twice, `prettier --write is not idempotent on ${file}`).toBe(once);
+    },
+    30_000
+  );
 });
 
 // Four parser guards, each earned by a false positive it removed. Without all

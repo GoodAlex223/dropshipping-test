@@ -112,11 +112,31 @@ column index.
 **Check 3 — reverse coverage.**
 Every `.md` under an allowlisted directory must have a row in `docs/README.md`. Allowlist:
 `planning/`, `superpowers/specs/`, `archive/plans/`, `api/`, `database/`, `deployment/`, `testing/`,
-plus the three tracked root docs (`ARCHITECTURE.md`, `PROJECT_CONTEXT.md`, `TESTING_CHECKLIST.md`).
+`reference/`, plus the three tracked root docs (`ARCHITECTURE.md`, `PROJECT_CONTEXT.md`,
+`TESTING_CHECKLIST.md`).
 _Guard:_ exemptions are listed **by exact path**, following the
 `ADMIN_ONLY_PROPS` idiom in `no-bright-colors.test.ts` — `docs/README.md` (self), `*/README.md`
 directory indexes, and the two `design_handoff_mirox/` sub-docs indexed by their own parent README.
 Unguarded, this check fires 13 rows of which 4 are wrong.
+
+> **Superseded note (2026-08-17, final whole-branch review).** The paragraph above is left as the
+> record of what was designed, not edited to match what shipped — it describes an allowlist (7
+> directories + 3 root docs, now 8 with `reference/` added just above) that cannot itself produce
+> the exemption list in the same paragraph: the shipped `INDEX_EXEMPT` is one exact-path entry
+> (`docs/archive/plans/README.md`), not a `*/README.md` pattern, and the claim that the two
+> `design_handoff_mirox/` sub-docs are "indexed by their own parent README" was checked during
+> this review and found false — that README names its siblings only inside inline code spans,
+> which Check 5b's link-extraction guard deliberately strips, so they were never markdown links at
+> all. The shipped test therefore excludes `docs/design/**` and `docs/plans/` (plus the
+> `docs/archive/` root and `docs/README.md` itself) via a separate, explicit `OUT_OF_SCOPE_DIRS`
+> const with a stated reason per entry, rather than folding them into `INDEX_EXEMPT`. The "13 rows
+> of which 4 are wrong" figure was also measured at an earlier, different point in the same design
+> session than the "1 finding" figure in §1.1's table — not a contradiction to reconcile, just two
+> snapshots of a tree that was still moving. The shipped scope's unguarded fire count is **10** rows
+> with **1** exemption. `tests/unit/docs-freshness.test.ts`'s `INDEXED_DIRS` / `INDEXED_ROOT_DOCS` /
+> `INDEX_EXEMPT` / `OUT_OF_SCOPE_DIRS` are the current, coherent source of truth for this check's
+> scope; a new self-truing meta-assertion added in the same review (every `.md` under `docs/` must
+> be indexed, exempt, or explicitly out of scope) keeps it from drifting silently again.
 
 **Check 4 — `docs/README.md`'s own header.**
 README's own `**Last Updated**` must be greater than or equal to every date in any `Last Updated`
