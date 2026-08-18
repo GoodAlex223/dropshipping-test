@@ -22,14 +22,16 @@ test.describe("Navigation", () => {
     // Check main navigation elements (only on desktop - mobile has hamburger
     // menu). Header.tsx's `navigation` array (Task 6, per this branch's
     // design handoff) is Ukrainian and matches Mirox Home.dc.html:28-34
-    // exactly, including that the prototype's desktop nav has no Categories
-    // link at all (the desktop Categories dropdown was removed, not
-    // relabeled) — /categories is still a real route, just no longer
-    // reachable from the desktop header (only from the mobile menu, see the
-    // "can navigate to categories page via mobile menu" test below).
+    // exactly. G12 (user decision 2026-08-18) added a fourth desktop entry
+    // alongside it — a plain «Категорії» link to the index, matching the
+    // mobile menu's own entry — because the G4 visual gate found the desktop
+    // header had no way to reach categories at all. It is a standalone
+    // <Link>, not a `navigation` array member (that array also feeds the
+    // mobile menu, which already renders its own «Категорії» link).
     // Scoped to the <header> landmark: Footer.tsx has its own "Каталог" /
-    // "Новинки" links (to the same hrefs), so an unscoped getByRole match
-    // resolves to 2 elements and throws a strict-mode violation.
+    // "Новинки" / categories links (to the same hrefs), so an unscoped
+    // getByRole match resolves to 2 elements and throws a strict-mode
+    // violation.
     if (!isMobile) {
       const header = page.getByRole("banner");
       await expect(header.getByRole("link", { name: "Каталог", exact: true })).toHaveAttribute(
@@ -44,7 +46,10 @@ test.describe("Navigation", () => {
         "href",
         "/products?sort=popular"
       );
-      await expect(header.getByRole("link", { name: "Категорії", exact: true })).toHaveCount(0);
+      await expect(header.getByRole("link", { name: "Категорії", exact: true })).toHaveAttribute(
+        "href",
+        "/categories"
+      );
     }
 
     // Check hero section
