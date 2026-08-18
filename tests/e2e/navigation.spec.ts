@@ -85,10 +85,11 @@ test.describe("Navigation", () => {
   });
 
   test("can navigate to categories page via mobile menu", async ({ page }) => {
-    // The desktop header has no Categories entry point (see the absence
-    // assertion above) — the mobile Sheet menu is the only surviving nav
-    // path to /categories (Header.tsx's mobile-only "Категорії" link from
-    // site.header.categories). Scoped to the sheet's role="dialog" so this
+    // Since G12 the desktop header has its own «Категорії» entry (asserted
+    // above), but this test forces a 375px viewport, where that <nav> is
+    // md:hidden — so the mobile Sheet menu is still the only reachable nav
+    // path to /categories here (Header.tsx's own "Категорії" link, from
+    // header.categories). Scoped to the sheet's role="dialog" so this
     // doesn't also match Footer.tsx's own categories links.
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/");

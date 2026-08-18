@@ -1132,9 +1132,15 @@ rest 🟤 Auto-Generated.
   `account.orderStatus`/`paymentStatus` label values rather than reusing the keys, add a sync
   test asserting the duplicates stay byte-identical; moot if G13 reuses `account.*` keys
   directly. (Low value, Low effort) [G9 final review, 2026-08-15]
-- 🟤 **`seo.breadcrumb` vs `products.breadcrumbHome` consolidation** — two catalog keys carry
-  the same «Головна» concept in different namespaces; consolidate to one home.
-  (Low value, Low effort) [G9 final review, 2026-08-15]
+- [x] 🟤 ~~**`seo.breadcrumb` vs `products.breadcrumbHome` consolidation** — two catalog keys carry
+      the same «Головна» concept in different namespaces; consolidate to one home.
+      (Low value, Low effort) [G9 final review, 2026-08-15]~~ — **RESOLVED in G12's review round**
+      (2026-08-18): resolved by deletion rather than consolidation. `seo.breadcrumb.{home,categories}`
+      had exactly one consumer — the `categories/[slug]/page.tsx` that G12 retired — so the duplicate
+      pair was orphaned, not merely redundant. Both keys removed from `messages/{uk,ru}.json`;
+      `products.breadcrumbHome` (the PDP/catalog breadcrumb, via `getTranslations("products")`) is
+      now the single «Головна». Missed by G12's own `seo`-namespace sweep, which removed the sibling
+      `seo.categoryNotFound` for exactly this reason — caught by the branch code review.
 - 🟤 **AnnouncementBar root-hook polish** — uses root `useTranslations()` with a
   factually-wrong justifying comment; should be `useTranslations("site")` + corrected comment.
   (Low value, Low effort) [G9 T4 review minor, 2026-08-15]
