@@ -69,6 +69,28 @@
    written off). No DB existence check — an invalid slug lands on the catalog's empty
    state with a removable pill, which is graceful. The segment's `loading.tsx` is
    deleted (nothing renders).
+
+   > **SUPERSEDED during implementation (2026-08-18, browser gate).** The premise
+   > "Next's `redirect()` emits 307" is **false** for a Server Component page. Next wraps
+   > every route segment in a `RedirectBoundary`, so the redirect error is captured
+   > mid-stream and emitted as `<meta id="__next-page-redirect" http-equiv="refresh"
+content="1;url=…">` on an **HTTP 200** — measured against a production build
+   > (`next build` + `next start`), not just dev; the meta-refresh branch in
+   > `next/dist/server/app-render/make-get-server-inserted-html.js` is not
+   > `NODE_ENV`-gated. Next only sets a real 307 in its shell-error path
+   > (`app-render.js:830`), which a boundary-captured redirect never reaches.
+   >
+   > **Shipped instead** (user decision 2026-08-18): a routing-layer
+   > `redirects()` entry in `next.config.mjs` — `source: "/categories/:slug"`,
+   > `destination: "/products?category=:slug"`, `permanent: false` — which emits a
+   > genuine `307 Temporary Redirect` before any rendering, verified end-to-end. The
+   > page file is deleted outright rather than shrunk (routing-layer redirects run
+   > before the filesystem route, so it would be dead code). Everything else in this
+   > decision stands: still 307 not 308, still unvalidated, `loading.tsx` still deleted.
+   > `:slug` is a required segment, so the bare `/categories` index is unaffected.
+   > Regression: `tests/unit/category-redirect.test.ts` resolves the real exported config
+   > and invokes `redirects()`.
+
 7. **Retirement sweep.** `category-client.tsx` deleted outright (`CategoryNotFound`
    becomes unreachable). `getCategoryMetadata` deleted from `seo.ts` (its only consumer
    dies) with its 4 tests pruned from `seo.test.ts`; the orphaned `seo.categoryNotFound`

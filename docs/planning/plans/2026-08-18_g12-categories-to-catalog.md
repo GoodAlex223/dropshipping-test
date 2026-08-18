@@ -35,7 +35,7 @@
 - Consumes: existing `GET /api/products` handler; test helpers `createNextRequest`, `whereOf` (already in the test file).
 - Produces: `where.category = { OR: [{ slug }, { parent: { slug } }] }` query semantics — Tasks 2–5 rely on a parent slug in the `category` URL param matching descendants' products.
 
-- [ ] **Step 1: Update the existing combined-filter test and add the rollup test**
+- [x] **Step 1: Update the existing combined-filter test and add the rollup test**
 
 In `tests/unit/products-api.test.ts`, replace the `category: { slug: "hudi" }` expectation inside the existing `"combines new filters with existing category and price params"` test with the new shape, and add one new test right after it:
 
@@ -64,12 +64,12 @@ it("rolls a parent slug up to descendants via a two-level category OR", async ()
 });
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `npx vitest run tests/unit/products-api.test.ts`
 Expected: the two tests above FAIL (received `{ slug: "hudi" }` / `{ slug: "odyah" }`); everything else passes.
 
-- [ ] **Step 3: Implement the rollup**
+- [x] **Step 3: Implement the rollup**
 
 In `src/app/api/products/route.ts`, replace:
 
@@ -91,17 +91,17 @@ if (categorySlug) {
 }
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `npx vitest run tests/unit/products-api.test.ts`
 Expected: PASS (all tests in the file).
 
-- [ ] **Step 5: Typecheck (Prisma relation-filter shape must compile)**
+- [x] **Step 5: Typecheck (Prisma relation-filter shape must compile)**
 
 Run: `npm run typecheck`
 Expected: clean. (If `where.category = { OR: [...] }` errors against the generated Prisma types, the fallback shape is `where.category = { is: { OR: [...] } }` — update the two test expectations to match whichever form compiles.)
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/app/api/products/route.ts tests/unit/products-api.test.ts
@@ -124,7 +124,7 @@ git commit -m "fix(g12): parent-category slugs roll up to descendants in /api/pr
 - Consumes: existing `FilterBarProps`, `chipClasses`, `INACTIVE_ROW_HOVER`, `cn`, Radix `Popover`/`Sheet` imports (all already in `filter-bar.tsx`).
 - Produces: `export interface CategoryFacetGroup { id: string; name: string; slug: string; children: { id: string; name: string; slug: string }[] }`; `FilterBarProps` gains required `categories: CategoryFacetGroup[]`; `FilterBar` and `FiltersSheet` accept and render it. Task 3 imports `CategoryFacetGroup` from `./filter-bar`.
 
-- [ ] **Step 1: Add the catalog keys**
+- [x] **Step 1: Add the catalog keys**
 
 In `messages/uk.json`, inside `products.filters` (next to `"colorTrigger"`), add:
 
@@ -142,7 +142,7 @@ In `messages/ru.json`, same position inside `products.filters`:
 
 (RU is a DRAFT catalog — mirroring keeps the toggle coherent; the values match RU `header.categories` = «Категории».)
 
-- [ ] **Step 2: Write the failing tests**
+- [x] **Step 2: Write the failing tests**
 
 In `tests/unit/filter-bar.test.tsx`: add `categories={[]}` to EVERY pre-existing `<FilterBar ...>` render (initial renders and `rerender(wrapIntl(...))` calls alike — the prop is required, the file won't typecheck without it). Then add this fixture after the existing `filters` const, and the new describe block at the end of the file:
 
@@ -271,12 +271,12 @@ describe("FilterBar — category facet (G12)", () => {
 });
 ```
 
-- [ ] **Step 3: Run the tests to verify they fail**
+- [x] **Step 3: Run the tests to verify they fail**
 
 Run: `npx vitest run tests/unit/filter-bar.test.tsx`
 Expected: the six new tests FAIL (no «Категорії» chip exists); pre-existing tests still pass once `categories={[]}` is added to their renders.
 
-- [ ] **Step 4: Implement the facet in `filter-bar.tsx`**
+- [x] **Step 4: Implement the facet in `filter-bar.tsx`**
 
 Add the exported type after `CatalogFilters` and extend the props:
 
@@ -477,7 +477,7 @@ Pill (only the interpolation changes):
 }
 ```
 
-- [ ] **Step 5: Temporary wiring in `products-content.tsx`**
+- [x] **Step 5: Temporary wiring in `products-content.tsx`**
 
 The `categories` prop is required, so the page must compile now; Task 3 replaces this with the real fetch:
 
@@ -491,12 +491,12 @@ The `categories` prop is required, so the page must compile now; Task 3 replaces
 />
 ```
 
-- [ ] **Step 6: Run the tests to verify they pass**
+- [x] **Step 6: Run the tests to verify they pass**
 
 Run: `npx vitest run tests/unit/filter-bar.test.tsx && npm run typecheck`
 Expected: PASS, typecheck clean.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/app/\(shop\)/products/filter-bar.tsx src/app/\(shop\)/products/products-content.tsx messages/uk.json messages/ru.json tests/unit/filter-bar.test.tsx
@@ -516,7 +516,7 @@ git commit -m "feat(g12): DB-driven category facet in the catalog FilterBar + pi
 - Consumes: `CategoryFacetGroup` from `./filter-bar` (Task 2); `GET /api/categories?parentOnly=true` (existing route — active parents with nested active children, `sortOrder`-sorted; the Header makes the same call).
 - Produces: `categories` state passed to `<FilterBar categories={categories} ...>`.
 
-- [ ] **Step 1: Add the fetch (brands pattern, verbatim analog)**
+- [x] **Step 1: Add the fetch (brands pattern, verbatim analog)**
 
 Extend the import: `import { FilterBar, type CatalogFilters, type CatalogSort, type CategoryFacetGroup } from "./filter-bar";`
 
@@ -546,12 +546,12 @@ useEffect(() => {
 
 Replace Task 2's temporary `categories={[]}` with `categories={categories}`.
 
-- [ ] **Step 2: Verify**
+- [x] **Step 2: Verify**
 
 Run: `npm run typecheck && npx vitest run tests/unit/filter-bar.test.tsx`
 Expected: clean/PASS. (No dedicated products-content unit test exists — the wiring mirrors the brands fetch verbatim; the Task 6 browser gate exercises it end-to-end.)
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/app/\(shop\)/products/products-content.tsx
@@ -574,7 +574,7 @@ git commit -m "feat(g12): fetch category groups for the catalog facet"
 - Consumes: `redirect` from `next/navigation` (server-component redirect — emits 307).
 - Produces: `/categories/<slug>` → `/products?category=<slug>` for old bookmarks/external links. Task 5 rewrites internal links to skip the bounce.
 
-- [ ] **Step 1: Write the failing redirect test**
+- [x] **Step 1: Write the failing redirect test**
 
 Create `tests/unit/category-redirect.test.ts`:
 
@@ -607,12 +607,12 @@ describe("/categories/[slug] thin 307 redirect (G12)", () => {
 });
 ```
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 Run: `npx vitest run tests/unit/category-redirect.test.ts`
 Expected: FAIL — the current page renders `CategoryClient`; `redirect` is never called (the import of the old page may also error on its `next-intl/server` dependency chain — either failure mode is fine).
 
-- [ ] **Step 3: Rewrite the page, delete the client component and loading file**
+- [x] **Step 3: Rewrite the page, delete the client component and loading file**
 
 Replace the ENTIRE contents of `src/app/(shop)/categories/[slug]/page.tsx` with:
 
@@ -637,19 +637,19 @@ export default async function CategoryRedirectPage({ params }: PageProps) {
 git rm src/app/\(shop\)/categories/\[slug\]/category-client.tsx src/app/\(shop\)/categories/\[slug\]/loading.tsx
 ```
 
-- [ ] **Step 4: Retirement sweep**
+- [x] **Step 4: Retirement sweep**
 
 1. `src/lib/seo.ts`: delete the whole `getCategoryMetadata` exported function INCLUDING the multi-line comment directly above it (the block starting near line 148 discussing the unreachable EN description fallback — that concern retires with the function).
 2. `tests/unit/seo.test.ts`: delete the `describe("getCategoryMetadata", ...)` block (lines ~178–231) and remove `getCategoryMetadata` from the import list (line ~46).
 3. `messages/uk.json` AND `messages/ru.json`: remove the `"categoryNotFound"` key from the `seo` namespace (its only consumer was the old page's `generateMetadata`).
 4. `src/app/sitemap.ts`: remove `let categoryPages: MetadataRoute.Sitemap = [];`, the whole `// Category pages` fetch+map block inside the try, and change the return to `return [...staticPages, ...productPages];`. The `/categories` static row stays.
 
-- [ ] **Step 5: Run the tests to verify they pass**
+- [x] **Step 5: Run the tests to verify they pass**
 
 Run: `npx vitest run tests/unit/category-redirect.test.ts tests/unit/seo.test.ts && npm run typecheck`
 Expected: PASS / clean. Typecheck confirms no dangling references to the deleted function or component (`CategoryClient`, `CategoryNotFound`, `Category` type were only imported by the old page itself).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add -A src/app/\(shop\)/categories/\[slug\] src/lib/seo.ts src/app/sitemap.ts messages/uk.json messages/ru.json tests/unit/category-redirect.test.ts tests/unit/seo.test.ts
@@ -670,7 +670,7 @@ git commit -m "feat(g12): /categories/[slug] becomes a thin 307 to the catalog; 
 - Consumes: existing `header.categories` catalog key («Категорії» / «Категории» — already present in both files); rollup semantics from Task 1 (parent slugs now list products).
 - Produces: no internal link points at `/categories/<slug>` anymore.
 
-- [ ] **Step 1: Extend the failing header test**
+- [x] **Step 1: Extend the failing header test**
 
 In `tests/unit/header.test.tsx`, inside the `"renders the three resolvable Ukrainian nav links (and none to unbuilt pages)"` test, add after the Бестселери assertion:
 
@@ -680,12 +680,12 @@ expect(screen.getByRole("link", { name: "Категорії" })).toHaveAttribute
 
 (The mobile sheet is closed in this render, so its own «Категорії» link is unmounted — the query is unambiguous.)
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 Run: `npx vitest run tests/unit/header.test.tsx`
 Expected: FAIL — no desktop «Категорії» link exists yet.
 
-- [ ] **Step 3: Implement the Header changes**
+- [x] **Step 3: Implement the Header changes**
 
 In `src/components/common/Header.tsx`:
 
@@ -704,16 +704,16 @@ In `src/components/common/Header.tsx`:
 
 2. Mobile menu top-5 category links: change `href={`/categories/${category.slug}`}` to `href={`/products?category=${category.slug}`}` (internal links skip the redirect bounce).
 
-- [ ] **Step 4: Rewrite the index-card links**
+- [x] **Step 4: Rewrite the index-card links**
 
 In `src/app/(shop)/categories/page.tsx`, change the card link from `href={`/categories/${category.slug}`}` to `href={`/products?category=${category.slug}`}`. Nothing else on the page changes (index restyle is out of scope).
 
-- [ ] **Step 5: Run the tests to verify they pass**
+- [x] **Step 5: Run the tests to verify they pass**
 
 Run: `npx vitest run tests/unit/header.test.tsx && npm run typecheck`
 Expected: PASS / clean.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/components/common/Header.tsx src/app/\(shop\)/categories/page.tsx tests/unit/header.test.tsx
@@ -726,7 +726,7 @@ git commit -m "feat(g12): desktop Категорії nav entry; internal categor
 
 **Files:** none (verification only; plan checkbox updates + any fixes found)
 
-- [ ] **Step 1: Full local gates**
+- [x] **Step 1: Full local gates**
 
 Run, in order:
 
@@ -740,7 +740,7 @@ npm run build
 
 Expected: all clean. `test:run` must show the full suite green — including `docs-freshness.test.ts` (this plan file is indexed) and the untouched E2E-adjacent unit suites. NOTE: do NOT judge visuals from this local `next build` (the `/etc/environment` `NODE_ENV=development` corrupts local prod-CSS — known container issue); the build gate is for compile errors only.
 
-- [ ] **Step 2: Browser gate (fresh cache, real browser)**
+- [x] **Step 2: Browser gate (fresh cache, real browser)**
 
 ```bash
 rm -rf .next
@@ -758,7 +758,7 @@ Walk and screenshot each check (Playwright/Chrome DevTools MCP against `http://l
 
 Publish the screenshots as ONE Artifact page (gate convention — chat-inline images never reach the user) and present it for user sign-off. **STOP for the user's visual approval before proceeding to close-out.**
 
-- [ ] **Step 3: Log completion in this plan**
+- [x] **Step 3: Log completion in this plan**
 
 Check off all task checkboxes, note any deviations inline, and commit the plan update:
 
@@ -773,3 +773,94 @@ git commit -m "docs(g12): plan execution log"
 
 - BACKLOG resolutions: mark the two [2026-08-09] G4-gate entries resolved (redesign + rollup); mark the "pill shows raw slug" 🟤 entry resolved; mark the "`/categories` + `/categories/[slug]` missed the rebrand sweep" entry **partially** resolved (the `[slug]` half retired; the index half stays open); check whether the G9 "machine-metadata residue" entry's `getCategoryMetadata` EN-fallback fragment can be struck (the function is deleted).
 - Extract ≥2 improvements → BACKLOG (🟤), transition WEEKLY G12 → `✅ PR #N`, archive this plan (file move + index-row move, same commit), DONE.md entry, memory capture.
+
+---
+
+## Execution Log (2026-08-18)
+
+Executed with `superpowers:executing-plans` (user-directed; no subagents). All six
+tasks complete, one commit per task.
+
+| Task | Commit    | Notes                                                                                               |
+| ---- | --------- | --------------------------------------------------------------------------------------------------- |
+| 1    | `f82f172` | Rollup. Prisma accepted `where.category = { OR: [...] }` — the `{ is: … }` fallback was not needed. |
+| 2    | `904282b` | Facet + pill. Trigger label deviates (see D1).                                                      |
+| 3    | `6705dfd` | Categories fetch, brands-pattern analog.                                                            |
+| 4    | `031c3f9` | 307 + retirement sweep, plus four live-doc corrections (see D2).                                    |
+| 5    | `1c172d3` | Nav entry + link sweep, plus an E2E assertion fix (see D3).                                         |
+| 6    | this      | Gates + browser gate.                                                                               |
+
+### Deviations
+
+**D1 — chip label carries the `▾` affordance marker.** The plan specified
+`products.filters.categoryTrigger` = «Категорії». Every sibling dropdown-trigger chip
+in the same row reads «Ціна ▾» / «Бренд ▾» / «Колір ▾» / «Наявність ▾», so a bare
+«Категорії» would have been the only popover trigger without the marker, and
+`categoryTrigger`/`categoryHeading` would have held byte-identical values (the
+established pattern is `priceTrigger` «Ціна ▾» vs `priceHeading` «Ціна»). Shipped as
+«Категорії ▾» / «Категорії» (RU: «Категории ▾» / «Категории»). Raised before Task 2
+and **user-confirmed 2026-08-18**. The plan's six facet tests were adjusted to query
+the trigger by its actual accessible name.
+
+**D2 — live-doc propagation, beyond the plan's four-item retirement sweep.** Deleting
+`getCategoryMetadata` and `category-client.tsx` falsified four assertions in _live_
+docs, none of which the plan listed:
+
+- root `CLAUDE.md` — "(`getCategoryMetadata` stays sync — category names come from
+  the DB, not the catalog)"
+- `src/app/CLAUDE.md` — the same claim, in its Async SEO metadata convention
+- `src/app/CLAUDE.md` — `category-client.tsx` cited as a client-component example,
+  and the `categories/` tree line described as "Category listing + detail (with
+  [slug])"
+- `tests/unit/seo.test.ts` — a comment citing the deleted page as live precedent for
+  the `getTranslations("seo")` not-found pattern
+
+All corrected in Task 4's commit, per CLAUDE.md's propagation check (live docs get
+corrected; frozen specs/audits/BACKLOG get their notes at close-out). Neither
+`CLAUDE.md` carries a `**Last Updated**` header, so the docs-freshness linter was not
+implicated.
+
+**D3 — an E2E assertion directly contradicted Task 5.** `tests/e2e/navigation.spec.ts`
+asserted, with a TASK-034 comment justifying it against the Mirox prototype:
+
+```ts
+await expect(header.getByRole("link", { name: "Категорії", exact: true })).toHaveCount(0);
+```
+
+Task 5 adds exactly that link. The plan's Global Constraints said not to touch the E2E
+specs and the spec's testing section named only the _mobile-menu_ E2E test as needing
+to keep passing, so this was missed on both. It would not have surfaced in any local
+gate — `npm run test:run` is Vitest-only; the Playwright suite runs in CI. Flipped to
+an href assertion with the reasoning rewritten. Raised to the user before Task 1.
+
+**D4 — the spec's 307 premise was false; the redirect mechanism changed.** The Task 6
+browser gate measured `/categories/hudi` returning **HTTP 200 with
+`<meta http-equiv="refresh">`**, not the 307 the spec (decision 6) and the shipped page
+comment both asserted. Next wraps every route segment in a `RedirectBoundary`, so a
+`redirect()` thrown inside a Server Component page is captured mid-stream; Next only sets
+a real 307 in its shell-error path (`app-render.js:830`), which a captured redirect never
+reaches. Confirmed against a **production** build (`next build` + `next start`), not just
+dev — the meta-refresh branch in `make-get-server-inserted-html.js` is not
+`NODE_ENV`-gated, so this was never a dev-only artifact.
+
+Fix (**user decision 2026-08-18**, chosen from three options): move the redirect to the
+routing layer as a `next.config.mjs` `redirects()` entry, which emits a genuine
+`307 Temporary Redirect` before any rendering. `src/app/(shop)/categories/[slug]/page.tsx`
+is deleted outright — config redirects run before the filesystem route, so the page would
+be unreachable dead code. `tests/unit/category-redirect.test.ts` was rewritten to resolve
+the real exported config and invoke `redirects()` (asserting shipped behaviour, not source
+text); both its assertions were proven able to fail via deliberately-broken controls
+(`permanent: true`, and a broadened `/categories/:path*` source that would swallow the
+index). Spec decision 6 carries a superseded note.
+
+### Verification
+
+- `npm run typecheck` — clean
+- `npm run lint` — clean
+- `npm run format:check` — "All matched files use Prettier code style!"
+- `npm run test:run` — **64 files, 882 passed, 1 todo**, exit 0 (includes
+  `docs-freshness.test.ts`)
+- `npm run build` — see the gate section below
+- Rollup proven against the seeded local DB, not just the mocked `where` shape:
+  `odyah` 0 → 7 products, `aksesuary` 0 → 1, leaf `hudi` unchanged at 3. The «Всі» = 0
+  repro is dead and leaf slugs did not regress.
