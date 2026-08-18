@@ -8,7 +8,12 @@ import { Package } from "lucide-react";
 import { ProductCard, QuickViewDialog } from "@/components/products";
 import { trackViewItemList, trackSelectItem, type GA4Item } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
-import { FilterBar, type CatalogFilters, type CatalogSort } from "./filter-bar";
+import {
+  FilterBar,
+  type CatalogFilters,
+  type CatalogSort,
+  type CategoryFacetGroup,
+} from "./filter-bar";
 
 interface Product {
   id: string;
@@ -84,6 +89,7 @@ function ProductsContentInner() {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [brands, setBrands] = useState<string[]>([]);
+  const [categories, setCategories] = useState<CategoryFacetGroup[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 12,
@@ -153,6 +159,20 @@ function ProductsContentInner() {
       }
     }
     fetchBrands();
+  }, []);
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const response = await fetch("/api/categories?parentOnly=true");
+        if (!response.ok) throw new Error("Failed to fetch categories");
+        const data = await response.json();
+        setCategories(data);
+      } catch {
+        setCategories([]);
+      }
+    }
+    fetchCategories();
   }, []);
 
   // GA4: Track product list view (once per product set)
@@ -235,7 +255,7 @@ function ProductsContentInner() {
       <FilterBar
         filters={filters}
         brands={brands}
-        categories={[]}
+        categories={categories}
         onChange={updateFilters}
         onClearAll={clearFilters}
       />
