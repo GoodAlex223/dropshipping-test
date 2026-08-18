@@ -2,11 +2,33 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-08-17
+**Last Updated**: 2026-08-18
 
 ---
 
 ## 2026-08 (August)
+
+### [2026-08-18] G12 - Categories-to-Catalog Redesign (WEEKLY batch 🏆, 🔵 User)
+
+**Plan**: [2026-08-18_g12-categories-to-catalog.md](../archive/plans/2026-08-18_g12-categories-to-catalog.md) — 6 tasks, executed inline via `superpowers:executing-plans` (user-directed; no subagents)
+**Spec**: [2026-08-18-g12-categories-to-catalog-design.md](../superpowers/specs/2026-08-18-g12-categories-to-catalog-design.md) — 9 decisions; **decision 6 superseded during implementation**
+**Branch**: `feat/g12-categories-to-catalog`, tip `f94c03a` (6 commits) — **no PR and not merged**: the user instructed no PR, and chose "keep as-is, nothing pushed" at the integration menu. The SHA is the resolvable pointer; the work is not in `main`.
+
+**Summary**: Retires the pre-Mirox `/categories/[slug]` page in favour of the catalog and closes the launch-visible bug where a parent category's card advertised «7 товарів» while its destination listed zero. Five of the browser gate's six checks passed as written; the sixth disproved a premise the spec, the plan, and the shipped page comment all shared.
+
+**Key changes**:
+
+- **Parent rollup** — `where.category = { OR: [{ slug }, { parent: { slug } }] }`, nested inside the relation filter because the top-level `where.OR` already belongs to the search filter. Verified against the seeded DB rather than the mocked `where` shape: `odyah` 0 → 7 products, `aksesuary` 0 → 1, leaf `hudi` unchanged at 3. Index card counts now match their destination.
+- **DB-driven category facet** — desktop «Категорії ▾» popover (parents selectable, children indented) plus a matching first section in the mobile Фільтри sheet, which stays open on select per the sheet-wide multi-filter convention. One `/api/categories?parentOnly=true` mount-effect feeds both, mirroring the brands fetch; an empty or failed list hides the facet entirely rather than showing placeholder text.
+- **Pill rider** — the active-category pill resolves slug → display name via a parents+children `Map`, falling back to the slug for unknown slugs and the fetch-in-flight window. Closes a 🟤 BACKLOG nit.
+- **Retirement** — `category-client.tsx` (434 lines, deliberately skipped by TASK-039), the segment's `loading.tsx`, `getCategoryMetadata` + its 4 tests, the orphaned `seo.categoryNotFound` key in both catalogs, and the per-category sitemap rows (a sitemap must not list URLs that redirect). **−576 net lines of app code.**
+- **Redirect, via `next.config.mjs` not the page** — see Learnings. Real 307, verified end-to-end.
+- **Desktop «Категорії» nav entry** — a standalone `<Link>`, not a `navigation` array member (that array also feeds the mobile menu, which has its own). Internal links now go straight to `/products?category=<slug>`; the redirect serves only old bookmarks and external links.
+- Closes 3 BACKLOG entries, partially closes 1, strikes a fragment of a 5th. Suite 877 → **881 | 1 todo**.
+
+**Verification**: `typecheck` / `lint` / `format:check` / `test:run` / `build` all exit 0 — the first four re-run **without pipes** after `tail` was found masking exit codes (`format:check` had genuinely failed and been reported clean). Browser gate on a cleared `.next`, screenshots delivered as an Artifact for user sign-off. E2E was **not** run: it needs its own runner, so the `navigation.spec.ts` edit is reasoned and typechecked only, and CI is its first execution.
+
+**Learnings**: **`redirect()` in a Server Component page does not emit a 3xx.** Next wraps every route segment in a `RedirectBoundary`, so the redirect error is captured mid-stream and rendered as `<meta http-equiv="refresh">` on a **200**; Next only sets a real status in its shell-error path (`app-render.js:830`), which a captured redirect never reaches. The spec, the plan and the page comment all asserted 307 and all three were wrong — measured against a **production** build, since the branch that emits the meta tag is not `NODE_ENV`-gated and a dev-only excuse was available and false. A routing-layer `redirects()` entry emits a genuine 307 before any rendering, so the page file was deleted outright rather than shrunk. **Piping a gate through `tail` discards its exit code** — `npm run format:check | tail -4` reported success while prettier was failing, because the pipeline's status is `tail`'s; the same `grep|head` hazard already in memory, in a new place. **A plan's "do not touch X" can be the instruction that hides the defect**: the plan forbade editing E2E specs, and the one assertion contradicting the work lived there — invisible to every local gate, since `test:run` is Vitest-only. And the propagation check has to sweep **live** docs, not just the plan and spec: deleting one function falsified four assertions in two `CLAUDE.md` files and a test comment, none of which the plan's four-item retirement sweep listed.
 
 ### [2026-08-17] G11 - Docs-Freshness Linter (WEEKLY solo, 🟤 Auto)
 

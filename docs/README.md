@@ -35,14 +35,13 @@ Central index for all project documentation.
 | [planning/README.md](planning/README.md)                                                                             | Planning overview                                                             | 2026-01-05   |
 | [planning/WEEKLY.md](planning/WEEKLY.md)                                                                             | Current week's plan                                                           | 2026-08-15   |
 | [planning/TODO.md](planning/TODO.md)                                                                                 | Active tasks                                                                  | 2026-08-15   |
-| [planning/DONE.md](planning/DONE.md)                                                                                 | Completed tasks                                                               | 2026-08-17   |
-| [planning/BACKLOG.md](planning/BACKLOG.md)                                                                           | Unprioritized ideas                                                           | 2026-08-17   |
+| [planning/DONE.md](planning/DONE.md)                                                                                 | Completed tasks                                                               | 2026-08-18   |
+| [planning/BACKLOG.md](planning/BACKLOG.md)                                                                           | Unprioritized ideas                                                           | 2026-08-18   |
 | [planning/ROADMAP.md](planning/ROADMAP.md)                                                                           | Long-term vision                                                              | 2026-07-14   |
 | [planning/GOALS.md](planning/GOALS.md)                                                                               | Objectives & metrics                                                          | 2026-01-26   |
 | [planning/MILESTONES.md](planning/MILESTONES.md)                                                                     | Key targets                                                                   | 2026-01-26   |
 | [planning/REVIEW-QUEUE.md](planning/REVIEW-QUEUE.md)                                                                 | Weekly Reviews cross-week state — Reviewed log, Next-up parks, conventions    | 2026-08-15   |
 | [planning/audits/2026-08-04-storefront-staleness-audit.md](planning/audits/2026-08-04-storefront-staleness-audit.md) | Storefront EN-string/staleness audit — G2/G4 definitive scope + TASK-056 gaps | 2026-08-04   |
-| [planning/plans/2026-08-18_g12-categories-to-catalog.md](planning/plans/2026-08-18_g12-categories-to-catalog.md)     | G12 implementation plan (active) — rollup, catalog category facet, thin 307   | 2026-08-18   |
 
 ### Architecture & Design
 
@@ -112,6 +111,7 @@ Central index for all project documentation.
 | [2026-08-15_g14-rebrand-residuals.md](archive/plans/2026-08-15_g14-rebrand-residuals.md)                             | G14 Rebrand Residuals                | COMPLETE | 2026-08-15 |
 | [2026-08-16_g13-admin-translation.md](archive/plans/2026-08-16_g13-admin-translation.md)                             | G13 Admin Translation & Alignment    | COMPLETE | 2026-08-17 |
 | [2026-08-17_g11-docs-freshness-linter.md](archive/plans/2026-08-17_g11-docs-freshness-linter.md)                     | G11 Docs-Freshness Linter            | COMPLETE | 2026-08-17 |
+| [2026-08-18_g12-categories-to-catalog.md](archive/plans/2026-08-18_g12-categories-to-catalog.md)                     | G12 Categories-to-Catalog Redesign   | COMPLETE | 2026-08-18 |
 
 See [archive/README.md](archive/README.md) for more historical plans.
 
