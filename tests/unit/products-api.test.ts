@@ -68,11 +68,18 @@ describe("GET /api/products — filters", () => {
     );
     expect(whereOf()).toEqual(
       expect.objectContaining({
-        category: { slug: "hudi" },
+        category: { OR: [{ slug: "hudi" }, { parent: { slug: "hudi" } }] },
         price: { gte: 500, lte: 1500 },
         AND: [{ variants: { some: { name: "Розмір", value: "L" } } }],
       })
     );
+  });
+
+  it("rolls a parent slug up to descendants via a two-level category OR", async () => {
+    await GET(createNextRequest({ url: "/api/products", searchParams: { category: "odyah" } }));
+    expect(whereOf().category).toEqual({
+      OR: [{ slug: "odyah" }, { parent: { slug: "odyah" } }],
+    });
   });
 
   it("selects variants (id/name/value/stock/price), createdAt, and all images ordered by position", async () => {

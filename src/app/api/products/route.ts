@@ -69,7 +69,11 @@ export async function GET(request: NextRequest) {
     }
 
     if (categorySlug) {
-      where.category = { slug: categorySlug };
+      // Two-level rollup (G12): match the product's own category OR its
+      // category's parent, so a parent slug lists descendants' products.
+      // Must nest inside the relation filter — top-level where.OR is owned
+      // by the search filter above.
+      where.category = { OR: [{ slug: categorySlug }, { parent: { slug: categorySlug } }] };
     }
 
     if (minPrice) {
