@@ -235,6 +235,7 @@ function ProductsContentInner() {
       <FilterBar
         filters={filters}
         brands={brands}
+        categories={[]}
         onChange={updateFilters}
         onClearAll={clearFilters}
       />

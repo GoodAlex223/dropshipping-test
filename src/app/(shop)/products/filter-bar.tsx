@@ -24,9 +24,18 @@ export interface CatalogFilters {
   sort: CatalogSort;
 }
 
+export interface CategoryFacetGroup {
+  id: string;
+  name: string;
+  slug: string;
+  children: { id: string; name: string; slug: string }[];
+}
+
 interface FilterBarProps {
   filters: CatalogFilters;
   brands: string[];
+  /** Parent categories with children (G12); empty array hides the facet. */
+  categories: CategoryFacetGroup[];
   /** null deletes the param; page resets to 1 (handled by the caller). */
   onChange: (updates: Record<string, string | null>) => void;
   onClearAll: () => void;
@@ -190,6 +199,71 @@ function BrandPopover({
   );
 }
 
+function CategoryPopover({
+  category,
+  categories,
+  onChange,
+}: {
+  category: string | null;
+  categories: CategoryFacetGroup[];
+  onChange: FilterBarProps["onChange"];
+}) {
+  const t = useTranslations("products");
+  const [open, setOpen] = useState(false);
+  if (categories.length === 0) return null;
+  const select = (slug: string) => {
+    onChange({ category: category === slug ? null : slug });
+    setOpen(false);
+  };
+  const rowClasses = (isActive: boolean, indented: boolean) =>
+    cn(
+      "rounded-[8px] border px-3 py-2 text-left text-[13px] font-semibold transition-colors",
+      indented && "ml-3",
+      isActive
+        ? "border-white bg-white text-black"
+        : cn("border-transparent text-[#a3a3a3]", INACTIVE_ROW_HOVER)
+    );
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className={cn("hidden md:inline-flex", chipClasses(category !== null))}
+        >
+          {t("filters.categoryTrigger")}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-64 border-[#262626] bg-[#0d0d0d] p-2 text-white">
+        <div className="flex flex-col gap-1">
+          {categories.map((parent) => (
+            <div key={parent.id} className="flex flex-col gap-1">
+              <button
+                type="button"
+                aria-pressed={category === parent.slug}
+                onClick={() => select(parent.slug)}
+                className={rowClasses(category === parent.slug, false)}
+              >
+                {parent.name}
+              </button>
+              {parent.children.map((child) => (
+                <button
+                  key={child.id}
+                  type="button"
+                  aria-pressed={category === child.slug}
+                  onClick={() => select(child.slug)}
+                  className={rowClasses(category === child.slug, true)}
+                >
+                  {child.name}
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 function ColorPopover({
   color,
   onChange,
@@ -330,11 +404,13 @@ function SizeGroup({
 function FiltersSheet({
   filters,
   brands,
+  categories,
   onChange,
   onClearAll,
 }: {
   filters: CatalogFilters;
   brands: string[];
+  categories: CategoryFacetGroup[];
   onChange: FilterBarProps["onChange"];
   onClearAll: FilterBarProps["onClearAll"];
 }) {
@@ -360,6 +436,57 @@ function FiltersSheet({
           <SheetTitle className="text-white">{t("filters.title")}</SheetTitle>
         </SheetHeader>
         <div className="mt-4 flex flex-col gap-6 px-4 pb-8">
+          {categories.length > 0 && (
+            <div>
+              <p className="mb-2 text-[13px] font-semibold text-[#a3a3a3]">
+                {t("filters.categoryHeading")}
+              </p>
+              <div className="flex flex-col gap-1">
+                {categories.map((parent) => (
+                  <div key={parent.id} className="flex flex-col gap-1">
+                    <button
+                      type="button"
+                      aria-pressed={filters.category === parent.slug}
+                      onClick={() =>
+                        onChange({
+                          category: filters.category === parent.slug ? null : parent.slug,
+                        })
+                      }
+                      className={cn(
+                        "rounded-[8px] border px-3 py-2 text-left text-[13px] font-semibold transition-colors",
+                        filters.category === parent.slug
+                          ? "border-white bg-white text-black"
+                          : cn("border-[#262626] text-[#a3a3a3]", INACTIVE_ROW_HOVER)
+                      )}
+                    >
+                      {parent.name}
+                    </button>
+                    {parent.children.map((child) => (
+                      <button
+                        key={child.id}
+                        type="button"
+                        aria-pressed={filters.category === child.slug}
+                        onClick={() =>
+                          onChange({
+                            category: filters.category === child.slug ? null : child.slug,
+                          })
+                        }
+                        className={cn(
+                          "ml-3 rounded-[8px] border px-3 py-2 text-left text-[13px] font-semibold transition-colors",
+                          filters.category === child.slug
+                            ? "border-white bg-white text-black"
+                            : cn("border-[#262626] text-[#a3a3a3]", INACTIVE_ROW_HOVER)
+                        )}
+                      >
+                        {child.name}
+                      </button>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div>
             <p className="mb-2 text-[13px] font-semibold text-[#a3a3a3]">
               {t("filters.priceHeading")}
@@ -557,17 +684,24 @@ function FiltersSheet({
   );
 }
 
-export function FilterBar({ filters, brands, onChange, onClearAll }: FilterBarProps) {
+export function FilterBar({ filters, brands, categories, onChange, onClearAll }: FilterBarProps) {
   const t = useTranslations("products");
+  const categoryNameBySlug = new Map<string, string>();
+  for (const parent of categories) {
+    categoryNameBySlug.set(parent.slug, parent.name);
+    for (const child of parent.children) categoryNameBySlug.set(child.slug, child.name);
+  }
   return (
     <div className="mb-8">
       <div className="flex flex-nowrap items-center gap-2.5 overflow-x-auto pb-1 md:flex-wrap md:overflow-visible md:pb-0">
         <FiltersSheet
           filters={filters}
           brands={brands}
+          categories={categories}
           onChange={onChange}
           onClearAll={onClearAll}
         />
+        <CategoryPopover category={filters.category} categories={categories} onChange={onChange} />
         <PricePopover minPrice={filters.minPrice} maxPrice={filters.maxPrice} onChange={onChange} />
         <BrandPopover brand={filters.brand} brands={brands} onChange={onChange} />
         <SizeGroup size={filters.size} onChange={onChange} />
@@ -628,7 +762,9 @@ export function FilterBar({ filters, brands, onChange, onClearAll }: FilterBarPr
           )}
           {filters.category && (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-[#262626] py-1.5 pr-2 pl-3 text-[12.5px] font-medium text-[#a3a3a3]">
-              {t("filters.categoryPill", { category: filters.category })}
+              {t("filters.categoryPill", {
+                category: categoryNameBySlug.get(filters.category) ?? filters.category,
+              })}
               <button
                 type="button"
                 aria-label={t("filters.clearCategory")}

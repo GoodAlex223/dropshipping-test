@@ -606,6 +606,8 @@
       "allProducts": "Все товары",
       "inStock": "В наличии",
       "colorTrigger": "Цвет ▾",
+      "categoryTrigger": "Категории ▾",
+      "categoryHeading": "Категории",
       "clearAll": "Сбросить всё",
       "sortHeading": "Сортировка",
       "searchPill": "Поиск: {query}",

@@ -42,11 +42,30 @@ const filters: CatalogFilters = {
   sort: "new",
 };
 
+const categoryGroups = [
+  {
+    id: "c1",
+    name: "Одяг",
+    slug: "odyah",
+    children: [
+      { id: "c2", name: "Худі", slug: "hudi" },
+      { id: "c3", name: "Футболки", slug: "futbolky" },
+    ],
+  },
+  { id: "c4", name: "Аксесуари", slug: "aksesuary", children: [] },
+];
+
 describe("FilterBar", () => {
   it("toggles a size chip on and off", () => {
     const onChange = vi.fn();
     const { rerender } = renderWithIntl(
-      <FilterBar filters={filters} brands={[]} onChange={onChange} onClearAll={vi.fn()} />
+      <FilterBar
+        filters={filters}
+        brands={[]}
+        categories={[]}
+        onChange={onChange}
+        onClearAll={vi.fn()}
+      />
     );
     fireEvent.click(screen.getByRole("button", { name: "M" }));
     expect(onChange).toHaveBeenCalledWith({ size: "M" });
@@ -55,6 +74,7 @@ describe("FilterBar", () => {
         <FilterBar
           filters={{ ...filters, size: "M" }}
           brands={[]}
+          categories={[]}
           onChange={onChange}
           onClearAll={vi.fn()}
         />
@@ -66,7 +86,13 @@ describe("FilterBar", () => {
 
   it("renders all five size chips S–XXL", () => {
     renderWithIntl(
-      <FilterBar filters={filters} brands={[]} onChange={vi.fn()} onClearAll={vi.fn()} />
+      <FilterBar
+        filters={filters}
+        brands={[]}
+        categories={[]}
+        onChange={vi.fn()}
+        onClearAll={vi.fn()}
+      />
     );
     for (const s of ["S", "M", "L", "XL", "XXL"]) {
       expect(screen.getByRole("button", { name: s })).toBeInTheDocument();
@@ -76,7 +102,13 @@ describe("FilterBar", () => {
   it("emits sort selection from the sort buttons", () => {
     const onChange = vi.fn();
     renderWithIntl(
-      <FilterBar filters={filters} brands={[]} onChange={onChange} onClearAll={vi.fn()} />
+      <FilterBar
+        filters={filters}
+        brands={[]}
+        categories={[]}
+        onChange={onChange}
+        onClearAll={vi.fn()}
+      />
     );
     fireEvent.click(screen.getByRole("button", { name: "Ціна ↑" }));
     expect(onChange).toHaveBeenCalledWith({ sort: "price-asc" });
@@ -89,6 +121,7 @@ describe("FilterBar", () => {
       <FilterBar
         filters={{ ...filters, sort: "popular" }}
         brands={[]}
+        categories={[]}
         onChange={vi.fn()}
         onClearAll={vi.fn()}
       />
@@ -109,6 +142,7 @@ describe("FilterBar", () => {
       <FilterBar
         filters={{ ...filters, search: "худі" }}
         brands={[]}
+        categories={[]}
         onChange={onChange}
         onClearAll={vi.fn()}
       />
@@ -125,7 +159,13 @@ describe("FilterBar — R5 mobile: filters + sort live only in the sheet", () =>
     // mobile-only-sheet behavior depends on. See the E2E isMobile branch in
     // tests/e2e/products.spec.ts for the real behavioral proof.
     renderWithIntl(
-      <FilterBar filters={filters} brands={["Mirox"]} onChange={vi.fn()} onClearAll={vi.fn()} />
+      <FilterBar
+        filters={filters}
+        brands={["Mirox"]}
+        categories={[]}
+        onChange={vi.fn()}
+        onClearAll={vi.fn()}
+      />
     );
 
     const brandTrigger = screen.getByRole("button", { name: "Бренд ▾" });
@@ -156,6 +196,7 @@ describe("FilterBar — R5 mobile: filters + sort live only in the sheet", () =>
       <FilterBar
         filters={{ ...filters, sort: "popular" }}
         brands={[]}
+        categories={[]}
         onChange={onChange}
         onClearAll={vi.fn()}
       />
@@ -180,7 +221,13 @@ describe("FilterBar — R5 mobile: filters + sort live only in the sheet", () =>
   it("opens the Фільтри sheet with a Розмір size chip that emits the same size param", () => {
     const onChange = vi.fn();
     renderWithIntl(
-      <FilterBar filters={filters} brands={[]} onChange={onChange} onClearAll={vi.fn()} />
+      <FilterBar
+        filters={filters}
+        brands={[]}
+        categories={[]}
+        onChange={onChange}
+        onClearAll={vi.fn()}
+      />
     );
 
     fireEvent.click(screen.getByRole("button", { name: /Фільтри/ }));
@@ -188,5 +235,113 @@ describe("FilterBar — R5 mobile: filters + sort live only in the sheet", () =>
 
     fireEvent.click(within(dialog).getByRole("button", { name: "M" }));
     expect(onChange).toHaveBeenCalledWith({ size: "M" });
+  });
+});
+
+describe("FilterBar — category facet (G12)", () => {
+  it("renders parent groups with children and filters by the clicked slug", () => {
+    const onChange = vi.fn();
+    renderWithIntl(
+      <FilterBar
+        filters={filters}
+        brands={[]}
+        categories={categoryGroups}
+        onChange={onChange}
+        onClearAll={vi.fn()}
+      />
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Категорії ▾" }));
+    expect(screen.getByRole("button", { name: "Одяг" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Аксесуари" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Худі" }));
+    expect(onChange).toHaveBeenCalledWith({ category: "hudi" });
+  });
+
+  it("filters by a parent slug from the parent row (rollup entry point)", () => {
+    const onChange = vi.fn();
+    renderWithIntl(
+      <FilterBar
+        filters={filters}
+        brands={[]}
+        categories={categoryGroups}
+        onChange={onChange}
+        onClearAll={vi.fn()}
+      />
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Категорії ▾" }));
+    fireEvent.click(screen.getByRole("button", { name: "Одяг" }));
+    expect(onChange).toHaveBeenCalledWith({ category: "odyah" });
+  });
+
+  it("toggles the active category off", () => {
+    const onChange = vi.fn();
+    renderWithIntl(
+      <FilterBar
+        filters={{ ...filters, category: "hudi" }}
+        brands={[]}
+        categories={categoryGroups}
+        onChange={onChange}
+        onClearAll={vi.fn()}
+      />
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Категорії ▾" }));
+    fireEvent.click(screen.getByRole("button", { name: "Худі" }));
+    expect(onChange).toHaveBeenCalledWith({ category: null });
+  });
+
+  it("hides the facet entirely when categories are empty", () => {
+    renderWithIntl(
+      <FilterBar
+        filters={filters}
+        brands={[]}
+        categories={[]}
+        onChange={vi.fn()}
+        onClearAll={vi.fn()}
+      />
+    );
+    expect(screen.queryByRole("button", { name: "Категорії ▾" })).not.toBeInTheDocument();
+  });
+
+  it("offers the facet inside the mobile Фільтри sheet and keeps the sheet open on select", () => {
+    const onChange = vi.fn();
+    renderWithIntl(
+      <FilterBar
+        filters={filters}
+        brands={[]}
+        categories={categoryGroups}
+        onChange={onChange}
+        onClearAll={vi.fn()}
+      />
+    );
+    fireEvent.click(screen.getByRole("button", { name: /Фільтри/ }));
+    const sheet = screen.getByRole("dialog");
+    fireEvent.click(within(sheet).getByRole("button", { name: "Футболки" }));
+    expect(onChange).toHaveBeenCalledWith({ category: "futbolky" });
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("resolves the category pill to the display name, with slug fallback", () => {
+    const { rerender } = renderWithIntl(
+      <FilterBar
+        filters={{ ...filters, category: "hudi" }}
+        brands={[]}
+        categories={categoryGroups}
+        onChange={vi.fn()}
+        onClearAll={vi.fn()}
+      />
+    );
+    expect(screen.getByText("Категорія: Худі")).toBeInTheDocument();
+    rerender(
+      wrapIntl(
+        <FilterBar
+          filters={{ ...filters, category: "hudi" }}
+          brands={[]}
+          categories={[]}
+          onChange={vi.fn()}
+          onClearAll={vi.fn()}
+        />
+      )
+    );
+    expect(screen.getByText("Категорія: hudi")).toBeInTheDocument();
   });
 });

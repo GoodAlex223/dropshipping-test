@@ -606,6 +606,8 @@
       "allProducts": "Всі товари",
       "inStock": "В наявності",
       "colorTrigger": "Колір ▾",
+      "categoryTrigger": "Категорії ▾",
+      "categoryHeading": "Категорії",
       "clearAll": "Скинути все",
       "sortHeading": "Сортування",
       "searchPill": "Пошук: {query}",
