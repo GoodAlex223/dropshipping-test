@@ -42,6 +42,7 @@ Central index for all project documentation.
 | [planning/MILESTONES.md](planning/MILESTONES.md)                                                                     | Key targets                                                                   | 2026-01-26   |
 | [planning/REVIEW-QUEUE.md](planning/REVIEW-QUEUE.md)                                                                 | Weekly Reviews cross-week state — Reviewed log, Next-up parks, conventions    | 2026-08-15   |
 | [planning/audits/2026-08-04-storefront-staleness-audit.md](planning/audits/2026-08-04-storefront-staleness-audit.md) | Storefront EN-string/staleness audit — G2/G4 definitive scope + TASK-056 gaps | 2026-08-04   |
+| [planning/plans/2026-08-18_g12-categories-to-catalog.md](planning/plans/2026-08-18_g12-categories-to-catalog.md)     | G12 implementation plan (active) — rollup, catalog category facet, thin 307   | 2026-08-18   |
 
 ### Architecture & Design
 
