@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-08-17
+**Last Updated**: 2026-08-18
 
 ---
 
@@ -486,7 +486,7 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 
 **Origin**: `feat/task-036-catalog-redesign-filters` branch, final whole-branch fix wave (post-Task-11 review round). All 🟤 Auto-Generated (Claude-surfaced during the final review).
 
-- 🟤 **Catalog's active-category filter chip displays the raw slug, not the category name** — `src/app/(shop)/products/filter-bar.tsx` (~line 592-604): the "Категорія: {filters.category}" removable chip renders `filters.category` directly, which is the URL's `category` query param (a slug like `hudi`, not the display name "Худі"). `products-content.tsx` only has the slug available client-side (the category param comes straight from `searchParams`) — showing the proper name needs either a slug→name lookup (e.g. reuse the `/api/categories` fetch this page doesn't currently make) or threading the category name through from wherever the filter link was clicked. Low visibility today since the catalog's slugs (hudi, olimpiiky, ...) are reasonably self-explanatory, but not correct per the "Категорія: <Name>" copy pattern. (Low value, Low effort)
+- [x] 🟤 ~~**Catalog's active-category filter chip displays the raw slug, not the category name** — `src/app/(shop)/products/filter-bar.tsx` (~line 592-604): the "Категорія: {filters.category}" removable chip renders `filters.category` directly, which is the URL's `category` query param (a slug like `hudi`, not the display name "Худі"). `products-content.tsx` only has the slug available client-side (the category param comes straight from `searchParams`) — showing the proper name needs either a slug→name lookup (e.g. reuse the `/api/categories` fetch this page doesn't currently make) or threading the category name through from wherever the filter link was clicked. Low visibility today since the catalog's slugs (hudi, olimpiiky, ...) are reasonably self-explanatory, but not correct per the "Категорія: <Name>" copy pattern. (Low value, Low effort)~~ — **RESOLVED in G12** (tip `f94c03a`, 2026-08-18), as the rider the entry's own diagnosis predicted. The first of the two options it names is what shipped: G12 added the `/api/categories?parentOnly=true` fetch to `products-content.tsx` for the category facet, so `FilterBar` now builds a slug→name `Map` over parents and children and the pill renders `categoryNameBySlug.get(slug) ?? slug`. The `?? slug` fallback is load-bearing, not defensive padding — it covers both a stale/unknown slug in a bookmarked URL and the fetch-in-flight window before the facet data lands. Browser-confirmed: «Категорія: Худі» and «Категорія: Одяг». Regression: `tests/unit/filter-bar.test.tsx` asserts both the resolved name and the slug fallback.
 - 🟤 **`FilterBar`'s popover filters (brand/color/availability) and `onClearAll` have no unit-test coverage** — `tests/unit/filter-bar.test.tsx` covers size chips, sort buttons, the search-chip, the mobile sheet's class contract, and its sort/size sections, but never opens `BrandPopover`, `ColorPopover`, or `AvailabilityPopover` (desktop) nor exercises the sheet's brand/color/availability rows or the "Скинути все" (`onClearAll`) button — all still asserted only indirectly via E2E (`tests/e2e/products.spec.ts`). Worth a follow-up pass adding `fireEvent`-based coverage for each, mirroring the existing sheet sort/size tests' pattern (`within(dialog).getByRole(...)`). (Low value, Low effort)
 
 ### [2026-08-01] From: PR #26 review
@@ -615,11 +615,18 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
   only for CI E2E; the local prod-mode gap is already BACKLOG'd ([2026-07-16] entry) — this adds
   the dev-mode-login facet. Doc fix. (Low effort)
   `[possible-dup-of: 2026-07-16 AUTH_TRUST_HOST entry]`
-- 🟤 **`/categories` + `/categories/[slug]` missed the rebrand sweep** — G1's staleness audit
-  found both pages still carry pre-Mirox chrome and English copy ("Categories", "Browse our
-  products by category", empty-state strings); they're in no current WEEKLY group (G2 =
-  checkout, G4 = auth/account/newsletter/error). Either fold into G4's Thursday sweep if slack
-  allows or schedule next week with the launch-push visuals. (Med value, S effort)
+- 🟤 **`/categories` missed the rebrand sweep** — G1's staleness audit found both
+  `/categories` and `/categories/[slug]` still carrying pre-Mirox chrome and English copy
+  ("Categories", "Browse our products by category", empty-state strings); they're in no current
+  WEEKLY group (G2 = checkout, G4 = auth/account/newsletter/error). Either fold into G4's
+  Thursday sweep if slack allows or schedule next week with the launch-push visuals. (Med
+  value, S effort) — **PARTIALLY RESOLVED in G12** (tip `f94c03a`, 2026-08-18): the
+  `/categories/[slug]` half is closed by deletion, not by restyling — the route is retired to a
+  routing-layer 307 and `category-client.tsx` is gone, so its pre-Mirox chrome cannot rot
+  further. **The `/categories` index half stays open and is what this entry now tracks**: G12's
+  spec put the index restyle explicitly out of scope, and the page still renders generic shadcn
+  `Card`s on the light default surface rather than the catalog's dark Mirox language. Its copy
+  is Ukrainian (TASK-039 G9 converted it) — what remains is purely visual.
 - 🟤 **`/account/addresses` and `/account/settings` are dead 404 links** — `/account` links to
   both; neither route exists. Audit-confirmed. Either build stubs in G4's account sweep, drop
   the links, or fold into TASK-056's content round-trip (addresses need real legal/contact
@@ -799,24 +806,40 @@ by implementers/reviewers while executing the G4 plan's 15 tasks. All 🟤 Auto-
 
 **Origin**: user feedback at the G4 visual-consistency gate (Task 14). Both 🔵 User-Flagged.
 
-- 🔵 **Categories→catalog redesign** — `/categories/[slug]` becomes a thin 307 redirect to
-  `/products?category=<slug>`; a DB-driven category facet in the catalog `FilterBar` (parent
-  groups with children, auto-grows with new categories); retire `category-client.tsx` (~436
-  lines); fix the parent-category rollup in the products API (parent slug should match
-  descendants' products — see the entry below); consider a desktop «Категорії» nav entry (the
-  user couldn't find the entry point during the gate). User-proposed at the G4 visual gate,
-  2026-08-09; next-week WEEKLY candidate (~5 SP). (High value, Med effort) **Scheduled
-  2026-08-11** → WEEKLY [G12](WEEKLY.md) 🏆 stretch (week of 2026-08-10); the rollup entry below
-  rides along as its member 3.
-- 🔵 **Parent-category «Всі» shows 0 products** — `/api/products`'s
-  `where.category = { slug }` (`src/app/api/products/route.ts:70-71`) matches only the exact
-  category, with no child rollup, while the `/categories` cards DO roll up counts — so a
-  top-level page (e.g. `/categories/odyah`, `/categories/aksesuary`) claims N товарів on its
-  own card but lists zero products when visited. Launch-visible.
-  `[possible-dup-of: the categories→catalog redesign entry above — its rollup fix resolves this]`;
-  ship as a standalone fix if the redesign slips. (Med value, Low effort) **Scheduled
-  2026-08-11** into WEEKLY [G12](WEEKLY.md) as member 3 (🏆 stretch); the standalone escape hatch
-  stands if the stretch slips.
+- [x] 🔵 ~~**Categories→catalog redesign** — `/categories/[slug]` becomes a thin 307 redirect to
+      `/products?category=<slug>`; a DB-driven category facet in the catalog `FilterBar` (parent
+      groups with children, auto-grows with new categories); retire `category-client.tsx` (~436
+      lines); fix the parent-category rollup in the products API (parent slug should match
+      descendants' products — see the entry below); consider a desktop «Категорії» nav entry (the
+      user couldn't find the entry point during the gate). User-proposed at the G4 visual gate,
+      2026-08-09; next-week WEEKLY candidate (~5 SP). (High value, Med effort) **Scheduled
+      2026-08-11** → WEEKLY [G12](WEEKLY.md) 🏆 stretch (week of 2026-08-10); the rollup entry below
+      rides along as its member 3.~~ — **RESOLVED in G12** (`feat/g12-categories-to-catalog`, tip
+      `f94c03a`, 2026-08-18; user-approved at the browser gate, branch deliberately left unmerged
+      and unpushed on the user's instruction). All five asks shipped: the facet, the rollup, the
+      retirement (`category-client.tsx` + `loading.tsx` + `getCategoryMetadata` + the orphan
+      `seo.categoryNotFound` key + the per-category sitemap rows, −576 net lines of app code), and
+      the desktop «Категорії» nav entry. **One deviation from the ask**: the redirect is NOT a
+      page-level `redirect()` — that shipped a 200 + `<meta http-equiv="refresh">`, measured against
+      a production build, because Next's per-segment `RedirectBoundary` captures the error
+      mid-stream. It is a `next.config.mjs` `redirects()` entry instead, which emits a real 307.
+      See [the design spec](../superpowers/specs/2026-08-18-g12-categories-to-catalog-design.md)
+      decision 6's superseded note.
+- [x] 🔵 ~~**Parent-category «Всі» shows 0 products** — `/api/products`'s
+      `where.category = { slug }` (`src/app/api/products/route.ts:70-71`) matches only the exact
+      category, with no child rollup, while the `/categories` cards DO roll up counts — so a
+      top-level page (e.g. `/categories/odyah`, `/categories/aksesuary`) claims N товарів on its
+      own card but lists zero products when visited. Launch-visible.
+      `[possible-dup-of: the categories→catalog redesign entry above — its rollup fix resolves this]`;
+      ship as a standalone fix if the redesign slips. (Med value, Low effort) **Scheduled
+      2026-08-11** into WEEKLY [G12](WEEKLY.md) as member 3 (🏆 stretch); the standalone escape hatch
+      stands if the stretch slips.~~ — **RESOLVED in G12** (tip `f94c03a`, 2026-08-18). The escape
+      hatch was never needed — the stretch ran. `where.category` is now
+      `{ OR: [{ slug }, { parent: { slug } }] }`, nested inside the relation filter because the
+      top-level `where.OR` belongs to the search filter. Measured against the seeded DB rather than
+      the mocked query shape: `odyah` 0 → 7 products, `aksesuary` 0 → 1, leaf `hudi` unchanged at 3
+      (no regression for leaf slugs). Browser-confirmed: the `/categories` card counts (7 / 1) now
+      match what clicking through lists.
 
 ### [2026-08-09] From: G4 final review
 
@@ -1098,17 +1121,26 @@ rest 🟤 Auto-Generated.
   API-returned messages. Natural G13-era companion. (Low-Med value, Med effort)
   [G9 gate Q5, 2026-08-15]
 - 🟤 **Machine-metadata EN corners** — `og:locale: "en_US"`, JSON-LD
-  `availableLanguage: "English"`, `getCategoryMetadata`'s unreachable EN fallback, and no
+  `availableLanguage: "English"`, ~~`getCategoryMetadata`'s unreachable EN fallback~~, and no
   `alternates.languages`. The non-user-visible residue of the [2026-08-09] G4-final-review
   entry above after PR #37 shipped its user-visible half. (Low value, Low effort)
-  [G9 T8 + final review, 2026-08-15]
+  [G9 T8 + final review, 2026-08-15] — **one fragment struck in G12** (tip `f94c03a`,
+  2026-08-18): `getCategoryMetadata` was deleted outright with its only consumer, taking the
+  unreachable `Shop {name} products…` EN fallback with it. The entry stays open for its other
+  three fragments, which G12 did not touch.
 - 🟤 **G13 duplicate-value sync test** — if G13's `admin.*` namespace duplicates
   `account.orderStatus`/`paymentStatus` label values rather than reusing the keys, add a sync
   test asserting the duplicates stay byte-identical; moot if G13 reuses `account.*` keys
   directly. (Low value, Low effort) [G9 final review, 2026-08-15]
-- 🟤 **`seo.breadcrumb` vs `products.breadcrumbHome` consolidation** — two catalog keys carry
-  the same «Головна» concept in different namespaces; consolidate to one home.
-  (Low value, Low effort) [G9 final review, 2026-08-15]
+- [x] 🟤 ~~**`seo.breadcrumb` vs `products.breadcrumbHome` consolidation** — two catalog keys carry
+      the same «Головна» concept in different namespaces; consolidate to one home.
+      (Low value, Low effort) [G9 final review, 2026-08-15]~~ — **RESOLVED in G12's review round**
+      (2026-08-18): resolved by deletion rather than consolidation. `seo.breadcrumb.{home,categories}`
+      had exactly one consumer — the `categories/[slug]/page.tsx` that G12 retired — so the duplicate
+      pair was orphaned, not merely redundant. Both keys removed from `messages/{uk,ru}.json`;
+      `products.breadcrumbHome` (the PDP/catalog breadcrumb, via `getTranslations("products")`) is
+      now the single «Головна». Missed by G12's own `seo`-namespace sweep, which removed the sibling
+      `seo.categoryNotFound` for exactly this reason — caught by the branch code review.
 - 🟤 **AnnouncementBar root-hook polish** — uses root `useTranslations()` with a
   factually-wrong justifying comment; should be `useTranslations("site")` + corrected comment.
   (Low value, Low effort) [G9 T4 review minor, 2026-08-15]
@@ -1207,6 +1239,18 @@ Next-up parks (`defer`) or recorded as rows only (`pass`).
 - [ ] 🟤 **The docs-freshness suite's runtime grows linearly with `docs/`, and it is already ~50s of a ~190s suite** — `tests/unit/docs-freshness.test.ts`'s prettier fixed-point check formats every doc **twice** (`it.each` over 71 docs = 142 format calls). The final whole-branch review triaged it as not merge-blocking, since it buys a check `format:check` structurally cannot provide (PR #32 `53fa347` failed CI on a file the formatter had just fixed), and an explicit `30_000` per-test timeout was added so growth surfaces as slowness rather than a spurious red. But the trend is one-way. Options when it becomes a complaint: split that one `describe` behind an env flag so it runs in CI but not in local `--watch`, or sample rather than sweep. Do **not** batch the fan-out into a single test — the per-file cases are what make a failure name the offending file. (Low value, Low effort) `[relates-to: the [2026-08-17] G11 group above]`
 - [ ] 🟤 **Non-vacuity floors in the docs-freshness linter are `> 0`, which tolerates a near-total coverage collapse** — every derived set carries `expect(set.length).toBeGreaterThan(0)`, which is literal spec compliance and catches the "renamed directory silently disarms the guard" case it was written for. But 1-of-14 comparable rows, or 1-of-64 in-scope docs, still passes. If the guard should resist quiet erosion rather than only total erasure, pin approximate lower bounds (e.g. `toBeGreaterThan(40)` for in-scope docs) with enough slack that ordinary growth never trips them. Raised as a recommendation by the final whole-branch review, deliberately not applied in-branch. (Low value, Low effort)
 - [ ] 🟤 **`parseTables`' guards are exercised only against `docs/README.md`** — the fenced-code and escaped-pipe handling in `splitCells`/`blankFences` is pinned by synthetic unit tests, but in production `parseTables` is called on exactly one file (the index). Every other doc reaches the linter only through the link and prettier checks. That is correct for today's design — the header↔row check has no reason to parse other files — but it means the parsing hardening bought during the code-review round is latent everywhere except one file, and a future check that parses more docs inherits untested breadth rather than proven breadth. Worth knowing before extending the parser's reach (the git-timestamp and value-agreement checks in §7 of the spec would both do so). (Low value, Low effort)
+
+### [2026-08-18] From: G12 categories→catalog redesign
+
+**Origin**: executing the G12 plan (`feat/g12-categories-to-catalog`) and its browser gate. The
+first entry is the plan's own falsified premise; the rest are gaps the work exposed but did not
+own. All 🟤 Auto-Generated (Claude-surfaced during implementation/verification).
+
+- [ ] 🟤 **`redirect()` in a Server Component page does not emit a 3xx — audit the other three call sites** — G12's browser gate measured `/categories/hudi` returning **HTTP 200 with `<meta id="__next-page-redirect" http-equiv="refresh">`**, not the 307 the spec asserted, against a _production_ build. Cause: Next wraps every route segment in a `RedirectBoundary`, so a redirect error thrown inside a Server Component is captured mid-stream and rendered by `make-get-server-inserted-html.js` (whose redirect branch is **not** `NODE_ENV`-gated); Next only sets a real status in its shell-error path (`app-render.js:830`), which a captured redirect never reaches. G12 fixed its own case by moving to a `next.config.mjs` `redirects()` entry. **The general belief is what needs auditing**: grep for other `redirect(` calls in server components (`src/middleware.ts` is fine — middleware `NextResponse.redirect` is a real 307; Server Actions and Route Handlers are also fine) and decide per site whether a meta refresh is acceptable there. Anywhere a crawler or an API client is the caller, it is not. (Med value, Low effort)
+- [ ] 🟤 **`/categories` index is the last pre-Mirox storefront surface** — now that `[slug]` is retired, the index is the only customer-facing page still rendering generic shadcn `Card`s on the light default surface instead of the dark Mirox language. G12's spec put the restyle explicitly out of scope. Its copy is already Ukrainian (G9), so this is purely visual: dark tokens, the catalog's `#0d0d0d`/`#262626` treatment, and a decision about whether the page earns its keep at all now that the header links to it and the catalog facet covers the same job. Tracked by the narrowed `/categories` rebrand-sweep entry above; filed here as the concrete next increment. (Med value, S effort)
+- [ ] 🟤 **The three showcase themes still link to `/categories/<slug>`** — `BoldCategories.tsx`, `LuxuryCategories.tsx`, and `OrganicCategories.tsx` each build `href={`/categories/${category.slug}`}`. They work — the routing-layer 307 catches them — but every showcase category click now costs a needless round trip, and the links point at a route that exists only as a redirect. G12's link sweep deliberately covered only the index cards and the mobile header (the spec named those two), leaving showcase as a separate demo system. One-line change per file whenever showcase is next touched. (Low value, Low effort)
+- [ ] 🟤 **Piping a gate through `tail` silently discards its exit code** — during G12's Task 6 the command `npm run format:check 2>&1 | tail -4` reported success while `prettier --check` was actually failing on a file: the pipeline's exit status is `tail`'s, and the warning lines had scrolled past the 4-line window. Re-running without the pipe surfaced `FORMAT_EXIT=1` immediately. This is the `css-verification-and-next-minifier-gotchas` memory's `grep|head` masking hazard, recurring in a new spot (gate invocation rather than CSS verification). Worth a durable convention: gates get run bare, or as `cmd > log 2>&1; echo "EXIT=$?"`, never piped into a truncating filter. Candidate for a `.claude/rules/` line or a CLAUDE.md Best Practices bullet. (Med value, Low effort)
+- [ ] 🟤 **No E2E covers the retired `/categories/[slug]` route or the category facet** — G12's regression coverage is entirely Vitest: the facet via `filter-bar.test.tsx`, the rollup via `products-api.test.ts` (a mocked `where` shape), the redirect via a config assertion. None of these exercise a real request. The 307 itself, the facet's Radix popover in a real browser, and the mobile sheet's stay-open behaviour were verified _once_, by hand, at the gate. `navigation.spec.ts` was edited by G12 (its desktop-«Категорії» absence assertion had to be inverted) but still never requests `/categories/<slug>`. A three-line spec asserting the 307 and one asserting the facet filters would make the gate's findings permanent. (Med value, Low effort)
 
 ---
 

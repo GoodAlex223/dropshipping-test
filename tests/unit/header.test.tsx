@@ -41,6 +41,7 @@ describe("Header", () => {
       "href",
       "/products?sort=popular"
     );
+    expect(screen.getByRole("link", { name: "Категорії" })).toHaveAttribute("href", "/categories");
     for (const dead of ["Про нас", "Доставка", "Контакти"]) {
       expect(screen.queryByRole("link", { name: dead })).not.toBeInTheDocument();
     }

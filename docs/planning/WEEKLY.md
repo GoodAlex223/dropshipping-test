@@ -73,9 +73,9 @@ _Group IDs continue from last week (G1–G7 are permanently taken by DONE.md and
 
 > The Weekly Challenge — see the 🏆 section below. User-proposed at the G4 visual gate (2026-08-09); stretch placement user-confirmed 2026-08-11 ("G12 now is ok"). Subsumes the launch-visible parent-category «Всі»=0 rollup bug; if the stretch doesn't run, the rollup member's standalone-fix escape hatch moves to next week.
 
-- [ ] `/categories/[slug]` → thin 307 redirect to `/products?category=<slug>`; retire `category-client.tsx` (~436 lines); `/categories` index page keeps working (2) — BACKLOG [2026-08-09] G4 visual gate [HIGH]
-- [ ] DB-driven category facet in the catalog `FilterBar` (parent groups with children, auto-grows with new categories) + desktop «Категорії» nav entry decision (the gate found no entry point) (2) — BACKLOG [2026-08-09] G4 visual gate
-- [ ] Parent-category rollup fix in `/api/products` (parent slug matches descendants' products — closes «Всі» shows 0) (1) — BACKLOG [2026-08-09] G4 visual gate [HIGH]
+- [x] `/categories/[slug]` → thin 307 redirect to `/products?category=<slug>`; retire `category-client.tsx` (~436 lines); `/categories` index page keeps working (2) — BACKLOG [2026-08-09] G4 visual gate [HIGH] — **shipped, with a mechanism change**: the page-level `redirect()` the plan specified emits a **200 + meta refresh**, not a 307 (Next's per-segment `RedirectBoundary` captures it mid-stream; measured against a production build). Shipped as a `next.config.mjs` `redirects()` entry instead — a real 307, verified end-to-end — and the page file deleted outright. Spec decision 6 carries a superseded note.
+- [x] DB-driven category facet in the catalog `FilterBar` (parent groups with children, auto-grows with new categories) + desktop «Категорії» nav entry decision (the gate found no entry point) (2) — BACKLOG [2026-08-09] G4 visual gate — **shipped**: desktop «Категорії ▾» popover chip + a matching first section in the mobile Фільтри sheet, both fed by one `/api/categories?parentOnly=true` mount-effect; hidden entirely when the list is empty. Nav decision: a standalone «Категорії» link to the index (user ruling 2026-08-18), which required inverting `navigation.spec.ts`'s absence assertion. Rider: the active-category pill now resolves slug → display name.
+- [x] Parent-category rollup fix in `/api/products` (parent slug matches descendants' products — closes «Всі» shows 0) (1) — BACKLOG [2026-08-09] G4 visual gate [HIGH] — **shipped**: `where.category = { OR: [{ slug }, { parent: { slug } }] }`, nested inside the relation filter (top-level `where.OR` belongs to the search filter). Verified against the seeded DB, not just the mocked shape: `odyah` 0 → 7, `aksesuary` 0 → 1, leaf `hudi` unchanged at 3.
 
 ### G13. Admin Translation & Alignment [solo]
 
@@ -129,7 +129,7 @@ _Group IDs continue from last week (G1–G7 are permanently taken by DONE.md and
 - ✅ **[G13](#g13-admin-translation--alignment-solo)** 🔵 — ran Sat–Sun 2026-08-16/17: spec + 15-task SDD plan + implementation + reviews Sat; browser gate, PR #40, review round, merge Sun. The close-out's spillover trigger ("delivery runs past Sun Aug 16") fired — this line is that record.
 - ✅ **[G11](#g11-docs-freshness-linter-solo)** 🟤 — the OVERDUE linter. (Shipped Sun 2026-08-17, merged `745e039` — **no PR**: the branch was never pushed, so the SHA is the status's resolvable pointer.)
 - ✅ **[G10](#g10-weekly-reviews-batch)** ⚪ — part 2: non-Claude slot + propagation scan. (Ran Sat 2026-08-15 in the same session as part 1.)
-- 🏆 **[G12](#g12-categories-to-catalog-redesign-batch-)** 🔵 — stretch, behind everything above.
+- [x] 🏆 **[G12](#g12-categories-to-catalog-redesign-batch-)** 🔵 — stretch, behind everything above. **Shipped Tue 2026-08-18** (+4 days past the Friday, weekend/Monday spill) — `feat/g12-categories-to-catalog`, forked from `main` @ `d13c8a1`, user-approved at the browser gate. No PR and **not merged to main** by user instruction. The **branch name** is the resolvable pointer here, not a SHA: the tip keeps moving while the branch lives unmerged (close-out, then a review round, both after the first SHA was written here), so a pinned SHA silently comes to mean "the state before the last round".
 - Week close-out: statuses → `✅ PR #N`, spillover check (**add the Spillover header line if delivery runs past Sun Aug 16**), seed the pre-launch week (client ask + polish + carried finds).
 
 ---
@@ -142,7 +142,7 @@ _Group IDs continue from last week (G1–G7 are permanently taken by DONE.md and
 | G9  | TASK-039 i18n Foundation `[solo]`                   | i18n/content       | 🔵 User     | 3      | 8        | Wed–Thu       | ✅ PR [#37](https://github.com/GoodAlex223/dropshipping-test/pull/37) |
 | G10 | Weekly Reviews `[batch]`                            | recurring reviews  | ⚪ Overhead | 4      | 5        | Thu–Fri       | ✅ PR [#39](https://github.com/GoodAlex223/dropshipping-test/pull/39) |
 | G11 | Docs-Freshness Linter `[solo]`                      | docs tooling       | 🟤 Auto     | 1      | 3        | Fri→spill     | ✅ `745e039`                                                          |
-| G12 | Categories-to-Catalog Redesign `[batch]` 🏆         | storefront/catalog | 🔵 User     | 3      | 5        | Fri (stretch) | ☐ Planned                                                             |
+| G12 | Categories-to-Catalog Redesign `[batch]` 🏆         | storefront/catalog | 🔵 User     | 3      | 5        | Fri (stretch) | ✅ branch `feat/g12-categories-to-catalog` (unmerged)                 |
 | G13 | Admin Translation & Alignment `[solo]`              | admin panel        | 🔵 User     | 3      | 8        | Fri→spill     | ✅ PR [#40](https://github.com/GoodAlex223/dropshipping-test/pull/40) |
 | G14 | Rebrand Residuals: Variants + Design Gaps `[batch]` | storefront/data    | 🔵 User     | 2      | 5        | Thu           | ✅ PR [#38](https://github.com/GoodAlex223/dropshipping-test/pull/38) |
 | P2  | Prod re-seed after variant rename (user-gated)      | ops/data           | 🟡 Ops      | 1      | 1        | on G14 done   | ⛔ Superseded (G14 migration)                                         |

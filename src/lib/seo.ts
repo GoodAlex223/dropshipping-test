@@ -142,58 +142,6 @@ export async function getProductMetadata(product: {
   };
 }
 
-// Generate category metadata. Stays SYNC (Task 8 didn't touch it): title and
-// openGraph.title are pure DB data (category.name), and the description's
-// fallback sentence below ("Shop {name} products...") is its own pre-existing
-// English literal, distinct from the BRAND_DESCRIPTION move and outside
-// Task 8's enumerated fixed set (not in the closing BACKLOG entry, not
-// matched by the brief's Step 1 grep). It's effectively unreachable today —
-// every seeded category has a description — but is real, reachable English
-// the moment an admin saves a category with a blank description. Flagged for
-// a follow-up BACKLOG entry rather than converted here (see task-8-report.md).
-export function getCategoryMetadata(category: {
-  name: string;
-  slug: string;
-  description?: string | null;
-  image?: string | null;
-  productCount?: number;
-}): Metadata {
-  const description =
-    category.description ||
-    `Shop ${category.name} products. ${category.productCount || "Browse"} quality items at great prices.`;
-  const image = category.image || siteConfig.ogImage;
-  const url = `${siteConfig.url}/categories/${category.slug}`;
-
-  return {
-    title: category.name,
-    description,
-    openGraph: {
-      type: "website",
-      url,
-      title: `${category.name} | ${siteConfig.name}`,
-      description,
-      images: [
-        {
-          url: image,
-          width: 1200,
-          height: 630,
-          alt: category.name,
-        },
-      ],
-      siteName: siteConfig.name,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `${category.name} | ${siteConfig.name}`,
-      description,
-      images: [image],
-    },
-    alternates: {
-      canonical: url,
-    },
-  };
-}
-
 // Generate home page metadata. Async (Task 8): both strings now come from
 // the i18n catalog (brand.description, brand.metaSuffix) instead of the
 // removed BRAND_DESCRIPTION/local BRAND_META_SUFFIX import.

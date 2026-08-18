@@ -33,6 +33,24 @@ const nextConfig = {
       "/products/**": ["./public/images/og-logo-ghost.png"],
     },
   },
+  // G12: /categories/<slug> is retired in favour of the catalog's category
+  // facet. This lives at the routing layer, NOT as a page-level redirect():
+  // Next wraps every segment in a RedirectBoundary, so a redirect() thrown
+  // inside a Server Component page is captured mid-stream and emitted as
+  // `<meta http-equiv="refresh">` on a 200 — verified against a production
+  // build — rather than a real 3xx. A redirects() entry emits a genuine 307
+  // before any rendering happens. 307, not 308: these URLs stay reclaimable
+  // for future category landing pages. `:slug` does not match the bare
+  // /categories index, which keeps rendering normally.
+  async redirects() {
+    return [
+      {
+        source: "/categories/:slug",
+        destination: "/products?category=:slug",
+        permanent: false,
+      },
+    ];
+  },
   // Compression
   compress: true,
   // PoweredBy header removal for security

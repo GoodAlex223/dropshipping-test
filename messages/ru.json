@@ -606,6 +606,8 @@
       "allProducts": "Все товары",
       "inStock": "В наличии",
       "colorTrigger": "Цвет ▾",
+      "categoryTrigger": "Категории ▾",
+      "categoryHeading": "Категории",
       "clearAll": "Сбросить всё",
       "sortHeading": "Сортировка",
       "searchPill": "Поиск: {query}",
@@ -766,11 +768,6 @@
         "description": "Создайте аккаунт {name}, чтобы сохранять избранное, отслеживать заказы и оформлять покупки быстрее."
       }
     },
-    "categoryNotFound": "Категория не найдена",
-    "productNotFound": "Товар не найден",
-    "breadcrumb": {
-      "home": "Главная",
-      "categories": "Категории"
-    }
+    "productNotFound": "Товар не найден"
   }
 }

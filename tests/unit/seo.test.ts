@@ -43,7 +43,6 @@ import {
   siteConfig,
   getDefaultMetadata,
   getProductMetadata,
-  getCategoryMetadata,
   getHomeMetadata,
   getProductsListingMetadata,
   getCategoriesListingMetadata,
@@ -172,61 +171,6 @@ describe("SEO Utilities", () => {
       const metadata = await getProductMetadata(productWithoutImages);
       // OG images handled by opengraph-image.tsx file convention
       expect(metadata.openGraph?.images).toBeUndefined();
-    });
-  });
-
-  describe("getCategoryMetadata", () => {
-    const mockCategory = {
-      name: "Electronics",
-      slug: "electronics",
-      description: "Electronic devices and gadgets",
-      image: "https://example.com/category.jpg",
-      productCount: 42,
-    };
-
-    it("should generate category-specific metadata", () => {
-      const metadata = getCategoryMetadata(mockCategory);
-
-      expect(metadata.title).toBe("Electronics");
-      expect(metadata.description).toBe("Electronic devices and gadgets");
-    });
-
-    it("should generate description when not provided", () => {
-      const categoryWithoutDesc = {
-        ...mockCategory,
-        description: null,
-      };
-      const metadata = getCategoryMetadata(categoryWithoutDesc);
-
-      expect(metadata.description).toContain("Electronics");
-      expect(metadata.description).toContain("42");
-    });
-
-    it("should use 'Browse' when productCount is undefined", () => {
-      const categoryWithoutCount = {
-        ...mockCategory,
-        description: null,
-        productCount: undefined,
-      };
-      const metadata = getCategoryMetadata(categoryWithoutCount);
-
-      expect(metadata.description).toContain("Browse");
-    });
-
-    it("should use ogImage when category has no image", () => {
-      const categoryWithoutImage = {
-        ...mockCategory,
-        image: null,
-      };
-      const metadata = getCategoryMetadata(categoryWithoutImage);
-
-      expect(metadata.openGraph?.images).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            url: siteConfig.ogImage,
-          }),
-        ])
-      );
     });
   });
 
@@ -629,8 +573,9 @@ describe("SEO Utilities", () => {
     // Unlike the other seo.* keys above, this one isn't read by any seo.ts
     // export — src/app/(shop)/products/[slug]/page.tsx's generateMetadata
     // calls getTranslations("seo") directly for its not-found branch (the
-    // same pattern categories/[slug]/page.tsx already used for
-    // "categoryNotFound", which this task originally missed one file over).
+    // same pattern categories/[slug]/page.tsx used for "categoryNotFound",
+    // which this task originally missed one file over — that page and its
+    // key are gone since G12, this one is the surviving instance).
     // This pins the catalog value through the exact same mock the rest of
     // this file uses, since there's no seo.ts helper to exercise it through.
     it("resolves to the catalog value via getTranslations('seo')", async () => {

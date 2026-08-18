@@ -36,7 +36,7 @@ app/
 │   ├── page.tsx           # Homepage
 │   ├── account/           # User account + order history
 │   ├── cart/              # Cart page
-│   ├── categories/        # Category listing + detail (with [slug])
+│   ├── categories/        # Category index; [slug] is a thin 307 to the catalog (G12)
 │   ├── checkout/          # Checkout + confirmation page
 │   ├── feedback/          # /feedback page + co-located client form (guest-capable, G8)
 │   └── products/          # Product listing + detail
@@ -86,7 +86,7 @@ app/
 
 - **Route groups**: `(admin)`, `(auth)`, `(shop)` define separate layouts but don't appear in URLs
 - **Page files**: `page.tsx` for routes, `layout.tsx` for nested layouts, `loading.tsx` for Suspense
-- **Client components**: Form components and interactive pages use `"use client"` directive (e.g., `login-form.tsx`, `category-client.tsx`, `product-detail-client.tsx`)
+- **Client components**: Form components and interactive pages use `"use client"` directive (e.g., `login-form.tsx`, `products-content.tsx`, `product-detail-client.tsx`)
 - **API routes**: Export named HTTP method functions (`GET`, `POST`, `PUT`, `DELETE`)
 - **API auth**: Admin endpoints call `requireAdmin()` first; customer endpoints call `requireAuth()`
 - **Dynamic segments**: `[id]` for admin resources, `[slug]` for public-facing pages
@@ -96,7 +96,7 @@ app/
 - **List page structure**: Admin list pages follow pattern: Suspense wrapper → filters/search → debounced fetch → table/grid → pagination
 - **OG image generation**: Use `opengraph-image.tsx` file convention for dynamic Open Graph images (exports `alt`, `size`, `contentType`, and default `Image` function returning `ImageResponse`)
 - **OG image text truncation**: Server-side text truncation instead of CSS line clamp (Satori rendering engine limitations)
-- **Async SEO metadata (TASK-039)**: the root `src/app/layout.tsx` now exports `generateMetadata()` (async, replacing a static `export const metadata`), and 6 of `src/lib/seo.ts`'s metadata helpers are `async` and call `await getTranslations(namespace)` — `getDefaultMetadata`, `getProductMetadata`, `getHomeMetadata`, `getProductsListingMetadata`, `getCategoriesListingMetadata`, `getAuthMetadata` (`getCategoryMetadata` stays sync — category names come from the DB, not the catalog). Any new metadata export that needs translated copy must follow suit: the exported function (or the helper it calls) becomes `async` and uses `getTranslations`, never the non-async `useTranslations` hook (request-scoped, server-only outside a render — see the cookie-mode i18n Detected Pattern in the root `CLAUDE.md`)
+- **Async SEO metadata (TASK-039)**: the root `src/app/layout.tsx` now exports `generateMetadata()` (async, replacing a static `export const metadata`), and 6 of `src/lib/seo.ts`'s metadata helpers are `async` and call `await getTranslations(namespace)` — `getDefaultMetadata`, `getProductMetadata`, `getHomeMetadata`, `getProductsListingMetadata`, `getCategoriesListingMetadata`, `getAuthMetadata` (the one former sync holdout, `getCategoryMetadata`, was deleted with the `/categories/[slug]` page in G12). Any new metadata export that needs translated copy must follow suit: the exported function (or the helper it calls) becomes `async` and uses `getTranslations`, never the non-async `useTranslations` hook (request-scoped, server-only outside a render — see the cookie-mode i18n Detected Pattern in the root `CLAUDE.md`)
 - **Feed routes**: XML/RSS feeds in `feed/` directory; use `export const dynamic = "force-dynamic"` and `export const revalidate = 3600` for hourly updates
 - **XML escaping**: Feed routes must escape special characters (&, <, >, ", ') using dedicated `escapeXml()` helper to prevent malformed XML
 - **Feed validation**: Use strict Zod schemas (e.g., `google-shopping.ts`) to validate feed items before XML serialization; enforce title/description length limits, price format, GTIN format, and enum values

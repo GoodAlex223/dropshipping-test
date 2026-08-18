@@ -74,7 +74,7 @@ export default async function CategoriesPage() {
               category.children.reduce((sum, child) => sum + child._count.products, 0);
 
             return (
-              <Link key={category.id} href={`/categories/${category.slug}`}>
+              <Link key={category.id} href={`/products?category=${category.slug}`}>
                 <Card className="group h-full overflow-hidden transition-shadow hover:shadow-lg">
                   <div className="bg-muted relative aspect-[16/9]">
                     {category.image ? (

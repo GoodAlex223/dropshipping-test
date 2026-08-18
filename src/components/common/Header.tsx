@@ -220,7 +220,7 @@ export function Header() {
                   {categories.slice(0, 5).map((category) => (
                     <Link
                       key={category.id}
-                      href={`/categories/${category.slug}`}
+                      href={`/products?category=${category.slug}`}
                       onClick={closeMobileMenu}
                       className="text-muted-foreground hover:bg-muted hover:text-foreground flex items-center rounded-lg px-3 py-1.5 text-sm transition-colors"
                     >
@@ -320,6 +320,16 @@ export function Header() {
               {t(`nav.${item.key}`)}
             </Link>
           ))}
+
+          {/* G12: a standalone link, not a `navigation` entry — that array
+              also feeds the mobile menu, which already has its own
+              «Категорії» link and would render it twice. */}
+          <Link
+            href="/categories"
+            className="text-muted-foreground hover:text-foreground text-sm font-semibold transition-colors"
+          >
+            {t("categories")}
+          </Link>
 
           {isAdmin && (
             <Link
