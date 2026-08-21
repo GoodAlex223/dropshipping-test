@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-08-20
+**Last Updated**: 2026-08-21
 
 ---
 
@@ -1225,6 +1225,16 @@ surfaced but deliberately did not fix. All 🟤 Auto-Generated.
 - [ ] 🟤 **`i18n-byte-diff.mjs` has no concept of a retired surface** — the script's premise is that a Cyrillic string removed from `src/**` was _extracted_ to `messages/uk.json`, so a removal with no catalog counterpart is corruption. A file deleted outright breaks that premise: there is no target string, so every one of its live UI strings reports as a miss. G12 hit this with `category-client.tsx` (9 fragments) and resolved it in the **data** layer — allowlisting the 9 and widening the allowlist header to name the second kind — after explicitly rejecting the code fix (`--diff-filter=D` skip), because a code-level exemption would silently un-check any future commit that deletes a file **and** extracts its strings. That reasoning is recorded in the allowlist itself. The structural gap stands, and the next wholesale surface retirement will pay the same cost. If it recurs, the shape worth considering is a per-entry _reason_ column rather than a blanket skip, so exemptions stay auditable. (Low value, Low-Med effort) `[relates-to: the [2026-08-18] G12 group above]`
 - [ ] 🟤 **"Kept for X" comments are unenforced scheduled deletions** — `pluralizeUk`'s docstring read "Kept for category-client.tsx (retired by G12)": a deletion scheduled in prose, with its trigger named, and nothing that fires when the trigger happens. G12 retired the file and left the function; the branch review caught it. This is the third instance of the class here (PR #26 finding 1, PR #37 round 2, now G12), and the two earlier ones were also caught by human review rather than by tooling. Cheap candidate: a unit test that greps `src/**` for `Kept for <path>` / `until <TASK-NNN>` style justifications and fails when the named path no longer exists. That covers the file-trigger form exactly; the task-trigger form would need a DONE.md lookup and is probably not worth it. (Med value, Low effort)
 - [ ] 🟤 **Nothing verifies a Vercel production deploy except a human looking at it** — G12's deploy was confirmed by the user, as G14's and G13's were. The repo's own history says a green Actions badge proves nothing (the Deploy job is a validated no-op) and that Vercel has served byte-identical stale CSS across deploys, so "verify the real prod URL" is standing practice — but it is practice, not a control. A small post-deploy smoke script (fetch `/`, `/products`, assert 200 + a DB-backed string; fetch `/categories/hudi`, assert 307; assert the served CSS chunk hash differs from the previous deploy's) would turn the ritual into something that fails loudly. (Med value, Low-Med effort) `[relates-to: prod-schema-drift + stale-CSS entries above]` **Scheduled 2026-08-20** → WEEKLY [G19](WEEKLY.md) member 2 (smoke script).
+
+### [2026-08-21] From: G15 client-ask review (branded-goods finding)
+
+**Origin**: G15's review of the client's first 3 real products (`docs/real_products/`, gitignored)
+found all three are third-party branded — Palm Angels / Polo Ralph Lauren / Lacoste, likely
+replicas. Surfaced to the user 2026-08-21; per user rulings the advisory + positioning questions
+went into the client ask (item 14). Both entries Claude-surfaced → 🟤.
+
+- [ ] 🟤 **Google Shopping feed needs a branded-goods exclusion mechanism before G16 enters real products** — the feed emits every active product (`src/app/feed/google-shopping.xml/`), and Google's counterfeit/unauthorized-brand policy is a whole-account Merchant Center suspension risk, so the 3 branded products must not reach the feed **regardless of the client's item-14 answer** (stated to the client in the ask). Today nothing in the schema or feed route can exclude a product; options: an `excludeFromFeed` boolean on Product (explicit, survives brand-name ambiguity) vs a brand-list filter in the feed route (no migration, but silent and list-maintained). Needed by the time real products go live in prod — G16 enters them, so decide the mechanism there or immediately after. (High value, Low-Med effort) `[relates-to: G16, TASK-056 item 14]`
+- [ ] 🟤 **Multibrand positioning copy sweep, gated on the client's item-14 answer** — the storefront's copy and data model assume Mirox is a clothing brand: seed products carry `brand: "Mirox"`, product JSON-LD emits it, and hero/whyChooseUs/testimonial copy reads as a house-brand store. The user confirmed 2026-08-21 the Mirox clothing line does not exist yet — the shop is (pending the client's answer) a multibrand reseller. When the client answers ask item 14 (brand-in-card vs neutral, оригінал/репліка labeling, store positioning), sweep: product `brand` field usage incl. JSON-LD + feed, catalog «Бренди» filter contents, and any copy string that claims Mirox-as-brand. Do NOT start before the answer — the client may instead choose neutral no-brand presentation, which is a different sweep. (Med value, Med effort) `[relates-to: TASK-056 item 14, messages/uk.json marketing namespaces]`
 
 ---
 

@@ -26,7 +26,7 @@ _Group IDs continue from prior weeks (G1–G14 are permanently taken by DONE.md 
 > The launch critical path: every remaining launch blocker is client-side (domain → order emails, legal copy → TASK-055 → TASK-048 prerequisites, photography, NP API key). Head start user-approved 2026-08-20 — the ask drafts **Fri Aug 21** so the client's multi-week clock starts before the weekend. The 3 real products received 2026-08-20 are **acknowledged** in the ask (with their remaining gaps: size charts, back-view images for the card hover-swap, GTIN/brand data); their intake is G16's job, not this group's.
 
 - [x] _(2026-08-21)_ Draft the consolidated ask document (client-facing, UA) from the TASK-056 checklist: photography (hero/product/measurement), logo vector, real socials + claims re-confirmation, size charts, legal-page copy / lawyer engagement, contact details, bank-card + WhatsApp details, free-shipping threshold, announcement copy, **domain purchase + email chain** (Resend DNS → `EMAIL_FROM`), NP API key + the Ukrposhta carrier question, `FEEDBACK_EMAIL` recipient, RU catalog sign-off package (nuance list in [messages/README.md](../../messages/README.md)) + the RU product-copy opt-in question (2) — TODO.md TASK-056 [HIGH]
-- [ ] Hand off for sending Monday; record the send date + per-item response tracking on TODO TASK-056; process same-week responses as interrupts (1) — TODO.md TASK-056
+- [x] _(2026-08-21 — sent by the user the same day as drafted, ahead of the Monday plan; send date + 📨 statuses recorded on the TODO TASK-056 tracking table)_ Hand off for sending Monday; record the send date + per-item response tracking on TODO TASK-056; process same-week responses as interrupts (1) — TODO.md TASK-056
 
 ### G16. Real-Product Intake Pair Session [batch]
 
@@ -90,12 +90,12 @@ _Group IDs continue from prior weeks (G1–G14 are permanently taken by DONE.md 
 
 ### Friday Aug 21 (pre-week) — Head start (user-approved 2026-08-20)
 
-- **[G15](#g15-task-056-client-round-trip-solo)** 🔵 — part 1: the consolidated ask drafts today so it can reach the client before the weekend. (**[G16](#g16-real-product-intake-pair-session-batch)** may pull forward here if the user is available — intake findings would sharpen the ask.)
+- **[G15](#g15-task-056-client-round-trip-solo)** 🔵 — part 1: the consolidated ask drafts today so it can reach the client before the weekend. _(Done 2026-08-21 — and part 2 as well: after two review rounds — user edits, the branded-goods advisory, item renumber to 21 — the user sent the ask the same day. The whole group landed Friday.)_
 
 ### Monday — Real data + the ask goes out
 
 - **[G16](#g16-real-product-intake-pair-session-batch)** 🔵 — prep first thing, then the pair session (user availability governs the hour).
-- **[G15](#g15-task-056-client-round-trip-solo)** 🔵 — part 2: finalize, hand off for sending, set up response tracking.
+- **[G15](#g15-task-056-client-round-trip-solo)** 🔵 — ~~part 2: finalize, hand off for sending, set up response tracking~~ _(moot — completed Fri 2026-08-21, ask already sent)_.
 
 ### Tuesday — Security + guest-access design
 

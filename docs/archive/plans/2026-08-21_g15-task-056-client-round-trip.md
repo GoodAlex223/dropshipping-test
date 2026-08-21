@@ -1,9 +1,9 @@
 # G15 — TASK-056 Client Round-Trip (part 1: consolidated ask draft)
 
 **Last Updated**: 2026-08-21
-**Task**: TASK-056 (Client content inventory) · WEEKLY [G15](../WEEKLY.md#g15-task-056-client-round-trip-solo)
+**Task**: TASK-056 (Client content inventory) · WEEKLY [G15](../../planning/WEEKLY.md#g15-task-056-client-round-trip-solo)
 **Branch**: `feat/g15-task-056-client-round-trip`
-**Status**: IN PROGRESS — part 1 (Fri Aug 21 draft, user-approved head start); part 2 (hand-off + send-date recording) runs Mon Aug 25
+**Status**: COMPLETE 2026-08-21 — both parts landed Friday: the ask drafted, reviewed twice (user edits + the branded-goods advisory), and **sent by the user the same day**, four days ahead of the Monday plan; per-item tracking live on TODO TASK-056 (21 rows, all 📨)
 
 ---
 
@@ -78,3 +78,8 @@ their gaps: back-view photos, size charts, GTIN/brand data); any implementation 
   placeholder was already correct); t.me/mirox_vidgyk is the reviews channel — item 16 updated,
   display question added. (4) `docs/real_products/` gitignored (4.1 MB source photos, headed for
   S3 at G16 intake).
+- **2026-08-21, close-out** — round-1 changes committed `b84c474`. **The user sent the ask the
+  same day** (via messenger, ahead of the Mon 2026-08-25 plan) → send date + 📨 statuses recorded
+  on the TODO TASK-056 tracking table; WEEKLY G15 items both ticked. Extractions → BACKLOG
+  `[2026-08-21]` group: feed branded-goods exclusion mechanism (pre-G16) + client-answer-gated
+  multibrand copy sweep. Plan archived. Group closes at merge; responses from here are interrupts.
