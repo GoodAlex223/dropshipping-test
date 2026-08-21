@@ -1,6 +1,6 @@
 # TODO
 
-**Last Updated**: 2026-08-15
+**Last Updated**: 2026-08-20
 
 Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-shop-program-design.md) · Current week: [WEEKLY.md](WEEKLY.md)
 
@@ -42,7 +42,7 @@ _Items added 2026-08-11 from manual testing; both promoted the same day into WEE
 
 _G8 (TASK-058 feedback form + TASK-059 launch marquee) completed 2026-08-14 — PR [#35](https://github.com/GoodAlex223/dropshipping-test/pull/35) merged `a4114e6` + prod-CSS hotfix PR [#36](https://github.com/GoodAlex223/dropshipping-test/pull/36) merged `92236d4`, production live-verified; see [DONE.md](DONE.md). Residue: the polish batch below, three 🟤 BACKLOG entries ([2026-08-14] intake group), and the TASK-056 `FEEDBACK_EMAIL` rider._
 
-- [ ] 🟠 **[G8 residue] Feedback/marquee post-merge polish batch** (one commit; ranked by the PR #35 re-review) — (1) malformed JSON body → explicit `request.json().catch()` → `400 VALIDATION_ERROR` instead of the convention 500 `SEND_FAILED` (a status-code lie to non-browser clients; newsletter subscribe shares the pattern — fix both or note why not); (2) `observer.observe(first)` in [AnnouncementBar.tsx](../../src/components/common/AnnouncementBar.tsx) so a late font swap can't leave a stale `--marquee-shift` seam; (3) test-debt: whitespace-honeypot + JSON-parse route paths, `VALIDATION_ERROR` toast path, `\r\n` template newline case, name-only/email-only template rows, boundary values (name=100, message=5/2000); (4) if the static (non-marquee) announcement variant is ever activated, fix its asymmetric `pr-3`-only inset first — added 2026-08-14, G8 final review + PR reviews
+- [ ] 🟠 **[G8 residue] Feedback/marquee post-merge polish batch** (one commit; ranked by the PR #35 re-review) — (1) malformed JSON body → explicit `request.json().catch()` → `400 VALIDATION_ERROR` instead of the convention 500 `SEND_FAILED` (a status-code lie to non-browser clients; newsletter subscribe shares the pattern — fix both or note why not); (2) `observer.observe(first)` in [AnnouncementBar.tsx](../../src/components/common/AnnouncementBar.tsx) so a late font swap can't leave a stale `--marquee-shift` seam; (3) test-debt: whitespace-honeypot + JSON-parse route paths, `VALIDATION_ERROR` toast path, `\r\n` template newline case, name-only/email-only template rows, boundary values (name=100, message=5/2000); (4) if the static (non-marquee) announcement variant is ever activated, fix its asymmetric `pr-3`-only inset first — added 2026-08-14, G8 final review + PR reviews. **Promoted 2026-08-20** → WEEKLY [G20](WEEKLY.md) member 2 (week of 2026-08-24, sourced 🔵 under the user's "ask + polish" pre-launch steer)
 
 ---
 
@@ -145,9 +145,17 @@ verify that out-of-tree work landed. Kept separate from the in-tree spawned task
 #### [TASK-056] Client content inventory
 
 **Priority**: 🟠 High
-**Status**: ⏸️ Deferred (user decision, 2026-08-11)
+**Status**: 📅 Scheduled → WEEKLY [G15](WEEKLY.md) (week of 2026-08-24; the ask drafts Fri 2026-08-21 as a user-approved head start)
 **Effort**: S
 **Dependencies**: None
+
+**Un-deferred 2026-08-20 (weekly brainstorm)**: the declared pre-launch week (Aug 17–21) was
+consumed by the prior week's +4-day spillover and never planned; the round-trip runs as WEEKLY G15
+in the week of Aug 24–28, with the ask drafting Fri Aug 21 so the client's multi-week clock starts
+before the weekend. **Same day, the client delivered the first 3 real products, ahead of the ask** —
+their intake runs as WEEKLY [G16](WEEKLY.md) (pair session with the user); the ask acknowledges
+receipt and requests these products' remaining gaps (size charts, back-view images for the card
+hover-swap, GTIN/brand data).
 
 **⏸️ Deferred to the pre-launch week (user, 2026-08-11)**: WEEKLY's G7 group was to assemble and hand off the consolidated ask on Fri 2026-08-07. The user's decision is to hold the whole client round-trip until the site is genuinely ready to operate in production with real data and real customers, rather than requesting assets against surfaces that don't exist yet. Nothing is dropped and nothing was partially sent — the checklist below is unchanged and carries forward at 🟠 High. Full rationale and the recorded counter-consideration (three items have multi-week client-side lead times and gate readiness itself) live in the 2026-08-03 week's WEEKLY § G7 (git history; condensed in [WEEKLY.md](WEEKLY.md) § Previous Week Summary). **Pre-launch week identified (user, 2026-08-11): next week, Aug 17–21** — the consolidated ask runs then, alongside polish, targeting user-ready by its end.
 

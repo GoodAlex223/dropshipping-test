@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-08-18
+**Last Updated**: 2026-08-20
 
 ---
 
@@ -76,25 +76,6 @@ These tasks from the advertising/promotion plan require a registered business, r
 - [ ] Connect order data to CRM deals/opportunities
 - [ ] Set up automated workflows (abandoned cart, follow-ups)
 - [ ] Configure email integration with CRM
-
----
-
-## Post-MVP Features (Moved from TODO)
-
-### [TASK-014] - Additional Integrations (Post-MVP)
-
-**Priority**: Low
-**Dependencies**: Deployment complete
-**Moved from TODO**: 2026-01-22
-
-**Description**: Additional third-party integrations.
-
-**Sub-tasks**:
-
-- [ ] Additional payment methods
-- [ ] Multiple supplier API integrations
-- [ ] Automated inventory sync
-- [ ] Shipping rate calculators
 
 ---
 
@@ -421,7 +402,7 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
 
 - 🟤 **No guard against production schema drift — it hid for ~5 months** — nothing applied `prisma migrate deploy` to prod (Actions deploy job is the no-op above; `build` only did `generate && next build`), so prod silently sat at the January schema while `reviews`/`subscribers` and later migrations accumulated unapplied. PR #22 fixed the _mechanism_ (`scripts/vercel-build.sh` now migrates on every Vercel deploy), but there is still no _detection_: add a check that fails loudly when the deployed DB is behind committed migrations (e.g. `prisma migrate status` in CI against a shadow, or a post-deploy assertion), so a future gap in the deploy path can't drift silently again. This also **closes the loop on the `[2026-07-18]` "no migration has ever run from CI" prediction** — it was correct, and it took the homepage down. (High value, Med effort) `[relates-to: the Actions deploy-no-op entry above; TASK-040]`
 - 🟤 **Reconcile the now-triply-redundant Actions "Deploy to Vercel" migration step** — with `vercel-build` applying migrations on the real (Git-integration) deploy, the Actions job's skipped `prisma migrate deploy` step is not just a no-op, it now describes a path that would _double-migrate_ if its secrets were ever wired. Fold this into the "delete or wire the Actions deploy job" decision so the two deploy stories stop contradicting each other. (Med value, Low effort) `[relates-to: the Actions deploy-no-op entry above]`
-- 🟤 **No post-deploy smoke test — the outage was only caught by a manual `curl`** — CI/Deploy has no check that the production homepage (and a DB-backed route) returns 200 after a deploy. A ~5-line post-deploy step hitting `/`, `/products` and e.g. `/api/products/<slug>/reviews`, failing on a 5xx, would have caught this in minutes instead of relying on someone looking. (Med value, Low effort) `[relates-to: TASK-040]`
+- 🟤 **No post-deploy smoke test — the outage was only caught by a manual `curl`** — CI/Deploy has no check that the production homepage (and a DB-backed route) returns 200 after a deploy. A ~5-line post-deploy step hitting `/`, `/products` and e.g. `/api/products/<slug>/reviews`, failing on a 5xx, would have caught this in minutes instead of relying on someone looking. (Med value, Low effort) `[relates-to: TASK-040]` **Scheduled 2026-08-20** → WEEKLY [G19](WEEKLY.md) member 2 (smoke script).
 - 🟤 **Audit other multi-query server render paths for the same all-or-nothing failure** — the homepage 500'd because three parallel queries were awaited together and one throwing rejected the whole render (now wrapped in `safeSection()`). Other server components that fan out queries in render (category pages, product detail's related/recently-viewed, etc.) may share the pattern; a page shouldn't 500 because one non-critical section's data is unavailable. (Med value, Low effort)
 - 🟤 **`DIRECT_URL` is now load-bearing for deploys but undocumented outside the build script** — `scripts/vercel-build.sh` reads `DIRECT_URL` (direct, non-pooled Neon endpoint) for `migrate deploy`, deliberately kept out of `prisma/schema.prisma` (per-command override) to avoid a CI/local blast radius. The cost is that the requirement lives only in a script comment: a new environment (staging) or a fresh Vercel project would silently skip migrations if `DIRECT_URL` is unset (the script warns but is non-fatal by design). Document it in `.env.example` / deployment docs. (Med value, Low effort)
 
@@ -648,7 +629,9 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
   ownership/email check on the public confirmation page**: order PII sits behind the
   order-number capability URL alone, so that piece is a privacy item and must land **before
   real customer traffic**, not on the volume trigger (PR #29 r6 caveat).
-  [G2 spec §4 + PR #29 review rounds 2/6]
+  [G2 spec §4 + PR #29 review rounds 2/6] **Ownership-check piece scheduled 2026-08-20** →
+  WEEKLY [G18](WEEKLY.md) member 2 (week of 2026-08-24); the volume-triggered pieces
+  (idempotency token, CSPRNG order-number suffix) stay here on their original trigger.
 - 🟤 **Dormant Stripe path: retire or revive decision** — `create-payment-intent`,
   `confirm-order`, `PaymentForm.tsx`, `stripe.ts`, `stripe-client.ts` are unreferenced by the
   live checkout since G2. Decide at TASK-048 time whether they're the revival base (LiqPay
@@ -682,6 +665,7 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
   `/account/orders`; the confirmation CTA is now hidden for guests, but there is no way for a
   guest to check an order later. Add lookup by order number + email, and/or claim-by-email on
   registration. Recommended before real launch. (High value, Med effort) [user Q4, 2026-08-07]
+  **Scheduled 2026-08-20** → WEEKLY [G18](WEEKLY.md) 🏆 (week of 2026-08-24).
 - 🔵 **Nova Poshta branch drop-down selector** — replace the free-text «Відділення / адреса»
   with the standard city → warehouse-list picker driven by the NP address API (needs the
   client's NP API key). Explicit scope addition for the delivery integration task. (High value)
@@ -759,12 +743,6 @@ decisions that were deliberately left out of the sweep. All 🟤 Auto-Generated.
   to the `[2026-08-04]` G1 entry "`/account/addresses` and `/account/settings` are dead 404
   links," which this task resolved by removing the links — same TASK-056 content gap, now
   documented on the other side of it. (Low value, Low effort) `[relates-to: TASK-056]`
-- 🟤 **Products↔categories sort-set unification** — `/products` (TASK-036) and
-  `/categories/[slug]` carry independent sort-option sets; sharing one options list (and
-  `getSalesRanking()`) is a deliberate behavior change, out of G4's copy-only scope (spec §3.1
-  keeps categories chrome inline for this reason).
-  `[possible-dup-of: categories→catalog redesign, 2026-08-09 visual-gate group]` — subsumed if
-  that redesign lands, since it retires `category-client.tsx` outright. (Low value, Low effort)
 
 ### [2026-08-09] From: G4 execution
 
@@ -902,16 +880,6 @@ while evaluating candidates; they route 🟤 by the source rule, independent of 
   (Low value, Low effort) `[relates-to: G5]` **RESOLVED by G5 (PR #33, 2026-08-10)**: both
   templates render through the shared shell (`src/lib/email-templates/layout.ts`) with
   `<html lang="uk">` + UA `<title>`, asserted by `tests/unit/email-templates.test.ts`.
-- 🟤 **TASK-039 design input: next-intl's `useExtracted` + its "don't let agents translate"
-  guidance** — next-intl's official AI-agent workflow page documents `useExtracted`, a hook
-  purpose-built for agents that writes messages **inline at the usage site** and auto-extracts
-  them into catalogs. That is a different model from this repo's `src/content/*.ts` layer, which
-  was deliberately built as "extraction-ready" for a `useTranslations` + catalog migration — so
-  TASK-039 should weigh the two rather than default to the assumed one. The same page advises
-  **against** having agents translate message catalogs (missing context and nuance) and points to
-  professional translation, which matters here because the storefront is Ukrainian-first and the
-  client supplies copy. Source: <https://next-intl.dev/docs/workflows/agents> (fetched
-  2026-08-10). (Med value, Low effort) `[relates-to: TASK-039]`
 - 🟤 **Markdown: an inline code span carrying list-marker syntax across a line break makes Prettier
   oscillate** — extracted at completion. Writing `` `- [ ] README updated if needed` `` inside a
   wrapped list item put `format:check` into a state `--write` could not fix: Prettier's list parser
@@ -976,7 +944,7 @@ while evaluating candidates; they route 🟤 by the source rule, independent of 
   order + confirmation email to a real inbox, newsletter double-opt-in round-trip, sitemap/robots
   on the new domain, GA4/GTM firing, Search Console + feed re-registration). The operational
   slice of TASK-054's "Launch readiness"; assemble as a checklist doc the launch day executes
-  verbatim. (High value, Med effort) `[relates-to: TASK-054]` [user, 2026-08-10]
+  verbatim. (High value, Med effort) `[relates-to: TASK-054]` [user, 2026-08-10] **Scheduled 2026-08-20** → WEEKLY [G19](WEEKLY.md) (week of 2026-08-24), subsuming the post-deploy smoke-check 🟤 entries.
 
 ### [2026-08-10] From: G5 completion
 
@@ -1074,7 +1042,7 @@ these are the standing improvements.
   `globals.css` did NOT bust it; only a cache-off redeploy did). Add to the production-launch
   deploy runbook: after any CSS/JS-affecting deploy, verify the served chunk hash CHANGED vs the
   previous deploy, and keep `VERCEL_FORCE_NO_BUILD_CACHE=1` / dashboard cache-off redeploy as
-  the standard remedy. (High value, Low effort) `[relates-to: 🔵 production-launch deploy runbook, 2026-08-10]`
+  the standard remedy. (High value, Low effort) `[relates-to: 🔵 production-launch deploy runbook, 2026-08-10]` **Scheduled 2026-08-20** → WEEKLY [G19](WEEKLY.md) (runbook + smoke script).
 
 ### [2026-08-15] From: PR #37 review chat (dev-console warnings)
 
@@ -1128,10 +1096,6 @@ rest 🟤 Auto-Generated.
   2026-08-18): `getCategoryMetadata` was deleted outright with its only consumer, taking the
   unreachable `Shop {name} products…` EN fallback with it. The entry stays open for its other
   three fragments, which G12 did not touch.
-- 🟤 **G13 duplicate-value sync test** — if G13's `admin.*` namespace duplicates
-  `account.orderStatus`/`paymentStatus` label values rather than reusing the keys, add a sync
-  test asserting the duplicates stay byte-identical; moot if G13 reuses `account.*` keys
-  directly. (Low value, Low effort) [G9 final review, 2026-08-15]
 - [x] 🟤 ~~**`seo.breadcrumb` vs `products.breadcrumbHome` consolidation** — two catalog keys carry
       the same «Головна» concept in different namespaces; consolidate to one home.
       (Low value, Low effort) [G9 final review, 2026-08-15]~~ — **RESOLVED in G12's review round**
@@ -1166,14 +1130,14 @@ audit's one small fix (light blur shimmer → dark) shipped in-branch.
   scroll past 4 tall cards). Confined to ProductRail's responsive classes but changes mobile
   interaction and deserves its own visual-gate round — pre-launch-week candidate. The
   mockup's mobile-PDP contextual header (back arrow + product name) is a related flourish;
-  assess it in the same pass. (Med value, Low-Med effort) [G14 audit, 2026-08-15]
+  assess it in the same pass. (Med value, Low-Med effort) [G14 audit, 2026-08-15] **Scheduled 2026-08-20** → WEEKLY [G20](WEEKLY.md) (week of 2026-08-24), sourced 🔵 under the user's "ask + polish" pre-launch steer.
 - 🟤 **Checkout distraction-free header per `Mirox Checkout.dc.html`** — the mockup gives
   checkout a simplified header (logo + «Захищене оформлення» only, no nav/search/cart/
   announcement); shipped `/checkout` keeps the full storefront chrome incl. the G8 marquee
   (the «Захищене оформлення» note lives in the summary sidebar instead). No G2 ruling
   recorded on this delta (checked spec + plan). Standard conversion practice, but needs a
   checkout-scoped layout and a decision on how far to strip (keep the Кошик stepper link as
-  escape hatch?). (Med value, Med effort) [G14 audit, 2026-08-15]
+  escape hatch?). (Med value, Med effort) [G14 audit, 2026-08-15] **Deferred 2026-08-20 (user ruling at the weekly brainstorm)**: not scheduled into the pre-launch week — restructuring checkout chrome days before launch risks more than it buys; revisit post-launch.
 
 ### [2026-08-15] From: G10 weekly reviews run 2
 
@@ -1193,7 +1157,7 @@ Next-up parks (`defer`) or recorded as rows only (`pass`).
   (needs ≥3.9) ✅, git checkout ✅. Reports land in a self-gitignoring
   `CLAUDE-SECURITY-<timestamp>/` directory, so nothing is swept into a commit. Pairs with — does
   not replace — the standing G2 hardening bundle (confirmation-page ownership check) that the
-  pre-launch week already inherits. (High value, Low-Med effort) [G10 run 2 slot 1, 2026-08-15]
+  pre-launch week already inherits. (High value, Low-Med effort) [G10 run 2 slot 1, 2026-08-15] **Scheduled 2026-08-20** → WEEKLY [G17](WEEKLY.md) (week of 2026-08-24), the week's single 🟤 group.
 - 🟤 **Automate the "every statement of a value agrees" check — fold into the docs-freshness
   linter's host script** — G10's step-5 re-check pass asserted its tallies agreed and **passed
   while contradicting itself**: it grepped for the _presence_ of the expected value, found it, and
@@ -1260,7 +1224,7 @@ surfaced but deliberately did not fix. All 🟤 Auto-Generated.
 
 - [ ] 🟤 **`i18n-byte-diff.mjs` has no concept of a retired surface** — the script's premise is that a Cyrillic string removed from `src/**` was _extracted_ to `messages/uk.json`, so a removal with no catalog counterpart is corruption. A file deleted outright breaks that premise: there is no target string, so every one of its live UI strings reports as a miss. G12 hit this with `category-client.tsx` (9 fragments) and resolved it in the **data** layer — allowlisting the 9 and widening the allowlist header to name the second kind — after explicitly rejecting the code fix (`--diff-filter=D` skip), because a code-level exemption would silently un-check any future commit that deletes a file **and** extracts its strings. That reasoning is recorded in the allowlist itself. The structural gap stands, and the next wholesale surface retirement will pay the same cost. If it recurs, the shape worth considering is a per-entry _reason_ column rather than a blanket skip, so exemptions stay auditable. (Low value, Low-Med effort) `[relates-to: the [2026-08-18] G12 group above]`
 - [ ] 🟤 **"Kept for X" comments are unenforced scheduled deletions** — `pluralizeUk`'s docstring read "Kept for category-client.tsx (retired by G12)": a deletion scheduled in prose, with its trigger named, and nothing that fires when the trigger happens. G12 retired the file and left the function; the branch review caught it. This is the third instance of the class here (PR #26 finding 1, PR #37 round 2, now G12), and the two earlier ones were also caught by human review rather than by tooling. Cheap candidate: a unit test that greps `src/**` for `Kept for <path>` / `until <TASK-NNN>` style justifications and fails when the named path no longer exists. That covers the file-trigger form exactly; the task-trigger form would need a DONE.md lookup and is probably not worth it. (Med value, Low effort)
-- [ ] 🟤 **Nothing verifies a Vercel production deploy except a human looking at it** — G12's deploy was confirmed by the user, as G14's and G13's were. The repo's own history says a green Actions badge proves nothing (the Deploy job is a validated no-op) and that Vercel has served byte-identical stale CSS across deploys, so "verify the real prod URL" is standing practice — but it is practice, not a control. A small post-deploy smoke script (fetch `/`, `/products`, assert 200 + a DB-backed string; fetch `/categories/hudi`, assert 307; assert the served CSS chunk hash differs from the previous deploy's) would turn the ritual into something that fails loudly. (Med value, Low-Med effort) `[relates-to: prod-schema-drift + stale-CSS entries above]`
+- [ ] 🟤 **Nothing verifies a Vercel production deploy except a human looking at it** — G12's deploy was confirmed by the user, as G14's and G13's were. The repo's own history says a green Actions badge proves nothing (the Deploy job is a validated no-op) and that Vercel has served byte-identical stale CSS across deploys, so "verify the real prod URL" is standing practice — but it is practice, not a control. A small post-deploy smoke script (fetch `/`, `/products`, assert 200 + a DB-backed string; fetch `/categories/hudi`, assert 307; assert the served CSS chunk hash differs from the previous deploy's) would turn the ritual into something that fails loudly. (Med value, Low-Med effort) `[relates-to: prod-schema-drift + stale-CSS entries above]` **Scheduled 2026-08-20** → WEEKLY [G19](WEEKLY.md) member 2 (smoke script).
 
 ---
 
@@ -1324,6 +1288,10 @@ Ideas considered but decided against (with reasoning).
 | Extract hardcoded USD to `NEXT_PUBLIC_CURRENCY` env var (was under [2026-02-01] TASK-018)            | reaped → 🪦 section below: superseded by the shipped `formatPrice()`/§7.4 UAH architecture; transaction currency is a TASK-048 decision                                                                        | 2026-08-11 |
 | Seed demo products with brand/barcode/MPN for feed testing (was under [2026-02-02] TASK-020)         | reaped → 🪦 section below: electronics demo catalog replaced by the deliberately-placeholder Mirox seed; realistic feed content waits for real products (TASK-054/056)                                         | 2026-08-11 |
 | Manual Testing Plan (was the sole "Deferred Tasks" member; section removed with it)                  | reaped → 🪦 section below: implicitly delivered by `docs/TESTING_CHECKLIST.md` (323 lines) + the standing visual-fidelity gate + live user testing rounds                                                      | 2026-08-11 |
+| Products↔categories sort-set unification (was under [2026-08-08] From: G4 brainstorm)                | reaped → 🪦 section below: its own subsumption condition fired — G12 retired `/categories/[slug]` + `category-client.tsx`, so there is no second sort set to unify                                             | 2026-08-20 |
+| next-intl `useExtracted` design input for TASK-039 (was under [2026-08-10] From: G6 run 1)           | reaped → 🪦 section below: consumed — G9's library decision weighed exactly this input and TASK-039 shipped (PR #37)                                                                                           | 2026-08-20 |
+| G13 duplicate-value sync test (was under [2026-08-15] From: G9 close-out)                            | reaped → 🪦 section below: mooted by its own condition — G13 reuses `account.orderStatus`/`paymentStatus` keys directly (PR #40)                                                                               | 2026-08-20 |
+| [TASK-014] Additional Integrations umbrella (was under Post-MVP Features; section removed with it)   | reaped → 🪦 section below: payments → TASK-048 + the payments decision doc; supplier APIs / shipping calculators → spec v2.0 directions; automated inventory sync is an explicit GOALS.md Non-Goal             | 2026-08-20 |
 
 ---
 
@@ -1425,6 +1393,77 @@ batch). _(Was the sole member of the now-removed "Deferred Tasks (Moved from TOD
 originally deprioritized 2026-01-22 in favor of marketing preparation.)_
 
 - [ ] Develop comprehensive manual testing plan for the website
+
+### ~~Products↔categories sort-set unification~~ — reaped 2026-08-20
+
+**Reaped because**: its own subsumption condition fired — G12 (merged `9fc4fd3`, 2026-08-18) retired
+`/categories/[slug]` and `category-client.tsx` outright, so there is no second sort-option set left
+to unify with the catalog's. User-approved at the 2026-08-20 weekly brainstorm. _(Was under:
+[2026-08-08] From: G4 brainstorm.)_
+
+- 🟤 **Products↔categories sort-set unification** — `/products` (TASK-036) and
+  `/categories/[slug]` carry independent sort-option sets; sharing one options list (and
+  `getSalesRanking()`) is a deliberate behavior change, out of G4's copy-only scope (spec §3.1
+  keeps categories chrome inline for this reason).
+  `[possible-dup-of: categories→catalog redesign, 2026-08-09 visual-gate group]` — subsumed if
+  that redesign lands, since it retires `category-client.tsx` outright. (Low value, Low effort)
+
+### ~~TASK-039 design input: next-intl's `useExtracted` + "don't let agents translate"~~ — reaped 2026-08-20
+
+**Reaped because**: consumed — G9's in-plan library decision weighed exactly this input (the WEEKLY
+G9 group note cites it) and TASK-039 shipped (PR #37, merged `2c93da7`, 2026-08-15); the
+agent-translation risk it flagged was mitigated by the byte-diff verifier + the RU draft's
+client-sign-off gate. Its purpose is fulfilled. User-approved at the 2026-08-20 weekly brainstorm.
+_(Was under: [2026-08-10] From: G6 Weekly Reviews (first run).)_
+
+- 🟤 **TASK-039 design input: next-intl's `useExtracted` + its "don't let agents translate"
+  guidance** — next-intl's official AI-agent workflow page documents `useExtracted`, a hook
+  purpose-built for agents that writes messages **inline at the usage site** and auto-extracts
+  them into catalogs. That is a different model from this repo's `src/content/*.ts` layer, which
+  was deliberately built as "extraction-ready" for a `useTranslations` + catalog migration — so
+  TASK-039 should weigh the two rather than default to the assumed one. The same page advises
+  **against** having agents translate message catalogs (missing context and nuance) and points to
+  professional translation, which matters here because the storefront is Ukrainian-first and the
+  client supplies copy. Source: <https://next-intl.dev/docs/workflows/agents> (fetched
+  2026-08-10). (Med value, Low effort) `[relates-to: TASK-039]`
+
+### ~~G13 duplicate-value sync test~~ — reaped 2026-08-20
+
+**Reaped because**: mooted by its own stated condition — G13 (PR #40, merged `56328f0`, 2026-08-17)
+reuses the `account.orderStatus`/`account.paymentStatus` catalog keys directly at all admin badge
+sites (verified in `src/lib/order-status.ts`; supplier statuses use their own
+`admin.supplierOrderStatus` namespace, a different vocabulary, not duplicated values). No duplicate
+values exist to keep in sync. User-approved at the 2026-08-20 weekly brainstorm. _(Was under:
+[2026-08-15] From: G9 close-out.)_
+
+- 🟤 **G13 duplicate-value sync test** — if G13's `admin.*` namespace duplicates
+  `account.orderStatus`/`paymentStatus` label values rather than reusing the keys, add a sync
+  test asserting the duplicates stay byte-identical; moot if G13 reuses `account.*` keys
+  directly. (Low value, Low effort) [G9 final review, 2026-08-15]
+
+### ~~[TASK-014] - Additional Integrations (Post-MVP)~~ — reaped 2026-08-20
+
+**Reaped because**: same shape as the TASK-013/015 umbrellas reaped 2026-08-11 — every sub-item is
+superseded or ruled out: additional payment methods → TASK-048 + the
+[Ukraine payments & delivery decision](../superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md);
+multiple supplier API integrations and shipping rate calculators → spec v2.0 directions; automated
+inventory sync is an explicit GOALS.md Non-Goal ("background jobs sufficient for dropshipping
+model"). User-approved at the 2026-08-20 weekly brainstorm. _(Was the sole remaining member of the
+now-removed "Post-MVP Features (Moved from TODO)" section — TASK-013/015 were reaped from it
+2026-08-11.)_
+
+**Priority**: Low
+**Dependencies**: Deployment complete
+**Moved from TODO**: 2026-01-22
+
+**Description**: Additional third-party integrations.
+
+**Sub-tasks**:
+
+- [ ] Additional payment methods
+- [ ] Multiple supplier API integrations
+- [ ] Automated inventory sync
+- [ ] Shipping rate calculators
 
 ---
 
