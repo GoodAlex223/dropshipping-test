@@ -1,6 +1,6 @@
 # TODO
 
-**Last Updated**: 2026-08-20
+**Last Updated**: 2026-08-21
 
 Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-shop-program-design.md) · Current week: [WEEKLY.md](WEEKLY.md)
 
@@ -145,7 +145,7 @@ verify that out-of-tree work landed. Kept separate from the in-tree spawned task
 #### [TASK-056] Client content inventory
 
 **Priority**: 🟠 High
-**Status**: 📅 Scheduled → WEEKLY [G15](WEEKLY.md) (week of 2026-08-24; the ask drafts Fri 2026-08-21 as a user-approved head start)
+**Status**: 📅 Scheduled → WEEKLY [G15](WEEKLY.md) (week of 2026-08-24) · **ask DRAFTED 2026-08-21** → [reference/2026-08-21-client-ask.md](../reference/2026-08-21-client-ask.md) (G15 part 1, the user-approved Fri head start; plan: [plans/2026-08-21_g15-task-056-client-round-trip.md](plans/2026-08-21_g15-task-056-client-round-trip.md)); hand-off + send Mon 2026-08-25, per-item tracking table below
 **Effort**: S
 **Dependencies**: None
 
@@ -197,3 +197,34 @@ hover-swap, GTIN/brand data).
       prod env → redeploy. Interim smoke-test (works now): `EMAIL_FROM=onboarding@resend.dev` +
       redeploy — Resend's test sender, delivers ONLY to the Resend account owner's own inbox, never
       to customers. Closes BACKLOG's 🔵 "Verify prod email config"
+
+**Response tracking (G15, scaffolded 2026-08-21)** — rows keyed to the item numbers of the
+client-facing ask ([reference/2026-08-21-client-ask.md](../reference/2026-08-21-client-ask.md));
+the client answers "до п.N". Legend: ⬜ not sent · 📨 sent, awaiting · 🔁 partial answer ·
+✅ answered · ➖ dropped/n-a. Responses are processed as interrupts (WEEKLY § Parallel Work); the
+domain → Resend DNS → `EMAIL_FROM` chain (items 1–2) is pre-authorized interrupt work.
+
+**Sent**: — _(planned Mon 2026-08-25 — record the actual send date here at hand-off)_
+
+| №   | Item (🔴 = launch blocker)         | Internal touchpoint                                                                      | Status | Response / date |
+| --- | ---------------------------------- | ---------------------------------------------------------------------------------------- | ------ | --------------- |
+| 1   | 🔴 Domain choice/purchase/DNS      | gates №2, real-domain deploy, SEO                                                        | ⬜     |                 |
+| 2   | 🔴 Customer-email chain            | Resend DNS verify → `EMAIL_FROM` (Vercel prod) → redeploy                                | ⬜     |                 |
+| 3   | Feedback recipient address         | `FEEDBACK_EMAIL` (Vercel prod)                                                           | ⬜     |                 |
+| 4   | Contact details (phone/email/addr) | TASK-055 `/contact` + Footer                                                             | ⬜     |                 |
+| 5   | Prepay card number + holder        | `src/content/checkout.ts` `payment.prepay`                                               | ⬜     |                 |
+| 6   | WhatsApp manager number            | `src/content/brand.ts` `WHATSAPP_HREF`                                                   | ⬜     |                 |
+| 7   | NP API key + Ukrposhta question    | TASK-049 · BACKLOG [2026-08-11] carrier decision                                         | ⬜     |                 |
+| 8   | 🔴 Hero photography                | replaces `public/images/hero-model-2.png`                                                | ⬜     |                 |
+| 9   | 🔴 Product photos (front + back)   | product images; back view = card hover-swap; incl. the 3 real products                   | ⬜     |                 |
+| 10  | Measurement photos                 | restores PDP «Відкрити фото замірів» (TASK-037 ledger #3)                                | ⬜     |                 |
+| 11  | Logo vector source                 | source for `public/images/logo.png`                                                      | ⬜     |                 |
+| 12  | Size charts                        | TASK-045 · replaces `SizePicker.tsx` interim formula; incl. the 3 real products          | ⬜     |                 |
+| 13  | GTIN/EAN + brand/MPN data          | product identifiers → Google Shopping feed; incl. the 3 real products                    | ⬜     |                 |
+| 14  | 🔴 Legal-page copy / lawyer        | TASK-055 (7 routes; 3 are §5.3 prerequisites; «14 днів» approved)                        | ⬜     |                 |
+| 15  | Real socials + follower counts     | `src/content/brand.ts` `SOCIALS`                                                         | ⬜     |                 |
+| 16  | Claim figures re-confirmation      | `src/content/site.ts` `claims`                                                           | ⬜     |                 |
+| 17  | Free-shipping threshold            | none exists in the order path (TASK-035 Finding 1) — needs code if confirmed             | ⬜     |                 |
+| 18  | Announcement/promo copy            | `site.announcement` (bump `id` on change)                                                | ⬜     |                 |
+| 19  | RU catalog sign-off package        | `messages/ru.json` DRAFT · nuance list in [messages/README.md](../../messages/README.md) | ⬜     |                 |
+| 20  | RU product-copy opt-in question    | BACKLOG [2026-08-15] design sketch — build only on opt-in                                | ⬜     |                 |
