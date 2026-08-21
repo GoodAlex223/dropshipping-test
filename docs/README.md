@@ -2,7 +2,7 @@
 
 Central index for all project documentation.
 
-**Last Updated**: 2026-08-20
+**Last Updated**: 2026-08-21
 
 ---
 
@@ -34,9 +34,9 @@ Central index for all project documentation.
 | -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------ |
 | [planning/README.md](planning/README.md)                                                                             | Planning overview                                                             | 2026-01-05   |
 | [planning/WEEKLY.md](planning/WEEKLY.md)                                                                             | Current week's plan                                                           | 2026-08-20   |
-| [planning/TODO.md](planning/TODO.md)                                                                                 | Active tasks                                                                  | 2026-08-20   |
+| [planning/TODO.md](planning/TODO.md)                                                                                 | Active tasks                                                                  | 2026-08-21   |
 | [planning/DONE.md](planning/DONE.md)                                                                                 | Completed tasks                                                               | 2026-08-18   |
-| [planning/BACKLOG.md](planning/BACKLOG.md)                                                                           | Unprioritized ideas                                                           | 2026-08-20   |
+| [planning/BACKLOG.md](planning/BACKLOG.md)                                                                           | Unprioritized ideas                                                           | 2026-08-21   |
 | [planning/ROADMAP.md](planning/ROADMAP.md)                                                                           | Long-term vision                                                              | 2026-07-14   |
 | [planning/GOALS.md](planning/GOALS.md)                                                                               | Objectives & metrics                                                          | 2026-01-26   |
 | [planning/MILESTONES.md](planning/MILESTONES.md)                                                                     | Key targets                                                                   | 2026-01-26   |
@@ -72,6 +72,7 @@ Central index for all project documentation.
 | [superpowers/specs/2026-08-18-g12-categories-to-catalog-design.md](superpowers/specs/2026-08-18-g12-categories-to-catalog-design.md)           | G12 design: categories→catalog redesign — two-level parent rollup in `/api/products` (closes «Всі» = 0), DB-driven category facet in the catalog FilterBar, thin 307 `/categories/[slug]` redirect + `category-client.tsx` retirement, desktop «Категорії» nav entry | 2026-08-18   |
 | [design/design_handoff_mirox/README.md](design/design_handoff_mirox/README.md)                                                                 | **Design handoff** — 7 HTML screen prototypes (Home/Catalog/Product/Cart/Checkout/Contacts/Mobile) + design spec, reconstructed from the client mockup and client-approved                                                                                           | 2026-07-27   |
 | [reference/client-brief.md](reference/client-brief.md)                                                                                         | **Client brief (verbatim)** — Mirox Shop requirement lists #1 and #2, RU + EN                                                                                                                                                                                        | 2026-07-19   |
+| [reference/2026-08-21-client-ask.md](reference/2026-08-21-client-ask.md)                                                                       | **TASK-056 consolidated client ask (UA, messenger-paste format)** — 21 items / 7 blocks: domain+email chain, contacts/payment, photography+brand, branded-goods advisory, legal copy, marketing, RU sign-off; drafted G15, sent per TODO.md tracking table           | 2026-08-21   |
 
 ---
 
@@ -112,6 +113,7 @@ Central index for all project documentation.
 | [2026-08-16_g13-admin-translation.md](archive/plans/2026-08-16_g13-admin-translation.md)                             | G13 Admin Translation & Alignment    | COMPLETE | 2026-08-17 |
 | [2026-08-17_g11-docs-freshness-linter.md](archive/plans/2026-08-17_g11-docs-freshness-linter.md)                     | G11 Docs-Freshness Linter            | COMPLETE | 2026-08-17 |
 | [2026-08-18_g12-categories-to-catalog.md](archive/plans/2026-08-18_g12-categories-to-catalog.md)                     | G12 Categories-to-Catalog Redesign   | COMPLETE | 2026-08-18 |
+| [2026-08-21_g15-task-056-client-round-trip.md](archive/plans/2026-08-21_g15-task-056-client-round-trip.md)           | G15 TASK-056 Client Ask Round-Trip   | COMPLETE | 2026-08-21 |
 
 See [archive/README.md](archive/README.md) for more historical plans.
 
