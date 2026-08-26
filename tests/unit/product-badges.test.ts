@@ -2,7 +2,10 @@ import { describe, it, expect } from "vitest";
 import { isNewProduct, getProductBadge, NEW_BADGE_WINDOW_DAYS } from "@/lib/product-badges";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-const now = new Date("2026-07-31T12:00:00Z");
+// Must track the real clock: getProductBadge() calls isNewProduct(createdAt)
+// without a `now`, so it reads the system clock. A frozen date here rots —
+// the "recent" fixture aged past the 30-day window and failed on 2026-08-26 (G16).
+const now = new Date();
 const recent = new Date(now.getTime() - 5 * DAY_MS).toISOString();
 const old = new Date(now.getTime() - 60 * DAY_MS).toISOString();
 
