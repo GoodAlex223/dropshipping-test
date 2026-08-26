@@ -41,7 +41,7 @@ function buildProductFormSchema(t: TProductForm) {
       barcode: z.string().optional(),
       brand: z.string().optional(),
       mpn: z.string().optional(),
-      styleGroup: z.string().max(100).optional(),
+      styleGroup: z.string().max(100, t("errors.styleGroupTooLong")).optional(),
       stock: z.string().refine((val) => !isNaN(parseInt(val)) && parseInt(val) >= 0, {
         message: t("errors.stockNonNegative"),
       }),

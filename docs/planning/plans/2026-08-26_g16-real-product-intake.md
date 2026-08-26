@@ -3,7 +3,7 @@
 **Last Updated**: 2026-08-26
 **Task**: G16 (WEEKLY [G16](../WEEKLY.md#g16-real-product-intake-pair-session-batch)) · user-raised 2026-08-20
 **Branch**: `feat/g16-real-product-intake`
-**Status**: PLANNED 2026-08-26 — spec approved, plan awaiting execution
+**Status**: IN PROGRESS 2026-08-26 — spec approved, Tasks 1-10 implemented, Tasks 11-13 outstanding
 **Spec**: [2026-08-26-g16-real-product-intake-design.md](../../superpowers/specs/2026-08-26-g16-real-product-intake-design.md)
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
@@ -2400,3 +2400,6 @@ storefront falls back to the product name): «<name> — вид спереду /
 _(appended during execution — planning, per-task completion, blockers, pair-session findings)_
 
 - 2026-08-26 — plan written; spec approved; effort revised 4 → 9 SP (Task 1).
+- 2026-08-26 — Tasks 1-10 implemented via subagent-driven development, each task reviewed
+  individually; Tasks 11-13 (the two pair sessions and close-out) remain outstanding — they need
+  the client's R2 credentials, a production deploy, and a merge.

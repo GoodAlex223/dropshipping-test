@@ -1286,7 +1286,8 @@
         "skuRequired": "Вкажіть SKU",
         "stockNonNegative": "Залишок має бути цілим невід'ємним числом",
         "categoryRequired": "Оберіть категорію",
-        "comparePriceGreater": "Стара ціна має бути більшою за звичайну"
+        "comparePriceGreater": "Стара ціна має бути більшою за звичайну",
+        "styleGroupTooLong": "Група кольорів не повинна перевищувати 100 символів"
       }
     },
     "imageUploader": {
