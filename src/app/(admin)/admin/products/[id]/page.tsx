@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ProductForm } from "@/components/admin";
+import { ProductForm, ProductVariantsSection } from "@/components/admin";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
@@ -108,6 +108,7 @@ export default function EditProductPage() {
       </div>
 
       <ProductForm product={product} isEdit />
+      <ProductVariantsSection productId={product.id} />
     </div>
   );
 }
