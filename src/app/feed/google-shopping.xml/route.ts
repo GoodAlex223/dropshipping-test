@@ -112,12 +112,15 @@ function itemToXml(item: GoogleShoppingItem): string {
 
 /**
  * GET /feed/google-shopping.xml
- * Generates an RSS 2.0 XML feed with Google Shopping namespace for all active products.
+ * Generates an RSS 2.0 XML feed with Google Shopping namespace for all active products
+ * not flagged `excludeFromFeed`.
  */
 export async function GET(): Promise<Response> {
   try {
     const products = await prisma.product.findMany({
-      where: { isActive: true },
+      // G16: per-product opt-out — trademark-bearing imagery must never enter
+      // the public feed, regardless of which text fields are set.
+      where: { isActive: true, excludeFromFeed: false },
       select: {
         id: true,
         name: true,
