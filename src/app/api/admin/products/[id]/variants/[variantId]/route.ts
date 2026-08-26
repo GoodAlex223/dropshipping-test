@@ -20,12 +20,12 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       where: { id: variantId, productId: id },
     });
     if (!existing) {
-      return apiError("Variant not found", 404);
+      return apiError("Variant not found", 404, "VARIANT_NOT_FOUND");
     }
 
     const validationResult = productVariantUpdateSchema.safeParse(body);
     if (!validationResult.success) {
-      return apiError(validationResult.error.issues[0].message, 400);
+      return apiError(validationResult.error.issues[0].message, 400, "VALIDATION_ERROR");
     }
     const data = validationResult.data;
 
@@ -42,7 +42,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       select: { id: true },
     });
     if (duplicate) {
-      return apiError("This variant already exists on the product", 400);
+      return apiError("This variant already exists on the product", 400, "DUPLICATE_VARIANT");
     }
 
     const variant = await prisma.productVariant.update({
@@ -73,7 +73,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       include: { _count: { select: { orderItems: true, cartItems: true } } },
     });
     if (!variant) {
-      return apiError("Variant not found", 404);
+      return apiError("Variant not found", 404, "VARIANT_NOT_FOUND");
     }
 
     // No onDelete on the OrderItem/CartItem relations — a referenced variant
@@ -81,7 +81,8 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     if (variant._count.orderItems > 0 || variant._count.cartItems > 0) {
       return apiError(
         "Cannot delete a variant that is referenced by orders or carts. Set its stock to 0 instead.",
-        400
+        400,
+        "VARIANT_REFERENCED"
       );
     }
 

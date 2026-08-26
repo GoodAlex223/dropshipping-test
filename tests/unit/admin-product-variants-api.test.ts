@@ -116,6 +116,9 @@ describe("POST /api/admin/products/[id]/variants", () => {
     vi.mocked(prisma.productVariant.findFirst).mockResolvedValue(sizeM as never);
     const res = await post({ name: "Розмір", value: "M", stock: 5 });
     expect(res.status).toBe(400);
+    // The admin UI maps this `code` to a Ukrainian toast (never the English
+    // `error` text) — pin the machine-readable half of that contract here.
+    expect((await res.json()).code).toBe("DUPLICATE_VARIANT");
     expect(prisma.productVariant.create).not.toHaveBeenCalled();
     // Pin the scoping: a route that only scoped by productId (rejecting
     // every second variant on a product) would pass the assertions above
@@ -212,7 +215,11 @@ describe("DELETE /api/admin/products/[id]/variants/[variantId]", () => {
       ...sizeM,
       _count: { orderItems: 2, cartItems: 0 },
     } as never);
-    expect((await del()).status).toBe(400);
+    const res = await del();
+    expect(res.status).toBe(400);
+    // The admin UI maps this `code` to a Ukrainian toast (never the English
+    // `error` text) — pin the machine-readable half of that contract here.
+    expect((await res.json()).code).toBe("VARIANT_REFERENCED");
     expect(prisma.productVariant.delete).not.toHaveBeenCalled();
   });
 

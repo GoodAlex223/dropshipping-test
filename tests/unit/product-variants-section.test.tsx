@@ -4,6 +4,7 @@ import { renderWithIntl } from "../helpers/render-with-intl";
 
 vi.mock("sonner", () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
+import { toast } from "sonner";
 import { ProductVariantsSection } from "@/components/admin/ProductVariantsSection";
 
 const fetchMock = vi.fn();
@@ -76,5 +77,129 @@ describe("ProductVariantsSection", () => {
       )
     );
     await waitFor(() => expect(screen.queryByDisplayValue("Чорний")).toBeNull());
+  });
+
+  it("edits an existing row via PATCH on blur — value persists, stock is coerced to a number", async () => {
+    renderWithIntl(<ProductVariantsSection productId="p1" />);
+    await screen.findByDisplayValue("Чорний");
+
+    // Row order from the fixture: v1 (Розмір/M) then v2 (Колір/Чорний), both
+    // before the add row — index 0 is v1's "Значення" input.
+    const valueInputs = screen.getAllByRole("textbox", { name: "Значення" });
+    fireEvent.change(valueInputs[0], { target: { value: "XL" } });
+    fireEvent.blur(valueInputs[0]);
+
+    await waitFor(() => {
+      const patchCall = fetchMock.mock.calls.find(
+        ([url, init]) => url === "/api/admin/products/p1/variants/v1" && init?.method === "PATCH"
+      );
+      expect(patchCall).toBeDefined();
+      expect(JSON.parse(patchCall![1].body as string)).toEqual({ value: "XL" });
+    });
+
+    // v2's "Залишок" input — same index convention as above.
+    const stockInputs = screen.getAllByRole("spinbutton", { name: "Залишок" });
+    fireEvent.change(stockInputs[1], { target: { value: "9" } });
+    fireEvent.blur(stockInputs[1]);
+
+    await waitFor(() => {
+      const patchCall = fetchMock.mock.calls.find(
+        ([url, init]) => url === "/api/admin/products/p1/variants/v2" && init?.method === "PATCH"
+      );
+      expect(patchCall).toBeDefined();
+      const body = JSON.parse(patchCall![1].body as string);
+      // The API's Zod schema is z.number().int().min(0) and 400s on a string
+      // — proving the edit path coerces the same way the add path already does.
+      expect(body).toEqual({ stock: 9 });
+      expect(typeof body.stock).toBe("number");
+    });
+  });
+
+  it("surfaces the Ukrainian VALIDATION_ERROR toast on add — never the English `error` text", async () => {
+    fetchMock.mockImplementation(async (_url: string, init?: RequestInit) => {
+      if (!init || init.method === undefined) return { ok: true, json: async () => rows };
+      if (init.method === "POST") {
+        return {
+          ok: false,
+          json: async () => ({ error: "Invalid enum value", code: "VALIDATION_ERROR" }),
+        };
+      }
+      return { ok: true, json: async () => ({}) };
+    });
+    renderWithIntl(<ProductVariantsSection productId="p1" />);
+    await screen.findByDisplayValue("Чорний");
+
+    fireEvent.change(screen.getAllByRole("textbox", { name: "Значення" }).at(-1)!, {
+      target: { value: "L" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Додати варіант" }));
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "Перевірте назву, значення та залишок варіанта — щось не так."
+      )
+    );
+    expect(toast.error).not.toHaveBeenCalledWith("Invalid enum value");
+  });
+
+  it("surfaces the Ukrainian DUPLICATE_VARIANT toast on add — never the English `error` text", async () => {
+    fetchMock.mockImplementation(async (_url: string, init?: RequestInit) => {
+      if (!init || init.method === undefined) return { ok: true, json: async () => rows };
+      if (init.method === "POST") {
+        return {
+          ok: false,
+          json: async () => ({
+            error: "This variant already exists on the product",
+            code: "DUPLICATE_VARIANT",
+          }),
+        };
+      }
+      return { ok: true, json: async () => ({}) };
+    });
+    renderWithIntl(<ProductVariantsSection productId="p1" />);
+    await screen.findByDisplayValue("Чорний");
+
+    fireEvent.change(screen.getAllByRole("textbox", { name: "Значення" }).at(-1)!, {
+      target: { value: "M" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Додати варіант" }));
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "Варіант із такими назвою та значенням уже існує для цього товару."
+      )
+    );
+    expect(toast.error).not.toHaveBeenCalledWith("This variant already exists on the product");
+  });
+
+  it("surfaces the Ukrainian VARIANT_REFERENCED toast on delete — never the English `error` text", async () => {
+    fetchMock.mockImplementation(async (_url: string, init?: RequestInit) => {
+      if (!init || init.method === undefined) return { ok: true, json: async () => rows };
+      if (init.method === "DELETE") {
+        return {
+          ok: false,
+          json: async () => ({
+            error: "Cannot delete a variant that is referenced by orders or carts.",
+            code: "VARIANT_REFERENCED",
+          }),
+        };
+      }
+      return { ok: true, json: async () => ({}) };
+    });
+    renderWithIntl(<ProductVariantsSection productId="p1" />);
+    await screen.findByDisplayValue("Чорний");
+
+    fireEvent.click(screen.getAllByRole("button", { name: "Видалити" })[1]);
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "Неможливо видалити варіант, на який посилаються замовлення або кошики. Замість цього встановіть залишок 0."
+      )
+    );
+    expect(toast.error).not.toHaveBeenCalledWith(
+      "Cannot delete a variant that is referenced by orders or carts."
+    );
+    // The refused row is never optimistically removed.
+    expect(await screen.findByDisplayValue("Чорний")).toBeInTheDocument();
   });
 });

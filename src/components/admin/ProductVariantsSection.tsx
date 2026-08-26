@@ -66,6 +66,20 @@ export function ProductVariantsSection({ productId }: ProductVariantsSectionProp
     load();
   }, [base, t]);
 
+  // The API returns English `error` prose (log/consumer text) plus a machine
+  // `code` (see src/lib/api-utils.ts's apiError). This admin panel is
+  // UA-catalog-driven since G13, so we never render `data.error` — we map
+  // `code` through byCode instead, falling back to a generic UA sentence for
+  // an absent/unknown code. Same guarded-dynamic-key pattern as
+  // feedback-form.tsx / NewsletterSignup.tsx.
+  const errorMessageForCode = useCallback(
+    (code?: string) => {
+      const key = code ? `byCode.${code}` : "";
+      return key && t.has(key as never) ? t(key as never) : t("fallback");
+    },
+    [t]
+  );
+
   const addVariant = async () => {
     const stock = parseInt(draft.stock, 10);
     if (!draft.value.trim() || isNaN(stock) || stock < 0) return;
@@ -78,14 +92,15 @@ export function ProductVariantsSection({ productId }: ProductVariantsSectionProp
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || t("toasts.saveError"));
+        toast.error(errorMessageForCode(data.code));
+        return;
       }
       const created: VariantRow = await res.json();
       setRows((prev) => [...prev, created]);
       setDraft({ name: draft.name, value: "", stock: "0" });
       toast.success(t("toasts.added"));
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : t("toasts.saveError"));
+    } catch {
+      toast.error(t("toasts.saveError"));
     } finally {
       setBusyId(null);
     }
@@ -102,18 +117,19 @@ export function ProductVariantsSection({ productId }: ProductVariantsSectionProp
         });
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
-          throw new Error(data.error || t("toasts.saveError"));
+          toast.error(errorMessageForCode(data.code));
+          return;
         }
         const updated: VariantRow = await res.json();
         setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...updated } : r)));
         toast.success(t("toasts.updated"));
-      } catch (error) {
-        toast.error(error instanceof Error ? error.message : t("toasts.saveError"));
+      } catch {
+        toast.error(t("toasts.saveError"));
       } finally {
         setBusyId(null);
       }
     },
-    [base, t]
+    [base, t, errorMessageForCode]
   );
 
   const deleteVariant = async (id: string) => {
@@ -122,12 +138,13 @@ export function ProductVariantsSection({ productId }: ProductVariantsSectionProp
       const res = await fetch(`${base}/${id}`, { method: "DELETE" });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || t("toasts.deleteError"));
+        toast.error(errorMessageForCode(data.code));
+        return;
       }
       setRows((prev) => prev.filter((r) => r.id !== id));
       toast.success(t("toasts.deleted"));
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : t("toasts.deleteError"));
+    } catch {
+      toast.error(t("toasts.deleteError"));
     } finally {
       setBusyId(null);
     }

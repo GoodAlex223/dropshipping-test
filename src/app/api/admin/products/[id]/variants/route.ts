@@ -17,7 +17,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     const product = await prisma.product.findUnique({ where: { id }, select: { id: true } });
     if (!product) {
-      return apiError("Product not found", 404);
+      return apiError("Product not found", 404, "PRODUCT_NOT_FOUND");
     }
 
     const variants = await prisma.productVariant.findMany({
@@ -43,12 +43,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const product = await prisma.product.findUnique({ where: { id }, select: { id: true } });
     if (!product) {
-      return apiError("Product not found", 404);
+      return apiError("Product not found", 404, "PRODUCT_NOT_FOUND");
     }
 
     const validationResult = productVariantSchema.safeParse(body);
     if (!validationResult.success) {
-      return apiError(validationResult.error.issues[0].message, 400);
+      return apiError(validationResult.error.issues[0].message, 400, "VALIDATION_ERROR");
     }
     const data = validationResult.data;
 
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       select: { id: true },
     });
     if (duplicate) {
-      return apiError("This variant already exists on the product", 400);
+      return apiError("This variant already exists on the product", 400, "DUPLICATE_VARIANT");
     }
 
     const variant = await prisma.productVariant.create({
