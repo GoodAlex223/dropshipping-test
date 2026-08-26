@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { VARIANT_NAMES } from "@/lib/variant-names";
 
 // Auth validations
 export const loginSchema = z.object({
@@ -50,6 +51,20 @@ export const productSchema = productBaseSchema.refine(
     path: ["comparePrice"],
   }
 );
+
+// Product variant validations (G16). `name` is an enum over the canonical DATA
+// values — a hand-typed "Size" is unenterable, not merely discouraged
+// (stated-conventions-are-not-controls). Per-variant price/sku deliberately
+// not exposed (YAGNI).
+export const productVariantSchema = z.object({
+  name: z.enum([VARIANT_NAMES.size, VARIANT_NAMES.color], {
+    message: `Variant name must be "${VARIANT_NAMES.size}" or "${VARIANT_NAMES.color}"`,
+  }),
+  value: z.string().trim().min(1, "Value is required").max(50),
+  stock: z.number().int().min(0, "Stock cannot be negative"),
+});
+
+export const productVariantUpdateSchema = productVariantSchema.partial();
 
 // Category validations
 export const categorySchema = z.object({
