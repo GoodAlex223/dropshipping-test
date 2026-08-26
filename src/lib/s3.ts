@@ -1,8 +1,17 @@
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
+// G16: Cloudflare R2 is SigV4/S3-compatible — one optional endpoint is the
+// only difference. Credentials + bucket stay in the AWS_* slots (single env
+// contract, no R2_* fork). R2 ignores region and expects "auto"; real AWS
+// keeps the old default. forcePathStyle is re-verified against the real
+// bucket in Task 11 — if virtual-host addressing works there, drop it.
+const endpoint = process.env.S3_ENDPOINT || undefined;
+
 const s3Client = new S3Client({
-  region: process.env.AWS_REGION || "us-east-1",
+  region: process.env.AWS_REGION || (endpoint ? "auto" : "us-east-1"),
+  endpoint,
+  forcePathStyle: Boolean(endpoint),
   credentials: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID || "",
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
