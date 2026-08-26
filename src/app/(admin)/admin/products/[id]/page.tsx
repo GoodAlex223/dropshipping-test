@@ -22,10 +22,12 @@ interface Product {
   barcode: string | null;
   brand: string | null;
   mpn: string | null;
+  styleGroup: string | null;
   stock: number;
   categoryId: string;
   isActive: boolean;
   isFeatured: boolean;
+  excludeFromFeed: boolean;
 }
 
 export default function EditProductPage() {
