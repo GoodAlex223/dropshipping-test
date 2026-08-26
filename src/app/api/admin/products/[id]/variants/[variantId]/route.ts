@@ -29,6 +29,22 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
     const data = validationResult.data;
 
+    // Same invariant POST enforces: no two rows on a product may share
+    // name+value. Compare against the *resulting* name/value — the incoming
+    // field if present, otherwise the row's current value — so a PATCH that
+    // only touches `value` still checks against the unchanged `name`, and
+    // vice versa. Exclude this row itself so a no-op PATCH doesn't self-match.
+    const resultingName = data.name ?? existing.name;
+    const resultingValue = data.value ?? existing.value;
+
+    const duplicate = await prisma.productVariant.findFirst({
+      where: { productId: id, name: resultingName, value: resultingValue, id: { not: variantId } },
+      select: { id: true },
+    });
+    if (duplicate) {
+      return apiError("This variant already exists on the product", 400);
+    }
+
     const variant = await prisma.productVariant.update({
       where: { id: variantId },
       data: {

@@ -117,6 +117,13 @@ describe("POST /api/admin/products/[id]/variants", () => {
     const res = await post({ name: "Розмір", value: "M", stock: 5 });
     expect(res.status).toBe(400);
     expect(prisma.productVariant.create).not.toHaveBeenCalled();
+    // Pin the scoping: a route that only scoped by productId (rejecting
+    // every second variant on a product) would pass the assertions above
+    // unchanged.
+    expect(prisma.productVariant.findFirst).toHaveBeenCalledWith({
+      where: { productId: "p1", name: "Розмір", value: "M" },
+      select: { id: true },
+    });
   });
 
   it("returns 404 for an unknown product", async () => {
@@ -133,7 +140,11 @@ describe("PATCH /api/admin/products/[id]/variants/[variantId]", () => {
     );
 
   it("updates value and stock", async () => {
-    vi.mocked(prisma.productVariant.findFirst).mockResolvedValue(sizeM as never);
+    // Call 1: the ownership existence check. Call 2: the sibling-duplicate
+    // guard — no collision, so the update proceeds.
+    vi.mocked(prisma.productVariant.findFirst)
+      .mockResolvedValueOnce(sizeM as never)
+      .mockResolvedValueOnce(null as never);
     vi.mocked(prisma.productVariant.update).mockResolvedValue({ ...sizeM, stock: 9 } as never);
     const res = await patch({ stock: 9 });
     expect(res.status).toBe(200);
@@ -152,6 +163,30 @@ describe("PATCH /api/admin/products/[id]/variants/[variantId]", () => {
   it("returns 404 when the variant is not on this product", async () => {
     vi.mocked(prisma.productVariant.findFirst).mockResolvedValue(null);
     expect((await patch({ stock: 1 })).status).toBe(404);
+    // Pin the ownership scoping: a lookup that dropped `productId` would
+    // pass the assertion above unchanged while letting an admin PATCH a
+    // variant belonging to a different product by guessing its id.
+    expect(prisma.productVariant.findFirst).toHaveBeenCalledWith({
+      where: { id: "v1", productId: "p1" },
+    });
+  });
+
+  it("rejects a PATCH that would collide with an existing sibling variant with 400", async () => {
+    const sizeL = { id: "v2", productId: "p1", name: "Розмір", value: "L", stock: 3 };
+    // Call 1: the ownership existence check (v1, currently Розмір/M).
+    // Call 2: the sibling-duplicate guard finds Розмір/L already on p1.
+    vi.mocked(prisma.productVariant.findFirst)
+      .mockResolvedValueOnce(sizeM as never)
+      .mockResolvedValueOnce(sizeL as never);
+    const res = await patch({ value: "L" });
+    expect(res.status).toBe(400);
+    expect(prisma.productVariant.update).not.toHaveBeenCalled();
+    // The exclusion is load-bearing: without `id: { not: variantId }` a
+    // no-op PATCH would self-match and every PATCH would 400.
+    expect(prisma.productVariant.findFirst).toHaveBeenLastCalledWith({
+      where: { productId: "p1", name: "Розмір", value: "L", id: { not: "v1" } },
+      select: { id: true },
+    });
   });
 });
 
@@ -184,5 +219,12 @@ describe("DELETE /api/admin/products/[id]/variants/[variantId]", () => {
   it("returns 404 when not found", async () => {
     vi.mocked(prisma.productVariant.findFirst).mockResolvedValue(null);
     expect((await del()).status).toBe(404);
+    // Pin the ownership scoping: a lookup that dropped `productId` would
+    // pass the assertion above unchanged while letting an admin delete a
+    // variant belonging to a different product by guessing its id.
+    expect(prisma.productVariant.findFirst).toHaveBeenCalledWith({
+      where: { id: "v1", productId: "p1" },
+      include: { _count: { select: { orderItems: true, cartItems: true } } },
+    });
   });
 });
