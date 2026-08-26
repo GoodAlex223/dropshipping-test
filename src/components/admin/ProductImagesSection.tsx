@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -29,6 +29,17 @@ export function ProductImagesSection({ productId }: ProductImagesSectionProps) {
   const [orderDirty, setOrderDirty] = useState(false);
   const [isSavingOrder, setIsSavingOrder] = useState(false);
 
+  // I6/G16 fix: the initial-fetch effect below must not depend on `t`.
+  // useTranslations' return is memoised today so there's no loop right now,
+  // but that's exactly the shape of the G13 use-toast loop bug — if the
+  // provider's messages identity ever churns, this effect would refetch in
+  // a loop. The ref gives the catch branch a current translator without the
+  // effect depending on its identity.
+  const tRef = useRef(t);
+  useEffect(() => {
+    tRef.current = t;
+  }, [t]);
+
   useEffect(() => {
     const load = async () => {
       try {
@@ -37,13 +48,13 @@ export function ProductImagesSection({ productId }: ProductImagesSectionProps) {
         const rows: { id: string; url: string; alt: string | null }[] = await res.json();
         setImages(rows.map((r) => ({ id: r.id, url: r.url, alt: r.alt ?? undefined })));
       } catch {
-        toast.error(t("toasts.loadError"));
+        toast.error(tRef.current("toasts.loadError"));
       } finally {
         setIsLoading(false);
       }
     };
     load();
-  }, [base, t]);
+  }, [base]);
 
   const handleChange = async (next: AdminImage[]) => {
     const { added, removedIds, orderChanged } = diffImages(images, next);
@@ -74,10 +85,20 @@ export function ProductImagesSection({ productId }: ProductImagesSectionProps) {
 
     for (const item of added) {
       try {
+        // I1/G16 fix: no `position` here. `working.indexOf(item)` is an
+        // index into the *currently visible* list, which collides with
+        // whatever position a surviving row already holds server-side (e.g.
+        // remove image 0, upload a replacement — indexOf gives 1, which i2
+        // already occupies there). Two rows sharing a position makes
+        // "first" (the product-card/OG image) arbitrary until the next
+        // reload. The route already assigns max+1 when position is
+        // omitted, which is always collision-free; ordering is then
+        // explicitly owned by the reorder-and-save flow, which is the
+        // design's intent anyway.
         const res = await fetch(base, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: item.url, position: working.indexOf(item) }),
+          body: JSON.stringify({ url: item.url }),
         });
         if (!res.ok) throw new Error();
         const row: { id: string; url: string; alt: string | null } = await res.json();

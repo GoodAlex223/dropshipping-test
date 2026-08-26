@@ -124,4 +124,53 @@ describe("ProductImagesSection", () => {
       expect(screen.queryByRole("button", { name: "Зберегти порядок" })).toBeNull()
     );
   });
+
+  // I1/G16 fix: `position: working.indexOf(item)` was an index into the
+  // *currently visible* list, colliding with a surviving row's real
+  // server-side position (e.g. remove image 0, upload a replacement —
+  // indexOf gives 1, which i2 already occupies). The route's max+1 default
+  // (only applied when `position` is absent) is the only collision-free
+  // choice, so the POST body must never carry the field at all.
+  it("uploading a new image posts no position — the route's max+1 default owns ordering", async () => {
+    const uploadUrl = "https://signed.example/put";
+    const publicUrl = "https://pub.r2.dev/products/999-new.jpg";
+    fetchMock.mockImplementation(async (url: string, init?: RequestInit) => {
+      const method = init?.method ?? "GET";
+      if (url === "/api/admin/upload" && method === "POST") {
+        return {
+          ok: true,
+          json: async () => ({ uploadUrl, publicUrl, key: "products/999-new.jpg" }),
+        };
+      }
+      if (url === uploadUrl && method === "PUT") {
+        return { ok: true, json: async () => ({}) };
+      }
+      if (url === "/api/admin/products/p1/images" && method === "POST") {
+        return { ok: true, json: async () => ({ id: "i3", url: publicUrl, alt: null }) };
+      }
+      if (method === "DELETE") return { ok: true, json: async () => ({ message: "deleted" }) };
+      return { ok: true, json: async () => rows };
+    });
+
+    const { container } = renderWithIntl(<ProductImagesSection productId="p1" />);
+    await screen.findByAltText("Ззаду");
+
+    // Drive the same hidden file input react-dropzone's "click to browse"
+    // path uses — the standard way to trigger its onDrop pipeline in jsdom
+    // without simulating real HTML5 drag-and-drop DataTransfer events.
+    const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(["fake-image-bytes"], "new.jpg", { type: "image/jpeg" });
+    Object.defineProperty(fileInput, "files", { value: [file] });
+    fireEvent.change(fileInput);
+
+    await waitFor(() => {
+      const postCall = fetchMock.mock.calls.find(
+        ([u, i]) => u === "/api/admin/products/p1/images" && i?.method === "POST"
+      );
+      expect(postCall).toBeDefined();
+      const body = JSON.parse(postCall![1].body as string);
+      expect(body).toEqual({ url: publicUrl });
+      expect(body).not.toHaveProperty("position");
+    });
+  });
 });

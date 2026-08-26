@@ -71,4 +71,34 @@ describe("s3.ts client configuration (G16: Cloudflare R2 via S3_ENDPOINT)", () =
     expect(result.publicUrl).toBe(`https://pub-xyz.r2.dev/${result.key}`);
     expect(mod.getKeyFromUrl(result.publicUrl)).toBe(result.key);
   });
+
+  // I3/G16 fix: with S3_ENDPOINT set (R2) but AWS_CLOUDFRONT_URL unset, the
+  // old code silently fell back to `${BUCKET_NAME}.s3.amazonaws.com` — a
+  // host R2 objects are never reachable under — and persisted that broken
+  // URL as the upload's publicUrl. getPresignedUploadUrl must now refuse.
+  it("with S3_ENDPOINT set and AWS_CLOUDFRONT_URL unset, getPresignedUploadUrl throws a named, actionable error instead of returning a broken URL", async () => {
+    const { mod } = await loadS3({
+      S3_ENDPOINT: "https://abc123.r2.cloudflarestorage.com",
+      AWS_CLOUDFRONT_URL: undefined,
+    });
+    await expect(mod.getPresignedUploadUrl("file.jpg", "image/jpeg")).rejects.toBeInstanceOf(
+      mod.MissingCdnUrlError
+    );
+    await expect(mod.getPresignedUploadUrl("file.jpg", "image/jpeg")).rejects.toThrow(
+      /AWS_CLOUDFRONT_URL/
+    );
+  });
+
+  // The legacy real-AWS path (no S3_ENDPOINT) never had a CDN configured in
+  // this repo and its *.s3.amazonaws.com virtual-host URL is genuinely
+  // reachable there — this fallback must stay legal for that path.
+  it("without S3_ENDPOINT, an unset AWS_CLOUDFRONT_URL still resolves via the amazonaws.com fallback (legacy AWS path stays legal)", async () => {
+    const { mod } = await loadS3({
+      S3_ENDPOINT: undefined,
+      AWS_CLOUDFRONT_URL: undefined,
+      AWS_S3_BUCKET: "legacy-bucket",
+    });
+    const result = await mod.getPresignedUploadUrl("file.jpg", "image/jpeg");
+    expect(result.publicUrl).toBe(`https://legacy-bucket.s3.amazonaws.com/${result.key}`);
+  });
 });

@@ -2,7 +2,7 @@ import { screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderWithIntl } from "../helpers/render-with-intl";
 
-vi.mock("sonner", () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
+vi.mock("sonner", () => ({ toast: { error: vi.fn(), success: vi.fn(), warning: vi.fn() } }));
 
 import { toast } from "sonner";
 import { ProductVariantsSection } from "@/components/admin/ProductVariantsSection";
@@ -201,5 +201,162 @@ describe("ProductVariantsSection", () => {
     );
     // The refused row is never optimistically removed.
     expect(await screen.findByDisplayValue("Чорний")).toBeInTheDocument();
+  });
+
+  // I2/G16 fix (hole 3): a rejected PATCH left the optimistic edit on
+  // screen forever, disagreeing with the server. A refetch rolls it back.
+  it("rolls back the optimistic edit on a failed PATCH by refetching the server's rows", async () => {
+    fetchMock.mockImplementation(async (_url: string, init?: RequestInit) => {
+      if (!init || init.method === undefined) return { ok: true, json: async () => rows };
+      if (init.method === "PATCH") {
+        return {
+          ok: false,
+          json: async () => ({
+            error: "This variant already exists on the product",
+            code: "DUPLICATE_VARIANT",
+          }),
+        };
+      }
+      return { ok: true, json: async () => ({}) };
+    });
+    renderWithIntl(<ProductVariantsSection productId="p1" />);
+    await screen.findByDisplayValue("Чорний");
+
+    // Not getAllByRole("textbox", ...): a Колір row's value input carries
+    // a `list` attribute (I4's datalist), which HTML-AAM maps to role
+    // "combobox" instead of "textbox" — getByLabelText finds it either way.
+    const valueInputs = screen.getAllByLabelText("Значення");
+    fireEvent.change(valueInputs[1], { target: { value: "Синій" } });
+    fireEvent.blur(valueInputs[1]);
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "Варіант із такими назвою та значенням уже існує для цього товару."
+      )
+    );
+
+    // The drifted local edit is gone and the server's original value is
+    // back — a GET refetch, not a targeted per-field undo.
+    await waitFor(() => expect(screen.queryByDisplayValue("Синій")).toBeNull());
+    expect(await screen.findByDisplayValue("Чорний")).toBeInTheDocument();
+  });
+
+  // I2/G16 fix (holes 1 & 2): clearing the value field and blurring used to
+  // skip the PATCH silently, leaving an empty box over an unchanged server
+  // row with no indication anything was wrong.
+  it("reverts an emptied value on blur to the last saved value and warns, sending no PATCH", async () => {
+    renderWithIntl(<ProductVariantsSection productId="p1" />);
+    await screen.findByDisplayValue("Чорний");
+
+    const valueInputs = screen.getAllByRole("textbox", { name: "Значення" });
+    fireEvent.change(valueInputs[0], { target: { value: "" } });
+    fireEvent.blur(valueInputs[0]);
+
+    await waitFor(() =>
+      expect(toast.warning).toHaveBeenCalledWith(
+        "Значення не може бути порожнім — залишено попереднє значення."
+      )
+    );
+    expect(await screen.findByDisplayValue("M")).toBeInTheDocument();
+    expect(fetchMock.mock.calls.some(([, init]) => init?.method === "PATCH")).toBe(false);
+  });
+
+  // I2/G16 fix (hole 1): clearing the stock field wrote a silent local `0`
+  // via `Number("")`, then onBlur's `parseInt("")` was NaN, so no PATCH was
+  // ever sent — the server kept the old stock forever with no indication.
+  it("reverts an emptied stock field on blur to the last saved value and warns, sending no PATCH", async () => {
+    renderWithIntl(<ProductVariantsSection productId="p1" />);
+    await screen.findByDisplayValue("Чорний");
+
+    const stockInputs = screen.getAllByRole("spinbutton", { name: "Залишок" });
+    fireEvent.change(stockInputs[0], { target: { value: "" } });
+    fireEvent.blur(stockInputs[0]);
+
+    await waitFor(() =>
+      expect(toast.warning).toHaveBeenCalledWith(
+        "Залишок має бути невід'ємним числом — залишено попереднє значення."
+      )
+    );
+    expect(await screen.findByDisplayValue("5")).toBeInTheDocument();
+    expect(fetchMock.mock.calls.some(([, init]) => init?.method === "PATCH")).toBe(false);
+  });
+
+  // I2/G16 fix (hole 4): addVariant already early-returned on an invalid
+  // stock, but the button stayed enabled — clearing stock, typing a value,
+  // and clicking «Додати варіант» used to do nothing, silently.
+  it("disables Add when the stock field is cleared, even with a value present", async () => {
+    renderWithIntl(<ProductVariantsSection productId="p1" />);
+    await screen.findByDisplayValue("Чорний");
+
+    fireEvent.change(screen.getAllByRole("textbox", { name: "Значення" }).at(-1)!, {
+      target: { value: "L" },
+    });
+    fireEvent.change(screen.getAllByRole("spinbutton", { name: "Залишок" }).at(-1)!, {
+      target: { value: "" },
+    });
+
+    expect(screen.getByRole("button", { name: "Додати варіант" })).toBeDisabled();
+  });
+
+  // I4/G16 fix: the known swatch colours are offered as datalist
+  // suggestions on a Колір row's value input, so a near-miss typo is one
+  // autocomplete pick away from actually matching a swatch key.
+  it("offers the known swatch colours as datalist suggestions on a Колір row's value input", async () => {
+    renderWithIntl(<ProductVariantsSection productId="p1" />);
+    await screen.findByDisplayValue("Чорний");
+
+    // Row order from the fixture: v1 (Розмір/M) then v2 (Колір/Чорний).
+    // Not getAllByRole("textbox", ...): the `list` attribute below maps
+    // this input's role to "combobox" per HTML-AAM — getByLabelText finds
+    // it regardless of which role it ends up with.
+    const valueInputs = screen.getAllByLabelText("Значення");
+    const colorValueInput = valueInputs[1];
+    const listId = colorValueInput.getAttribute("list");
+    expect(listId).toBeTruthy();
+    const options = document.querySelectorAll(`#${listId} option`);
+    expect(Array.from(options).map((o) => o.getAttribute("value"))).toEqual(
+      expect.arrayContaining(["Чорний", "Білий", "Бежевий", "Темно-синій"])
+    );
+
+    // The Розмір row's value input gets no colour suggestions.
+    const sizeValueInput = valueInputs[0];
+    expect(sizeValueInput).not.toHaveAttribute("list");
+  });
+
+  // I4/G16 fix: the datalist is guidance, not a control — this warning
+  // after a successful save is the actual control against a colour value
+  // with no swatch entry disappearing silently on the storefront.
+  it("warns after saving an edited Колір value that has no swatch entry", async () => {
+    fetchMock.mockImplementation(async (_url: string, init?: RequestInit) => {
+      if (!init || init.method === undefined) return { ok: true, json: async () => rows };
+      if (init.method === "PATCH") {
+        return {
+          ok: true,
+          json: async () => ({
+            id: "v2",
+            productId: "p1",
+            name: "Колір",
+            value: "Рожевий",
+            stock: 20,
+          }),
+        };
+      }
+      return { ok: true, json: async () => ({}) };
+    });
+    renderWithIntl(<ProductVariantsSection productId="p1" />);
+    await screen.findByDisplayValue("Чорний");
+
+    // Not getAllByRole("textbox", ...): a Колір row's value input carries
+    // a `list` attribute (I4's datalist), which HTML-AAM maps to role
+    // "combobox" instead of "textbox" — getByLabelText finds it either way.
+    const valueInputs = screen.getAllByLabelText("Значення");
+    fireEvent.change(valueInputs[1], { target: { value: "Рожевий" } });
+    fireEvent.blur(valueInputs[1]);
+
+    await waitFor(() =>
+      expect(toast.warning).toHaveBeenCalledWith(
+        "Для кольору «Рожевий» немає зразка — плашка кольору не відображатиметься."
+      )
+    );
   });
 });
