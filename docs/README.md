@@ -34,7 +34,7 @@ Central index for all project documentation.
 | -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------ |
 | [planning/README.md](planning/README.md)                                                                             | Planning overview                                                             | 2026-01-05   |
 | [planning/WEEKLY.md](planning/WEEKLY.md)                                                                             | Current week's plan                                                           | 2026-08-20   |
-| [planning/TODO.md](planning/TODO.md)                                                                                 | Active tasks                                                                  | 2026-08-21   |
+| [planning/TODO.md](planning/TODO.md)                                                                                 | Active tasks                                                                  | 2026-08-26   |
 | [planning/DONE.md](planning/DONE.md)                                                                                 | Completed tasks                                                               | 2026-08-21   |
 | [planning/BACKLOG.md](planning/BACKLOG.md)                                                                           | Unprioritized ideas                                                           | 2026-08-21   |
 | [planning/ROADMAP.md](planning/ROADMAP.md)                                                                           | Long-term vision                                                              | 2026-07-14   |
@@ -79,9 +79,9 @@ Central index for all project documentation.
 
 ## Implementation Plans
 
-| Plan                | Task | Status | Started |
-| ------------------- | ---- | ------ | ------- |
-| _(no active plans)_ | —    | —      | —       |
+| Plan                                                                                          | Task                                                | Status      | Started    |
+| --------------------------------------------------------------------------------------------- | --------------------------------------------------- | ----------- | ---------- |
+| [2026-08-26_g16-real-product-intake.md](planning/plans/2026-08-26_g16-real-product-intake.md) | G16 — Real-product intake (admin gap + R2 + 7 rows) | IN PROGRESS | 2026-08-26 |
 
 ### Archived Plans
 
