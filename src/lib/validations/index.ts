@@ -32,6 +32,12 @@ export const productBaseSchema = z.object({
   barcode: z.string().max(14).optional().nullable(),
   brand: z.string().max(70).optional().nullable(),
   mpn: z.string().max(70).optional().nullable(),
+  // G16: colourway-sibling link (TASK-037 model — one Product per colourway).
+  styleGroup: z.string().max(100).optional().nullable(),
+  // G16: Google Shopping opt-out. Deliberately NO .default(): Zod 4 applies
+  // defaults even under .partial(), which would reset the flag to false on
+  // every partial PUT. The DB default (false) covers creation.
+  excludeFromFeed: z.boolean().optional(),
   categoryId: z.string().min(1, "Category is required"),
   isActive: z.boolean().default(true),
   isFeatured: z.boolean().default(false),

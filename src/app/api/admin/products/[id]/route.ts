@@ -108,6 +108,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         ...(data.barcode !== undefined && { barcode: data.barcode }),
         ...(data.brand !== undefined && { brand: data.brand }),
         ...(data.mpn !== undefined && { mpn: data.mpn }),
+        ...(data.styleGroup !== undefined && { styleGroup: data.styleGroup }),
+        ...(data.excludeFromFeed !== undefined && { excludeFromFeed: data.excludeFromFeed }),
         ...(data.stock !== undefined && { stock: data.stock }),
         ...(data.categoryId && { categoryId: data.categoryId }),
         ...(data.isActive !== undefined && { isActive: data.isActive }),
