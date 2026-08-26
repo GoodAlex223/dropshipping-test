@@ -68,6 +68,14 @@ describe("seed data integrity (mirrors seed.ts fail-fast guards)", () => {
       "MRX-004",
     ]);
   });
+
+  // G16: every real product sits on a leaf — Светри (Одяг) and Рюкзаки (Аксесуари).
+  it("seeds the G16 leaf categories under the right parents", () => {
+    const bySlug = new Map(subcategories.map((s) => [s.slug, s]));
+    expect(bySlug.get("svetry")?.parentSlug).toBe("odyah");
+    expect(bySlug.get("ryukzaky")?.parentSlug).toBe("aksesuary");
+    expect(new Set(subcategories.map((s) => s.slug)).size).toBe(subcategories.length);
+  });
 });
 
 describe("colorway integrity (TASK-037)", () => {

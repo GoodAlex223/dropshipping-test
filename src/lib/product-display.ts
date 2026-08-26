@@ -10,6 +10,10 @@ export const SIZE_ORDER = ["S", "M", "L", "XL", "XXL"] as const;
 export const COLOR_SWATCH_CLASSES: Record<string, string> = {
   Чорний: "bg-black border-border-strong",
   Білий: "bg-[#f5f5f5] border-border",
+  // G16 (real полузамок colourways). Muted hexes on purpose — the swatch is a
+  // chip, not a brand colour; no-bright-colors does not scan this module.
+  Бежевий: "bg-[#d6c3a5] border-border",
+  "Темно-синій": "bg-[#1f2a44] border-border-strong",
 };
 
 /** Dedupes size values and orders them S · M · L · XL · XXL, extras appended in first-seen order. */

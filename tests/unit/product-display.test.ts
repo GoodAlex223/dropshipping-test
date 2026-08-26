@@ -22,4 +22,13 @@ describe("product-display", () => {
   it("swatch classes cover the seed colorways", () => {
     expect(Object.keys(COLOR_SWATCH_CLASSES)).toEqual(expect.arrayContaining(["Чорний", "Білий"]));
   });
+
+  // G16: the real полузамок colourways — without these keys ProductCard,
+  // filter-bar and the PDP swatch row silently drop the chips.
+  it("swatch classes cover the G16 real-product colourways", () => {
+    expect(Object.keys(COLOR_SWATCH_CLASSES)).toEqual(
+      expect.arrayContaining(["Чорний", "Білий", "Бежевий", "Темно-синій"])
+    );
+    for (const cls of Object.values(COLOR_SWATCH_CLASSES)) expect(cls).toMatch(/\bbg-/);
+  });
 });
