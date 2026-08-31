@@ -2403,3 +2403,13 @@ _(appended during execution — planning, per-task completion, blockers, pair-se
 - 2026-08-26 — Tasks 1-10 implemented via subagent-driven development, each task reviewed
   individually; Tasks 11-13 (the two pair sessions and close-out) remain outstanding — they need
   the client's R2 credentials, a production deploy, and a merge.
+- 2026-08-31 — **Task 11 Steps 1-2 complete.** Bucket `mirox-media` provisioned by the user;
+  public `r2.dev` managed domain enabled; CORS allows GET/PUT from `http://localhost:3000` with
+  `Content-Type` (all three verified through the Cloudflare API, not assumed). R2 API token minted
+  by the user, `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` set locally.
+  **Spec §1 open item RESOLVED: path-style addressing verified** — presigned `PUT` to
+  `<account>.r2.cloudflarestorage.com/<bucket>/<key>` → 200, public `GET` through the r2.dev URL
+  → 200, probe object deleted. `forcePathStyle: true` stays as written and needs no code change;
+  `tests/unit/s3.test.ts:44` already asserts it. Recorded in `src/lib/s3.ts`, the spec's §1, and
+  the spec's Risks table. Remaining in Task 11: Steps 3-6 (dev server, the 7-row intake, the
+  storefront checklist) — a pair session with the user.

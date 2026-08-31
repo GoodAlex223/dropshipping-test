@@ -4,8 +4,11 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 // G16: Cloudflare R2 is SigV4/S3-compatible — one optional endpoint is the
 // only difference. Credentials + bucket stay in the AWS_* slots (single env
 // contract, no R2_* fork). R2 ignores region and expects "auto"; real AWS
-// keeps the old default. forcePathStyle is re-verified against the real
-// bucket in Task 11 — if virtual-host addressing works there, drop it.
+// keeps the old default. forcePathStyle: VERIFIED against the real bucket
+// (G16 Task 11, 2026-08-31) — a presigned PUT to
+// <account>.r2.cloudflarestorage.com/<bucket>/<key> returned 200 and the
+// object read back 200 through the public r2.dev URL. Do not switch to
+// virtual-host addressing without re-running that probe.
 const endpoint = process.env.S3_ENDPOINT || undefined;
 
 const s3Client = new S3Client({

@@ -123,6 +123,11 @@ Both `/api/admin/upload` handlers, `getPresignedUploadUrl`, `deleteFromS3` and
 against a real R2 bucket at implementation time**, not assumed — if virtual-host
 works, `forcePathStyle` is dropped.
 
+**Verified: path-style** (2026-08-31, Task 11 Step 2, bucket `mirox-media`). A
+presigned `PUT` to `<account>.r2.cloudflarestorage.com/<bucket>/<key>` returned
+200 and the object read back 200 through the public `r2.dev` URL. `forcePathStyle`
+stays as written; `tests/unit/s3.test.ts` already asserts it.
+
 **Env contract stays single, not forked.** Add `S3_ENDPOINT`; keep the existing
 `AWS_*` names as the credential slots. `.env.example`'s currently-commented `R2_*`
 block is **replaced** by a note that R2 credentials go in the `AWS_*` vars with
@@ -297,7 +302,7 @@ visual-gate round, since no design handoff covers admin screens.
 | R2 `r2.dev` URL is rate-limited and not production-grade | Accepted interim; swap to `img.<domain>` on the pre-authorized chain when item 1 lands. Tracked as a TASK-056 dependent row.                                          |
 | Scope exceeds the planned 4 SP                           | Recorded in §8 below; the SP revision is surfaced to the user, not absorbed silently.                                                                                 |
 | Prod `db:seed` becomes destruction once real data lands  | Already a standing landmine (WEEKLY, memory). Reinforced by §4: prod deactivation is an admin action, and the re-seed runbook is retired for prod from intake onward. |
-| Path-style vs virtual-host addressing on R2              | Verified against a real bucket during implementation; the spec does not assume.                                                                                       |
+| Path-style vs virtual-host addressing on R2              | **Resolved 2026-08-31**: path-style verified against bucket `mirox-media` (presigned PUT 200, public GET 200). `forcePathStyle` stays; see §1.                        |
 | Stock counts are invented                                | Nominal values, explicitly flagged, plus a TASK-056 tracking row.                                                                                                     |
 
 ## §8 Effort revision
