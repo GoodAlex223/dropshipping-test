@@ -2507,3 +2507,11 @@ _(appended during execution — planning, per-task completion, blockers, pair-se
   `variantId` is set — but it belongs in its own task with create-order test coverage.
   Not a launch blocker at current volume (stock is correctable by hand in admin), but high
   priority: it causes overselling.
+- 2026-08-31 — **MRX-107 stray `styleGroup` FILED, not cleared** (user ruling). The value stays
+  `"ryukzak-ekoshkira-chornyi"` locally. Confirmed harmless as rendered — the user verified the
+  colour links behave correctly, which is consistent with the field being set, since a one-member
+  group yields no rail. Two things follow: (a) a 🟤 BACKLOG row at close-out — the PDP issues a
+  `findMany` for any product carrying a `styleGroup`, including groups that cannot have siblings,
+  and nothing normalises a group whose only member names it after itself; (b) **Task 12 Step 5 must
+  leave «Група кольорів» empty for MRX-107 in prod**, per Appendix A — local is throwaway, prod is
+  the row that lasts.
