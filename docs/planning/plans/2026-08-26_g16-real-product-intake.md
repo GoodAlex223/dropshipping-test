@@ -2413,3 +2413,25 @@ _(appended during execution — planning, per-task completion, blockers, pair-se
   `tests/unit/s3.test.ts:44` already asserts it. Recorded in `src/lib/s3.ts`, the spec's §1, and
   the spec's Risks table. Remaining in Task 11: Steps 3-6 (dev server, the 7-row intake, the
   storefront checklist) — a pair session with the user.
+- 2026-08-31 — **Task 11 Step 4 begun: MRX-101 entered and verified.** All scalars correct in the
+  DB (`excludeFromFeed=true`, `styleGroup="olimpiyka-lampasy"` — a real value, not `""` — `brand`
+  and `comparePrice` null, category Олімпійки); 3 images at positions 0/1/2 in upload order on the
+  public r2.dev host, all three fetching 200 `image/jpeg`; 5 variants with the canonical UA names
+  («Колір» ×1 at stock 20, «Розмір» S/M/L/XL at 5). The browser→presigned-URL→R2 upload path works
+  end to end, which the Step 2 probe could not exercise. PDP returns 200.
+  **Convention settled** (Appendix A left it unspecified): the «Колір» row's stock equals the
+  product total, matching every seeded product (MRX-001 sizes sum to 30, «Чорний» is 30).
+- 2026-08-31 — **DEFECT FOUND (pre-existing, fixed live): the Google Shopping feed emitted zero
+  items.** `image_link` is validated with `z.string().url()`, which rejects the root-relative paths
+  (`/images/products/p-cap.png`) that every seeded product stores; `validateFeedItemSafe` then
+  filtered all 8 placeholders out silently. **Not a G16 regression** — G16's only change to the
+  route is the `excludeFromFeed: false` where-clause, and the schema and seed image paths are
+  untouched on this branch; the same 8 rows fail identically on `main`. The feature has been a
+  no-op since the placeholder catalog was seeded. Ironically MRX-101 was the first row whose images
+  would have passed (R2 gives absolute URLs), so on `main` the trademark-bearing product would have
+  been the feed's only entry.
+  Fixed by resolving `ProductImage.url` against `siteConfig.url` (`toAbsoluteImageUrl`, using
+  `new URL(url, baseUrl)` so already-absolute R2 URLs pass through untouched). Root cause of the
+  review miss: `tests/unit/google-shopping-route.test.ts`'s fixture used an absolute-URL image, so
+  it never exercised the shape the seed actually produces — the fixture now carries a relative-path
+  row. 3 new tests; suite 939 → 942. User ruled "fix now" over filing it.

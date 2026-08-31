@@ -59,6 +59,17 @@ const fixture: Row[] = [
     images: [{ url: "https://pub-xyz.r2.dev/products/1-photo.jpg" }],
   }),
   row({ id: "p-inactive", slug: "inactive", sku: "MRX-009", isActive: false }),
+  // The shape the seeded catalog actually stores: ProductImage.url is a
+  // root-relative path under public/, not an absolute URL. Every other row in
+  // this fixture used an absolute URL, which is why the feed's rejection of
+  // relative paths survived review (found in the G16 Task 11 pair session).
+  row({
+    id: "p-relative",
+    name: "Кепка Mirox",
+    slug: "kepka-mirox",
+    sku: "MRX-008",
+    images: [{ url: "/images/products/p-cap.png" }],
+  }),
 ];
 
 beforeEach(() => {
@@ -94,5 +105,30 @@ describe("GET /feed/google-shopping.xml — excludeFromFeed (G16)", () => {
     expect(xml).toContain("<g:price>1290.00 UAH</g:price>");
     expect(xml).toContain("<g:brand>Mirox</g:brand>");
     expect(xml).toContain("<g:product_type>Худі</g:product_type>");
+  });
+});
+
+describe("GET /feed/google-shopping.xml — relative image paths", () => {
+  it("absolutizes a root-relative ProductImage.url against the site URL", async () => {
+    const xml = await (await GET()).text();
+    expect(xml).toContain(
+      "<g:image_link>https://mirox.test/images/products/p-cap.png</g:image_link>"
+    );
+  });
+
+  it("keeps a row whose image is a relative path instead of dropping it in validation", async () => {
+    // image_link is a required z.string().url() — a bare "/images/..." fails it,
+    // and validateFeedItemSafe then silently filters the whole item out of the
+    // feed. Every seeded product stores a relative path, so before this was
+    // fixed the feed rendered zero items.
+    const xml = await (await GET()).text();
+    expect(xml).toContain("<g:id>p-relative</g:id>");
+  });
+
+  it("leaves an already-absolute image URL untouched", async () => {
+    const xml = await (await GET()).text();
+    expect(xml).toContain(
+      "<g:image_link>https://mirox.test/images/products/p-hudi-basic.png</g:image_link>"
+    );
   });
 });
