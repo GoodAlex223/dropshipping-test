@@ -2477,3 +2477,33 @@ _(appended during execution — planning, per-task completion, blockers, pair-se
   `og:image:alt` is the English literal `"Product"`
   (`src/app/(shop)/products/[slug]/opengraph-image.tsx:21`) — pre-existing, already covered by the
   BACKLOG'd "SEO machine-metadata corners still EN" item, not a G16 find.
+- 2026-08-31 — **Task 11 Step 5 COD check PASSES.** Order `ORD-MTHNE9T7-WCRJ`, total 3478 грн
+  (1749 + 1649 + 80 delivery, exactly as predicted). Both lines persisted `variantId` **and**
+  `variantInfo`: «Розмір: M» for the олімпійка and «Розмір: Один розмір» for the рюкзак — never
+  «— Size». This is the first order in this database ever to carry variant data; all 13 seeded
+  order items have `variantId`/`variantInfo` null, so the write path had never executed here.
+  Confirmation email rendered and delivered (to the Resend account owner, as expected).
+  Card hover-swap and the light visual check confirmed by the user. **Task 11 complete** apart
+  from clearing MRX-107's stray `styleGroup`.
+- 2026-08-31 — **DEFECT FOUND (pre-existing, NOT fixed — filed): `product.stock` never decrements
+  for variant purchases.** User-observed: stock dropped on the PDP but not on the admin products
+  list. Confirmed in the DB — MRX-101 size M went 5→4 while `product.stock` stayed 20; MRX-107
+  «Один розмір» went 10→9 while `product.stock` stayed 10.
+  Cause: `src/app/api/checkout/create-order/route.ts:148-161` is an either/or — it decrements the
+  **variant** when `item.variantId` is set and the **product** otherwise, never both. Every seeded
+  product sets `product.stock` = sum of its size variants, and three consumers treat it as the
+  authoritative total: the admin list's stock column and low/out-of-stock badge thresholds
+  (`admin/products/page.tsx:357-364`), the storefront `inStock` filter
+  (`api/products/route.ts:124` → `where.stock = { gt: 0 }`), and the feed's
+  `availability` (`feed/google-shopping.xml/route.ts:89`). So for any product sold with a variant
+  the aggregate silently overstates for ever, widening with each sale: admin shows wrong inventory,
+  a sold-out product keeps passing the in-stock filter and keeps reporting "in stock" to Google,
+  and `lowStockAlert` can never fire.
+  **Not a G16 regression** — `create-order` is untouched on this branch (empty
+  `git diff main..HEAD`); the either/or dates to `89e590f` (2026-08-06, the original COD endpoint)
+  and `40ed536` (2026-08-07). **Filed rather than fixed live**: it sits entirely outside G16's diff,
+  it is the checkout money path, and this branch has already absorbed one out-of-scope fix (the
+  feed). Fix shape is small — decrement the product always, and the variant additionally when
+  `variantId` is set — but it belongs in its own task with create-order test coverage.
+  Not a launch blocker at current volume (stock is correctable by hand in admin), but high
+  priority: it causes overselling.
