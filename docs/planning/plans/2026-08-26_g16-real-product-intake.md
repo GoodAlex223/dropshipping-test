@@ -2456,3 +2456,24 @@ _(appended during execution — planning, per-task completion, blockers, pair-se
   imported. An unmatched `category` falls back to `categories[0]` rather than erroring. No tests
   cover the route or its dialog. Filed rather than fixed: it is a feature-sized task, and this
   branch has already absorbed one out-of-scope fix (the feed).
+- 2026-08-31 — **Task 11 Step 4 complete: all 7 rows entered locally.** MRX-107 verified —
+  Рюкзаки category, 10 R2 images in order 1→10, variants «Колір: Чорний»=10 and
+  «Розмір: Один розмір»=10, and the PDP renders **no size picker at all** (the one-size behaviour
+  no other row in this intake can test). 15 products total = 8 placeholders + 7 real.
+  **Minor defect, cosmetic:** MRX-107 saved `styleGroup="ryukzak-ekoshkira-chornyi"` where
+  Appendix A specifies none. Harmless as rendered — the sibling query carries
+  `id: { not: product.id }` (`src/app/(shop)/products/[slug]/page.tsx:66-83`), so a one-member
+  group yields `[]` and no swatch rail — but it is wrong data and costs a pointless `findMany` on
+  every backpack view. To be cleared in the UI; **must not be repeated in the prod intake.**
+- 2026-08-31 — **Task 11 Step 5: every terminal-runnable check passes.** Feed 8 items with zero
+  real-row leak; sitemap carries all 7 slugs; 7/7 PDPs 200; 7/7 OG images 200 `image/png`
+  (300–450 KB); category facets svetry→4, ryukzaky→1; search Светр→4, Рюкзак→1, Олімпійка→3 (the
+  third is placeholder MRX-003, correct); colour facets Бежевий→1, Темно-синій→1, Чорний→9; size
+  facets XL→12, «Один розмір»→2; featured set MRX-101/102/106/107. Remaining checklist items are
+  browser-only: COD checkout with a size, card hover-swap, and the light visual check.
+  **Instrument note for the prod re-run:** `/products/<slug>/opengraph-image` **404s** — Next
+  appends a generated segment (`opengraph-image-<id>?<hash>`). Read the URL from the page's
+  `og:image` meta tag; the plan's literal path is wrong and reads as a false failure.
+  `og:image:alt` is the English literal `"Product"`
+  (`src/app/(shop)/products/[slug]/opengraph-image.tsx:21`) — pre-existing, already covered by the
+  BACKLOG'd "SEO machine-metadata corners still EN" item, not a G16 find.
