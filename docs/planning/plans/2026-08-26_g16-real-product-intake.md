@@ -2435,3 +2435,24 @@ _(appended during execution — planning, per-task completion, blockers, pair-se
   review miss: `tests/unit/google-shopping-route.test.ts`'s fixture used an absolute-URL image, so
   it never exercised the shape the seed actually produces — the fixture now carries a relative-path
   row. 3 new tests; suite 939 → 942. User ruled "fix now" over filing it.
+- 2026-08-31 — **Светри MRX-103…106 entered and verified** (categories, `svetr-blyskavka`
+  styleGroup with all 4 members, prices, `excludeFromFeed=true`, R2 images in upload order —
+  MRX-106 correctly carries 6). Both new swatch values registered cleanly: «Темно-синій» and
+  «Бежевий» saved without the unrecognised-swatch warning.
+  **DEVIATION FROM APPENDIX A (user ruling, deliberate — not a defect):** the featured светр is
+  **MRX-106 «бежевий», not MRX-103 «чорний»**. Reason: MRX-106 has 6 photos against MRX-103's 3,
+  so it presents better in the homepage «Рекомендовані» rail. The featured set is therefore
+  **MRX-101, 102, 106, 107** — Appendix A's table still reads 101/102/103/107 and is superseded on
+  this point. **Task 12 Step 5 (prod intake) must use the corrected set**, or prod and local
+  diverge on the homepage rail.
+- 2026-08-31 — **CSV import ruled out for this intake** (user agreed; → BACKLOG at close-out).
+  `src/app/api/admin/products/import/route.ts` has no `excludeFromFeed` and no `styleGroup` column,
+  creates no ProductVariant rows, and writes at most one image — a backpack imported through it
+  would take the schema default `excludeFromFeed=false` and enter the Google Shopping feed with
+  trademark-bearing photography, silently. Underneath that, `transformHeader` lowercases every
+  header (`route.ts:57`) while the handler reads camelCase properties, so `isActive`, `isFeatured`,
+  `imageUrl`, `comparePrice`, `costPrice`, `shortDesc` and `categoryId` bind as `undefined` for
+  every row — including rows built from the route's own template — and the row still reports as
+  imported. An unmatched `category` falls back to `categories[0]` rather than erroring. No tests
+  cover the route or its dialog. Filed rather than fixed: it is a feature-sized task, and this
+  branch has already absorbed one out-of-scope fix (the feed).
