@@ -135,6 +135,8 @@ export async function POST(request: NextRequest) {
         barcode: data.barcode,
         brand: data.brand,
         mpn: data.mpn,
+        styleGroup: data.styleGroup,
+        excludeFromFeed: data.excludeFromFeed,
         stock: data.stock,
         categoryId: data.categoryId,
         isActive: data.isActive,

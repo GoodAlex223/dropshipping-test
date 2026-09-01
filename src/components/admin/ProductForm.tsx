@@ -41,12 +41,14 @@ function buildProductFormSchema(t: TProductForm) {
       barcode: z.string().optional(),
       brand: z.string().optional(),
       mpn: z.string().optional(),
+      styleGroup: z.string().max(100, t("errors.styleGroupTooLong")).optional(),
       stock: z.string().refine((val) => !isNaN(parseInt(val)) && parseInt(val) >= 0, {
         message: t("errors.stockNonNegative"),
       }),
       categoryId: z.string().min(1, t("errors.categoryRequired")),
       isActive: z.boolean(),
       isFeatured: z.boolean(),
+      excludeFromFeed: z.boolean(),
     })
     .refine(
       (data) => {
@@ -83,10 +85,12 @@ interface Product {
   barcode: string | null;
   brand: string | null;
   mpn: string | null;
+  styleGroup: string | null;
   stock: number;
   categoryId: string;
   isActive: boolean;
   isFeatured: boolean;
+  excludeFromFeed: boolean;
 }
 
 interface ProductFormProps {
@@ -123,15 +127,18 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
       barcode: product?.barcode || "",
       brand: product?.brand || "",
       mpn: product?.mpn || "",
+      styleGroup: product?.styleGroup || "",
       stock: product?.stock?.toString() || "0",
       categoryId: product?.categoryId || "",
       isActive: product?.isActive ?? true,
       isFeatured: product?.isFeatured ?? false,
+      excludeFromFeed: product?.excludeFromFeed ?? false,
     },
   });
 
   const isActive = watch("isActive");
   const isFeatured = watch("isFeatured");
+  const excludeFromFeed = watch("excludeFromFeed");
   const categoryId = watch("categoryId");
 
   useEffect(() => {
@@ -168,10 +175,12 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
         barcode: data.barcode || null,
         brand: data.brand || null,
         mpn: data.mpn || null,
+        styleGroup: data.styleGroup || null,
         stock: parseInt(data.stock),
         categoryId: data.categoryId,
         isActive: data.isActive,
         isFeatured: data.isFeatured,
+        excludeFromFeed: data.excludeFromFeed,
       };
 
       const url = isEdit ? `/api/admin/products/${product?.id}` : "/api/admin/products";
@@ -470,6 +479,21 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
                   disabled={isLoading}
                 />
               </div>
+
+              <Separator />
+
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <Label htmlFor="excludeFromFeed">{t("labels.excludeFromFeed")}</Label>
+                  <p className="text-muted-foreground text-sm">{t("hints.excludeFromFeed")}</p>
+                </div>
+                <Switch
+                  id="excludeFromFeed"
+                  checked={excludeFromFeed}
+                  onCheckedChange={(checked) => setValue("excludeFromFeed", checked)}
+                  disabled={isLoading}
+                />
+              </div>
             </CardContent>
           </Card>
 
@@ -502,6 +526,20 @@ export function ProductForm({ product, isEdit = false }: ProductFormProps) {
                 </Select>
                 {errors.categoryId && (
                   <p className="text-destructive text-sm">{errors.categoryId.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="styleGroup">{t("labels.styleGroup")}</Label>
+                <Input
+                  id="styleGroup"
+                  {...register("styleGroup")}
+                  placeholder={t("placeholders.styleGroup")}
+                  disabled={isLoading}
+                />
+                <p className="text-muted-foreground text-xs">{t("hints.styleGroup")}</p>
+                {errors.styleGroup && (
+                  <p className="text-destructive text-sm">{errors.styleGroup.message}</p>
                 )}
               </div>
             </CardContent>

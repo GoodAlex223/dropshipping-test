@@ -28,6 +28,28 @@ function formatFeedPrice(price: { toString(): string }): string {
 }
 
 /**
+ * Resolve a ProductImage.url into the absolute URL the feed schema demands.
+ *
+ * `image_link` is validated with `z.string().url()`, which rejects a
+ * root-relative path outright — and because the route filters on
+ * `validateFeedItemSafe`, a rejected item is dropped from the feed silently.
+ * The seeded catalog stores relative paths for images served out of `public/`
+ * (R2-backed uploads already store absolute URLs), so before this resolution
+ * existed every seeded product failed validation and the feed rendered zero
+ * items. Found in the G16 Task 11 pair session; the route's own tests had used
+ * an absolute-URL fixture and so never exercised the real shape.
+ */
+function toAbsoluteImageUrl(url: string | undefined, baseUrl: string): string {
+  const fallback = new URL("/og-image.png", baseUrl).toString();
+  if (!url) return fallback;
+  try {
+    return new URL(url, baseUrl).toString();
+  } catch {
+    return fallback;
+  }
+}
+
+/**
  * Wrap a value in an XML tag. Returns empty string if value is undefined/null/empty.
  */
 function xmlTag(tag: string, value: string | undefined): string {
@@ -62,7 +84,7 @@ function transformProduct(
     title: product.name.slice(0, 150),
     description: (product.description || product.shortDesc || product.name).slice(0, 5000),
     link: `${baseUrl}/products/${product.slug}`,
-    image_link: product.images[0]?.url || `${baseUrl}/og-image.png`,
+    image_link: toAbsoluteImageUrl(product.images[0]?.url, baseUrl),
     price: formatFeedPrice(product.price),
     availability: product.stock > 0 ? "in stock" : "out of stock",
     condition: "new",
@@ -112,12 +134,15 @@ function itemToXml(item: GoogleShoppingItem): string {
 
 /**
  * GET /feed/google-shopping.xml
- * Generates an RSS 2.0 XML feed with Google Shopping namespace for all active products.
+ * Generates an RSS 2.0 XML feed with Google Shopping namespace for all active products
+ * not flagged `excludeFromFeed`.
  */
 export async function GET(): Promise<Response> {
   try {
     const products = await prisma.product.findMany({
-      where: { isActive: true },
+      // G16: per-product opt-out — trademark-bearing imagery must never enter
+      // the public feed, regardless of which text fields are set.
+      where: { isActive: true, excludeFromFeed: false },
       select: {
         id: true,
         name: true,

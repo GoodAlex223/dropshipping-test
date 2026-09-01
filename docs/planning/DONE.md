@@ -2,11 +2,29 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-08-18
+**Last Updated**: 2026-08-21
 
 ---
 
 ## 2026-08 (August)
+
+### [2026-08-21] G15 - TASK-056 Client Ask Round-Trip (WEEKLY solo, 🔵 User)
+
+**Plan**: [2026-08-21_g15-task-056-client-round-trip.md](../archive/plans/2026-08-21_g15-task-056-client-round-trip.md) — bounded brainstorm path, no spec
+**Merge**: `b836e77` (2026-08-21, `--no-ff`, merged locally from `feat/g15-task-056-client-round-trip`). **No PR** — docs-only; the deliverable was reviewed live by the user across two rounds (in-place edits, then the branded-goods ruling round) and accepted in the strongest possible way: they sent it.
+
+**Summary**: The launch-critical client round-trip opened **four days ahead of plan** — the consolidated ask (UA, messenger-paste format, 21 items / 7 blocks: домен і пошта / контакти й оплата / фото і бренд / брендові товари / тексти сторінок / маркетинг / RU-версія) drafted, twice reviewed, and **sent by the user 2026-08-21** instead of the planned Monday hand-off. Per-item response tracking is live on TODO TASK-056 (21 rows, all 📨); TASK-056 stays open in its waiting phase — responses are interrupts, the domain → Resend DNS → `EMAIL_FROM` chain pre-authorized.
+
+**Key changes**:
+
+- `docs/reference/2026-08-21-client-ask.md` — the ask itself; 🔴 launch blockers settled at items 1 (domain), 2 (customer email), 9 (product photos) after the user demoted hero + legal.
+- **Branded-goods discovery**: all 3 delivered real products are third-party branded — Palm Angels zip-hoodie, Polo Ralph Lauren half-zip, Lacoste backpack, likely replicas (verified against all 25 photos + TG descriptions; the export masks brand emoji as 🔤). Per user rulings the advisory went **into the written ask** (item 14: Google-feed exclusion stated, seller-side legal/gateway risk flagged, positioning questions asked — brand-in-card vs neutral, оригінал/репліка, Mirox Shop as multibrand store since the Mirox clothing line does not exist yet). Two 🟤 extractions filed: feed branded-goods exclusion mechanism (needed before G16 enters real products) and the client-answer-gated multibrand copy sweep.
+- **Item-9 correction from the artifact**: the planning record's "back-view photos missing" claim was wrong — back views are owed only for the black zip-hoodie colorway and the half-zip; the backpack set is complete. The ask now states exactly that.
+- TG main channel **confirmed t.me/mirox_shop** (the placeholder was already correct); reviews channel `t.me/mirox_vidgyk` display question added to item 16. `docs/real_products/` (4.1 MB source photos) gitignored — S3-bound at G16 intake, never repo content.
+
+**Verification**: docs-freshness 100/100 green before each of the three commits (`9ff1fd7`, `b84c474`, `dd5043a`); prettier idempotence via lint-staged.
+
+**Learnings**: A recorded gap is a claim about an artifact — **check the artifact before asking a client to fill the gap** (the "back-view missing" claim died on contact with the actual photos, and the user caught it, not the process). Telegram channel exports under-report what photos reveal: brand-name emoji flatten to 🔤, so the descriptions alone looked brand-neutral while every photo was branded.
 
 ### [2026-08-18] G12 - Categories-to-Catalog Redesign (WEEKLY batch 🏆, 🔵 User)
 

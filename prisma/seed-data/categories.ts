@@ -60,4 +60,18 @@ export const subcategories = [
     parentSlug: "aksesuary",
     sortOrder: 1,
   },
+  {
+    name: "Светри",
+    slug: "svetry",
+    description: "Светри Mirox — в'язані та на блискавці",
+    parentSlug: "odyah",
+    sortOrder: 6,
+  },
+  {
+    name: "Рюкзаки",
+    slug: "ryukzaky",
+    description: "Рюкзаки та ранці Mirox",
+    parentSlug: "aksesuary",
+    sortOrder: 2,
+  },
 ];

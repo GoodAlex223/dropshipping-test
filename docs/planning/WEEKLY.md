@@ -25,14 +25,16 @@ _Group IDs continue from prior weeks (G1–G14 are permanently taken by DONE.md 
 
 > The launch critical path: every remaining launch blocker is client-side (domain → order emails, legal copy → TASK-055 → TASK-048 prerequisites, photography, NP API key). Head start user-approved 2026-08-20 — the ask drafts **Fri Aug 21** so the client's multi-week clock starts before the weekend. The 3 real products received 2026-08-20 are **acknowledged** in the ask (with their remaining gaps: size charts, back-view images for the card hover-swap, GTIN/brand data); their intake is G16's job, not this group's.
 
-- [ ] Draft the consolidated ask document (client-facing, UA) from the TASK-056 checklist: photography (hero/product/measurement), logo vector, real socials + claims re-confirmation, size charts, legal-page copy / lawyer engagement, contact details, bank-card + WhatsApp details, free-shipping threshold, announcement copy, **domain purchase + email chain** (Resend DNS → `EMAIL_FROM`), NP API key + the Ukrposhta carrier question, `FEEDBACK_EMAIL` recipient, RU catalog sign-off package (nuance list in [messages/README.md](../../messages/README.md)) + the RU product-copy opt-in question (2) — TODO.md TASK-056 [HIGH]
-- [ ] Hand off for sending Monday; record the send date + per-item response tracking on TODO TASK-056; process same-week responses as interrupts (1) — TODO.md TASK-056
+- [x] _(2026-08-21)_ Draft the consolidated ask document (client-facing, UA) from the TASK-056 checklist: photography (hero/product/measurement), logo vector, real socials + claims re-confirmation, size charts, legal-page copy / lawyer engagement, contact details, bank-card + WhatsApp details, free-shipping threshold, announcement copy, **domain purchase + email chain** (Resend DNS → `EMAIL_FROM`), NP API key + the Ukrposhta carrier question, `FEEDBACK_EMAIL` recipient, RU catalog sign-off package (nuance list in [messages/README.md](../../messages/README.md)) + the RU product-copy opt-in question (2) — TODO.md TASK-056 [HIGH]
+- [x] _(2026-08-21 — sent by the user the same day as drafted, ahead of the Monday plan; send date + 📨 statuses recorded on the TODO TASK-056 tracking table)_ Hand off for sending Monday; record the send date + per-item response tracking on TODO TASK-056; process same-week responses as interrupts (1) — TODO.md TASK-056
 
 ### G16. Real-Product Intake Pair Session [batch]
 
-🔵 User · catalog/data · **4 SP** · Mon (can pull forward to Fri if the user is available)
+🔵 User · catalog/data · **4 SP → revised 9 SP (spec §8, 2026-08-26)** · Mon (can pull forward to Fri if the user is available)
 
 > User-raised 2026-08-20: the client delivered the first 3 real products — a live rehearsal of the real-data path before launch, run as a **pair session** (user + Claude) so problems are seen and fixed together. Environment decision at session start: prod admin (alongside the deliberately-placeholder catalog) vs local-first. **Landmine recorded up front**: once real data enters prod, `db:seed` against prod is destruction — the seed deletes the whole catalog tree by design; the user-gated re-seed runbook is effectively retired for prod from that moment.
+
+> **Effort revision (2026-08-26, spec §8)**: the prep step found the admin path cannot carry a real product (no image/variant UI, no storage backend, no `styleGroup` field, no feed opt-out). Decision 1 (close the admin gap first) makes this a feature group — realistic 8–10 SP, booked as 9. Scheduling overflow surfaced to the user, not absorbed; pressure-valve order (G20 → G18 tracking half → G21) unchanged.
 
 - [ ] Prep: dry-run the admin product-creation path on seed data — ProductForm fields incl. brand/MPN (Google Shopping), image upload path (S3 config in the target env), category assignment, comparePrice refine; variant names MUST be the canonical «Розмір»/«Колір» DATA values ([src/lib/variant-names.ts](../../src/lib/variant-names.ts) — a hand-typed "Size" breaks every storefront variant lookup); known gaps going in: no `styleGroup` field in the form (colorway linking needs DB access), Textarea ref-drop (validation errors can't autofocus) (1) — user-raised 2026-08-20 [HIGH]
 - [ ] Pair session: enter the 3 products together; verify each end-to-end — PDP, catalog listing + filters, search, cart → COD checkout, Google Shopping feed row validity (`validateFeedItemSafe` must not silently drop them), sitemap + OG image; fix small problems live, file larger finds (3) — user-raised 2026-08-20 [HIGH]
@@ -90,12 +92,12 @@ _Group IDs continue from prior weeks (G1–G14 are permanently taken by DONE.md 
 
 ### Friday Aug 21 (pre-week) — Head start (user-approved 2026-08-20)
 
-- **[G15](#g15-task-056-client-round-trip-solo)** 🔵 — part 1: the consolidated ask drafts today so it can reach the client before the weekend. (**[G16](#g16-real-product-intake-pair-session-batch)** may pull forward here if the user is available — intake findings would sharpen the ask.)
+- **[G15](#g15-task-056-client-round-trip-solo)** 🔵 — part 1: the consolidated ask drafts today so it can reach the client before the weekend. _(Done 2026-08-21 — and part 2 as well: after two review rounds — user edits, the branded-goods advisory, item renumber to 21 — the user sent the ask the same day. The whole group landed Friday.)_
 
 ### Monday — Real data + the ask goes out
 
 - **[G16](#g16-real-product-intake-pair-session-batch)** 🔵 — prep first thing, then the pair session (user availability governs the hour).
-- **[G15](#g15-task-056-client-round-trip-solo)** 🔵 — part 2: finalize, hand off for sending, set up response tracking.
+- **[G15](#g15-task-056-client-round-trip-solo)** 🔵 — ~~part 2: finalize, hand off for sending, set up response tracking~~ _(moot — completed Fri 2026-08-21, ask already sent)_.
 
 ### Tuesday — Security + guest-access design
 
@@ -120,16 +122,16 @@ _Group IDs continue from prior weeks (G1–G14 are permanently taken by DONE.md 
 
 ## Summary Table
 
-| ID  | Group                                       | Domain          | Source      | Tasks  | Total SP | Day          | Status    |
-| --- | ------------------------------------------- | --------------- | ----------- | ------ | -------- | ------------ | --------- |
-| G15 | TASK-056 Client Round-Trip `[solo]`         | client comms    | 🔵 User     | 2      | 3        | Fri(pre)+Mon | ☐ Planned |
-| G16 | Real-Product Intake Pair Session `[batch]`  | catalog/data    | 🔵 User     | 2      | 4        | Mon          | ☐ Planned |
-| G17 | Pre-Launch Security Scan `[solo]`           | security        | 🟤 Auto     | 2      | 3        | Tue          | ☐ Planned |
-| G18 | Guest Order Access & Hardening `[batch]` 🏆 | checkout/orders | 🔵 User     | 2      | 7        | Tue–Wed      | ☐ Planned |
-| G19 | Launch Runbook + Deploy Verify `[batch]`    | ops/deploy      | 🔵 User     | 2      | 3        | Thu          | ☐ Planned |
-| G20 | Pre-Launch Polish `[batch]`                 | storefront      | 🔵 User     | 2      | 4        | Thu          | ☐ Planned |
-| G21 | Weekly Reviews `[batch]`                    | recurring       | ⚪ Overhead | 4      | 5        | Fri          | ☐ Planned |
-|     | **Total**                                   |                 |             | **16** | **29**   |              |           |
+| ID  | Group                                       | Domain          | Source      | Tasks  | Total SP | Day          | Status       |
+| --- | ------------------------------------------- | --------------- | ----------- | ------ | -------- | ------------ | ------------ |
+| G15 | TASK-056 Client Round-Trip `[solo]`         | client comms    | 🔵 User     | 2      | 3        | Fri(pre)+Mon | ✅ `b836e77` |
+| G16 | Real-Product Intake Pair Session `[batch]`  | catalog/data    | 🔵 User     | 2      | 9        | Mon          | ☐ Planned    |
+| G17 | Pre-Launch Security Scan `[solo]`           | security        | 🟤 Auto     | 2      | 3        | Tue          | ☐ Planned    |
+| G18 | Guest Order Access & Hardening `[batch]` 🏆 | checkout/orders | 🔵 User     | 2      | 7        | Tue–Wed      | ☐ Planned    |
+| G19 | Launch Runbook + Deploy Verify `[batch]`    | ops/deploy      | 🔵 User     | 2      | 3        | Thu          | ☐ Planned    |
+| G20 | Pre-Launch Polish `[batch]`                 | storefront      | 🔵 User     | 2      | 4        | Thu          | ☐ Planned    |
+| G21 | Weekly Reviews `[batch]`                    | recurring       | ⚪ Overhead | 4      | 5        | Fri          | ☐ Planned    |
+|     | **Total**                                   |                 |             | **16** | **34**   |              |              |
 
 _Source legend: 🔵 User · 🟡 Ops · 🟤 Auto · ⚪ Overhead (exempt from the quota denominator). Status on completion: `✅ PR #N` (the number, never a bare ✅)._
 
@@ -144,7 +146,7 @@ _Source legend: 🔵 User · 🟡 Ops · 🟤 Auto · ⚪ Overhead (exempt from 
   2. **next-intl `useExtracted` design input for TASK-039** · [2026-08-10] G6 run 1 — consumed: G9's library decision weighed exactly this input and TASK-039 shipped (PR #37).
   3. **G13 duplicate-value sync test** · [2026-08-15] G9 close-out — mooted by its own condition: G13 reuses `account.orderStatus`/`paymentStatus` keys directly (PR #40).
   4. **[TASK-014] Additional Integrations umbrella** · Post-MVP Features (section removed with it, as with TASK-013/015) — payments → TASK-048 + the payments decision doc; supplier APIs / shipping calculators → spec v2.0 directions; automated inventory sync is an explicit GOALS.md Non-Goal.
-- **Capacity & pressure valve**: 24 non-⚪ SP against observed 20–26. Deferral order under pressure: **G20 polish first**, then G18's guest-tracking member slips to launch week (**the ownership check stays** — its "before real customer traffic" pin is the point); G21 may defer under its own hard-deadline rule. G16's fix-work is unknown-size by nature: small problems fixed live, larger finds filed rather than absorbed.
+- **Capacity & pressure valve**: 29 non-⚪ SP (G16 **4 SP → revised 9 SP**, spec §8, 2026-08-26) against observed 20–26 — now above the band, not within it. Deferral order under pressure: **G20 polish first**, then G18's guest-tracking member slips to launch week (**the ownership check stays** — its "before real customer traffic" pin is the point); G21 may defer under its own hard-deadline rule. G16's fix-work is unknown-size by nature: small problems fixed live, larger finds filed rather than absorbed.
 - **Dependencies / risks**: G16 may surface real-data-path defects (that is its purpose) — Friday holds slack; the prod-seed destruction landmine is recorded in the group note. G17's findings are unknown-size; severe ones are an abort-condition consult. G18 must not break the post-checkout confirmation flow (one-time grant design decision in-plan) and touches checkout/account surfaces → visual gate + the standing rule: any string change sweeps every E2E locator type (specs that don't run locally run in CI). G21 runs sequential in-session (devcontainer fan-out OOM). Client responses are welcome interrupts — the domain → Resend DNS → `EMAIL_FROM` chain is pre-authorized (Parallel Work).
 - **Quota sourcing transparency**: G18/G19/G20 subsume 🟤-origin riders (2 + 1 + 2 SP) inside 🔵 groups under the G13/G14 subsumption precedent and the explicit user rulings (2026-08-11 steer; 2026-08-20 confirmation). Strict-origin accounting would read 🟤 at 8/24 (33%); the Quota Check below uses group sourcing, and this note is the honest record of the difference.
 - **Parked (carried)**: 📌 Process Rules section for BACKLOG.md + MILESTONES/GOALS refresh (Cleanup-Week fodder; both still show pre-Mirox January state); hydration console errors investigation (held since 2026-08-04); the cross-project propagation queue (6 TODO § 🔀 rows + 4 fold-ins, none actioned — candidate for a post-launch batch sitting); checkout distraction-free header (deferred 2026-08-20); TASK-040 CI extensions (next candidate week); admin dashboard stat-tile wiring.

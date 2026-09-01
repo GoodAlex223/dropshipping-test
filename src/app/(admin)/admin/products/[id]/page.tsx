@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ProductForm } from "@/components/admin";
+import { ProductForm, ProductImagesSection, ProductVariantsSection } from "@/components/admin";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
@@ -22,10 +22,12 @@ interface Product {
   barcode: string | null;
   brand: string | null;
   mpn: string | null;
+  styleGroup: string | null;
   stock: number;
   categoryId: string;
   isActive: boolean;
   isFeatured: boolean;
+  excludeFromFeed: boolean;
 }
 
 export default function EditProductPage() {
@@ -106,6 +108,8 @@ export default function EditProductPage() {
       </div>
 
       <ProductForm product={product} isEdit />
+      <ProductImagesSection productId={product.id} />
+      <ProductVariantsSection productId={product.id} />
     </div>
   );
 }

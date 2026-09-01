@@ -66,3 +66,6 @@ test-results/
 
 # Playwright MCP browser session artifacts (screenshots, page snapshots)
 .playwright-mcp/
+
+# Client product-photo drops (source material for S3 intake, not repo content)
+docs/real_products/

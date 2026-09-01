@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { VARIANT_NAMES } from "@/lib/variant-names";
 
 // Auth validations
 export const loginSchema = z.object({
@@ -32,6 +33,12 @@ export const productBaseSchema = z.object({
   barcode: z.string().max(14).optional().nullable(),
   brand: z.string().max(70).optional().nullable(),
   mpn: z.string().max(70).optional().nullable(),
+  // G16: colourway-sibling link (TASK-037 model — one Product per colourway).
+  styleGroup: z.string().max(100).optional().nullable(),
+  // G16: Google Shopping opt-out. Deliberately NO .default(): Zod 4 applies
+  // defaults even under .partial(), which would reset the flag to false on
+  // every partial PUT. The DB default (false) covers creation.
+  excludeFromFeed: z.boolean().optional(),
   categoryId: z.string().min(1, "Category is required"),
   isActive: z.boolean().default(true),
   isFeatured: z.boolean().default(false),
@@ -44,6 +51,20 @@ export const productSchema = productBaseSchema.refine(
     path: ["comparePrice"],
   }
 );
+
+// Product variant validations (G16). `name` is an enum over the canonical DATA
+// values — a hand-typed "Size" is unenterable, not merely discouraged
+// (stated-conventions-are-not-controls). Per-variant price/sku deliberately
+// not exposed (YAGNI).
+export const productVariantSchema = z.object({
+  name: z.enum([VARIANT_NAMES.size, VARIANT_NAMES.color], {
+    message: `Variant name must be "${VARIANT_NAMES.size}" or "${VARIANT_NAMES.color}"`,
+  }),
+  value: z.string().trim().min(1, "Value is required").max(50),
+  stock: z.number().int().min(0, "Stock cannot be negative"),
+});
+
+export const productVariantUpdateSchema = productVariantSchema.partial();
 
 // Category validations
 export const categorySchema = z.object({
