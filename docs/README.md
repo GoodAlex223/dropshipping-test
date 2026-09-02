@@ -2,7 +2,7 @@
 
 Central index for all project documentation.
 
-**Last Updated**: 2026-09-01
+**Last Updated**: 2026-09-02
 
 ---
 
@@ -79,8 +79,9 @@ Central index for all project documentation.
 
 ## Implementation Plans
 
-| Plan | Task | Status | Started |
-| ---- | ---- | ------ | ------- |
+| Plan                                                                                                    | Task                         | Status      | Started    |
+| ------------------------------------------------------------------------------------------------------- | ---------------------------- | ----------- | ---------- |
+| [2026-09-02_g17-pre-launch-security-scan.md](planning/plans/2026-09-02_g17-pre-launch-security-scan.md) | G17 Pre-Launch Security Scan | IN PROGRESS | 2026-09-02 |
 
 ### Archived Plans
 
