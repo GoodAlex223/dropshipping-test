@@ -22,7 +22,8 @@ app/
 │   ├── newsletter/        # Newsletter subscriber management
 │   │   └── page.tsx       # Subscriber list with search/filter/pagination/export
 │   ├── orders/            # Order management + detail view
-│   ├── products/          # Product CRUD + new/edit
+│   ├── products/          # Product CRUD + new/edit; the [id] edit page mounts
+│   │                      #   ProductImagesSection + ProductVariantsSection (G16)
 │   ├── reviews/           # Review management (list, reply, hide/show, delete)
 │   ├── settings/          # Admin settings
 │   └── suppliers/         # Supplier management + detail
@@ -53,6 +54,10 @@ app/
 │   │   │   ├── route.ts   # GET (list with search/filter/pagination)
 │   │   │   ├── [id]/route.ts  # PATCH (update status), DELETE
 │   │   │   └── export/route.ts  # GET (CSV export)
+│   │   ├── products/      # Product CRUD; [id]/variants (G16) — GET/POST list, PATCH/DELETE [variantId]
+│   │   │                  #   ownership-scoped via findFirst({id, productId}); coded outcomes
+│   │   │                  #   (PRODUCT_NOT_FOUND / VALIDATION_ERROR / DUPLICATE_VARIANT /
+│   │   │                  #   VARIANT_NOT_FOUND / VARIANT_REFERENCED)
 │   │   └── reviews/       # Admin review API ([id], [id]/reply, [id]/visibility)
 │   ├── auth/              # NextAuth route handler
 │   ├── cart/validate/     # Cart validation
@@ -69,7 +74,10 @@ app/
 │   │   └── [slug]/reviews/  # Product-specific review list
 │   └── reviews/           # Customer review API (create, update, delete, eligibility check)
 ├── feed/                  # Product feeds for external services
-│   └── google-shopping.xml/  # Google Shopping RSS 2.0 feed (hourly revalidation)
+│   └── google-shopping.xml/  # Google Shopping RSS 2.0 feed (hourly revalidation);
+│                             #   filters excludeFromFeed and resolves image_link against
+│                             #   siteConfig.url (G16 — relative paths fail z.string().url()
+│                             #   and were silently dropped, keeping the feed empty)
 ├── layout.tsx             # Root layout (providers, metadata)
 ├── error.tsx              # Global error boundary
 ├── not-found.tsx          # 404 page
@@ -99,6 +107,7 @@ app/
 - **Async SEO metadata (TASK-039)**: the root `src/app/layout.tsx` now exports `generateMetadata()` (async, replacing a static `export const metadata`), and 6 of `src/lib/seo.ts`'s metadata helpers are `async` and call `await getTranslations(namespace)` — `getDefaultMetadata`, `getProductMetadata`, `getHomeMetadata`, `getProductsListingMetadata`, `getCategoriesListingMetadata`, `getAuthMetadata` (the one former sync holdout, `getCategoryMetadata`, was deleted with the `/categories/[slug]` page in G12). Any new metadata export that needs translated copy must follow suit: the exported function (or the helper it calls) becomes `async` and uses `getTranslations`, never the non-async `useTranslations` hook (request-scoped, server-only outside a render — see the cookie-mode i18n Detected Pattern in the root `CLAUDE.md`)
 - **Feed routes**: XML/RSS feeds in `feed/` directory; use `export const dynamic = "force-dynamic"` and `export const revalidate = 3600` for hourly updates
 - **XML escaping**: Feed routes must escape special characters (&, <, >, ", ') using dedicated `escapeXml()` helper to prevent malformed XML
+- **Feed opt-out (G16)**: the Google Shopping route selects `where: { isActive: true, excludeFromFeed: false }` — an explicit per-product boolean, not a brand allowlist, so trademark-bearing imagery cannot reach the feed whatever the text fields say. Because the route filters on `validateFeedItemSafe`, **an item that fails validation is dropped without any error** — that is how a missing `image_link` resolution kept the feed at zero items from the first seeded catalog until 2026-09-01. Any new required field in the feed schema must be checked against what the seed actually writes, not against a hand-made fixture
 - **Feed validation**: Use strict Zod schemas (e.g., `google-shopping.ts`) to validate feed items before XML serialization; enforce title/description length limits, price format, GTIN format, and enum values
 - **Performance optimizations**: Root layout includes resource hints (preconnect/dns-prefetch) in `<head>`; Web Vitals reporter integrated via providers; deferred theme font loading with `preload: false` and `display: swap`; shop pages (home, product detail, category) use blur placeholders for images
 - **Query param validation**: API routes parse numeric filters with `parseInt(value, 10)` which returns NaN for invalid input; validate with `!isNaN(num) && num >= min && num <= max`; spread validated value conditionally into Prisma query (`...(valid ? { field: num } : {})`); pattern avoids throwing on malformed user input (e.g., rating filter in `/api/products/[slug]/reviews`)

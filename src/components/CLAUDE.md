@@ -16,8 +16,14 @@ Shared React components organized by domain: admin panel, analytics tracking, ch
 components/
 ├── admin/                 # Admin panel components
 │   ├── AdminSidebar.tsx   # Navigation sidebar (collapsible, includes newsletter link)
-│   ├── ImageUploader.tsx  # S3 image upload with drag-and-drop
-│   ├── ProductForm.tsx    # Product create/edit form (react-hook-form + zod, includes "Product Identifiers" card with brand/barcode/MPN fields)
+│   ├── ImageUploader.tsx  # S3/R2 image upload with drag-and-drop (had zero consumers until G16)
+│   ├── ProductImagesSection.tsx  # G16 — mounts ImageUploader on the product edit page; adds and
+│   │                      #   removals persist immediately, reordering waits for «Зберегти порядок»
+│   ├── ProductVariantsSection.tsx  # G16 — «Розмір»/«Колір» rows; name is a Select over VARIANT_NAMES,
+│   │                      #   never free text; rows save on blur, failures revert to the last committed
+│   │                      #   value and toast rather than failing silently
+│   ├── image-diff.ts      # G16 — pure diffImages(prev, next) → { added, removedIds, orderChanged }
+│   ├── ProductForm.tsx    # Product create/edit form (react-hook-form + zod, includes "Product Identifiers" card with brand/barcode/MPN fields); G16 added «Група кольорів» (styleGroup) and «Не показувати у Google Shopping» (excludeFromFeed)
 │   ├── ProductImportDialog.tsx  # CSV import dialog (supports brand/barcode/MPN columns)
 │   └── index.ts           # Barrel exports
 ├── analytics/             # Analytics tracking components
