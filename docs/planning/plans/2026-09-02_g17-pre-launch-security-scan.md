@@ -3,7 +3,7 @@
 **Last Updated**: 2026-09-02
 **Task**: G17 (WEEKLY [G17](../WEEKLY.md#g17-pre-launch-security-scan-solo)) · 🟤 BACKLOG [2026-08-15] G10 run-2 adopt
 **Branch**: `feat/g17-pre-launch-security-scan`
-**Status**: IN PROGRESS 2026-09-02 — run 1 (low, whole repo) complete; 6 of 9 findings fixed; run 2 (medium, `src`) still to run
+**Status**: IN PROGRESS 2026-09-02 — run 1 (low, whole repo) complete; 6 of 9 findings fixed; **F1 closed end-to-end incl. production**; run 2 (medium, `src`) still to run
 **Spec**: none (bounded task; the approved design is §1–§4 below)
 
 **Goal:** Run the adopted `claude-security` deep scan against the code that is about to take real
@@ -196,3 +196,34 @@ fixed here, and to **triage the nine before running the depth scan**.
 **Test-load finding**: the suite now fans out to 79 workers and fails non-deterministically in this
 container (6 worker-start failures, 5s timeouts on IO-bound tests, `oom_kill` 0 — contention, not
 the documented OOM class). Green at `--maxWorkers=4`: 79 files, 993 passed, 1 todo. Filed 🟤.
+
+### 2026-09-02 — F1 closed in production (owner-executed, verified)
+
+The code half shipped in `fdb24ae`; the production half was the owner's, since the app has **no
+password-change endpoint or UI anywhere** — the only write to `passwordHash` in `src/app/api` is the
+register route, so rotation was only possible against the database and no tool existed. Two guarded
+scripts were added for it: `db:rotate-password` (`2fe52a9`) and `db:delete-test-accounts`
+(`8d4c370`, dry-run by default, hard-coded address list, refuses on an ADMIN target — guard proven
+by promoting a fixture and watching it refuse **with** `CONFIRM_DELETE=yes`).
+
+**What was exposed**: `admin@store.com` / `admin123` (ADMIN), published in `README.md`'s Test
+Accounts table in a public repository, plus `customer123` / `password123` on four seeded customers.
+
+| Action                           | Evidence                                                                                                                                               |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Admin password rotated           | `Rotated password for admin@store.com (ADMIN) on host "ep-small-dream-ag9shegw-pooler…neon.tech"`                                                      |
+| Rotation reached the **live** DB | New password signs in on the deployed site; **`admin123` now fails** — the check that matters, since it rules out having written to the wrong endpoint |
+| 4 seeded test customers deleted  | Same prod host; 8 reviews cascaded, 7 orders detached and kept                                                                                         |
+| Prod confirmed clean afterwards  | Re-run dry run against prod: `No seeded test accounts found — nothing to do.`                                                                          |
+
+**Accepted consequence, verified benign**: production PDPs now show zero reviews. Checked rather
+than assumed — `getProductJsonLd`'s `hasReviews` guard (`src/lib/seo.ts:281`) omits both
+`aggregateRating` and `review` rather than emitting empty or `NaN` markup, `ReviewStats` returns
+`null` at zero, and `tests/unit/seo.test.ts:441` already covers the zero case. The 8 deleted reviews
+were seeded placeholders; real social proof has to come from real customers.
+
+**Correction recorded**: the `.env` duplicate-`DATABASE_URL` hazard carried in memory is **stale** —
+the second (Neon) line is commented out, disabled in TASK-038a with a note explaining it had
+silently pointed local dev and E2E at live production. What was verified instead, and is what the
+runbook should say: an inline `DATABASE_URL=… npm run …` **does** beat `.env`, because dotenv does
+not override variables already present in the environment.
