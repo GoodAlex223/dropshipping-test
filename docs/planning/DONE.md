@@ -2,11 +2,33 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-08-21
+**Last Updated**: 2026-09-01
 
 ---
 
 ## 2026-08 (August)
+
+### [2026-09-01] G16 - Real-Product Intake (WEEKLY batch, 🔵 User)
+
+**Plan**: [2026-08-26_g16-real-product-intake.md](../archive/plans/2026-08-26_g16-real-product-intake.md) — 13 tasks; 1–10 executed via `superpowers:subagent-driven-development`, 11–13 as an attended pair session
+**Spec**: [2026-08-26-g16-real-product-intake-design.md](../superpowers/specs/2026-08-26-g16-real-product-intake-design.md) — 9 decisions; **decision 9 deliberately outstanding** (see below)
+**Merge**: PR [#41](https://github.com/GoodAlex223/dropshipping-test/pull/41) → `36b5593` (2026-09-01). 30 commits, 40 files, +5642/−524. CI green on three runs; a five-agent review returned "no reportable issues" and its two sub-threshold findings were dispositioned in `ffbf4c7` with the disposition posted to the PR thread.
+
+**Summary**: WEEKLY planned G16 as a pair session — enter the client's first 3 real products and verify them. The prep step found the admin panel **could not carry a real product at all**: no image upload UI, no variant editing, no `styleGroup` field, no storage backend in any environment, and no way to keep a trademark-bearing product out of the Google Shopping feed. Decision 1 turned it into a feature group (4 SP → 9). The gap is now closed, R2 is live, and all 7 catalog rows were entered and verified locally end to end. Production holds 2; the user ruled the client enters the remaining 5 themselves, so the deliverable became a written Ukrainian intake guide instead.
+
+**Key changes**:
+
+- **Cloudflare R2 storage** — `s3.ts` gains an optional `S3_ENDPOINT`; credentials reuse the existing `AWS_*` slots (single env contract, no `R2_*` fork). Path-style addressing **verified against the real bucket**, closing the spec's one open implementation question. A new `MissingCdnUrlError` throws at call time, never at module load, so a misconfigured environment can't persist a permanently-dead image URL.
+- **`excludeFromFeed`** — one additive migration (`NOT NULL DEFAULT false`), an admin toggle, and a feed filter. Deliberately carries **no Zod `.default()`**: Zod 4 applies defaults even under `.partial()`, which the PUT handler uses, so a default would reset the flag on every partial update.
+- **Admin surfaces** — `ProductImagesSection` and `ProductVariantsSection` mount on the edit page (`ImageUploader` had existed with zero consumers since it was written); a new variants CRUD API under `/api/admin/products/[id]/variants` with ownership-scoped handlers and coded outcomes; `styleGroup` and the feed toggle added to `ProductForm`; `Textarea` now forwards its ref so react-hook-form's `register()` reaches the DOM.
+- **Catalog** — Светри and Рюкзаки leaf categories; Бежевий and Темно-синій swatches.
+- **Feed bug fixed en route** — the Google Shopping feed had emitted **zero items since the placeholder catalog was seeded**. `image_link` is validated with `z.string().url()`, which rejects the root-relative paths every seeded product stores, so `validateFeedItemSafe` silently filtered all 8 out. Pre-existing, not a regression. Production went 0 → 8 on this deploy — the first time that feature has ever worked.
+
+**Verification**: 942 unit tests / 73 files, docs-freshness 102, lint + typecheck + format clean. Beyond tests, all 7 rows were entered through the real admin against a live R2 bucket: 32 images on the R2 public host in upload order, feed at 8 with zero real-row leak, sitemap carrying all 7 slugs, 7/7 PDPs and OG images, every category/search/colour/size/featured facet correct, and a COD order persisting `variantInfo` as «Розмір: M» — the first order in that database ever to carry variant data. Production verified functionally rather than by badge: the feed flipping 0 → 8 simultaneously proves the migration applied and the fix shipped, because `vercel-build.sh` makes `prisma migrate deploy` non-fatal and a green deploy proves nothing.
+
+**Deliberately outstanding**: decision 9 — the 8 placeholders stay **active in production** because intake stopped at 2 of 7 rows. Client-facing Ukrainian intake guide written in their place, covering new products and colourway siblings, the four swatch-bearing colours, and the mistakes this session actually made.
+
+**Learnings**: Two pre-existing runtime bugs (the empty feed; `product.stock` never decrementing for variant purchases) were found by **a human driving the real UI against real data**, not by five review agents over the full diff — and the feed one had survived a reviewed task because the route's own test fixture used an absolute-URL image, so the fixture, not the assertion, was the hole. A colour name that disagrees with its photograph is invisible to every automated check: MRX-101 went into production with the white jacket's photo and «Колір: Білий» under the «чорна» name, saved without error, and was caught only by looking at the card. Writing the client guide surfaced two further defects nobody had thought to look for — `generateSlug` returns `""` for any Cyrillic name and the create route falls back to it, and `excludeFromFeed` defaults to off for a catalogue that is entirely third-party branded — which suggests **writing the instructions is itself a review technique**.
 
 ### [2026-08-21] G15 - TASK-056 Client Ask Round-Trip (WEEKLY solo, 🔵 User)
 

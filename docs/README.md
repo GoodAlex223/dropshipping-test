@@ -34,8 +34,8 @@ Central index for all project documentation.
 | -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------ |
 | [planning/README.md](planning/README.md)                                                                             | Planning overview                                                             | 2026-01-05   |
 | [planning/WEEKLY.md](planning/WEEKLY.md)                                                                             | Current week's plan                                                           | 2026-08-20   |
-| [planning/TODO.md](planning/TODO.md)                                                                                 | Active tasks                                                                  | 2026-08-26   |
-| [planning/DONE.md](planning/DONE.md)                                                                                 | Completed tasks                                                               | 2026-08-21   |
+| [planning/TODO.md](planning/TODO.md)                                                                                 | Active tasks                                                                  | 2026-09-01   |
+| [planning/DONE.md](planning/DONE.md)                                                                                 | Completed tasks                                                               | 2026-09-01   |
 | [planning/BACKLOG.md](planning/BACKLOG.md)                                                                           | Unprioritized ideas                                                           | 2026-09-01   |
 | [planning/ROADMAP.md](planning/ROADMAP.md)                                                                           | Long-term vision                                                              | 2026-07-14   |
 | [planning/GOALS.md](planning/GOALS.md)                                                                               | Objectives & metrics                                                          | 2026-01-26   |
@@ -79,9 +79,8 @@ Central index for all project documentation.
 
 ## Implementation Plans
 
-| Plan                                                                                          | Task                                                | Status      | Started    |
-| --------------------------------------------------------------------------------------------- | --------------------------------------------------- | ----------- | ---------- |
-| [2026-08-26_g16-real-product-intake.md](planning/plans/2026-08-26_g16-real-product-intake.md) | G16 — Real-product intake (admin gap + R2 + 7 rows) | IN PROGRESS | 2026-08-26 |
+| Plan | Task | Status | Started |
+| ---- | ---- | ------ | ------- |
 
 ### Archived Plans
 
@@ -115,6 +114,7 @@ Central index for all project documentation.
 | [2026-08-17_g11-docs-freshness-linter.md](archive/plans/2026-08-17_g11-docs-freshness-linter.md)                     | G11 Docs-Freshness Linter            | COMPLETE | 2026-08-17 |
 | [2026-08-18_g12-categories-to-catalog.md](archive/plans/2026-08-18_g12-categories-to-catalog.md)                     | G12 Categories-to-Catalog Redesign   | COMPLETE | 2026-08-18 |
 | [2026-08-21_g15-task-056-client-round-trip.md](archive/plans/2026-08-21_g15-task-056-client-round-trip.md)           | G15 TASK-056 Client Ask Round-Trip   | COMPLETE | 2026-08-21 |
+| [2026-08-26_g16-real-product-intake.md](archive/plans/2026-08-26_g16-real-product-intake.md)                         | G16 Real-Product Intake              | COMPLETE | 2026-09-01 |
 
 See [archive/README.md](archive/README.md) for more historical plans.
 

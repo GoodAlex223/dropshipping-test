@@ -36,8 +36,8 @@ _Group IDs continue from prior weeks (G1–G14 are permanently taken by DONE.md 
 
 > **Effort revision (2026-08-26, spec §8)**: the prep step found the admin path cannot carry a real product (no image/variant UI, no storage backend, no `styleGroup` field, no feed opt-out). Decision 1 (close the admin gap first) makes this a feature group — realistic 8–10 SP, booked as 9. Scheduling overflow surfaced to the user, not absorbed; pressure-valve order (G20 → G18 tracking half → G21) unchanged.
 
-- [ ] Prep: dry-run the admin product-creation path on seed data — ProductForm fields incl. brand/MPN (Google Shopping), image upload path (S3 config in the target env), category assignment, comparePrice refine; variant names MUST be the canonical «Розмір»/«Колір» DATA values ([src/lib/variant-names.ts](../../src/lib/variant-names.ts) — a hand-typed "Size" breaks every storefront variant lookup); known gaps going in: no `styleGroup` field in the form (colorway linking needs DB access), Textarea ref-drop (validation errors can't autofocus) (1) — user-raised 2026-08-20 [HIGH]
-- [ ] Pair session: enter the 3 products together; verify each end-to-end — PDP, catalog listing + filters, search, cart → COD checkout, Google Shopping feed row validity (`validateFeedItemSafe` must not silently drop them), sitemap + OG image; fix small problems live, file larger finds (3) — user-raised 2026-08-20 [HIGH]
+- [x] Prep: dry-run the admin product-creation path on seed data — ProductForm fields incl. brand/MPN (Google Shopping), image upload path (S3 config in the target env), category assignment, comparePrice refine; variant names MUST be the canonical «Розмір»/«Колір» DATA values ([src/lib/variant-names.ts](../../src/lib/variant-names.ts) — a hand-typed "Size" breaks every storefront variant lookup); known gaps going in: no `styleGroup` field in the form (colorway linking needs DB access), Textarea ref-drop (validation errors can't autofocus) (1) — user-raised 2026-08-20 [HIGH]
+- [x] Pair session: enter the 3 products together; verify each end-to-end — PDP, catalog listing + filters, search, cart → COD checkout, Google Shopping feed row validity (`validateFeedItemSafe` must not silently drop them), sitemap + OG image; fix small problems live, file larger finds (3) — user-raised 2026-08-20 [HIGH]
 
 ### G17. Pre-Launch Security Scan [solo]
 
@@ -96,7 +96,7 @@ _Group IDs continue from prior weeks (G1–G14 are permanently taken by DONE.md 
 
 ### Monday — Real data + the ask goes out
 
-- **[G16](#g16-real-product-intake-pair-session-batch)** 🔵 — prep first thing, then the pair session (user availability governs the hour).
+- [x] **[G16](#g16-real-product-intake-pair-session-batch)** 🔵 — **shipped PR #41 / `36b5593` (2026-09-01)**. Ran long: the prep step turned it into a feature group (4 → 9 SP), and delivery slipped past the Aug 24–28 window. Local pass entered all 7 rows; production holds 2, the remaining 5 handed to the client with a written guide.
 - **[G15](#g15-task-056-client-round-trip-solo)** 🔵 — ~~part 2: finalize, hand off for sending, set up response tracking~~ _(moot — completed Fri 2026-08-21, ask already sent)_.
 
 ### Tuesday — Security + guest-access design
@@ -125,7 +125,7 @@ _Group IDs continue from prior weeks (G1–G14 are permanently taken by DONE.md 
 | ID  | Group                                       | Domain          | Source      | Tasks  | Total SP | Day          | Status       |
 | --- | ------------------------------------------- | --------------- | ----------- | ------ | -------- | ------------ | ------------ |
 | G15 | TASK-056 Client Round-Trip `[solo]`         | client comms    | 🔵 User     | 2      | 3        | Fri(pre)+Mon | ✅ `b836e77` |
-| G16 | Real-Product Intake Pair Session `[batch]`  | catalog/data    | 🔵 User     | 2      | 9        | Mon          | ☐ Planned    |
+| G16 | Real-Product Intake Pair Session `[batch]`  | catalog/data    | 🔵 User     | 2      | 9        | Mon          | ✅ PR #41    |
 | G17 | Pre-Launch Security Scan `[solo]`           | security        | 🟤 Auto     | 2      | 3        | Tue          | ☐ Planned    |
 | G18 | Guest Order Access & Hardening `[batch]` 🏆 | checkout/orders | 🔵 User     | 2      | 7        | Tue–Wed      | ☐ Planned    |
 | G19 | Launch Runbook + Deploy Verify `[batch]`    | ops/deploy      | 🔵 User     | 2      | 3        | Thu          | ☐ Planned    |
