@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 import { requireAdmin, apiError } from "@/lib/api-utils";
+import { toCsv } from "@/lib/csv";
 
 // GET /api/admin/newsletter/export - Export subscribers as CSV
 export async function GET(request: NextRequest) {
@@ -36,19 +37,7 @@ export async function GET(request: NextRequest) {
       sub.createdAt.toISOString(),
     ]);
 
-    // Escape CSV cells: double internal quotes & prevent formula injection
-    function escapeCsvCell(cell: string): string {
-      const escaped = cell.replace(/"/g, '""');
-      // Prefix formula-triggering characters with a single quote
-      if (/^[=+\-@\t\r]/.test(escaped)) {
-        return `"'${escaped}"`;
-      }
-      return `"${escaped}"`;
-    }
-
-    const csv = [headers.join(","), ...rows.map((row) => row.map(escapeCsvCell).join(","))].join(
-      "\n"
-    );
+    const csv = toCsv([headers, ...rows]);
 
     const filename = `subscribers-${new Date().toISOString().split("T")[0]}.csv`;
 

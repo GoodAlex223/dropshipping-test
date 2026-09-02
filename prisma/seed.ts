@@ -1,7 +1,8 @@
 import "dotenv/config";
+import { randomBytes } from "node:crypto";
 import { PrismaClient, Role, OrderStatus, PaymentStatus, SubscriberStatus } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import { adminUser, testCustomers } from "./seed-data/users";
+import { adminUser, resolveSeedPassword, testCustomers } from "./seed-data/users";
 import { topLevelCategories, subcategories } from "./seed-data/categories";
 import { products } from "./seed-data/products";
 import { orders } from "./seed-data/orders";
@@ -11,15 +12,24 @@ import { subscribers } from "./seed-data/subscribers";
 const prisma = new PrismaClient();
 const SALT_ROUNDS = 12;
 
-function assertLocalDatabase() {
+const LOCAL_DB_HOSTS = new Set(["localhost", "127.0.0.1", "postgres", "db"]);
+
+function databaseHost(): string {
   const raw = process.env.DATABASE_URL ?? "";
-  let host = "";
   try {
-    host = new URL(raw).hostname;
+    return new URL(raw).hostname;
   } catch {
     throw new Error("DATABASE_URL is missing or unparsable — refusing to seed.");
   }
-  const local = new Set(["localhost", "127.0.0.1", "postgres", "db"]);
+}
+
+function isLocalDatabaseHost(): boolean {
+  return LOCAL_DB_HOSTS.has(databaseHost());
+}
+
+function assertLocalDatabase() {
+  const host = databaseHost();
+  const local = LOCAL_DB_HOSTS;
   if (!local.has(host) && process.env.SEED_ALLOW_REMOTE !== "1") {
     throw new Error(
       `Refusing to seed non-local database host "${host}". ` +
@@ -56,7 +66,23 @@ async function main() {
   console.log("Creating users...");
   const userMap = new Map<string, string>();
 
-  const adminHash = await bcrypt.hash(adminUser.password, SALT_ROUNDS);
+  // Seed passwords come from the environment, never from source (G17 F1).
+  // Locally an unset var yields a fresh random password, printed once below;
+  // a non-local target must name one explicitly or the resolver throws.
+  const isLocalHost = isLocalDatabaseHost();
+  const generate = () => randomBytes(24).toString("base64url");
+  const adminPassword = resolveSeedPassword(process.env.SEED_ADMIN_PASSWORD, {
+    isLocalHost,
+    generate,
+    envVar: "SEED_ADMIN_PASSWORD",
+  });
+  const customerPassword = resolveSeedPassword(process.env.SEED_CUSTOMER_PASSWORD, {
+    isLocalHost,
+    generate,
+    envVar: "SEED_CUSTOMER_PASSWORD",
+  });
+
+  const adminHash = await bcrypt.hash(adminPassword, SALT_ROUNDS);
   const admin = await prisma.user.upsert({
     where: { email: adminUser.email },
     update: {},
@@ -70,7 +96,7 @@ async function main() {
   userMap.set(admin.email, admin.id);
 
   for (const c of testCustomers) {
-    const hash = await bcrypt.hash(c.password, SALT_ROUNDS);
+    const hash = await bcrypt.hash(customerPassword, SALT_ROUNDS);
     const user = await prisma.user.upsert({
       where: { email: c.email },
       update: { name: c.name },
@@ -82,6 +108,18 @@ async function main() {
       },
     });
     userMap.set(user.email, user.id);
+  }
+  // Print a generated password once so local dev can log in. Only meaningful
+  // for accounts this run CREATED: the upserts above use `update: {}` for the
+  // admin, so an account that already existed keeps the password it had.
+  if (!process.env.SEED_ADMIN_PASSWORD?.trim()) {
+    console.log(`  admin password (generated): ${adminPassword}`);
+  }
+  if (!process.env.SEED_CUSTOMER_PASSWORD?.trim()) {
+    console.log(`  customer password (generated): ${customerPassword}`);
+  }
+  if (!process.env.SEED_ADMIN_PASSWORD?.trim() || !process.env.SEED_CUSTOMER_PASSWORD?.trim()) {
+    console.log("  (accounts that already existed keep their previous password)");
   }
   console.log(`  ${userMap.size} users`);
 
@@ -333,10 +371,10 @@ async function main() {
 
   // SUMMARY
   console.log("\nSeed completed successfully!");
-  console.log("\nTest accounts:");
-  console.log("  Admin: admin@store.com / admin123");
+  console.log("\nTest accounts (passwords shown in the users step above):");
+  console.log(`  Admin: ${adminUser.email}`);
   for (const c of testCustomers) {
-    console.log(`  Customer: ${c.email} / ${c.password}`);
+    console.log(`  Customer: ${c.email}`);
   }
 }
 

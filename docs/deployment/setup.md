@@ -51,10 +51,13 @@ npm run dev
 
 ### Test Accounts
 
-| Role     | Email                | Password    |
-| -------- | -------------------- | ----------- |
-| Admin    | admin@store.com      | admin123    |
-| Customer | customer@example.com | customer123 |
+| Role     | Email                |
+| -------- | -------------------- |
+| Admin    | admin@store.com      |
+| Customer | customer@example.com |
+
+Passwords come from `SEED_ADMIN_PASSWORD` / `SEED_CUSTOMER_PASSWORD`; unset locally, the seed
+generates and prints them. They are never committed.
 
 ---
 

@@ -18,12 +18,20 @@ const createOrderSchema = checkoutSchema.extend({
         // Capped: an uncapped quantity was a free arbitrary-stock-negative
         // primitive on an unauthenticated COD route (PR #29 r6). 100 per line
         // is far above any legitimate order; the stock-sufficiency guard
-        // (gte) remains separately BACKLOG'd.
+        // (gte) below rejects an oversell outright (G17 F8).
         quantity: z.number().int().positive().max(100),
       })
     )
     .min(1),
 });
+
+/** Thrown inside the order transaction when the gte guard rejects a decrement. */
+class InsufficientStockError extends Error {
+  constructor(readonly productName: string) {
+    super(`Insufficient stock for ${productName}`);
+    this.name = "InsufficientStockError";
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -146,18 +154,26 @@ export async function POST(request: NextRequest) {
       // Decrement from the filtered order lines, never the raw client items —
       // products dropped by the isActive/existence gate must not lose stock
       // (and a hard-deleted product no longer P2025s the transaction).
+      //
+      // updateMany + `stock: { gte }` makes the check and the decrement one
+      // atomic statement: the row is only written if it still holds enough
+      // stock, so two concurrent orders cannot both pass a separate read. A
+      // count of 0 means the guard rejected it — throw to roll the whole
+      // transaction back, order row included (G17 F8). Before this, an
+      // unauthenticated caller could loop the route and drive every product's
+      // stock negative, emptying the storefront.
       for (const item of orderItemsData) {
-        if (item.variantId) {
-          await tx.productVariant.update({
-            where: { id: item.variantId },
-            data: { stock: { decrement: item.quantity } },
-          });
-        } else {
-          await tx.product.update({
-            where: { id: item.productId },
-            data: { stock: { decrement: item.quantity } },
-          });
-        }
+        const { count } = item.variantId
+          ? await tx.productVariant.updateMany({
+              where: { id: item.variantId, stock: { gte: item.quantity } },
+              data: { stock: { decrement: item.quantity } },
+            })
+          : await tx.product.updateMany({
+              where: { id: item.productId, stock: { gte: item.quantity } },
+              data: { stock: { decrement: item.quantity } },
+            });
+
+        if (count === 0) throw new InsufficientStockError(item.productName);
       }
 
       return newOrder;
@@ -197,6 +213,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Invalid order data", code: "INVALID_ORDER_DATA", details: error.issues },
         { status: 400 }
+      );
+    }
+
+    if (error instanceof InsufficientStockError) {
+      return NextResponse.json(
+        { error: "Insufficient stock", code: "INSUFFICIENT_STOCK" },
+        { status: 409 }
       );
     }
 

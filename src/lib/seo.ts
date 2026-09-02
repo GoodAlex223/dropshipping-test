@@ -341,3 +341,28 @@ export function getBreadcrumbJsonLd(items: { name: string; url: string }[]) {
     })),
   };
 }
+
+/**
+ * Serialize a JSON-LD object for embedding in an inline `<script>` element.
+ *
+ * `JSON.stringify` escapes neither `<` nor `/`, so any user-controlled string
+ * reaching a JSON-LD block can close the script element and have the rest of
+ * its content parsed as HTML. Product JSON-LD embeds customer review bodies and
+ * reviewer display names, which made that a stored-XSS sink (G17 finding F2).
+ *
+ * `<`, `>` and `&` become `\uXXXX` escapes — still valid JSON, so the structured
+ * data parses identically for consumers, but inert as markup. U+2028 and U+2029
+ * are escaped too: they are valid in JSON strings but terminate a line in a
+ * script body, which breaks parsing of the block.
+ *
+ * Always use this instead of `JSON.stringify` for `dangerouslySetInnerHTML`;
+ * `tests/unit/json-ld-escaping.test.ts` fails the build if a call site does not.
+ */
+export function serializeJsonLd(value: unknown): string {
+  return JSON.stringify(value)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
+}

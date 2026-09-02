@@ -12,12 +12,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { loginSchema, type LoginInput } from "@/lib/validations";
+import { safeCallbackUrl } from "@/lib/safe-redirect";
 
 function LoginFormInner() {
   const t = useTranslations("auth.login");
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams?.get("callbackUrl") || "/";
+  // Attacker-supplied; only same-origin paths survive (G17 F5).
+  const callbackUrl = safeCallbackUrl(searchParams?.get("callbackUrl"));
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 

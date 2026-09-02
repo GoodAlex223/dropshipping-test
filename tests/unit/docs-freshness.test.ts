@@ -538,8 +538,11 @@ describe("every relative link in docs/** resolves", () => {
     expect(checks.length).toBeGreaterThan(0);
   });
 
+  // IO-bound: one existsSync per relative link across every doc under docs/.
+  // The 5s default was marginal and began timing out under a fully parallel
+  // suite (G17); the work is unchanged, only the allowance.
   it("every relative link target exists", () => {
     const broken = checks.filter((c) => !existsSync(c.abs)).map((c) => `${c.file} -> ${c.target}`);
     expect(broken, `Broken relative links:\n${broken.join("\n")}`).toEqual([]);
-  });
+  }, 30_000);
 });

@@ -111,6 +111,25 @@ export async function POST(request: NextRequest) {
     const tax = 0;
     const total = subtotal + shippingCost + tax;
 
+    // The intent id AND the item list both arrive from the client, and this
+    // route is unauthenticated. Without comparing what was actually paid to
+    // what the server priced, one cheap succeeded intent could be replayed
+    // against a cart of the most expensive goods and stored PAID (G17 F7).
+    //
+    // Minor units, matching create-payment-intent's `Math.round(total * 100)`.
+    // The currency is still test-mode "usd" against UAH amounts — a documented,
+    // deliberate mismatch until TASK-048, so it is asserted rather than
+    // converted; a differing currency means the intent is not this cart's.
+    const expectedMinorUnits = Math.round(total * 100);
+    const paidMinorUnits = paymentIntent.amount_received ?? 0;
+
+    if (paymentIntent.currency !== "usd" || paidMinorUnits < expectedMinorUnits) {
+      return NextResponse.json(
+        { error: "Payment does not cover the order total", code: "PAYMENT_AMOUNT_MISMATCH" },
+        { status: 400 }
+      );
+    }
+
     // Create order in transaction
     const order = await prisma.$transaction(async (tx) => {
       // Create order
@@ -150,18 +169,22 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      // Update stock for each item
-      for (const item of data.items) {
+      // Decrement from the filtered order lines, not the raw client items —
+      // same rule create-order follows: an item dropped by the existence gate
+      // above was never priced into the order and must not move stock.
+      for (const item of orderItemsData) {
         if (item.variantId) {
-          await tx.productVariant.update({
-            where: { id: item.variantId },
+          const { count } = await tx.productVariant.updateMany({
+            where: { id: item.variantId, stock: { gte: item.quantity } },
             data: { stock: { decrement: item.quantity } },
           });
+          if (count === 0) throw new Error(`Insufficient stock for ${item.productName}`);
         } else {
-          await tx.product.update({
-            where: { id: item.productId },
+          const { count } = await tx.product.updateMany({
+            where: { id: item.productId, stock: { gte: item.quantity } },
             data: { stock: { decrement: item.quantity } },
           });
+          if (count === 0) throw new Error(`Insufficient stock for ${item.productName}`);
         }
       }
 

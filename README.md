@@ -266,12 +266,16 @@ See [.env.example](.env.example) for full list with descriptions.
 
 After running `npm run db:seed`:
 
-| Role     | Email                | Password    |
-| -------- | -------------------- | ----------- |
-| Admin    | admin@store.com      | admin123    |
-| Customer | customer@example.com | customer123 |
+| Role     | Email                                                                                            |
+| -------- | ------------------------------------------------------------------------------------------------ |
+| Admin    | admin@store.com                                                                                  |
+| Customer | customer@example.com, sarah.wilson@example.com, mike.johnson@example.com, emily.chen@example.com |
 
-Additional test customers: alice@example.com, bob@example.com, carol@example.com, diana@example.com (password: customer123)
+**Passwords are not stored in this repository.** The seed reads `SEED_ADMIN_PASSWORD` and
+`SEED_CUSTOMER_PASSWORD` from the environment. Leave them unset for local development and the seed
+generates a random password per role and prints it once; set them explicitly to choose your own. A
+non-local `DATABASE_URL` refuses to seed without them rather than inventing a password nobody can
+rotate.
 
 ---
 
