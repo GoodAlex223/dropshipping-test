@@ -3,7 +3,7 @@
 **Last Updated**: 2026-09-02
 **Task**: G17 (WEEKLY [G17](../WEEKLY.md#g17-pre-launch-security-scan-solo)) · 🟤 BACKLOG [2026-08-15] G10 run-2 adopt
 **Branch**: `feat/g17-pre-launch-security-scan`
-**Status**: IN PROGRESS 2026-09-02 — design approved, scan not yet run
+**Status**: IN PROGRESS 2026-09-02 — run 1 (low, whole repo) complete; 6 of 9 findings fixed; run 2 (medium, `src`) still to run
 **Spec**: none (bounded task; the approved design is §1–§4 below)
 
 **Goal:** Run the adopted `claude-security` deep scan against the code that is about to take real
@@ -53,10 +53,10 @@ a detached sampler logs `MemAvailable`, `SwapFree`, `memory.current`, `memory.pe
 cannot be zeroed before the run; the usable signals are therefore (a) does peak climb past its
 current 4.70 GiB high-water mark, and (b) does `oom_kill` move off 0.
 
-- [ ] User installs the plugin (`/plugin install claude-security@claude-plugins-official`, `/reload-plugins`)
-- [ ] Start the sampler detached; record the pre-run memory baseline
-- [ ] Run the `low` / whole-repository / `focus=attack-surface` scan
-- [ ] Stop the sampler; record peak delta, `oom_kill` delta, wall-clock, and the run's own coverage object
+- [x] User installs the plugin (`/plugin install claude-security@claude-plugins-official`, `/reload-plugins`)
+- [x] Start the sampler detached; record the pre-run memory baseline
+- [x] Run the `low` / whole-repository / `focus=attack-surface` scan
+- [x] Stop the sampler; record peak delta, `oom_kill` delta, wall-clock, and the run's own coverage object
 
 ## 2. Step 2 — depth run (`medium`, scope `src`, `focus=attack-surface`)
 
@@ -95,9 +95,9 @@ BACKLOG rows go under `### [2026-09-02] From: G17 pre-launch security scan`, one
 (never silently merged), tagged `[possible-dup-of: …]` where a finding overlaps a standing G2
 hardening item.
 
-- [ ] Triage every surviving finding into exactly one of the three routes
-- [ ] Implement the quick fixes, each with its own failing-first regression test
-- [ ] File the remainder 🟤 with severity
+- [x] Triage every surviving finding into exactly one of the three routes
+- [x] Implement the quick fixes, each with its own failing-first regression test
+- [x] File the remainder 🟤 with severity
 
 ## 4. Step 4 — what is and is not committed
 
@@ -115,9 +115,9 @@ fixes and their tests, the BACKLOG rows, and the WEEKLY checkboxes.
 `INDEXED_DIRS`, so this file needs a `docs/README.md` row in the same commit, and the index's own
 header must be ≥ every date it lists.
 
-- [ ] Root `.gitignore` latch added
-- [ ] Plan doc + `docs/README.md` index row committed together
-- [ ] `npm run test:run`, `typecheck`, `lint`, `format:check` green before each commit
+- [x] Root `.gitignore` latch added
+- [x] Plan doc + `docs/README.md` index row committed together
+- [x] `npm run test:run`, `typecheck`, `lint`, `format:check` green before each commit
 
 ---
 
@@ -145,3 +145,54 @@ not wanted — the branch is pushed as backup only).
 - Memory sampler written to the scratchpad and **self-tested before trust** — 3 data rows, every
   field populated. `memory.peak` proved read-only, so the instrument's design was adjusted to a
   high-water-mark delta rather than a zeroed-peak measurement.
+
+### 2026-09-02 — Run 1 (low, whole repository, focus=attack-surface)
+
+**Result**: revision `cc5615e`, `verification.status: verified`. 12 candidates → **9 findings**
+(1 HIGH, 7 MEDIUM, 1 LOW); 3 rejected by the panel. 36 panel votes, one verification run, no
+candidate lost, no severity lowered. 38 agents, ~23 min wall-clock.
+
+**The OOM hypothesis was wrong, and now measured.** 634 samples: cgroup peak moved 2.80 → 3.34 GiB
+(+550 MiB) against a 9.71 GiB ceiling, MemAvailable floor 3.40 GiB, `oom_kill` **0**. The prediction
+of ~5 agents was also wrong — 38 ran (2 researchers + 36 panel votes) — yet memory barely moved,
+because these agents read local files rather than holding WebFetch payloads like the TASK-038b
+fan-out that OOM'd. **The step-2 gate passes.**
+
+**Coverage limit, stated rather than implied**: `completenessCheckOutcome: "not-applicable"` — a
+low-effort run has no inventory stage, so the whole-tree accounting never ran. Run 1 says what one
+pass surfaced; it is not evidence any directory is clean. Run 2 is still owed.
+
+### 2026-09-02 — Triage (user decisions on the record)
+
+F1 was an abort-condition consult, not a silent fix: a HIGH, data-exposure-class finding whose
+credential was verified live in the public README (9 occurrences) with documented `SEED_ALLOW_REMOTE=1`
+prod seed runs behind it. The user chose to **rotate production themselves** while the code half was
+fixed here, and to **triage the nine before running the depth scan**.
+
+| Finding                                     | Severity | Route         | Outcome                                          |
+| ------------------------------------------- | -------- | ------------- | ------------------------------------------------ |
+| F1 seeded admin password in a public README | HIGH 3/3 | consult → fix | Fixed `fdb24ae` + owner-side rotation            |
+| F2 stored XSS via review text in JSON-LD    | MED 3/3  | quick fix     | Fixed — `serializeJsonLd()`                      |
+| F3 confirmation page leaks order PII        | MED 3/3  | file 🟤       | G18 owns it (shares its verification design)     |
+| F4 CSV formula injection in order export    | MED 3/3  | quick fix     | Fixed — shared `src/lib/csv.ts`                  |
+| F5 open redirect via `callbackUrl`          | MED 3/3  | quick fix     | Fixed — `safeCallbackUrl()`                      |
+| F6 `/_next/image` SSRF via `**` host        | MED 3/3  | quick fix     | Fixed — CDN allow-list (needs post-deploy check) |
+| F7 card checkout ignores amount paid        | MED 2/3  | quick fix     | Amount+currency fixed; cart-binding filed        |
+| F8 unguarded stock decrement                | MED 3/3  | quick fix     | `gte` guard fixed; rate limiting filed           |
+| F9 no login throttling                      | LOW 3/3  | file 🟤       | Needs Redis-backed throttling                    |
+
+**Three things the fixing turned up that the scan did not:**
+
+1. `confirm-order` had the **same** unguarded stock decrement as F8's `create-order`, and the scan
+   only flagged the latter. Fixed both — leaving the sibling weak is exactly how F4 arose (two
+   copies of an escaper, one correct, one not).
+2. `confirm-order` also decremented from **raw client items** rather than the validated order lines,
+   unlike `create-order`, which carries a comment explaining why that is wrong. Corrected; found by
+   `tsc`, not by a test.
+3. The existing `create-order` test fixture mocked `product.update`. Left alone it would have gone
+   green against the guarded route **without exercising the guard** — a vacuous pass of exactly the
+   [[real-data-intake-finds-what-review-cannot]] shape. Fixture moved with the code.
+
+**Test-load finding**: the suite now fans out to 79 workers and fails non-deterministically in this
+container (6 worker-start failures, 5s timeouts on IO-bound tests, `oom_kill` 0 — contention, not
+the documented OOM class). Green at `--maxWorkers=4`: 79 files, 993 passed, 1 todo. Filed 🟤.
