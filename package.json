@@ -26,6 +26,7 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
+    "db:rotate-password": "tsx scripts/rotate-password.ts",
     "workers": "tsx src/workers/index.ts",
     "workers:forward": "tsx src/workers/order-forwarding.worker.ts",
     "workers:sync": "tsx src/workers/order-status-sync.worker.ts",
