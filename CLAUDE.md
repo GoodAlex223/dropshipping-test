@@ -86,6 +86,7 @@ src/
 │   ├── showcase/           # Multi-theme demo pages (bold, luxury, organic)
 │   ├── api/                # API routes
 │   │   ├── admin/          # Admin-only API endpoints (auth-guarded)
+│   │   │   ├── products/[id]/variants/  # Variant CRUD (G16) — GET/POST list, PATCH/DELETE [variantId]; ownership-scoped via findFirst({id, productId}), coded outcomes (PRODUCT_NOT_FOUND / VALIDATION_ERROR / DUPLICATE_VARIANT / VARIANT_NOT_FOUND / VARIANT_REFERENCED)
 │   │   │   ├── newsletter/ # Admin newsletter API (list, [id] update/delete, export CSV)
 │   │   │   └── reviews/    # Admin review API ([id], [id]/reply, [id]/visibility)
 │   │   ├── auth/           # NextAuth endpoints
@@ -106,7 +107,7 @@ src/
 │   ├── robots.ts           # SEO robots.txt
 │   └── sitemap.ts          # SEO dynamic sitemap
 ├── components/
-│   ├── admin/              # Admin panel components (sidebar, forms, dialogs)
+│   ├── admin/              # Admin panel components (sidebar, forms, dialogs); G16 added ProductImagesSection + ProductVariantsSection (mounted on the product edit page) and image-diff.ts (pure diffImages(prev,next) → {added, removedIds, orderChanged})
 │   ├── analytics/          # Analytics tracking components (PurchaseTracker, WebVitalsReporter)
 │   ├── checkout/           # Payment form components
 │   ├── common/             # Header, Footer, AnnouncementBar, BenefitStrip, SocialLinks, FadeIn, Logo, NewsletterSignup, CookieConsent, ResourceHints, LocaleSwitcher (TASK-039 UA|RU header toggle)
@@ -141,7 +142,7 @@ src/
 │   ├── og-fonts.ts         # Fetches Cyrillic-subset Manrope TTFs for next/og (Satori) OG image routes; fails safe to []
 │   ├── queue.ts            # BullMQ queue setup
 │   ├── redis.ts            # Redis/ioredis connection
-│   ├── s3.ts               # AWS S3 image storage
+│   ├── s3.ts               # S3-compatible image storage — AWS or Cloudflare R2 via the optional S3_ENDPOINT (G16). R2 credentials reuse the AWS_* slots: single env contract, NO R2_* variables. Setting an endpoint forces region "auto" + forcePathStyle (path-style verified against the real bucket) and makes AWS_CLOUDFRONT_URL mandatory — getPresignedUploadUrl throws MissingCdnUrlError at call time rather than persisting a dead *.s3.amazonaws.com URL
 │   ├── seo.ts              # SEO utilities (metadata, JSON-LD, review structured data)
 │   ├── analytics.ts        # GA4 e-commerce + share event tracking (GTM dataLayer)
 │   ├── share-utils.ts      # Social sharing URL builders, Web Share API
@@ -263,7 +264,7 @@ prisma/
 - **Social sharing pattern**: Platform-specific URL builders (`buildShareUrl`) with proper URI encoding; Web Share API detection (`canUseNativeShare`) with graceful fallback to clipboard copy on failure
 - **OG image file convention**: Product pages use `opengraph-image.tsx` file-based generation (exports `alt`, `size`, `contentType`, and default `Image` function returning `ImageResponse`); Next.js automatically wires images into meta tags. A **site-wide** root `src/app/opengraph-image.tsx` (added TASK-035/PR #21) covers every route without its own card. **Gotcha:** a segment's `opengraph-image` file is only merged if that same segment's metadata export leaves `openGraph.images` unset (`mergeStaticMetadata`'s `!source.openGraph.hasOwnProperty('images')` guard). `getDefaultMetadata()` therefore must **not** set `openGraph.images`/`twitter.images` — doing so silently suppressed the generated card and pinned every route to the stale `public/og-image.png`
 - **Native share visibility**: Native share button rendered with CSS hiding (`sm:hidden`) instead of conditional rendering to avoid hydration mismatch
-- **Google Shopping feed pattern**: RSS 2.0 XML with Google Shopping namespace; strict Zod validation for title (max 150 chars), description (max 5000 chars), price format (`/^\d+\.\d{2} [A-Z]{3}$/`), GTIN (8/12/13/14 digits), and enum values; XML escaping for special characters; hourly revalidation with stale-while-revalidate
+- **Google Shopping feed pattern**: RSS 2.0 XML with Google Shopping namespace; strict Zod validation for title (max 150 chars), description (max 5000 chars), price format (`/^\d+\.\d{2} [A-Z]{3}$/`), GTIN (8/12/13/14 digits), and enum values; XML escaping for special characters; hourly revalidation with stale-while-revalidate. **Per-product opt-out (G16)**: the route selects `where: { isActive: true, excludeFromFeed: false }` — an explicit `Product.excludeFromFeed` boolean, not a brand allowlist, so trademark-bearing imagery stays out of the feed regardless of which text fields are set. **`image_link` is resolved against `siteConfig.url`** (`new URL(url, baseUrl)`): it is validated with `z.string().url()`, which rejects the root-relative paths seeded products store, and because the route filters on `validateFeedItemSafe` a rejected item is dropped **silently** — that bug kept the feed at zero items from the first seeded catalog until G16 (2026-09-01)
 - **Feed validation filtering**: Use `validateFeedItemSafe()` with `.filter()` after `.map()` to exclude invalid items from feeds instead of breaking serialization; prevents malformed data (e.g., non-numeric GTINs) from corrupting XML output
 - **Product identifier fields**: Schema includes optional `brand` and `mpn` (Manufacturer Part Number) fields for Google Shopping compliance and product catalog enrichment
 - **Image blur placeholders**: SVG-based shimmer effect for `next/image` placeholder="blur"; `DEFAULT_BLUR_DATA_URL` constant provides lightweight gradient animation; `IMAGE_SIZES` const defines responsive sizes for productCard, productDetail, thumbnail, categoryCard, hero

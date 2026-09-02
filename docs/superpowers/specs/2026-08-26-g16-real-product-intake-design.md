@@ -1,7 +1,7 @@
 # G16 — Real-Product Intake: Design Spec
 
 **Date**: 2026-08-26
-**Status**: Approved (user, 2026-08-26) — pending implementation plan
+**Status**: Implemented (PR [#41](https://github.com/GoodAlex223/dropshipping-test/pull/41), merged `36b5593`, 2026-09-01). Decisions 1–8 shipped, and §1's path-style-vs-virtual-host open item is resolved (path-style, verified against the real bucket). **Decision 9 is deliberately outstanding**: the 8 seeded placeholders stay active in production because prod intake stopped at 2 of 7 rows — the user ruled 2026-09-01 that the client enters the remaining 5 themselves, so deactivation waits until the real catalogue can stand alone. Until then production shows placeholders and real products side by side.
 **Branch**: `feat/g16-real-product-intake` (from `main` @ `ab8b1df`)
 **Source**: WEEKLY.md G16 (🔵 User, 2 members, 4 SP as planned — **revised upward in §8**) — user-raised 2026-08-20 when the client delivered the first 3 real products ahead of the TASK-056 ask
 **Program context**: `2026-07-14-mirox-shop-program-design.md` (Mirox rebrand + Ukraine launch). Depends on TASK-056 item 1 (domain) for the production image URL, and carries the item-14 branded-goods constraint into code.

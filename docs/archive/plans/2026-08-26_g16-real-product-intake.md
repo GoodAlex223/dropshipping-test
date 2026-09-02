@@ -1,7 +1,7 @@
 # G16 — Real-Product Intake Implementation Plan
 
 **Last Updated**: 2026-08-26
-**Task**: G16 (WEEKLY [G16](../WEEKLY.md#g16-real-product-intake-pair-session-batch)) · user-raised 2026-08-20
+**Task**: G16 (WEEKLY [G16](../../planning/WEEKLY.md#g16-real-product-intake-pair-session-batch)) · user-raised 2026-08-20
 **Branch**: `feat/g16-real-product-intake`
 **Status**: IN PROGRESS 2026-08-26 — spec approved, Tasks 1-10 implemented, Tasks 11-13 outstanding
 **Spec**: [2026-08-26-g16-real-product-intake-design.md](../../superpowers/specs/2026-08-26-g16-real-product-intake-design.md)
@@ -2515,3 +2515,28 @@ _(appended during execution — planning, per-task completion, blockers, pair-se
   and nothing normalises a group whose only member names it after itself; (b) **Task 12 Step 5 must
   leave «Група кольорів» empty for MRX-107 in prod**, per Appendix A — local is throwaway, prod is
   the row that lasts.
+- 2026-09-01 — **Task 12 complete: production pass done.** PR [#41](https://github.com/GoodAlex223/dropshipping-test/pull/41)
+  opened, CI green on three runs, five-agent review returned "no reportable issues"; its two
+  sub-threshold findings were dispositioned in `ffbf4c7` (the stale UI-primitives rule in both
+  CLAUDE.md files) and the disposition posted to the PR thread. Merged `36b5593`.
+  Vercel prod env vars set by the user; the production origin added to the `mirox-media` CORS rule
+  through the Cloudflare API (read-back verified: `localhost:3000` retained). **Deploy verified
+  functionally rather than by badge** — prod feed went 0 → 8 items with `image_link` absolutized,
+  which simultaneously proves the migration applied (the route filters on `excludeFromFeed`) and
+  the feed fix shipped; a PDP returning 200 exercises the same `include`-with-no-`select` shape as
+  `create-order`, so the column is present in prod's schema. Two categories created by hand; the
+  first two olimpiyky entered through the deployed admin.
+  **Two prod intake defects, both caught by looking:** MRX-101 was first saved with MRX-102's photo
+  (`photo_1`, the white jacket — confirmed by opening both files) and «Колір: Білий» under the
+  «чорна» name; corrected. MRX-102's middle photos ended 1→3→5→6 rather than 1→5→3→6 (cosmetic).
+  MRX-101 is deliberately **not** featured (user ruling — MRX-102 carries 4 photos to 101's 3),
+  so the prod featured set differs from local.
+  **Remaining five rows are the client's own job** (user ruling 2026-09-01) — a Ukrainian intake
+  guide was written for them instead, covering new products and colourway siblings.
+- 2026-09-01 — **Guide-writing surfaced two more defects, both filed.** `generateSlug`
+  (`src/lib/api-utils.ts`) strips every character outside `a-z0-9`, so any Cyrillic name yields
+  `""`; `POST /api/admin/products` falls back to it, and a product saved with the slug field blank
+  — exactly what the form's «Згенерувати з назви» button produces for a Ukrainian name — is
+  written with `slug: ""` and is unreachable. Separately, `excludeFromFeed` defaults to **off**,
+  which is inverted for a catalogue that is entirely third-party branded. Both 🟤 filed; the guide
+  works around the first with a hard "type the slug by hand" rule.
