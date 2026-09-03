@@ -2,8 +2,8 @@
 
 **Task**: G1 opening item (WEEKLY 2026-08-03). Screenshots (session scratchpad, not committed)
 reviewed at desktop 1440×900 and mobile 390×844 against a locally seeded dev server
-(`npm run dev -- --port 3001`, customer account `customer@example.com` (password from `SEED_CUSTOMER_PASSWORD`, printed once by)
-`prisma/seed-data/users.ts`). Verdicts: ✅ Mirox / 🟠 partially stale / 🔴 stale.
+(`npm run dev -- --port 3001`, customer account `customer@example.com`, password from
+`SEED_CUSTOMER_PASSWORD` as printed once by `prisma/seed-data/users.ts`). Verdicts: ✅ Mirox / 🟠 partially stale / 🔴 stale.
 
 ## Route-by-route verdicts
 

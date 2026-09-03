@@ -35,8 +35,13 @@ const LEAKED_SECRETS = ["admin123", "customer123", "password123"];
 // BACKLOG.md is NOT exempt: it is a live working doc, not a historical one.
 const EXEMPT_HISTORICAL = new Set(["docs/planning/DONE.md"]);
 
+// Includes untracked, non-ignored markdown: see the note in
+// json-ld-escaping.test.ts — a new doc must trip this before it is staged.
 function discoverLiveDocs(): string[] {
-  return execFileSync("git", ["ls-files", "*.md"], { cwd: repoRoot, encoding: "utf8" })
+  return execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard", "*.md"], {
+    cwd: repoRoot,
+    encoding: "utf8",
+  })
     .split("\n")
     .filter(Boolean)
     .filter((file) => !file.startsWith("docs/archive/") && !EXEMPT_HISTORICAL.has(file));

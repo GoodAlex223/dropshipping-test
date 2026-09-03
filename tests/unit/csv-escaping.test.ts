@@ -10,12 +10,18 @@ const REPO_ROOT = join(__dirname, "..", "..");
  * Every route that emits CSV, found rather than listed — matched on the
  * response content type, which is what actually makes a route an export.
  */
+// PR #43 review round 2: discovery includes UNTRACKED (non-ignored) files. With
+// tracked-only lookup the guard went green for a developer who had not staged a
+// new file yet and red on commit — and this repo's pre-commit hook runs
+// lint-staged only, so the suite is exactly what a developer runs before
+// staging. A guard that fires only after `git add` is a guard whose first
+// failure lands at the least convenient moment.
 function discoverCsvRoutes(): string[] {
   // An emitter both declares the type AND names a download; a file that only
   // mentions text/csv is a consumer (the import dialog's accept attribute).
   const grep = (pattern: string) =>
     new Set(
-      execFileSync("git", ["grep", "-l", pattern, "--", "src"], {
+      execFileSync("git", ["grep", "-l", "--untracked", pattern, "--", "src"], {
         cwd: REPO_ROOT,
         encoding: "utf8",
       })
