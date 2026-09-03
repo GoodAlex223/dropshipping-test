@@ -6,7 +6,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 // bandwidth amplifier. Seeded product images are root-relative (public/), so
 // the only host that ever needs allowing is the configured CDN/R2 origin.
 
-const ORIGINAL = process.env.AWS_CLOUDFRONT_URL;
+// PR #43 review finding 5: the allow-list must mirror the SAME resolution
+// src/lib/s3.ts uses to BUILD image urls, which is not AWS_CLOUDFRONT_URL alone
+// — on the legacy real-AWS path (S3_ENDPOINT unset) it falls back to
+// https://<bucket>.s3.amazonaws.com, and MissingCdnUrlError does not fire
+// there because its guard is `endpoint && !CLOUDFRONT_URL`. Deriving from the
+// CDN variable alone left that configuration persisting urls the optimizer
+// would then refuse. Production (R2, both vars set) was never affected.
+const ENV_KEYS = ["AWS_CLOUDFRONT_URL", "AWS_S3_BUCKET", "S3_ENDPOINT"] as const;
+const ORIGINAL_ENV = Object.fromEntries(ENV_KEYS.map((k) => [k, process.env[k]]));
 
 async function loadConfig() {
   vi.resetModules();
@@ -19,8 +27,11 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  if (ORIGINAL === undefined) delete process.env.AWS_CLOUDFRONT_URL;
-  else process.env.AWS_CLOUDFRONT_URL = ORIGINAL;
+  for (const key of ENV_KEYS) {
+    const original = ORIGINAL_ENV[key];
+    if (original === undefined) delete process.env[key];
+    else process.env[key] = original;
+  }
 });
 
 // Loading next.config.mjs pulls in the next-intl plugin, which is slow on a
@@ -77,8 +88,11 @@ describe("next.config images.remotePatterns (G17 F6)", () => {
     async () => {
       // Local development serves product images from public/ as root-relative
       // paths, which next/image handles without any remotePatterns entry. An
-      // empty list is therefore correct, not a regression.
+      // empty list is therefore correct, not a regression — but only when no
+      // bucket is configured either, otherwise s3.ts's fallback host applies.
       delete process.env.AWS_CLOUDFRONT_URL;
+      delete process.env.AWS_S3_BUCKET;
+      delete process.env.S3_ENDPOINT;
       const config = await loadConfig();
       expect(config.images?.remotePatterns ?? []).toEqual([]);
     },
@@ -91,6 +105,51 @@ describe("next.config images.remotePatterns (G17 F6)", () => {
       process.env.AWS_CLOUDFRONT_URL = "not a url";
       const config = await loadConfig();
       expect(config.images?.remotePatterns ?? []).toEqual([]);
+    },
+    LOAD_TIMEOUT
+  );
+  it(
+    "allows the bucket host on the legacy AWS path, where s3.ts falls back to it",
+    async () => {
+      // S3_ENDPOINT unset => real AWS => CDN_URL falls back to the bucket host
+      // and MissingCdnUrlError never fires. Persisted urls point there, so the
+      // optimizer has to accept it or every product image 400s.
+      delete process.env.AWS_CLOUDFRONT_URL;
+      delete process.env.S3_ENDPOINT;
+      process.env.AWS_S3_BUCKET = "mirox-legacy";
+      const config = await loadConfig();
+      expect(config.images?.remotePatterns).toEqual([
+        { protocol: "https", hostname: "mirox-legacy.s3.amazonaws.com" },
+      ]);
+    },
+    LOAD_TIMEOUT
+  );
+
+  it(
+    "does not apply the bucket fallback once an S3_ENDPOINT is set",
+    async () => {
+      // R2 without a CDN url is a configuration s3.ts refuses at call time
+      // (MissingCdnUrlError), so nothing is ever persisted on that host and
+      // allowing it would only widen the optimizer for no reason.
+      delete process.env.AWS_CLOUDFRONT_URL;
+      process.env.S3_ENDPOINT = "https://acct.r2.cloudflarestorage.com";
+      process.env.AWS_S3_BUCKET = "mirox-media";
+      const config = await loadConfig();
+      expect(config.images?.remotePatterns ?? []).toEqual([]);
+    },
+    LOAD_TIMEOUT
+  );
+
+  it(
+    "prefers the configured CDN over the bucket fallback",
+    async () => {
+      process.env.AWS_CLOUDFRONT_URL = "https://cdn.example.net";
+      process.env.AWS_S3_BUCKET = "mirox-legacy";
+      delete process.env.S3_ENDPOINT;
+      const config = await loadConfig();
+      expect(config.images?.remotePatterns).toEqual([
+        { protocol: "https", hostname: "cdn.example.net" },
+      ]);
     },
     LOAD_TIMEOUT
   );

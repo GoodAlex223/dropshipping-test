@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -20,11 +21,28 @@ const read = (rel: string) => readFileSync(join(repoRoot, rel), "utf8");
 // Every plaintext credential the seed used to carry, as published.
 const LEAKED_SECRETS = ["admin123", "customer123", "password123"];
 
-// Docs that published the credential table. The archived plans and DONE/BACKLOG
-// entries are deliberately NOT swept: they are a historical record of what was
-// true at the time, and rewriting history would hide the exposure rather than
-// close it. Rotation is what makes those references inert.
-const LIVE_DOCS = ["README.md", "docs/deployment/setup.md", "docs/database/schema.md"];
+// Every LIVE doc, discovered rather than listed.
+//
+// PR #43 review finding 7: this was a hardcoded three-entry list, and the same
+// PR added a live plan doc that republished all three passwords verbatim — in
+// neither the swept set nor the exemption class. The invariant this test states
+// ("no live doc republishes a seed password") is only worth stating if it is
+// checked against every live doc, so the set is derived now.
+//
+// The exemption is narrow and deliberate: `docs/archive/**` and DONE.md are a
+// historical record of what was true at the time, and rewriting them would hide
+// the exposure rather than close it — rotation is what makes those inert. Note
+// BACKLOG.md is NOT exempt: it is a live working doc, not a historical one.
+const EXEMPT_HISTORICAL = new Set(["docs/planning/DONE.md"]);
+
+function discoverLiveDocs(): string[] {
+  return execFileSync("git", ["ls-files", "*.md"], { cwd: repoRoot, encoding: "utf8" })
+    .split("\n")
+    .filter(Boolean)
+    .filter((file) => !file.startsWith("docs/archive/") && !EXEMPT_HISTORICAL.has(file));
+}
+
+const LIVE_DOCS = discoverLiveDocs();
 
 describe("seed credentials are not hard-coded (G17 F1)", () => {
   // Both seed files, not just the data module: the first version of this guard
@@ -41,6 +59,13 @@ describe("seed credentials are not hard-coded (G17 F1)", () => {
       expect(source).not.toMatch(/^\s*password:\s*["'`]/m);
     }
   );
+
+  it("discovers the live docs rather than trusting a hardcoded list", () => {
+    // An empty or tiny set would make the sweep below vacuously pass.
+    expect(LIVE_DOCS.length).toBeGreaterThan(10);
+    expect(LIVE_DOCS).toContain("README.md");
+    expect(LIVE_DOCS).not.toContain("docs/planning/DONE.md");
+  });
 
   it("no live doc republishes a seed password", () => {
     for (const doc of LIVE_DOCS) {

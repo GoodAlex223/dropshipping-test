@@ -1,7 +1,31 @@
+import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { escapeCsvCell, toCsv } from "@/lib/csv";
+
+const REPO_ROOT = join(__dirname, "..", "..");
+
+/**
+ * Every route that emits CSV, found rather than listed — matched on the
+ * response content type, which is what actually makes a route an export.
+ */
+function discoverCsvRoutes(): string[] {
+  // An emitter both declares the type AND names a download; a file that only
+  // mentions text/csv is a consumer (the import dialog's accept attribute).
+  const grep = (pattern: string) =>
+    new Set(
+      execFileSync("git", ["grep", "-l", pattern, "--", "src"], {
+        cwd: REPO_ROOT,
+        encoding: "utf8",
+      })
+        .split("\n")
+        .filter(Boolean)
+    );
+  const declares = grep("text/csv");
+  const downloads = grep("Content-Disposition");
+  return [...declares].filter((file) => downloads.has(file)).sort();
+}
 
 // G17 / F4 (MEDIUM, 3/3 panel): the admin order export quoted CSV cells but
 // never neutralised a leading =, +, - or @, while the sibling newsletter export
@@ -62,13 +86,18 @@ describe("toCsv (G17 F4)", () => {
 describe("no export route rolls its own escaper (G17 F4)", () => {
   // The bug was a second, weaker copy of an escaper that already existed.
   // A local re-implementation in an export route is the shape to prevent.
-  const ROUTES = [
-    "src/app/api/admin/orders/export/route.ts",
-    "src/app/api/admin/newsletter/export/route.ts",
-  ];
+  // PR #43 review finding 6: this was a hardcoded two-entry list, so csv.ts's
+  // claim that "the next export route cannot repeat it" was not something the
+  // guard could enforce — a third export route would have sailed past. Routes
+  // are discovered now, so adding one without the shared sink fails the build.
+  const ROUTES = discoverCsvRoutes();
+
+  it("finds the CSV-emitting routes rather than trusting a hardcoded list", () => {
+    expect(ROUTES.length).toBeGreaterThanOrEqual(2);
+  });
 
   it.each(ROUTES)("%s uses the shared escaper", (route) => {
-    const source = readFileSync(join(__dirname, "..", "..", route), "utf8");
+    const source = readFileSync(join(REPO_ROOT, route), "utf8");
     expect(source).toMatch(/from "@\/lib\/csv"/);
     expect(source).not.toMatch(/(const|function)\s+escapeCS?V?\w*\s*[=(]/i);
   });

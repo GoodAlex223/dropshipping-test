@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAdmin, apiError, apiSuccess, generateSlug } from "@/lib/api-utils";
 import Papa from "papaparse";
+import { toCsv } from "@/lib/csv";
 
 interface CSVRow {
   name: string;
@@ -217,8 +218,46 @@ export async function GET() {
   const { error } = await requireAdmin();
   if (error) return error;
 
-  const template = `name,sku,price,comparePrice,costPrice,stock,category,brand,barcode,mpn,description,shortDesc,isActive,isFeatured,imageUrl
-"Example Product","SKU-001","29.99","39.99","15.00","100","Electronics","BrandName","0123456789012","MPN-001","Full product description here","Short description","true","false","https://example.com/image.jpg"`;
+  // Static, developer-authored content — no injection surface today. It goes
+  // through the shared sink anyway (PR #43 review finding 6): this is a CSV
+  // emitter, and the one exemption is the crack the next hand-rolled export
+  // grows from. If the template ever becomes data-driven it is already safe.
+  const template = toCsv([
+    [
+      "name",
+      "sku",
+      "price",
+      "comparePrice",
+      "costPrice",
+      "stock",
+      "category",
+      "brand",
+      "barcode",
+      "mpn",
+      "description",
+      "shortDesc",
+      "isActive",
+      "isFeatured",
+      "imageUrl",
+    ],
+    [
+      "Example Product",
+      "SKU-001",
+      "29.99",
+      "39.99",
+      "15.00",
+      "100",
+      "Electronics",
+      "BrandName",
+      "0123456789012",
+      "MPN-001",
+      "Full product description here",
+      "Short description",
+      "true",
+      "false",
+      "https://example.com/image.jpg",
+    ],
+  ]);
 
   return new Response(template, {
     headers: {

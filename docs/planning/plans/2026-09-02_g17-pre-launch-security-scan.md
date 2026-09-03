@@ -208,15 +208,18 @@ scripts were added for it: `db:rotate-password` (`2fe52a9`) and `db:delete-test-
 (`8d4c370`, dry-run by default, hard-coded address list, refuses on an ADMIN target — guard proven
 by promoting a fixture and watching it refuse **with** `CONFIRM_DELETE=yes`).
 
-**What was exposed**: `admin@store.com` / `admin123` (ADMIN), published in `README.md`'s Test
-Accounts table in a public repository, plus `customer123` / `password123` on four seeded customers.
+**What was exposed**: `admin@store.com` and its seeded password (ADMIN), published in `README.md`'s Test
+Accounts table in a public repository, plus the two seeded customer passwords on four accounts.
+The literals are deliberately not repeated here — they are in git history and in the archived
+pre-G17 docs, which is where the forensic record belongs; this is a live doc, and the credential
+sweep in `tests/unit/seed-credentials.test.ts` holds live docs to that rule.
 
-| Action                           | Evidence                                                                                                                                               |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Admin password rotated           | `Rotated password for admin@store.com (ADMIN) on host "ep-small-dream-ag9shegw-pooler…neon.tech"`                                                      |
-| Rotation reached the **live** DB | New password signs in on the deployed site; **`admin123` now fails** — the check that matters, since it rules out having written to the wrong endpoint |
-| 4 seeded test customers deleted  | Same prod host; 8 reviews cascaded, 7 orders detached and kept                                                                                         |
-| Prod confirmed clean afterwards  | Re-run dry run against prod: `No seeded test accounts found — nothing to do.`                                                                          |
+| Action                           | Evidence                                                                                                                                                     |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Admin password rotated           | `Rotated password for admin@store.com (ADMIN) on host "ep-small-dream-ag9shegw-pooler…neon.tech"`                                                            |
+| Rotation reached the **live** DB | New password signs in on the deployed site; **the old password now fails** — the check that matters, since it rules out having written to the wrong endpoint |
+| 4 seeded test customers deleted  | Same prod host; 8 reviews cascaded, 7 orders detached and kept                                                                                               |
+| Prod confirmed clean afterwards  | Re-run dry run against prod: `No seeded test accounts found — nothing to do.`                                                                                |
 
 **Accepted consequence, verified benign**: production PDPs now show zero reviews. Checked rather
 than assumed — `getProductJsonLd`'s `hasReviews` guard (`src/lib/seo.ts:281`) omits both

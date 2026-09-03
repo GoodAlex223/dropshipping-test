@@ -19,7 +19,16 @@ const withNextIntl = createNextIntlPlugin(); // default path: ./src/i18n/request
  * is configured, not a regression.
  */
 function cdnRemotePatterns() {
-  const configured = process.env.AWS_CLOUDFRONT_URL;
+  // Mirrors src/lib/s3.ts's CDN_URL resolution exactly, and must keep doing so:
+  // this list has to allow whatever host that module WRITES into
+  // ProductImage.url, or the optimizer refuses images the app itself stored.
+  // The bucket fallback is legal only on the legacy real-AWS path — once
+  // S3_ENDPOINT is set, getPresignedUploadUrl throws MissingCdnUrlError rather
+  // than persisting an *.s3.amazonaws.com url, so nothing lives there to allow.
+  const bucket = process.env.AWS_S3_BUCKET;
+  const fallback =
+    !process.env.S3_ENDPOINT && bucket ? `https://${bucket}.s3.amazonaws.com` : undefined;
+  const configured = process.env.AWS_CLOUDFRONT_URL || fallback;
   if (!configured) return [];
 
   try {

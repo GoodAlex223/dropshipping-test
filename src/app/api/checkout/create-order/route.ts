@@ -5,6 +5,7 @@ import { generateOrderNumber } from "@/lib/stripe";
 import { getDeliveryMethod } from "@/lib/shipping";
 import { sendOrderConfirmationEmail } from "@/lib/email";
 import { checkoutSchema } from "@/lib/validations";
+import { InsufficientStockError, INSUFFICIENT_STOCK_RESPONSE } from "@/lib/checkout-errors";
 import { z } from "zod";
 
 // No-prepayment COD order creation (spec §4). Guest-capable: session optional.
@@ -24,14 +25,6 @@ const createOrderSchema = checkoutSchema.extend({
     )
     .min(1),
 });
-
-/** Thrown inside the order transaction when the gte guard rejects a decrement. */
-class InsufficientStockError extends Error {
-  constructor(readonly productName: string) {
-    super(`Insufficient stock for ${productName}`);
-    this.name = "InsufficientStockError";
-  }
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -217,10 +210,9 @@ export async function POST(request: NextRequest) {
     }
 
     if (error instanceof InsufficientStockError) {
-      return NextResponse.json(
-        { error: "Insufficient stock", code: "INSUFFICIENT_STOCK" },
-        { status: 409 }
-      );
+      return NextResponse.json(INSUFFICIENT_STOCK_RESPONSE.body, {
+        status: INSUFFICIENT_STOCK_RESPONSE.status,
+      });
     }
 
     return NextResponse.json(

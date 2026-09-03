@@ -20,7 +20,7 @@
  *     CONFIRM_DELETE=yes npm run db:delete-test-accounts
  *
  * The address list is hard-coded on purpose: this script can only ever touch
- * these five seeded fixtures, never a real customer, whatever is passed to it.
+ * these four seeded fixtures, never a real customer, whatever is passed to it.
  */
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";

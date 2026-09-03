@@ -1,7 +1,22 @@
+import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { serializeJsonLd } from "@/lib/seo";
+
+const REPO_ROOT = join(__dirname, "..", "..");
+
+/**
+ * Every source file that embeds an `application/ld+json` block, found rather
+ * than listed. Uses git so build output and node_modules can never leak in.
+ */
+function discoverJsonLdSites(): string[] {
+  const out = execFileSync("git", ["grep", "-l", "application/ld+json", "--", "src"], {
+    cwd: REPO_ROOT,
+    encoding: "utf8",
+  });
+  return out.split("\n").filter(Boolean);
+}
 
 // G17 / F2 (MEDIUM, 3/3 panel): customer-controlled review `comment` and
 // `user.name` reach an inline <script type="application/ld+json"> through
@@ -60,10 +75,28 @@ describe("no JSON-LD site bypasses the serializer (G17 F2)", () => {
   // Structural guard: the fix is only durable if the NEXT ld+json block added
   // to the app also goes through serializeJsonLd. A bare JSON.stringify inside
   // dangerouslySetInnerHTML is the exact shape of the original bug.
-  const FILES = ["src/app/layout.tsx", "src/app/(shop)/products/[slug]/page.tsx"];
+  //
+  // PR #43 review finding 6: this list used to be two hardcoded paths, which
+  // meant a third ld+json block added anywhere else would not have failed
+  // anything — while seo.ts's docstring promised the build WOULD fail. The set
+  // is discovered now, so the promise is one the guard can actually keep. A
+  // guard that cannot see a new call site is documentation, not a control.
+  const FILES = discoverJsonLdSites();
+
+  it("finds the ld+json sites rather than trusting a hardcoded list", () => {
+    // Fails loudly if discovery silently matches nothing — an empty set would
+    // make every assertion below vacuously pass, which is the failure mode
+    // this whole describe block exists to prevent.
+    expect(FILES.length).toBeGreaterThanOrEqual(2);
+  });
 
   it.each(FILES)("%s passes no bare JSON.stringify to dangerouslySetInnerHTML", (file) => {
-    const source = readFileSync(join(__dirname, "..", "..", file), "utf8");
+    const source = readFileSync(join(REPO_ROOT, file), "utf8");
     expect(source).not.toMatch(/__html:\s*JSON\.stringify\(/);
+  });
+
+  it.each(FILES)("%s serialises through serializeJsonLd", (file) => {
+    const source = readFileSync(join(REPO_ROOT, file), "utf8");
+    expect(source).toMatch(/serializeJsonLd/);
   });
 });

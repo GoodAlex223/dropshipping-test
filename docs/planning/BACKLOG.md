@@ -979,11 +979,11 @@ not close, plus a dormant-route parity gap surfaced while verifying the fix.
   returns the existing order. Repo-wide grep for `idempoten` is empty today. (Med value, Med
   effort) `[relates-to: G2 hardening bundle]`
 - 🟤 **`confirm-order` hardening parity with `create-order`** — the dormant Stripe path never
-  received PR #29's fixes: no `isActive` filter on the product lookup, no `.max(100)` quantity
-  cap, and the stock-decrement loop iterates raw `data.items` instead of the validated
-  `orderItemsData` (a dropped line throws Prisma P2025 and rolls back the just-created order).
-  Also missing: an await-regression race test for its email send (PR #34 fixed the code, tested
-  only create-order). Exploitation needs a `succeeded` Stripe intent, so dormancy shields it —
+  received PR #29's fixes: no `isActive` filter on the product lookup and no `.max(100)` quantity
+  cap. ~~the stock-decrement loop iterates raw `data.items`~~ — **closed by G17 (`fdb24ae`)**: the
+  route now decrements from the validated `orderItemsData`, and PR #43 gave it the same typed
+  `InsufficientStockError` → coded 409 the sibling route returns. Also missing: an await-regression
+  race test for its email send (PR #34 fixed the code, tested only create-order). Exploitation needs a `succeeded` Stripe intent, so dormancy shields it —
   do this before TASK-048 revives the route. (Med value, Low effort) `[relates-to: TASK-048]`
 
 ### [2026-08-11] From: manual testing

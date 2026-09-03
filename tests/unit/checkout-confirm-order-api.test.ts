@@ -175,3 +175,63 @@ describe("POST /api/checkout/confirm-order — payment amount (G17 F7)", () => {
     expect(res.status).toBe(400);
   });
 });
+
+// PR #43 review finding 4: the F8 gte guard reached this route in `fdb24ae`,
+// but it threw a bare Error, and the catch below it only narrows z.ZodError —
+// so a stock rejection surfaced as `{ error: "Failed to create order" }, 500`.
+// Stock integrity held (the transaction rolls back), so this was a contract
+// gap, not a live bug: the sibling create-order route returns a coded 409 for
+// the identical condition, and a client cannot tell "sold out" from "the
+// server broke" without it. The Stripe path is dormant, which is exactly why
+// the divergence would otherwise sit here until TASK-048 revives it.
+describe("POST /api/checkout/confirm-order — stock rejection contract (PR #43 r1)", () => {
+  it("returns a coded 409 when a product has insufficient stock, not a bare 500", async () => {
+    mockIntent();
+    const tx = mockTx();
+    tx.product.updateMany.mockResolvedValue({ count: 0 });
+
+    const res = await POST(
+      createNextRequest({ url: "/api/checkout/confirm-order", method: "POST", body })
+    );
+
+    expect(res.status).toBe(409);
+    expect(await res.json()).toEqual(expect.objectContaining({ code: "INSUFFICIENT_STOCK" }));
+  });
+
+  it("returns a coded 409 when a variant has insufficient stock", async () => {
+    mockIntent();
+    mockFindMany.mockResolvedValue([
+      {
+        id: "prod-1",
+        name: "Худі Mirox Basic",
+        sku: "HUDI-1",
+        price: 1290,
+        variants: [{ id: "var-1", name: "Розмір", value: "L", price: 1290 }],
+      },
+    ]);
+    const tx = mockTx();
+    tx.productVariant.updateMany.mockResolvedValue({ count: 0 });
+
+    const res = await POST(
+      createNextRequest({
+        url: "/api/checkout/confirm-order",
+        method: "POST",
+        body: { ...body, items: [{ productId: "prod-1", variantId: "var-1", quantity: 1 }] },
+      })
+    );
+
+    expect(res.status).toBe(409);
+    expect(await res.json()).toEqual(expect.objectContaining({ code: "INSUFFICIENT_STOCK" }));
+  });
+
+  it("still returns 500 for an unrelated transaction failure", async () => {
+    mockIntent();
+    mockTransaction.mockRejectedValue(new Error("db down"));
+
+    const res = await POST(
+      createNextRequest({ url: "/api/checkout/confirm-order", method: "POST", body })
+    );
+
+    expect(res.status).toBe(500);
+  });
+});

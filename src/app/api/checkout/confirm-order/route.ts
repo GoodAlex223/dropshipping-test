@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getStripe, getShippingMethod, generateOrderNumber } from "@/lib/stripe";
 import { sendOrderConfirmationEmail } from "@/lib/email";
 import { z } from "zod";
+import { InsufficientStockError, INSUFFICIENT_STOCK_RESPONSE } from "@/lib/checkout-errors";
 
 const confirmOrderSchema = z.object({
   paymentIntentId: z.string(),
@@ -178,13 +179,13 @@ export async function POST(request: NextRequest) {
             where: { id: item.variantId, stock: { gte: item.quantity } },
             data: { stock: { decrement: item.quantity } },
           });
-          if (count === 0) throw new Error(`Insufficient stock for ${item.productName}`);
+          if (count === 0) throw new InsufficientStockError(item.productName);
         } else {
           const { count } = await tx.product.updateMany({
             where: { id: item.productId, stock: { gte: item.quantity } },
             data: { stock: { decrement: item.quantity } },
           });
-          if (count === 0) throw new Error(`Insufficient stock for ${item.productName}`);
+          if (count === 0) throw new InsufficientStockError(item.productName);
         }
       }
 
@@ -226,6 +227,14 @@ export async function POST(request: NextRequest) {
         { error: "Invalid order data", details: error.issues },
         { status: 400 }
       );
+    }
+
+    // Same coded outcome as create-order: a client must be able to tell a
+    // sold-out line from a server fault, and both routes share the sink.
+    if (error instanceof InsufficientStockError) {
+      return NextResponse.json(INSUFFICIENT_STOCK_RESPONSE.body, {
+        status: INSUFFICIENT_STOCK_RESPONSE.status,
+      });
     }
 
     return NextResponse.json({ error: "Failed to create order" }, { status: 500 });
