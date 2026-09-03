@@ -1,9 +1,9 @@
 # G17 — Pre-Launch Security Scan Plan
 
-**Last Updated**: 2026-09-02
+**Last Updated**: 2026-09-03
 **Task**: G17 (WEEKLY [G17](../WEEKLY.md#g17-pre-launch-security-scan-solo)) · 🟤 BACKLOG [2026-08-15] G10 run-2 adopt
 **Branch**: `feat/g17-pre-launch-security-scan`
-**Status**: IN PROGRESS 2026-09-02 — run 1 (low, whole repo) complete; 6 of 9 findings fixed; **F1 closed end-to-end incl. production**; run 2 (medium, `src`) still to run
+**Status**: COMPLETE 2026-09-03 — run 1 (low, whole repo) complete; 6 of 9 findings fixed, 3 filed 🟤; **F1 closed end-to-end incl. production**; run 2 (medium, `src`) attempted twice and **abandoned on cost** by user ruling — G17 closes at run-1 coverage
 **Spec**: none (bounded task; the approved design is §1–§4 below)
 
 **Goal:** Run the adopted `claude-security` deep scan against the code that is about to take real
@@ -160,7 +160,9 @@ fan-out that OOM'd. **The step-2 gate passes.**
 
 **Coverage limit, stated rather than implied**: `completenessCheckOutcome: "not-applicable"` — a
 low-effort run has no inventory stage, so the whole-tree accounting never ran. Run 1 says what one
-pass surfaced; it is not evidence any directory is clean. Run 2 is still owed.
+pass surfaced; it is not evidence any directory is clean. Run 2 was meant to close this
+gap and did not — see the 2026-09-03 section: it was abandoned on cost, so this caveat is
+**permanent for G17**, not a temporary state.
 
 ### 2026-09-02 — Triage (user decisions on the record)
 
@@ -227,3 +229,40 @@ the second (Neon) line is commented out, disabled in TASK-038a with a note expla
 silently pointed local dev and E2E at live production. What was verified instead, and is what the
 runbook should say: an inline `DATABASE_URL=… npm run …` **does** beat `.env`, because dotenv does
 not override variables already present in the environment.
+
+### 2026-09-03 — Run 2 attempted twice, abandoned on cost (user ruling)
+
+Run 2 was launched as specified: scope `src` (**255 tracked files**), `--effort medium`,
+`focus: "attack-surface"`, report dir `CLAUDE-SECURITY-20260902-220932/`.
+
+**It never reached the verification panel.** Two launches, both ended by the session, not by the
+scan:
+
+| Attempt               | Started   | Died      | Ran for | Artifacts written                     |
+| --------------------- | --------- | --------- | ------- | ------------------------------------- |
+| 1 (fresh)             | 22:09 UTC | 22:17 UTC | ~8 min  | `scan-meta.json`, `target-files.json` |
+| 2 (`resumeFromRunId`) | 00:29 UTC | —         | ~30 min | none beyond the above                 |
+
+Neither attempt wrote a `findings.json`, a `votes.json`, or a report. The report directory was
+therefore **deleted**, not kept: it held no results, and an empty `CLAUDE-SECURITY-*` directory on
+disk reads like a clean scan to anyone who finds it later. That misreading is the whole hazard here.
+
+**Not an OOM.** The sampler ran across both attempts: cgroup peak **4.86 GiB** against the 9.71 GiB
+ceiling, `oom_kill` **0** throughout. Run 1's measurement (peak 3.34 GiB, 38 agents) still stands as
+the memory-gate evidence; the medium tier costs more but stayed well inside the box. What it did not
+stay inside was the **context/session budget** — the constraint that actually binds here is tokens
+and session length, not RAM.
+
+**User ruling (2026-09-03):** the medium tier is not affordable — "a huge number of tokens that I
+can't afford to use, plus I can't fit them all into a single work session (Claude's limits cut the
+session short)". Run 2 is **abandoned, not deferred to later in G17**. G17 closes at run-1 coverage.
+
+**What this costs, stated plainly:** run 1 was low-effort, so it had no inventory stage and its
+`completenessCheckOutcome` was `not-applicable`. G17 therefore ships **nine findings that one pass
+surfaced, six of them fixed** — and **no claim that any directory is clean**. Anyone reading this
+record later should not treat G17 as a clean bill of health for `src`.
+
+**Re-run shape, if it is ever wanted:** the tier is the problem, not the target. A `low` run scoped
+to `src` fits a session (run 1's whole-repo `low` pass completed comfortably) and would at least
+re-examine the attack surface against the six fixes now in the branch. Filed 🟤 rather than left as
+a dangling "owed".

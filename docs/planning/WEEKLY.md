@@ -45,8 +45,16 @@ _Group IDs continue from prior weeks (G1–G14 are permanently taken by DONE.md 
 
 > The G10 run-2 `adopt`, pinned by its own park condition to exactly this window ("pre-launch security pass is scheduled, or real customer traffic is imminent"). Runs Tuesday so findings can be triaged and the quick ones fixed inside the week.
 
-- [ ] Install `claude-security@claude-plugins-official` (v0.10.0, Anthropic) and run the scoped deep scan: auth (NextAuth v5 + middleware), API routes + `requireAdmin()`/`requireAuth()` guards, `/api/checkout/create-order` (guest COD, no auth), the HMAC unsubscribe token path, admin routes, secrets pass (2) — BACKLOG [2026-08-15] G10 run 2 adopt [HIGH]
-- [ ] Triage findings: fix quick confirmed ones in-branch; file the rest 🟤 with severity. A severe finding (data exposure class) is an abort-condition consult with the user, not a silent fix (1)
+- [x] Install `claude-security@claude-plugins-official` (v0.10.0, Anthropic) and run the scoped deep scan: auth (NextAuth v5 + middleware), API routes + `requireAdmin()`/`requireAuth()` guards, `/api/checkout/create-order` (guest COD, no auth), the HMAC unsubscribe token path, admin routes, secrets pass (2) — BACKLOG [2026-08-15] G10 run 2 adopt [HIGH]
+- [x] Triage findings: fix quick confirmed ones in-branch; file the rest 🟤 with severity. A severe finding (data exposure class) is an abort-condition consult with the user, not a silent fix (1)
+
+**As delivered (2026-09-03)**: run 1 = `claude-security` **v0.11.0** (not v0.10.0), `low` effort over
+the **whole repository** rather than the scoped deep scan — 12 candidates → 9 panel-verified findings
+(1 HIGH, 7 MED, 1 LOW); 6 fixed in-branch with TDD, 3 filed 🟤. F1 was the abort-condition consult and
+was closed **end-to-end including production** (credential rotated, seeded test accounts deleted, both
+owner-executed and verified). The follow-up depth scan (`medium`, scoped `src`) was launched twice and
+**abandoned on cost** by user ruling — so the scoped-deep-scan half of task 1 was **not** delivered, and
+G17 carries run-1 coverage only: no directory in `src` is proven clean. Filed 🟤 [2026-09-03].
 
 ### G18. Guest Order Access & Hardening [batch]
 
@@ -122,16 +130,16 @@ _Group IDs continue from prior weeks (G1–G14 are permanently taken by DONE.md 
 
 ## Summary Table
 
-| ID  | Group                                       | Domain          | Source      | Tasks  | Total SP | Day          | Status       |
-| --- | ------------------------------------------- | --------------- | ----------- | ------ | -------- | ------------ | ------------ |
-| G15 | TASK-056 Client Round-Trip `[solo]`         | client comms    | 🔵 User     | 2      | 3        | Fri(pre)+Mon | ✅ `b836e77` |
-| G16 | Real-Product Intake Pair Session `[batch]`  | catalog/data    | 🔵 User     | 2      | 9        | Mon          | ✅ PR #41    |
-| G17 | Pre-Launch Security Scan `[solo]`           | security        | 🟤 Auto     | 2      | 3        | Tue          | ☐ Planned    |
-| G18 | Guest Order Access & Hardening `[batch]` 🏆 | checkout/orders | 🔵 User     | 2      | 7        | Tue–Wed      | ☐ Planned    |
-| G19 | Launch Runbook + Deploy Verify `[batch]`    | ops/deploy      | 🔵 User     | 2      | 3        | Thu          | ☐ Planned    |
-| G20 | Pre-Launch Polish `[batch]`                 | storefront      | 🔵 User     | 2      | 4        | Thu          | ☐ Planned    |
-| G21 | Weekly Reviews `[batch]`                    | recurring       | ⚪ Overhead | 4      | 5        | Fri          | ☐ Planned    |
-|     | **Total**                                   |                 |             | **16** | **34**   |              |              |
+| ID  | Group                                       | Domain          | Source      | Tasks  | Total SP | Day          | Status                                                                 |
+| --- | ------------------------------------------- | --------------- | ----------- | ------ | -------- | ------------ | ---------------------------------------------------------------------- |
+| G15 | TASK-056 Client Round-Trip `[solo]`         | client comms    | 🔵 User     | 2      | 3        | Fri(pre)+Mon | ✅ `b836e77`                                                           |
+| G16 | Real-Product Intake Pair Session `[batch]`  | catalog/data    | 🔵 User     | 2      | 9        | Mon          | ✅ PR #41                                                              |
+| G17 | Pre-Launch Security Scan `[solo]`           | security        | 🟤 Auto     | 2      | 3        | Tue          | ✅ `feat/g17-pre-launch-security-scan` (unmerged; run-1 coverage only) |
+| G18 | Guest Order Access & Hardening `[batch]` 🏆 | checkout/orders | 🔵 User     | 2      | 7        | Tue–Wed      | ☐ Planned                                                              |
+| G19 | Launch Runbook + Deploy Verify `[batch]`    | ops/deploy      | 🔵 User     | 2      | 3        | Thu          | ☐ Planned                                                              |
+| G20 | Pre-Launch Polish `[batch]`                 | storefront      | 🔵 User     | 2      | 4        | Thu          | ☐ Planned                                                              |
+| G21 | Weekly Reviews `[batch]`                    | recurring       | ⚪ Overhead | 4      | 5        | Fri          | ☐ Planned                                                              |
+|     | **Total**                                   |                 |             | **16** | **34**   |              |                                                                        |
 
 _Source legend: 🔵 User · 🟡 Ops · 🟤 Auto · ⚪ Overhead (exempt from the quota denominator). Status on completion: `✅ PR #N` (the number, never a bare ✅)._
 

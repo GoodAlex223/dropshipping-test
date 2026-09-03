@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-09-02
+**Last Updated**: 2026-09-03
 
 ---
 
@@ -1276,6 +1276,15 @@ researcher's.
 - [ ] 🟤 **Verify product images still render after the first deploy carrying the `remotePatterns` change** — G17 F6 replaced `images.remotePatterns: [{ hostname: "**" }]` with an allow-list derived from `AWS_CLOUDFRONT_URL` at **build** time. Unit-tested five ways, but `next.config.mjs` is build-time configuration and this container cannot produce a trustworthy production build (the three documented local-build corruptors), so the change is verified by test and by reading, **never against a running deployment**. If `AWS_CLOUDFRONT_URL` is absent or differently-shaped in the Vercel build environment, the allow-list comes back empty and every R2-hosted product image 400s from `/_next/image` — which is now the live catalogue, not placeholders. Cheap to check: load a PDP with a real product after the deploy and confirm the image renders rather than falling back. Natural home is the G19 post-deploy smoke script, which is being written this week anyway. (High value, Low effort) `[relates-to: G17 F6, G19]`
 - [ ] 🟤 **`.husky/pre-commit` runs lint-staged only, and the docs keep implying it runs the suite** — the hook is a single `npx lint-staged` (eslint --fix + prettier); the unit suite runs in CI, not locally. This is now the **second** time a task has had to discover and correct that mid-flight — G16's plan recorded the same correction against its spec, and G17's brief repeated the same wrong assumption. A belief that keeps being re-derived and re-corrected is cheaper to fix once: either make the statement correct (add a pre-push hook that runs `npm run test:run`) or state it plainly where the wrong version keeps coming from. Note the container cannot run the suite at full parallelism (see the next entry), so a hook would need `--maxWorkers`. (Med value, Low effort)
 - [ ] 🟤 **The unit suite cannot run at full parallelism in this devcontainer** — `npm run test:run` now fans out to 79 worker forks and fails non-deterministically here: six `Failed to start forks worker` errors plus 5s timeouts on IO-bound tests that pass comfortably in isolation, with `oom_kill` at **0** throughout (so this is fork/CPU contention, not the documented OOM class). `npx vitest run --maxWorkers=4` is green end to end (79 files, 993 passed, 1 todo, ~9 min). G17 raised the two affected timeouts, which treats the symptom; the failure mode will return as the suite grows. Options: set `poolOptions` in `vitest.config.ts` (CI has more headroom, so it would want to stay conditional), or document `--maxWorkers` as the local invocation. Worth settling before a green local suite is trusted as a merge gate. (Med value, Low effort)
+
+### [2026-09-03] From: G17 run-2 abandonment
+
+**Origin**: the deferred depth scan (`--scope src --effort medium`) was launched twice and killed
+both times by session limits before it wrote a single finding, then abandoned on cost by user ruling
+(detail: [G17 plan](plans/2026-09-02_g17-pre-launch-security-scan.md#2026-09-03--run-2-attempted-twice-abandoned-on-cost-user-ruling)).
+Claude-surfaced → 🟤.
+
+- [ ] 🟤 **`src` has never been scanned with whole-tree coverage accounting** — G17 shipped nine findings from a single `low`-effort pass, whose `completenessCheckOutcome` was `not-applicable`: a low run has no inventory stage, so no directory in `src` is _proven_ clean, and the G17 record says so explicitly. The intended `medium` run over `src` (255 tracked files) would have supplied that accounting; it was attempted twice and abandoned because the tier does not fit a single session's token budget — **not** for memory reasons (cgroup peak 4.86 GiB of 9.71 GiB, `oom_kill` 0 across both attempts). The re-run shape that actually fits is `low` scoped to `src`, which also re-examines the attack surface against the six fixes now merged; a `medium` pass would need splitting across sessions or a narrower scope (e.g. `src/app/api` alone). Value is real but second-order — the nine known findings are triaged and the HIGH one is closed in production — so this is a "do it when there is budget" item, not a launch blocker. (Med value, Med effort) `[relates-to: G17]`
 
 ---
 
