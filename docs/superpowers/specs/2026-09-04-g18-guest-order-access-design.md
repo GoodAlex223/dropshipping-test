@@ -1,7 +1,7 @@
 # G18 — Guest Order Access & Hardening: Design Spec
 
 **Date**: 2026-09-04
-**Status**: Draft — brainstormed and section-approved with the user 2026-09-04; pending the user's review of this document before the implementation plan is written.
+**Status**: Approved 2026-09-04 (brainstormed section-by-section, then the written spec reviewed and approved by the user the same day); implementation plan follows.
 **Branch**: `feat/g18-guest-order-access` (from `main` @ `eef2e4e`)
 **Source**: WEEKLY.md G18 (🔵 User, 2 members, 7 SP, 🏆 Weekly Challenge) — guest order tracking (🔵 [2026-08-07] G2 post-gate, "recommended before real launch") + the G2 confirmation-page ownership check (🟤 rider [2026-08-06], pinned "before real customer traffic"; independently confirmed 3/3 by the G17 panel as a MEDIUM finding, 2026-09-02)
 **Program context**: `2026-07-14-mirox-shop-program-design.md` (Mirox rebrand + Ukraine launch). Closes the last pre-launch privacy item on the checkout surface. Does not depend on any TASK-056 client item, but note the email constraint in Problem §3.
