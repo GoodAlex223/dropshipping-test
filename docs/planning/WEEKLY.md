@@ -115,7 +115,7 @@ the rotated admin password and orders in the browser.
 
 ### Tuesday — Security + guest-access design
 
-- **[G17](#g17-pre-launch-security-scan-solo)** 🟤 — scan + triage, early so fixes fit in-week.
+- [x] **[G17](#g17-pre-launch-security-scan-solo)** 🟤 — **shipped PR #43 / `0bee3d2` (2026-09-04)**. Scan + triage ran as planned; delivery slipped past the Aug 24–28 window like G16. 9 panel-verified findings, 6 fixed, 3 filed; the HIGH was an abort-condition consult and closed in production. Run 2 (the `medium` depth scan) abandoned on cost — G17 ships run-1 coverage only.
 - **[G18](#g18-guest-order-access--hardening-batch)** 🔵 — part 1: design + API (the week's biggest design decision, front-loaded).
 
 ### Wednesday — Guest access lands
