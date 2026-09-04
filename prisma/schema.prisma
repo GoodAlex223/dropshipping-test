@@ -266,6 +266,10 @@ model Order {
   trackingUrl     String?
   notes           String?         @db.Text
   customerNotes   String?         @db.Text
+  /// G18 guest lookup lockout: wrong-e-mail attempts against this order number.
+  lookupFailedAttempts Int       @default(0)
+  /// G18: while set and in the future, POST /api/orders/lookup answers 429.
+  lookupLockedUntil    DateTime?
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 
