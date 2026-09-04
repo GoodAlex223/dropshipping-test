@@ -72,11 +72,25 @@ test.describe("Checkout (guest COD)", () => {
     await page.context().clearCookies();
     await page.goto(confirmationUrl);
     await page.waitForURL(/\/track\?order=ORD-/, { timeout: 15000 });
+
+    // The rejection itself must carry none of the order's values: fetch the
+    // bearer URL cold (page.request shares the cleared cookie jar) and check
+    // the response body, not the page we were redirected to.
+    const cold = await page.request.get(confirmationUrl);
+    const coldBody = await cold.text();
+    expect(coldBody).not.toContain("Тест Тестовий");
+    expect(coldBody).not.toContain("Відділення №12");
+
     // Verify the rejection, not just the redirect: no order data reached the page.
     await expect(page.getByText(/адреса доставки/i)).toHaveCount(0);
     await expect(page.getByText("Тест Тестовий")).toHaveCount(0);
     await expect(page.getByText("Відділення №12")).toHaveCount(0);
     await expect(page.getByLabel(/^номер замовлення$/i)).toHaveValue(orderNumber);
+
+    // WebKit hydration race (project lesson): fields render in the SSR HTML,
+    // so a fill() before React hydrates silently drops on WebKit — wait for
+    // the mount signal before the first fill on this page.
+    await page.waitForSelector('form[data-hydrated="true"]');
 
     // Wrong e-mail → uniform not-found copy, still on the form.
     await page.getByLabel(/^email$/i).fill("someone-else@example.com");

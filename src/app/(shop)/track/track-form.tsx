@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -19,6 +19,12 @@ export function TrackForm() {
   const [orderNumber, setOrderNumber] = useState(searchParams?.get("order") ?? "");
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // E2E hydration signal (WebKit lesson, product-detail-client.tsx
+  // precedent): fields render in the SSR HTML, so a fill() before React
+  // hydrates silently drops on WebKit. Tests wait for [data-hydrated="true"].
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -51,7 +57,11 @@ export function TrackForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4"
+      data-hydrated={hydrated ? "true" : undefined}
+    >
       <div className="space-y-1.5">
         <label htmlFor="track-order-number" className="text-sm font-medium">
           {t("form.orderNumberLabel")}

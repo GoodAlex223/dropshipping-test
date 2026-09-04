@@ -32,6 +32,13 @@ function submit(orderNumber: string, email: string) {
 }
 
 describe("TrackForm", () => {
+  it("marks the form hydrated after mount (WebKit pre-hydration fill guard)", async () => {
+    renderWithIntl(<TrackForm />);
+    await waitFor(() =>
+      expect(document.querySelector('form[data-hydrated="true"]')).not.toBeNull()
+    );
+  });
+
   it("prefills the order number from ?order=", () => {
     search = `order=${ORDER}`;
     renderWithIntl(<TrackForm />);
