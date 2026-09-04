@@ -1,8 +1,8 @@
-import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { serializeJsonLd } from "@/lib/seo";
+import { DISCOVERY_ARGS, gitLines } from "../helpers/discovery";
 
 const REPO_ROOT = join(__dirname, "..", "..");
 
@@ -10,22 +10,19 @@ const REPO_ROOT = join(__dirname, "..", "..");
  * Every source file that embeds an `application/ld+json` block, found rather
  * than listed. Uses git so build output and node_modules can never leak in.
  */
-// PR #43 review round 2: discovery includes UNTRACKED (non-ignored) files. With
-// tracked-only lookup the guard went green for a developer who had not staged a
-// new file yet and red on commit — and this repo's pre-commit hook runs
-// lint-staged only, so the suite is exactly what a developer runs before
-// staging. A guard that fires only after `git add` is a guard whose first
-// failure lands at the least convenient moment.
+// PR #43 review round 2: discovery includes UNTRACKED (non-ignored) files.
+// With tracked-only lookup the guard simply could not see a file the developer
+// had not staged yet, and this repo's pre-commit hook runs lint-staged only —
+// no hook runs the suite. So the false green did NOT end at `git commit`
+// (round 3 corrected that): committing stayed green too, and the failure first
+// surfaced on some later suite run after staging, or in CI. The gap was wider
+// than "deferred to commit" — it was "deferred until something else happened
+// to look".
+//
+// The --untracked flag is load-bearing: drop it and this gap silently reopens.
+// tests/unit/discovery-untracked.test.ts pins it against a scratch repository.
 function discoverJsonLdSites(): string[] {
-  const out = execFileSync(
-    "git",
-    ["grep", "-l", "--untracked", "application/ld+json", "--", "src"],
-    {
-      cwd: REPO_ROOT,
-      encoding: "utf8",
-    }
-  );
-  return out.split("\n").filter(Boolean);
+  return gitLines(DISCOVERY_ARGS.jsonLd, REPO_ROOT);
 }
 
 // G17 / F2 (MEDIUM, 3/3 panel): customer-controlled review `comment` and

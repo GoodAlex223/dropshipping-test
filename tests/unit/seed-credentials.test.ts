@@ -1,8 +1,8 @@
-import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { resolveSeedPassword } from "../../prisma/seed-data/users";
+import { DISCOVERY_ARGS, gitLines } from "../helpers/discovery";
 
 // G17 / F1 (HIGH, 3/3 panel): the seeded ADMIN password was a source-controlled
 // literal ("admin123") that prisma/seed.ts bcrypt-hashed into an unconditional
@@ -37,14 +37,12 @@ const EXEMPT_HISTORICAL = new Set(["docs/planning/DONE.md"]);
 
 // Includes untracked, non-ignored markdown: see the note in
 // json-ld-escaping.test.ts — a new doc must trip this before it is staged.
+// The --others --exclude-standard pair is load-bearing and pinned by
+// tests/unit/discovery-untracked.test.ts.
 function discoverLiveDocs(): string[] {
-  return execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard", "*.md"], {
-    cwd: repoRoot,
-    encoding: "utf8",
-  })
-    .split("\n")
-    .filter(Boolean)
-    .filter((file) => !file.startsWith("docs/archive/") && !EXEMPT_HISTORICAL.has(file));
+  return gitLines(DISCOVERY_ARGS.markdown, repoRoot).filter(
+    (file) => !file.startsWith("docs/archive/") && !EXEMPT_HISTORICAL.has(file)
+  );
 }
 
 const LIVE_DOCS = discoverLiveDocs();

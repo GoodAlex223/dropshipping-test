@@ -1,7 +1,7 @@
-import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { DISCOVERY_ARGS, gitLines } from "../helpers/discovery";
 import { escapeCsvCell, toCsv } from "@/lib/csv";
 
 const REPO_ROOT = join(__dirname, "..", "..");
@@ -10,26 +10,22 @@ const REPO_ROOT = join(__dirname, "..", "..");
  * Every route that emits CSV, found rather than listed — matched on the
  * response content type, which is what actually makes a route an export.
  */
-// PR #43 review round 2: discovery includes UNTRACKED (non-ignored) files. With
-// tracked-only lookup the guard went green for a developer who had not staged a
-// new file yet and red on commit — and this repo's pre-commit hook runs
-// lint-staged only, so the suite is exactly what a developer runs before
-// staging. A guard that fires only after `git add` is a guard whose first
-// failure lands at the least convenient moment.
+// PR #43 review round 2: discovery includes UNTRACKED (non-ignored) files.
+// With tracked-only lookup the guard simply could not see a file the developer
+// had not staged yet, and this repo's pre-commit hook runs lint-staged only —
+// no hook runs the suite. So the false green did NOT end at `git commit`
+// (round 3 corrected that): committing stayed green too, and the failure first
+// surfaced on some later suite run after staging, or in CI. The gap was wider
+// than "deferred to commit" — it was "deferred until something else happened
+// to look".
+//
+// The --untracked flag is load-bearing: drop it and this gap silently reopens.
+// tests/unit/discovery-untracked.test.ts pins it against a scratch repository.
 function discoverCsvRoutes(): string[] {
   // An emitter both declares the type AND names a download; a file that only
   // mentions text/csv is a consumer (the import dialog's accept attribute).
-  const grep = (pattern: string) =>
-    new Set(
-      execFileSync("git", ["grep", "-l", "--untracked", pattern, "--", "src"], {
-        cwd: REPO_ROOT,
-        encoding: "utf8",
-      })
-        .split("\n")
-        .filter(Boolean)
-    );
-  const declares = grep("text/csv");
-  const downloads = grep("Content-Disposition");
+  const declares = new Set(gitLines(DISCOVERY_ARGS.csvType, REPO_ROOT));
+  const downloads = new Set(gitLines(DISCOVERY_ARGS.csvDownload, REPO_ROOT));
   return [...declares].filter((file) => downloads.has(file)).sort();
 }
 
