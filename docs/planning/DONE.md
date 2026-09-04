@@ -2,11 +2,37 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-09-01
+**Last Updated**: 2026-09-04
 
 ---
 
 ## 2026-08 (August)
+
+### [2026-09-04] G17 - Pre-Launch Security Scan (WEEKLY solo, 🟤 Auto)
+
+**Plan**: [2026-09-02_g17-pre-launch-security-scan.md](../archive/plans/2026-09-02_g17-pre-launch-security-scan.md) — staged run design, triage routing, production-remediation evidence
+**Origin**: BACKLOG [2026-08-15] G10 run-2 `adopt`, pinned by its own park condition to the pre-launch window
+**Merge**: PR [#43](https://github.com/GoodAlex223/dropshipping-test/pull/43) → `0bee3d2` (2026-09-04). 10 commits; three review rounds (7 findings → 1 self-inflicted defect → 0). All six checks green on the final commit.
+
+**Summary**: `claude-security` v0.11.0 at low effort over the whole repository: 12 candidates → **9 findings** past a three-lens panel (1 HIGH, 7 MED, 1 LOW). Six fixed in-branch with TDD, three filed 🟤. The HIGH was an abort-condition consult rather than a silent fix — the seeded admin credential was live in production **and published in this public repository's README** — and the owner rotated it and deleted the four seeded test accounts from production, both verified.
+
+**Key changes**:
+
+- **Seed credentials** (F1) — no password literal survives in source. Unset + local host generates and prints once; unset + non-local **refuses**, because seeding a remote database with a password nobody chose is how an unrotatable account gets planted. Two guarded scripts added: `db:rotate-password` and `db:delete-test-accounts` (dry-run default, refuses ADMIN targets, prints the host it acted on). The app has **no password-change endpoint or UI** — rotation is DB-only.
+- **Stored XSS via JSON-LD** (F2) — `JSON.stringify` escapes neither `<` nor `/`, so a review body could close the script element. `serializeJsonLd()` now covers `< > &` and U+2028/2029.
+- **CSV formula injection** (F4) — the order export carried a weaker private copy of an escaper the newsletter export already had right; both share `src/lib/csv.ts` now.
+- **Open redirect** (F5) and **`/_next/image` SSRF** (F6) — `safeCallbackUrl()` rejects `//host`, `/\host` and non-http schemes; `remotePatterns` derives from the same resolution `s3.ts` builds URLs from, rather than `hostname: "**"`.
+- **Unauthenticated stock drain** (F8) and **unverified payment amount** (F7) — decrements are `updateMany` + `stock: { gte }` inside the transaction, so check and write are one statement; `confirm-order` compares `amount_received` against the server-computed total.
+
+**Three defects the scan itself missed**, found while fixing: the same unguarded decrement in the sibling `confirm-order` route, that route decrementing from **raw client items** rather than validated order lines, and an F8 test fixture that mocked `product.update` — so it would have gone green against the guarded route without exercising it.
+
+**Verification**: 1017 unit tests / 80 files at `--maxWorkers=4`, lint + typecheck clean, CI green including E2E. F6 verified **against the running deployment**, which no test could reach: real R2 images 200 through the production optimizer, and arbitrary / cloud-metadata / lookalike hosts 400. Rendering alone would have proved only that the site still worked; the 400s prove the SSRF is closed. Owner separately confirmed PDP images, the rotated admin password and orders in the browser.
+
+**Deliberately outstanding**: **run-2 coverage**. The depth scan (`medium`, scoped `src`) was launched twice and abandoned on cost — both attempts died to session limits before writing a finding, and it was **not** memory (cgroup peak 4.86 GiB of 9.71, `oom_kill` 0). Run 1 was low-effort, so it had no inventory stage and `completenessCheckOutcome` was `not-applicable`. G17 therefore ships nine findings that one pass surfaced and **no claim that any directory in `src` is clean** — it must not be quoted as a clean bill of health. Re-run shape that fits a session (`low` scoped to `src`) filed 🟤.
+
+**Learnings**: a review rubric that emits only 0/25/50/75/100 turns an 80 gate into a 100 gate — six of round 1's seven findings scored 75 and one 65, so the automated flow would have posted an empty review while every finding was real. Separately, three guards in this branch asserted invariants they could not enforce (hardcoded file lists behind docstrings promising the build would fail); the fix each time was to widen what the guard discovers rather than shrink what the docstring claims, and widening immediately found a third CSV emitter and a live doc republishing the very passwords the sweep existed to catch.
+
+---
 
 ### [2026-09-01] G16 - Real-Product Intake (WEEKLY batch, 🔵 User)
 

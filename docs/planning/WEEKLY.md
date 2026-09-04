@@ -56,6 +56,12 @@ owner-executed and verified). The follow-up depth scan (`medium`, scoped `src`) 
 **abandoned on cost** by user ruling — so the scoped-deep-scan half of task 1 was **not** delivered, and
 G17 carries run-1 coverage only: no directory in `src` is proven clean. Filed 🟤 [2026-09-03].
 
+**Merged 2026-09-04** as `0bee3d2` (PR [#43](https://github.com/GoodAlex223/dropshipping-test/pull/43),
+10 commits, three review rounds ending in zero findings). F6's post-deploy check is **done**, not
+carried: the production optimizer serves the real R2 images (200) and rejects arbitrary, metadata and
+lookalike hosts (400) — so the SSRF is closed, not merely untriggered. Owner also verified PDP images,
+the rotated admin password and orders in the browser.
+
 ### G18. Guest Order Access & Hardening [batch]
 
 🔵 User · checkout/orders · **7 SP** · Tue–Wed · **🏆 Weekly Challenge**
@@ -130,16 +136,16 @@ G17 carries run-1 coverage only: no directory in `src` is proven clean. Filed �
 
 ## Summary Table
 
-| ID  | Group                                       | Domain          | Source      | Tasks  | Total SP | Day          | Status                                    |
-| --- | ------------------------------------------- | --------------- | ----------- | ------ | -------- | ------------ | ----------------------------------------- |
-| G15 | TASK-056 Client Round-Trip `[solo]`         | client comms    | 🔵 User     | 2      | 3        | Fri(pre)+Mon | ✅ `b836e77`                              |
-| G16 | Real-Product Intake Pair Session `[batch]`  | catalog/data    | 🔵 User     | 2      | 9        | Mon          | ✅ PR #41                                 |
-| G17 | Pre-Launch Security Scan `[solo]`           | security        | 🟤 Auto     | 2      | 3        | Tue          | ✅ PR #43 (unmerged; run-1 coverage only) |
-| G18 | Guest Order Access & Hardening `[batch]` 🏆 | checkout/orders | 🔵 User     | 2      | 7        | Tue–Wed      | ☐ Planned                                 |
-| G19 | Launch Runbook + Deploy Verify `[batch]`    | ops/deploy      | 🔵 User     | 2      | 3        | Thu          | ☐ Planned                                 |
-| G20 | Pre-Launch Polish `[batch]`                 | storefront      | 🔵 User     | 2      | 4        | Thu          | ☐ Planned                                 |
-| G21 | Weekly Reviews `[batch]`                    | recurring       | ⚪ Overhead | 4      | 5        | Fri          | ☐ Planned                                 |
-|     | **Total**                                   |                 |             | **16** | **34**   |              |                                           |
+| ID  | Group                                       | Domain          | Source      | Tasks  | Total SP | Day          | Status                                      |
+| --- | ------------------------------------------- | --------------- | ----------- | ------ | -------- | ------------ | ------------------------------------------- |
+| G15 | TASK-056 Client Round-Trip `[solo]`         | client comms    | 🔵 User     | 2      | 3        | Fri(pre)+Mon | ✅ `b836e77`                                |
+| G16 | Real-Product Intake Pair Session `[batch]`  | catalog/data    | 🔵 User     | 2      | 9        | Mon          | ✅ PR #41                                   |
+| G17 | Pre-Launch Security Scan `[solo]`           | security        | 🟤 Auto     | 2      | 3        | Tue          | ✅ `0bee3d2` / PR #43 (run-1 coverage only) |
+| G18 | Guest Order Access & Hardening `[batch]` 🏆 | checkout/orders | 🔵 User     | 2      | 7        | Tue–Wed      | ☐ Planned                                   |
+| G19 | Launch Runbook + Deploy Verify `[batch]`    | ops/deploy      | 🔵 User     | 2      | 3        | Thu          | ☐ Planned                                   |
+| G20 | Pre-Launch Polish `[batch]`                 | storefront      | 🔵 User     | 2      | 4        | Thu          | ☐ Planned                                   |
+| G21 | Weekly Reviews `[batch]`                    | recurring       | ⚪ Overhead | 4      | 5        | Fri          | ☐ Planned                                   |
+|     | **Total**                                   |                 |             | **16** | **34**   |              |                                             |
 
 _Source legend: 🔵 User · 🟡 Ops · 🟤 Auto · ⚪ Overhead (exempt from the quota denominator). Status on completion: `✅ PR #N` (the number, never a bare ✅)._
 

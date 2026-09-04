@@ -1,7 +1,7 @@
 # G17 — Pre-Launch Security Scan Plan
 
 **Last Updated**: 2026-09-03
-**Task**: G17 (WEEKLY [G17](../WEEKLY.md#g17-pre-launch-security-scan-solo)) · 🟤 BACKLOG [2026-08-15] G10 run-2 adopt
+**Task**: G17 (WEEKLY [G17](../../planning/WEEKLY.md#g17-pre-launch-security-scan-solo)) · 🟤 BACKLOG [2026-08-15] G10 run-2 adopt
 **Branch**: `feat/g17-pre-launch-security-scan`
 **Status**: COMPLETE 2026-09-03 — run 1 (low, whole repo) complete; 6 of 9 findings fixed, 3 filed 🟤; **F1 closed end-to-end incl. production**; run 2 (medium, `src`) attempted twice and **abandoned on cost** by user ruling — G17 closes at run-1 coverage
 **Spec**: none (bounded task; the approved design is §1–§4 below)
@@ -269,3 +269,33 @@ record later should not treat G17 as a clean bill of health for `src`.
 to `src` fits a session (run 1's whole-repo `low` pass completed comfortably) and would at least
 re-examine the attack surface against the six fixes now in the branch. Filed 🟤 rather than left as
 a dangling "owed".
+
+### 2026-09-04 — Merged, and F6 verified against production
+
+Merged as `0bee3d2` (PR [#43](https://github.com/GoodAlex223/dropshipping-test/pull/43), `--merge`,
+10 commits). Three review rounds: 7 findings in round 1, 1 defect I introduced in round 2, 0 findings
+in round 3. All six checks passed on the final commit before merge — including E2E (8m32s) and the
+first CI run of `discovery-untracked.test.ts`.
+
+**F6 closed against the running deployment**, which is the half no test could reach. Vercel reported
+the production deployment READY on `0bee3d2`, so the `remotePatterns` change was live:
+
+| Probe                                       | Result               | What it proves                                                                                          |
+| ------------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------- |
+| 4 real R2 product images via `/_next/image` | **200** `image/jpeg` | the build-time derivation resolved against the real bucket — the feared empty allow-list did not happen |
+| Seeded root-relative image                  | **200**              | placeholders unaffected                                                                                 |
+| Arbitrary host (`example.com`)              | **400**              | the SSRF the finding was about is closed                                                                |
+| Cloud metadata probe (`169.254.169.254`)    | **400**              | the specific attack the panel described is blocked                                                      |
+| Lookalike host (`…r2.dev.evil.com`)         | **400**              | not a naive suffix match                                                                                |
+
+The last three probes are the point. "Images still render" only proves the site was not broken; it
+does not prove the **fix works**, and F6 was an SSRF finding. A `remotePatterns` entry that passed the
+first two rows and failed the last three would look identical to a healthy site while leaving the
+optimizer an open proxy.
+
+**Owner-verified in the browser the same day**: PDP images render, the rotated admin password works
+against the live admin, and orders work. That closes F1's rotation as functionally sound rather than
+merely applied — a rotation that locks the owner out is not a fix.
+
+**What G17 does NOT close**: run-2 coverage. See the 2026-09-03 section — no directory in `src` is
+proven clean, and that is permanent for this group.
