@@ -80,8 +80,9 @@ Central index for all project documentation.
 
 ## Implementation Plans
 
-| Plan | Task | Status | Started |
-| ---- | ---- | ------ | ------- |
+| Plan                                                                                        | Task                               | Status      | Started    |
+| ------------------------------------------------------------------------------------------- | ---------------------------------- | ----------- | ---------- |
+| [2026-09-04_g18-guest-order-access.md](planning/plans/2026-09-04_g18-guest-order-access.md) | G18 Guest Order Access & Hardening | IN PROGRESS | 2026-09-04 |
 
 ### Archived Plans
 

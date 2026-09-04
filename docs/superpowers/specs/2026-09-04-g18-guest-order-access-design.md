@@ -77,7 +77,7 @@ One cookie per order: a guest with several orders accumulates several, each boun
 **Helper surface** (all pure except the cookie writer):
 
 - `isValidOrderNumber(value: string): boolean`
-- `createOrderGrant(orderNumber: string, now?: Date): string` — throws if `NEXTAUTH_SECRET` is unset (same posture as the newsletter helper).
+- `createOrderGrant(orderNumber: string, now?: Date): string` — throws if `NEXTAUTH_SECRET` is unset. (Deliberately stricter than `generateUnsubscribeToken`, which falls back to a `"development-secret"` — a forgeable grant is worse than a 500. `src/lib/auth.ts` already refuses to boot without the secret, so production never reaches this path.)
 - `verifyOrderGrant(orderNumber: string, cookieValue: string | undefined, now?: Date): boolean` — never throws; a missing secret reads as "no grant".
 - `orderGrantCookieName(orderNumber: string): string`
 - `setOrderGrantCookie(response: NextResponse, orderNumber: string, request: NextRequest): void`
