@@ -15,7 +15,7 @@ import {
 // throttle — per-IP limits are a platform decision (prod has no Redis).
 export async function POST(request: NextRequest) {
   try {
-    // A malformed body is the caller's error, not ours (G20 residue pattern).
+    // A malformed body is the caller's error, not ours — 400, never a bare 500.
     const body = await request.json().catch(() => null);
     const parsed = orderLookupSchema.safeParse(body);
     if (!parsed.success) {
@@ -42,32 +42,46 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!emailsMatch(order.email, email)) {
-      // Atomic increment; the lock decision reads the RETURNED count so two
-      // concurrent failures cannot both see 4 and neither lock.
-      const updated = await prisma.order.update({
+    // Count the attempt BEFORE comparing, so a concurrent burst cannot all
+    // compare against a pre-read counter of 0 (final review, G18). The lock
+    // decision reads the RETURNED count, never the pre-read value.
+    const attempt = await prisma.order.update({
+      where: { id: order.id },
+      data: { lookupFailedAttempts: { increment: 1 } },
+      select: { lookupFailedAttempts: true },
+    });
+
+    const lockedUntil = new Date(now.getTime() + LOOKUP_LOCK_MS);
+    if (attempt.lookupFailedAttempts > LOOKUP_MAX_FAILURES) {
+      // Past the cap without a lock on the row yet — only a concurrent burst
+      // gets here. Lock now and refuse without comparing.
+      await prisma.order.update({
         where: { id: order.id },
-        data: { lookupFailedAttempts: { increment: 1 } },
-        select: { lookupFailedAttempts: true },
+        data: { lookupFailedAttempts: 0, lookupLockedUntil: lockedUntil },
       });
-      if (updated.lookupFailedAttempts >= LOOKUP_MAX_FAILURES) {
+      const retryAfterSeconds = Math.ceil(LOOKUP_LOCK_MS / 1000);
+      return NextResponse.json(
+        { error: "Too many attempts", code: "TOO_MANY_ATTEMPTS", retryAfterSeconds },
+        { status: 429, headers: { "Retry-After": String(retryAfterSeconds) } }
+      );
+    }
+
+    if (!emailsMatch(order.email, email)) {
+      if (attempt.lookupFailedAttempts >= LOOKUP_MAX_FAILURES) {
         await prisma.order.update({
           where: { id: order.id },
-          data: {
-            lookupFailedAttempts: 0,
-            lookupLockedUntil: new Date(now.getTime() + LOOKUP_LOCK_MS),
-          },
+          data: { lookupFailedAttempts: 0, lookupLockedUntil: lockedUntil },
         });
       }
       return apiError("Order not found", 404, "ORDER_NOT_FOUND");
     }
 
-    if (order.lookupFailedAttempts > 0 || order.lookupLockedUntil) {
-      await prisma.order.update({
-        where: { id: order.id },
-        data: { lookupFailedAttempts: 0, lookupLockedUntil: null },
-      });
-    }
+    // Success: the attempt above counted this request, so always undo it and
+    // clear any expired lock.
+    await prisma.order.update({
+      where: { id: order.id },
+      data: { lookupFailedAttempts: 0, lookupLockedUntil: null },
+    });
 
     const response = apiSuccess({ orderNumber });
     setOrderGrantCookie(response, orderNumber, request);

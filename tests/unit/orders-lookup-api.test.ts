@@ -41,10 +41,14 @@ function storedOrder(
 beforeEach(() => {
   vi.clearAllMocks();
   process.env.NEXTAUTH_SECRET = "test-secret-for-order-grants";
-  mockUpdate.mockImplementation(
-    async (args) =>
-      ({ ...storedOrder(), ...(args as { data: Record<string, unknown> }).data }) as never
-  );
+  // The route counts the attempt before comparing (final review, G18), so the
+  // FIRST update call is always the increment — its return value is what the
+  // route's lock decision reads. Any later reset/lock write carries no
+  // `increment`, so it falls through to the harmless default.
+  mockUpdate.mockImplementation(async (args) => {
+    const data = (args as { data?: { lookupFailedAttempts?: { increment?: number } } }).data;
+    return (data?.lookupFailedAttempts?.increment ? { lookupFailedAttempts: 1 } : {}) as never;
+  });
 });
 afterEach(() => {
   process.env.NEXTAUTH_SECRET = originalSecret;
@@ -77,7 +81,7 @@ describe("POST /api/orders/lookup", () => {
     expect(mockUpdate).not.toHaveBeenCalled();
   });
 
-  it("returns the identical 404 for a wrong e-mail and increments the failure counter atomically", async () => {
+  it("returns the identical 404 for a wrong e-mail, counting the attempt before comparing", async () => {
     mockFindUnique.mockResolvedValue(storedOrder() as never);
     mockUpdate.mockResolvedValue({ lookupFailedAttempts: 1 } as never);
     const res = await POST(lookup({ orderNumber: ORDER, email: "wrong@example.com" }));
@@ -120,6 +124,37 @@ describe("POST /api/orders/lookup", () => {
     }
   });
 
+  it("answers 429 without comparing when a concurrent burst has pushed the count past the cap", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-09-04T12:00:00Z"));
+    try {
+      mockFindUnique.mockResolvedValue(storedOrder({ lookupFailedAttempts: 3 }) as never);
+      mockUpdate
+        .mockResolvedValueOnce({ lookupFailedAttempts: LOOKUP_MAX_FAILURES + 1 } as never)
+        .mockResolvedValueOnce({} as never);
+      // The correct e-mail: a genuine burst must never reach the comparison.
+      const res = await POST(lookup({ orderNumber: ORDER, email: "guest@example.com" }));
+      expect(res.status).toBe(429);
+      const json = await res.json();
+      expect(json.code).toBe("TOO_MANY_ATTEMPTS");
+      expect(json.retryAfterSeconds).toBe(900);
+      expect(res.headers.get("retry-after")).toBe("900");
+      expect(mockUpdate).toHaveBeenCalledTimes(2);
+      expect(mockUpdate).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          where: { id: "order-1" },
+          data: {
+            lookupFailedAttempts: 0,
+            lookupLockedUntil: new Date("2026-09-04T12:15:00Z"),
+          },
+        })
+      );
+      expect(res.headers.get("set-cookie")).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("returns 429 TOO_MANY_ATTEMPTS with Retry-After while locked, even for the right e-mail", async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-09-04T12:00:00Z"));
@@ -146,6 +181,12 @@ describe("POST /api/orders/lookup", () => {
     );
     const res = await POST(lookup({ orderNumber: ORDER, email: "guest@example.com" }));
     expect(res.status).toBe(200);
+    expect(mockUpdate).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        where: { id: "order-1" },
+        data: { lookupFailedAttempts: 0, lookupLockedUntil: null },
+      })
+    );
   });
 
   it("returns 200 with the grant cookie on a match, normalising case and whitespace on both sides", async () => {
@@ -159,7 +200,7 @@ describe("POST /api/orders/lookup", () => {
       expect.objectContaining({ where: { orderNumber: ORDER } })
     );
     // counter + lock reset because the stored row had failures
-    expect(mockUpdate).toHaveBeenCalledWith(
+    expect(mockUpdate).toHaveBeenLastCalledWith(
       expect.objectContaining({
         where: { id: "order-1" },
         data: { lookupFailedAttempts: 0, lookupLockedUntil: null },
@@ -176,11 +217,24 @@ describe("POST /api/orders/lookup", () => {
     expect(verifyOrderGrant(ORDER, value)).toBe(true);
   });
 
-  it("skips the reset write when there is nothing to reset", async () => {
+  it("always counts the attempt and then resets it on success", async () => {
     mockFindUnique.mockResolvedValue(storedOrder() as never);
     const res = await POST(lookup({ orderNumber: ORDER, email: "guest@example.com" }));
     expect(res.status).toBe(200);
-    expect(mockUpdate).not.toHaveBeenCalled();
+    expect(mockUpdate).toHaveBeenCalledTimes(2);
+    expect(mockUpdate).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        where: { id: "order-1" },
+        data: { lookupFailedAttempts: { increment: 1 } },
+      })
+    );
+    expect(mockUpdate).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        where: { id: "order-1" },
+        data: { lookupFailedAttempts: 0, lookupLockedUntil: null },
+      })
+    );
   });
 
   it("returns 500 LOOKUP_FAILED when the database throws", async () => {
