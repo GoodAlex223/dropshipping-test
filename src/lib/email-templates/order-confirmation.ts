@@ -35,8 +35,11 @@ export interface OrderEmailData {
   };
   shippingMethod: string;
   /**
-   * Guest COD orders (userId null) can't open /account/orders, so the CTA
-   * renders only for signed-in customers — the G2 confirmation-page ruling.
+   * Selects which CTA the contact panel renders: signed-in customers get
+   * «ІСТОРІЯ ЗАМОВЛЕНЬ» -> /account/orders. Guest COD orders (userId null)
+   * have no account page — the G2 ruling hid the account CTA for them, and
+   * G18 replaced that gap with a «СТАТУС ЗАМОВЛЕННЯ» -> /track?order=<N> CTA
+   * instead. One CTA always renders; which one depends on this flag.
    */
   hasAccount: boolean;
 }
