@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAdmin, apiError } from "@/lib/api-utils";
+import { toCsv } from "@/lib/csv";
 import { Prisma } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
@@ -118,18 +119,7 @@ export async function GET(request: NextRequest) {
       ];
     });
 
-    // Escape CSV values
-    const escapeCSV = (value: string) => {
-      if (value.includes(",") || value.includes('"') || value.includes("\n")) {
-        return `"${value.replace(/"/g, '""')}"`;
-      }
-      return value;
-    };
-
-    const csvContent = [
-      headers.map(escapeCSV).join(","),
-      ...rows.map((row) => row.map((cell) => escapeCSV(String(cell))).join(",")),
-    ].join("\n");
+    const csvContent = toCsv([headers, ...rows]);
 
     const filename = `orders-export-${new Date().toISOString().split("T")[0]}.csv`;
 

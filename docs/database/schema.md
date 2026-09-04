@@ -613,10 +613,11 @@ Seed uses upsert operations for idempotent execution and maintains entity relati
 # Run seed
 npx prisma db seed
 
-# Test accounts:
-# Admin: admin@store.com / admin123
-# Customer: customer@example.com / customer123
-# Additional: alice@example.com, bob@example.com, carol@example.com, diana@example.com (password: customer123)
+# Test accounts (passwords come from SEED_ADMIN_PASSWORD / SEED_CUSTOMER_PASSWORD,
+# generated and printed when unset locally — never committed):
+# Admin: admin@store.com
+# Customers: customer@example.com, sarah.wilson@example.com,
+#            mike.johnson@example.com, emily.chen@example.com
 ```
 
 ---

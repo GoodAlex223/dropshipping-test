@@ -24,7 +24,12 @@ import { Inter, JetBrains_Mono, Playfair_Display, Lora, Manrope } from "next/fon
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { Providers } from "@/components/providers";
-import { getDefaultMetadata, getOrganizationJsonLd, getWebsiteJsonLd } from "@/lib/seo";
+import {
+  getDefaultMetadata,
+  getOrganizationJsonLd,
+  getWebsiteJsonLd,
+  serializeJsonLd,
+} from "@/lib/seo";
 import { PRECONNECT_DOMAINS, DNS_PREFETCH_DOMAINS } from "@/components/common/ResourceHints";
 import "./globals.css";
 
@@ -123,13 +128,13 @@ export default async function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationJsonLd),
+            __html: serializeJsonLd(organizationJsonLd),
           }}
         />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(websiteJsonLd),
+            __html: serializeJsonLd(websiteJsonLd),
           }}
         />
       </head>

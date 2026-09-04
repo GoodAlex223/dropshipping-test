@@ -386,7 +386,11 @@ describe("GET /api/admin/newsletter/export", () => {
     expect(res.headers.get("Content-Disposition")).toContain(".csv");
 
     const csv = await res.text();
-    expect(csv).toContain("Email,Status,Subscribed At,Created At");
+    // Header cells are quoted since G17 F4 moved both exports onto the shared
+    // toCsv() sink, which escapes every cell rather than only the data rows.
+    // Still valid CSV and identical in a spreadsheet; the previous unquoted
+    // header row was the inconsistent side.
+    expect(csv).toContain('"Email","Status","Subscribed At","Created At"');
     expect(csv).toContain("test@example.com");
     expect(csv).toContain("ACTIVE");
   });

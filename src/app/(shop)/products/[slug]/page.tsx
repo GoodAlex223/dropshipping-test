@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/db";
-import { getProductMetadata, getProductJsonLd, getBreadcrumbJsonLd, siteConfig } from "@/lib/seo";
+import {
+  getProductMetadata,
+  getProductJsonLd,
+  getBreadcrumbJsonLd,
+  serializeJsonLd,
+  siteConfig,
+} from "@/lib/seo";
 import { safeSection } from "@/lib/safe-section";
 import { getSalesRanking } from "@/lib/product-queries";
 import { VARIANT_NAMES } from "@/lib/variant-names";
@@ -382,13 +388,13 @@ export default async function ProductDetailPage({ params }: PageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(productJsonLd),
+          __html: serializeJsonLd(productJsonLd),
         }}
       />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(breadcrumbJsonLd),
+          __html: serializeJsonLd(breadcrumbJsonLd),
         }}
       />
       {/* key: sibling-colorway navigation soft-navigates within this same route

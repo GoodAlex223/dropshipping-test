@@ -51,8 +51,11 @@ function mockTx() {
         items: [],
       }),
     },
-    product: { update: vi.fn() },
-    productVariant: { update: vi.fn() },
+    // updateMany, not update: the decrement carries a `stock: { gte }` guard
+    // and the route reads `count` to detect an oversell (G17 F8). A fixture
+    // still mocking `update` would make every assertion below vacuous.
+    product: { updateMany: vi.fn().mockResolvedValue({ count: 1 }) },
+    productVariant: { updateMany: vi.fn().mockResolvedValue({ count: 1 }) },
   };
   mockTransaction.mockImplementation(async (cb: (t: typeof tx) => Promise<unknown>) => cb(tx));
   return tx;
@@ -212,8 +215,8 @@ describe("POST /api/checkout/create-order", () => {
     await POST(
       createNextRequest({ url: "/api/checkout/create-order", method: "POST", body: validBody })
     );
-    expect(tx.product.update).toHaveBeenCalledWith({
-      where: { id: "prod-1" },
+    expect(tx.product.updateMany).toHaveBeenCalledWith({
+      where: { id: "prod-1", stock: { gte: 2 } },
       data: { stock: { decrement: 2 } },
     });
   });
@@ -233,8 +236,8 @@ describe("POST /api/checkout/create-order", () => {
         body: { ...validBody, items: [{ productId: "prod-1", variantId: "var-1", quantity: 1 }] },
       })
     );
-    expect(tx.productVariant.update).toHaveBeenCalledWith({
-      where: { id: "var-1" },
+    expect(tx.productVariant.updateMany).toHaveBeenCalledWith({
+      where: { id: "var-1", stock: { gte: 1 } },
       data: { stock: { decrement: 1 } },
     });
     expect(tx.order.create).toHaveBeenCalledWith(
@@ -311,5 +314,52 @@ describe("POST /api/checkout/create-order", () => {
       createNextRequest({ url: "/api/checkout/create-order", method: "POST", body: validBody })
     );
     expect(res.status).toBe(500);
+  });
+  // G17 / F8 (MEDIUM, 3/3 panel): this route is deliberately unauthenticated for
+  // guest COD, and every call decremented stock unconditionally. Looping it with
+  // quantity: 100 drove every product's stock negative, rendering the whole
+  // catalogue out of stock (`isAvailable: isActive && stock > 0`) until an admin
+  // restored each value by hand. The per-line cap added in PR #29 r6 bounded one
+  // request; it did not stop repetition.
+  it("rejects the order when a product has insufficient stock", async () => {
+    const tx = mockTx();
+    tx.product.updateMany.mockResolvedValue({ count: 0 });
+
+    const res = await POST(
+      createNextRequest({ url: "/api/checkout/create-order", method: "POST", body: validBody })
+    );
+
+    expect(res.status).toBe(409);
+    expect(await res.json()).toEqual(expect.objectContaining({ code: "INSUFFICIENT_STOCK" }));
+  });
+
+  it("rejects the order when a variant has insufficient stock", async () => {
+    mockFindMany.mockResolvedValue([
+      { ...dbProduct, variants: [{ id: "var-1", name: "Розмір", value: "L", price: 1390 }] },
+    ]);
+    const tx = mockTx();
+    tx.productVariant.updateMany.mockResolvedValue({ count: 0 });
+
+    const res = await POST(
+      createNextRequest({
+        url: "/api/checkout/create-order",
+        method: "POST",
+        body: { ...validBody, items: [{ productId: "prod-1", variantId: "var-1", quantity: 1 }] },
+      })
+    );
+
+    expect(res.status).toBe(409);
+    expect(await res.json()).toEqual(expect.objectContaining({ code: "INSUFFICIENT_STOCK" }));
+  });
+
+  it("sends no confirmation email when the order is rejected for stock", async () => {
+    const tx = mockTx();
+    tx.product.updateMany.mockResolvedValue({ count: 0 });
+
+    await POST(
+      createNextRequest({ url: "/api/checkout/create-order", method: "POST", body: validBody })
+    );
+
+    expect(sendOrderConfirmationEmail).not.toHaveBeenCalled();
   });
 });

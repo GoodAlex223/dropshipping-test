@@ -69,3 +69,7 @@ test-results/
 
 # Client product-photo drops (source material for S3 intake, not repo content)
 docs/real_products/
+
+# claude-security scan reports (self-gitignoring too; second latch because this repo is PUBLIC
+# and reports can describe unfixed findings). To commit one deliberately: git add -f
+CLAUDE-SECURITY-*/

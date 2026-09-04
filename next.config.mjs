@@ -2,6 +2,45 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin(); // default path: ./src/i18n/request.ts
 
+/**
+ * Hosts next/image is allowed to fetch from.
+ *
+ * This used to be `hostname: "**"`, which made the unauthenticated
+ * `/_next/image?url=` endpoint a server-side fetch proxy for ANY https URL —
+ * an SSRF probe into whatever network the deployment sits in, and a bandwidth
+ * amplifier besides (G17 finding F6).
+ *
+ * The only remote origin the storefront ever loads is the configured CDN / R2
+ * public bucket, so the allow-list is derived from AWS_CLOUDFRONT_URL (the same
+ * variable src/lib/s3.ts builds image URLs from — see its single env contract:
+ * R2 reuses the AWS_* slots, there are no R2_* variables). Seeded product
+ * images are root-relative paths served from public/, which next/image handles
+ * with no remotePatterns entry at all — so an empty list is correct when no CDN
+ * is configured, not a regression.
+ */
+function cdnRemotePatterns() {
+  // Mirrors src/lib/s3.ts's CDN_URL resolution exactly, and must keep doing so:
+  // this list has to allow whatever host that module WRITES into
+  // ProductImage.url, or the optimizer refuses images the app itself stored.
+  // The bucket fallback is legal only on the legacy real-AWS path — once
+  // S3_ENDPOINT is set, getPresignedUploadUrl throws MissingCdnUrlError rather
+  // than persisting an *.s3.amazonaws.com url, so nothing lives there to allow.
+  const bucket = process.env.AWS_S3_BUCKET;
+  const fallback =
+    !process.env.S3_ENDPOINT && bucket ? `https://${bucket}.s3.amazonaws.com` : undefined;
+  const configured = process.env.AWS_CLOUDFRONT_URL || fallback;
+  if (!configured) return [];
+
+  try {
+    const { hostname, protocol } = new URL(configured);
+    if (!hostname) return [];
+    return [{ protocol: protocol.replace(":", "") || "https", hostname }];
+  } catch {
+    // A malformed value must not break the build; it just allows nothing.
+    return [];
+  }
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Output standalone for Docker/Vercel deployment
@@ -11,12 +50,7 @@ const nextConfig = {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "**",
-      },
-    ],
+    remotePatterns: cdnRemotePatterns(),
     minimumCacheTTL: 60 * 60 * 24 * 7, // 7 days
   },
   // Performance optimizations
