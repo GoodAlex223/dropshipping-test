@@ -5,7 +5,14 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/db";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
+import {
+  canAccessOrder,
+  isValidOrderNumber,
+  normalizeOrderNumber,
+  orderGrantCookieName,
+} from "@/lib/order-access";
 import { PurchaseTracker } from "@/components/analytics/PurchaseTracker";
 import { formatPrice } from "@/lib/format";
 import { getShippingMethodLabel } from "@/lib/shipping";
@@ -28,8 +35,13 @@ async function OrderConfirmation({ orderNumber }: { orderNumber: string }) {
     },
   });
 
-  if (!order) {
-    notFound();
+  // G18 spec §1: owning session or a valid grant cookie, else /track with the
+  // number prefilled. Absent and unauthorized redirect identically — this
+  // page is not an existence oracle (the former notFound() was one).
+  // Next 14: cookies() is synchronous (await-style is Next 15 — G3 lesson).
+  const grant = cookies().get(orderGrantCookieName(orderNumber))?.value;
+  if (!canAccessOrder(order, session, grant)) {
+    redirect(`/track?order=${encodeURIComponent(orderNumber)}`);
   }
 
   const shippingAddress = order.shippingAddress as {
@@ -239,6 +251,14 @@ function NoOrderNumber() {
         >
           {t("confirmation.continueShopping")}
         </Link>
+        <p className="mt-4">
+          <Link
+            href="/track"
+            className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
+          >
+            {t("confirmation.trackLink")}
+          </Link>
+        </p>
       </div>
     </div>
   );
@@ -246,9 +266,11 @@ function NoOrderNumber() {
 
 export default async function ConfirmationPage({ searchParams }: ConfirmationPageProps) {
   const params = await searchParams;
-  const orderNumber = params.order;
+  // The gate runs before the number reaches a cookie name, a query or a
+  // redirect (spec §1). A malformed value is "no order", not a 404.
+  const orderNumber = params.order ? normalizeOrderNumber(params.order) : "";
 
-  if (!orderNumber) {
+  if (!orderNumber || !isValidOrderNumber(orderNumber)) {
     return <NoOrderNumber />;
   }
 
