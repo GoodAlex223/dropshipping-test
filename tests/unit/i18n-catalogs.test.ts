@@ -287,6 +287,31 @@ describe("byCode coverage (replaces content.test.ts's byCode blocks 1:1 — TASK
     );
     expect(screen.getByText("true")).toBeInTheDocument();
   });
+
+  it("track.byCode covers every code /api/orders/lookup emits", () => {
+    const byCode = uk.track.byCode as Record<string, string>;
+    for (const code of [
+      "ORDER_NOT_FOUND",
+      "TOO_MANY_ATTEMPTS",
+      "VALIDATION_ERROR",
+      "LOOKUP_FAILED",
+    ]) {
+      expect(byCode[code]).toBeTruthy();
+    }
+    expect(uk.track.fallback).toBeTruthy();
+  });
+
+  it("renders the lockout copy with the minutes argument in both locales", () => {
+    renderWithIntl(
+      createElement(Probe, {
+        namespace: "track",
+        msgKey: "byCode.TOO_MANY_ATTEMPTS",
+        values: { minutes: 15 },
+      })
+    );
+    expect(screen.getByText("Забагато спроб. Спробуйте знову через 15 хв.")).toBeInTheDocument();
+    expect((ru.track.byCode as Record<string, string>).TOO_MANY_ATTEMPTS).toContain("{minutes}");
+  });
 });
 
 describe("Prisma enum → account status label coverage", () => {

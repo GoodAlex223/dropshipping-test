@@ -79,3 +79,9 @@ codes. Extraction is byte-identical from the pre-i18n literals — verified by
   consistency with a careful, client-facing draft register; a copy-editor
   pass may reasonably flatten this to match a house style if the client
   prefers the informal spelling.
+- **`track.*` (G18, 2026-09-04)** — guest order lookup + status page. Same
+  gender resolution as the order-status badges: «Заказ с таким номером … не
+  найден» takes masculine agreement because the subject noun is present;
+  `TOO_MANY_ATTEMPTS` keeps the `{minutes}` ICU argument in both locales
+  («через {minutes} хв.» / «через {minutes} мин.»). Draft, pending the same
+  client sign-off as the rest of the RU catalog.
