@@ -63,6 +63,36 @@ test.describe("Checkout (guest COD)", () => {
     // specific order.paymentMethod === "cod" branch, not just any COD text
     // on the page.
     await expect(page.getByText(/оплата при отриманні у відділенні/i)).toBeVisible();
+
+    // --- G18: the grant cookie carried the confirmation; a cold visit must not.
+    const confirmationUrl = page.url();
+    const orderNumber = new URL(confirmationUrl).searchParams.get("order")!;
+    expect(orderNumber).toMatch(/^ORD-[A-Z0-9]+-[A-Z0-9]{4}$/);
+
+    await page.context().clearCookies();
+    await page.goto(confirmationUrl);
+    await page.waitForURL(/\/track\?order=ORD-/, { timeout: 15000 });
+    // Verify the rejection, not just the redirect: no order data reached the page.
+    await expect(page.getByText(/адреса доставки/i)).toHaveCount(0);
+    await expect(page.getByText("Тест Тестовий")).toHaveCount(0);
+    await expect(page.getByText("Відділення №12")).toHaveCount(0);
+    await expect(page.getByLabel(/^номер замовлення$/i)).toHaveValue(orderNumber);
+
+    // Wrong e-mail → uniform not-found copy, still on the form.
+    await page.getByLabel(/^email$/i).fill("someone-else@example.com");
+    await page.getByRole("button", { name: /^перевірити$/i }).click();
+    await expect(page.getByText(/з таким номером та email не знайдено/i)).toBeVisible();
+    await expect(page).toHaveURL(/\/track\?order=/);
+
+    // Right e-mail → the status page, PENDING in Ukrainian, the number on screen.
+    await page.getByLabel(/^email$/i).fill("guest-e2e@example.com");
+    await page.getByRole("button", { name: /^перевірити$/i }).click();
+    await page.waitForURL(new RegExp(`/track/${orderNumber}$`), { timeout: 15000 });
+    await expect(page.getByRole("heading", { name: orderNumber })).toBeVisible();
+    await expect(page.getByText("Очікує підтвердження")).toBeVisible();
+    await expect(page.getByText(/адреса доставки/i)).toBeVisible();
+    await expect(page.getByText("Тест Тестовий")).toBeVisible();
+    await expect(page.getByText("Відділення №12")).toBeVisible();
   });
 
   test("step 1 shows Ukrainian validation errors on empty submit", async ({ page }) => {
