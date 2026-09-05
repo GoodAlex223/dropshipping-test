@@ -79,7 +79,12 @@ test.describe("Checkout (guest COD)", () => {
     const cold = await page.request.get(confirmationUrl);
     const coldBody = await cold.text();
     expect(coldBody).not.toContain("Тест Тестовий");
-    expect(coldBody).not.toContain("Відділення №12");
+    // Not the branch address ("Відділення №12"): that string is also the
+    // shipping-step input's i18n PLACEHOLDER (messages/uk.json), which is
+    // baked into every page's hydration payload regardless of this order —
+    // asserting against it here is a guaranteed false positive, not a real
+    // leak check. The phone number carries no such collision.
+    expect(coldBody).not.toContain("+380501234567");
 
     // Verify the rejection, not just the redirect: no order data reached the page.
     await expect(page.getByText(/адреса доставки/i)).toHaveCount(0);
