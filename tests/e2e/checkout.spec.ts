@@ -63,6 +63,10 @@ test.describe("Checkout (guest COD)", () => {
     // specific order.paymentMethod === "cod" branch, not just any COD text
     // on the page.
     await expect(page.getByText(/оплата при отриманні у відділенні/i)).toBeVisible();
+    // Positive control for the cold-body probe below: the authorized page
+    // renders the e-mail (twice), so its absence from the cold body is a real
+    // rejection check, not a marker the page never prints.
+    await expect(page.getByText("guest-e2e@example.com").first()).toBeVisible();
 
     // --- G18: the grant cookie carried the confirmation; a cold visit must not.
     const confirmationUrl = page.url();
@@ -83,8 +87,10 @@ test.describe("Checkout (guest COD)", () => {
     // shipping-step input's i18n PLACEHOLDER (messages/uk.json), which is
     // baked into every page's hydration payload regardless of this order —
     // asserting against it here is a guaranteed false positive, not a real
-    // leak check. The phone number carries no such collision.
-    expect(coldBody).not.toContain("+380501234567");
+    // leak check. The phone number would be vacuous the other way round: the
+    // confirmation page never renders it. The e-mail is rendered twice (the
+    // "sent to" line and the e-mail card), so its absence is a real check.
+    expect(coldBody).not.toContain("guest-e2e@example.com");
 
     // Verify the rejection, not just the redirect: no order data reached the page.
     await expect(page.getByText(/адреса доставки/i)).toHaveCount(0);
