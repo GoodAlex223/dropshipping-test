@@ -69,6 +69,7 @@ export default async function TrackOrderPage({ params }: TrackOrderPageProps) {
           </p>
           <h1 className="mt-1 text-3xl font-extrabold">{order.orderNumber}</h1>
           <div className="mt-4 flex flex-col items-center gap-2">
+            <span className="sr-only">{t("statusLabel")}: </span>
             <Badge variant="secondary" className={`${getOrderStatusStyle(order.status)} text-sm`}>
               {statusLabel}
             </Badge>
