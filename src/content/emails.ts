@@ -37,6 +37,8 @@ export const emails = {
     contactHeading: "Питання щодо замовлення? Напишіть нам:",
     /** Pre-uppercased like checkout.payment.submit. */
     cta: "ІСТОРІЯ ЗАМОВЛЕНЬ",
+    /** Guest orders have no account page — this CTA opens /track prefilled (G18). */
+    guestCta: "СТАТУС ЗАМОВЛЕННЯ",
     /**
      * Manager channels for the contact block — mirrors checkout.contacts:
      * instagram/telegram now, WhatsApp appended once the client supplies the

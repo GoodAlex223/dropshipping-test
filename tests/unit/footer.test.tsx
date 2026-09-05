@@ -52,6 +52,10 @@ describe("Footer", () => {
       "href",
       "/feedback"
     );
+    expect(screen.getByRole("link", { name: "Статус замовлення" })).toHaveAttribute(
+      "href",
+      "/track"
+    );
   });
 
   it("invites visitors to follow along on social", () => {
