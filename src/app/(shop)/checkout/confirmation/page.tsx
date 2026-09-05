@@ -19,7 +19,7 @@ import { getShippingMethodLabel } from "@/lib/shipping";
 import { auth } from "@/lib/auth";
 
 interface ConfirmationPageProps {
-  searchParams: Promise<{ order?: string }>;
+  searchParams: Promise<{ order?: string | string[] }>;
 }
 
 async function OrderConfirmation({ orderNumber }: { orderNumber: string }) {
@@ -267,8 +267,10 @@ function NoOrderNumber() {
 export default async function ConfirmationPage({ searchParams }: ConfirmationPageProps) {
   const params = await searchParams;
   // The gate runs before the number reaches a cookie name, a query or a
-  // redirect (spec §1). A malformed value is "no order", not a 404.
-  const orderNumber = params.order ? normalizeOrderNumber(params.order) : "";
+  // redirect (spec §1). A malformed value is "no order", not a 404 — and
+  // `?order=a&order=b` makes params.order an array, which is also "no order"
+  // rather than a normalizeOrderNumber() crash.
+  const orderNumber = typeof params.order === "string" ? normalizeOrderNumber(params.order) : "";
 
   if (!orderNumber || !isValidOrderNumber(orderNumber)) {
     return <NoOrderNumber />;
