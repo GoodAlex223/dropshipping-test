@@ -40,6 +40,9 @@ function storedOrder(
 
 beforeEach(() => {
   vi.clearAllMocks();
+  // clearAllMocks keeps queued mockResolvedValueOnce values; a test that
+  // throws mid-route leaves one behind for the next test. Reset explicitly.
+  mockUpdate.mockReset();
   process.env.NEXTAUTH_SECRET = "test-secret-for-order-grants";
   // The route counts the attempt before comparing (final review, G18), so the
   // FIRST update call is always the increment — its return value is what the
@@ -47,7 +50,14 @@ beforeEach(() => {
   // `increment`, so it falls through to the harmless default.
   mockUpdate.mockImplementation(async (args) => {
     const data = (args as { data?: { lookupFailedAttempts?: { increment?: number } } }).data;
-    return (data?.lookupFailedAttempts?.increment ? { lookupFailedAttempts: 1 } : {}) as never;
+    const v = data?.lookupFailedAttempts;
+    return (
+      typeof v === "number"
+        ? { lookupFailedAttempts: v }
+        : v?.increment
+          ? { lookupFailedAttempts: 1 }
+          : {}
+    ) as never;
   });
 });
 afterEach(() => {
@@ -97,7 +107,7 @@ describe("POST /api/orders/lookup", () => {
     expect(res.headers.get("set-cookie")).toBeNull();
   });
 
-  it("locks the order for 15 minutes on the fifth failure and resets the counter", async () => {
+  it("locks the order for 15 minutes on the fifth failure without zeroing the counter", async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-09-04T12:00:00Z"));
     try {
@@ -114,7 +124,6 @@ describe("POST /api/orders/lookup", () => {
         expect.objectContaining({
           where: { id: "order-1" },
           data: {
-            lookupFailedAttempts: 0,
             lookupLockedUntil: new Date("2026-09-04T12:15:00Z"),
           },
         })
@@ -128,7 +137,15 @@ describe("POST /api/orders/lookup", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-09-04T12:00:00Z"));
     try {
-      mockFindUnique.mockResolvedValue(storedOrder({ lookupFailedAttempts: 3 }) as never);
+      // Interleaving (code review, PR #44): this request pre-read the row at
+      // the cap with no lock yet — the sibling that hit the cap is writing its
+      // lock right now. Because that lock write leaves the counter alone, this
+      // increment lands past the cap and is refused without a comparison. Were
+      // the lock to zero the counter, this increment would return 1 and the
+      // comparison would run — five more guesses per lock cycle.
+      mockFindUnique.mockResolvedValue(
+        storedOrder({ lookupFailedAttempts: LOOKUP_MAX_FAILURES }) as never
+      );
       mockUpdate
         .mockResolvedValueOnce({ lookupFailedAttempts: LOOKUP_MAX_FAILURES + 1 } as never)
         .mockResolvedValueOnce({} as never);
@@ -144,7 +161,6 @@ describe("POST /api/orders/lookup", () => {
         expect.objectContaining({
           where: { id: "order-1" },
           data: {
-            lookupFailedAttempts: 0,
             lookupLockedUntil: new Date("2026-09-04T12:15:00Z"),
           },
         })
@@ -175,12 +191,25 @@ describe("POST /api/orders/lookup", () => {
     }
   });
 
-  it("treats an expired lock as no lock", async () => {
+  it("treats an expired lock as no lock: the first attempt opens a new window at 1", async () => {
+    // The lock write keeps the counter, so the reset has to happen here, when
+    // an expired lock is observed — otherwise every attempt after expiry would
+    // land past the cap and re-lock the order forever.
     mockFindUnique.mockResolvedValue(
-      storedOrder({ lookupLockedUntil: new Date(Date.now() - 1000) }) as never
+      storedOrder({
+        lookupFailedAttempts: LOOKUP_MAX_FAILURES,
+        lookupLockedUntil: new Date(Date.now() - 1000),
+      }) as never
     );
     const res = await POST(lookup({ orderNumber: ORDER, email: "guest@example.com" }));
     expect(res.status).toBe(200);
+    expect(mockUpdate).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        where: { id: "order-1" },
+        data: { lookupFailedAttempts: 1, lookupLockedUntil: null },
+      })
+    );
     expect(mockUpdate).toHaveBeenLastCalledWith(
       expect.objectContaining({
         where: { id: "order-1" },

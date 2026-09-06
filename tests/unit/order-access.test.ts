@@ -12,6 +12,8 @@ import {
   setOrderGrantCookie,
   verifyOrderGrant,
 } from "@/lib/order-access";
+import { generateOrderNumber } from "@/lib/stripe";
+import { ORDER_NUMBER_MAX_LENGTH } from "@/lib/validations";
 
 const originalSecret = process.env.NEXTAUTH_SECRET;
 const NOW = new Date("2026-09-04T12:00:00Z");
@@ -51,6 +53,17 @@ describe("order number gate", () => {
   });
   it("derives the cookie name from the order number", () => {
     expect(orderGrantCookieName(ORDER)).toBe(`og_${ORDER}`);
+  });
+
+  it("accepts every number the live generator emits (the gate and the generator are one contract)", () => {
+    for (let i = 0; i < 1000; i++) {
+      expect(isValidOrderNumber(generateOrderNumber())).toBe(true);
+    }
+  });
+
+  it("caps the length at the lookup schema bound, so the page gate is no looser than the API gate", () => {
+    expect(ORDER.length).toBeLessThanOrEqual(ORDER_NUMBER_MAX_LENGTH);
+    expect(isValidOrderNumber(`ORD-${"A".repeat(ORDER_NUMBER_MAX_LENGTH)}-ABCD`)).toBe(false);
   });
 });
 

@@ -206,13 +206,15 @@ export const feedbackSchema = z.object({
 // (client + server) and src/lib/order-access.ts, which must not be imported
 // by client code (it pulls node:crypto).
 export const ORDER_NUMBER_PATTERN = /^ORD-[A-Z0-9]+-[A-Z0-9]{4}$/;
+/** Shared by the lookup schema and the page-side gate (order-access.ts), so neither is looser. */
+export const ORDER_NUMBER_MAX_LENGTH = 40;
 
 export const orderLookupSchema = z.object({
   orderNumber: z
     .string()
     .trim()
     .toUpperCase()
-    .max(40, "Order number is too long")
+    .max(ORDER_NUMBER_MAX_LENGTH, "Order number is too long")
     .regex(ORDER_NUMBER_PATTERN, "Invalid order number"),
   email: z
     .string()

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { createNextRequest } from "../helpers/api-test-utils";
 
 vi.mock("@/lib/auth", () => ({ auth: vi.fn() }));
@@ -61,11 +61,16 @@ function mockTx() {
   return tx;
 }
 
+const originalSecret = process.env.NEXTAUTH_SECRET;
+
 beforeEach(() => {
   process.env.NEXTAUTH_SECRET = "test-secret-for-order-grants";
   vi.clearAllMocks();
   mockAuth.mockResolvedValue(null);
   mockFindMany.mockResolvedValue([dbProduct]);
+});
+afterEach(() => {
+  process.env.NEXTAUTH_SECRET = originalSecret;
 });
 
 describe("POST /api/checkout/create-order", () => {

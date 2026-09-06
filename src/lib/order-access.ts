@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import type { NextRequest, NextResponse } from "next/server";
 import type { Session } from "next-auth";
-import { ORDER_NUMBER_PATTERN } from "@/lib/validations";
+import { ORDER_NUMBER_MAX_LENGTH, ORDER_NUMBER_PATTERN } from "@/lib/validations";
 
 /**
  * Guest order access (G18 spec §1–§2).
@@ -22,7 +22,7 @@ export function normalizeOrderNumber(value: string): string {
 }
 
 export function isValidOrderNumber(value: string): boolean {
-  return ORDER_NUMBER_PATTERN.test(value);
+  return value.length <= ORDER_NUMBER_MAX_LENGTH && ORDER_NUMBER_PATTERN.test(value);
 }
 
 export function orderGrantCookieName(orderNumber: string): string {
