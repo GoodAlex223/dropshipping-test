@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { createNextRequest } from "../helpers/api-test-utils";
 
 vi.mock("@/lib/auth", () => ({ auth: vi.fn() }));
@@ -61,10 +61,16 @@ function mockTx() {
   return tx;
 }
 
+const originalSecret = process.env.NEXTAUTH_SECRET;
+
 beforeEach(() => {
+  process.env.NEXTAUTH_SECRET = "test-secret-for-order-grants";
   vi.clearAllMocks();
   mockAuth.mockResolvedValue(null);
   mockFindMany.mockResolvedValue([dbProduct]);
+});
+afterEach(() => {
+  process.env.NEXTAUTH_SECRET = originalSecret;
 });
 
 describe("POST /api/checkout/create-order", () => {
@@ -197,6 +203,17 @@ describe("POST /api/checkout/create-order", () => {
         }),
       })
     );
+  });
+
+  it("sets the post-checkout grant cookie for the new order (G18 spec §1)", async () => {
+    mockTx();
+    const res = await POST(
+      createNextRequest({ url: "/api/checkout/create-order", method: "POST", body: validBody })
+    );
+    expect(res.status).toBe(200);
+    const cookie = res.cookies.get("og_ORD-TEST");
+    expect(cookie).toMatchObject({ httpOnly: true, sameSite: "lax", path: "/", maxAge: 86400 });
+    expect(cookie?.value).toMatch(/^\d+\.[0-9a-f]{64}$/);
   });
 
   it("links the order to the signed-in user", async () => {

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { generateOrderNumber } from "@/lib/stripe";
 import { getDeliveryMethod } from "@/lib/shipping";
 import { sendOrderConfirmationEmail } from "@/lib/email";
+import { setOrderGrantCookie } from "@/lib/order-access";
 import { checkoutSchema } from "@/lib/validations";
 import { InsufficientStockError, INSUFFICIENT_STOCK_RESPONSE } from "@/lib/checkout-errors";
 import { z } from "zod";
@@ -197,10 +198,16 @@ export async function POST(request: NextRequest) {
       // Email failure is non-critical — order is already created
     });
 
-    return NextResponse.json({
+    // The post-checkout one-time grant (G18 spec §1): the browser stores this
+    // same-origin fetch response's cookie before router.push navigates, so the
+    // confirmation page can authorize the just-created order with no user
+    // action. Cold visits later re-verify via /track.
+    const response = NextResponse.json({
       orderId: order.id,
       orderNumber: order.orderNumber,
     });
+    setOrderGrantCookie(response, order.orderNumber, request);
+    return response;
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(

@@ -15,6 +15,7 @@ const shopLinks = [
   { key: "catalog", href: "/products" },
   { key: "categories", href: "/categories" },
   { key: "new", href: "/products?sortBy=createdAt&sortOrder=desc" },
+  { key: "track", href: "/track" },
   { key: "feedback", href: "/feedback" },
 ] as const;
 

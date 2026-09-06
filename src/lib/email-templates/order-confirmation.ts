@@ -35,8 +35,11 @@ export interface OrderEmailData {
   };
   shippingMethod: string;
   /**
-   * Guest COD orders (userId null) can't open /account/orders, so the CTA
-   * renders only for signed-in customers — the G2 confirmation-page ruling.
+   * Selects which CTA the contact panel renders: signed-in customers get
+   * «ІСТОРІЯ ЗАМОВЛЕНЬ» -> /account/orders. Guest COD orders (userId null)
+   * have no account page — the G2 ruling hid the account CTA for them, and
+   * G18 replaced that gap with a «СТАТУС ЗАМОВЛЕННЯ» -> /track?order=<N> CTA
+   * instead. One CTA always renders; which one depends on this flag.
    */
   hasAccount: boolean;
 }
@@ -121,13 +124,17 @@ export function generateOrderConfirmationHtml(data: OrderEmailData): string {
     )
     .join(" &middot; ");
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  // Signed-in customers get the account page; guests get the grant-gated
+  // status page with the number prefilled (G18) — one button, never both.
+  const ctaButton = data.hasAccount
+    ? renderButton(`${appUrl}/account/orders`, t.cta)
+    : renderButton(`${appUrl}/track?order=${encodeURIComponent(data.orderNumber)}`, t.guestCta);
+
   const contactPanel = renderPanel(
     `<p style="margin: 0 0 8px 0; color: ${EMAIL_COLORS.muted};">${t.contactHeading}</p>
-    <p style="margin: 0${data.hasAccount ? " 0 20px 0" : ""};">${contactLinks}</p>${
-      data.hasAccount
-        ? `\n    ${renderButton(`${process.env.NEXT_PUBLIC_APP_URL}/account/orders`, t.cta)}`
-        : ""
-    }`,
+    <p style="margin: 0 0 20px 0;">${contactLinks}</p>
+    ${ctaButton}`,
     { center: true }
   );
 

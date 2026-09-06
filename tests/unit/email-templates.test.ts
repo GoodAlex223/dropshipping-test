@@ -214,16 +214,19 @@ describe("generateOrderConfirmationHtml", () => {
     expect(html).toContain("&lt;script&gt;");
   });
 
-  it("hides the account CTA for guest orders", () => {
+  it("gives guest orders the status CTA instead of the account CTA", () => {
     const html = generateOrderConfirmationHtml({ ...baseOrder, hasAccount: false });
     expect(html).not.toContain("ІСТОРІЯ ЗАМОВЛЕНЬ");
     expect(html).not.toContain("/account/orders");
+    expect(html).toContain("СТАТУС ЗАМОВЛЕННЯ");
+    expect(html).toContain("https://test.example.com/track?order=ORD-20260810-001");
   });
 
-  it("shows the account CTA for signed-in customers", () => {
+  it("shows the account CTA, not the status CTA, for signed-in customers", () => {
     const html = generateOrderConfirmationHtml({ ...baseOrder, hasAccount: true });
     expect(html).toContain("ІСТОРІЯ ЗАМОВЛЕНЬ");
     expect(html).toContain("https://test.example.com/account/orders");
+    expect(html).not.toContain("/track?order=");
   });
 
   it("renders the tax row only when tax > 0", () => {

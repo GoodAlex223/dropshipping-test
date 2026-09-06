@@ -63,6 +63,61 @@ test.describe("Checkout (guest COD)", () => {
     // specific order.paymentMethod === "cod" branch, not just any COD text
     // on the page.
     await expect(page.getByText(/оплата при отриманні у відділенні/i)).toBeVisible();
+    // Positive control for the cold-body probe below: the authorized page
+    // renders the e-mail (twice), so its absence from the cold body is a real
+    // rejection check, not a marker the page never prints.
+    await expect(page.getByText("guest-e2e@example.com").first()).toBeVisible();
+
+    // --- G18: the grant cookie carried the confirmation; a cold visit must not.
+    const confirmationUrl = page.url();
+    const orderNumber = new URL(confirmationUrl).searchParams.get("order")!;
+    expect(orderNumber).toMatch(/^ORD-[A-Z0-9]+-[A-Z0-9]{4}$/);
+
+    await page.context().clearCookies();
+    await page.goto(confirmationUrl);
+    await page.waitForURL(/\/track\?order=ORD-/, { timeout: 15000 });
+
+    // The rejection itself must carry none of the order's values: fetch the
+    // bearer URL cold (page.request shares the cleared cookie jar) and check
+    // the response body, not the page we were redirected to.
+    const cold = await page.request.get(confirmationUrl);
+    const coldBody = await cold.text();
+    expect(coldBody).not.toContain("Тест Тестовий");
+    // Not the branch address ("Відділення №12"): that string is also the
+    // shipping-step input's i18n PLACEHOLDER (messages/uk.json), which is
+    // baked into every page's hydration payload regardless of this order —
+    // asserting against it here is a guaranteed false positive, not a real
+    // leak check. The phone number would be vacuous the other way round: the
+    // confirmation page never renders it. The e-mail is rendered twice (the
+    // "sent to" line and the e-mail card), so its absence is a real check.
+    expect(coldBody).not.toContain("guest-e2e@example.com");
+
+    // Verify the rejection, not just the redirect: no order data reached the page.
+    await expect(page.getByText(/адреса доставки/i)).toHaveCount(0);
+    await expect(page.getByText("Тест Тестовий")).toHaveCount(0);
+    await expect(page.getByText("Відділення №12")).toHaveCount(0);
+    await expect(page.getByLabel(/^номер замовлення$/i)).toHaveValue(orderNumber);
+
+    // WebKit hydration race (project lesson): fields render in the SSR HTML,
+    // so a fill() before React hydrates silently drops on WebKit — wait for
+    // the mount signal before the first fill on this page.
+    await page.waitForSelector('form[data-hydrated="true"]');
+
+    // Wrong e-mail → uniform not-found copy, still on the form.
+    await page.getByLabel(/^email$/i).fill("someone-else@example.com");
+    await page.getByRole("button", { name: /^перевірити$/i }).click();
+    await expect(page.getByText(/з таким номером та email не знайдено/i)).toBeVisible();
+    await expect(page).toHaveURL(/\/track\?order=/);
+
+    // Right e-mail → the status page, PENDING in Ukrainian, the number on screen.
+    await page.getByLabel(/^email$/i).fill("guest-e2e@example.com");
+    await page.getByRole("button", { name: /^перевірити$/i }).click();
+    await page.waitForURL(new RegExp(`/track/${orderNumber}$`), { timeout: 15000 });
+    await expect(page.getByRole("heading", { name: orderNumber })).toBeVisible();
+    await expect(page.getByText("Очікує підтвердження")).toBeVisible();
+    await expect(page.getByText(/адреса доставки/i)).toBeVisible();
+    await expect(page.getByText("Тест Тестовий")).toBeVisible();
+    await expect(page.getByText("Відділення №12")).toBeVisible();
   });
 
   test("step 1 shows Ukrainian validation errors on empty submit", async ({ page }) => {

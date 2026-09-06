@@ -202,6 +202,28 @@ export const feedbackSchema = z.object({
   website: z.string().optional(),
 });
 
+// Guest order access (G18). The pattern is shared between the lookup schema
+// (client + server) and src/lib/order-access.ts, which must not be imported
+// by client code (it pulls node:crypto).
+export const ORDER_NUMBER_PATTERN = /^ORD-[A-Z0-9]+-[A-Z0-9]{4}$/;
+/** Shared by the lookup schema and the page-side gate (order-access.ts), so neither is looser. */
+export const ORDER_NUMBER_MAX_LENGTH = 40;
+
+export const orderLookupSchema = z.object({
+  orderNumber: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .max(ORDER_NUMBER_MAX_LENGTH, "Order number is too long")
+    .regex(ORDER_NUMBER_PATTERN, "Invalid order number"),
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .email("Invalid email address")
+    .max(254, "Email is too long"),
+});
+
 // Google Shopping feed validations
 export {
   googleShoppingItemSchema,
@@ -229,3 +251,4 @@ export type SubscribeNewsletterInput = z.infer<typeof subscribeNewsletterSchema>
 export type UnsubscribeNewsletterInput = z.infer<typeof unsubscribeNewsletterSchema>;
 export type UpdateSubscriberStatusInput = z.infer<typeof updateSubscriberStatusSchema>;
 export type FeedbackInput = z.infer<typeof feedbackSchema>;
+export type OrderLookupInput = z.infer<typeof orderLookupSchema>;
