@@ -2,7 +2,7 @@
 
 Central index for all project documentation.
 
-**Last Updated**: 2026-09-04
+**Last Updated**: 2026-09-06
 
 ---
 
@@ -35,8 +35,8 @@ Central index for all project documentation.
 | [planning/README.md](planning/README.md)                                                                             | Planning overview                                                             | 2026-01-05   |
 | [planning/WEEKLY.md](planning/WEEKLY.md)                                                                             | Current week's plan                                                           | 2026-08-20   |
 | [planning/TODO.md](planning/TODO.md)                                                                                 | Active tasks                                                                  | 2026-09-01   |
-| [planning/DONE.md](planning/DONE.md)                                                                                 | Completed tasks                                                               | 2026-09-04   |
-| [planning/BACKLOG.md](planning/BACKLOG.md)                                                                           | Unprioritized ideas                                                           | 2026-09-04   |
+| [planning/DONE.md](planning/DONE.md)                                                                                 | Completed tasks                                                               | 2026-09-06   |
+| [planning/BACKLOG.md](planning/BACKLOG.md)                                                                           | Unprioritized ideas                                                           | 2026-09-06   |
 | [planning/ROADMAP.md](planning/ROADMAP.md)                                                                           | Long-term vision                                                              | 2026-07-14   |
 | [planning/GOALS.md](planning/GOALS.md)                                                                               | Objectives & metrics                                                          | 2026-01-26   |
 | [planning/MILESTONES.md](planning/MILESTONES.md)                                                                     | Key targets                                                                   | 2026-01-26   |
@@ -80,9 +80,8 @@ Central index for all project documentation.
 
 ## Implementation Plans
 
-| Plan                                                                                        | Task                               | Status      | Started    |
-| ------------------------------------------------------------------------------------------- | ---------------------------------- | ----------- | ---------- |
-| [2026-09-04_g18-guest-order-access.md](planning/plans/2026-09-04_g18-guest-order-access.md) | G18 Guest Order Access & Hardening | IN PROGRESS | 2026-09-04 |
+| Plan | Task | Status | Started |
+| ---- | ---- | ------ | ------- |
 
 ### Archived Plans
 
@@ -118,6 +117,7 @@ Central index for all project documentation.
 | [2026-08-21_g15-task-056-client-round-trip.md](archive/plans/2026-08-21_g15-task-056-client-round-trip.md)           | G15 TASK-056 Client Ask Round-Trip   | COMPLETE | 2026-08-21 |
 | [2026-09-02_g17-pre-launch-security-scan.md](archive/plans/2026-09-02_g17-pre-launch-security-scan.md)               | G17 Pre-Launch Security Scan         | COMPLETE | 2026-09-04 |
 | [2026-08-26_g16-real-product-intake.md](archive/plans/2026-08-26_g16-real-product-intake.md)                         | G16 Real-Product Intake              | COMPLETE | 2026-09-01 |
+| [2026-09-04_g18-guest-order-access.md](archive/plans/2026-09-04_g18-guest-order-access.md)                           | G18 Guest Order Access & Hardening   | COMPLETE | 2026-09-06 |
 
 See [archive/README.md](archive/README.md) for more historical plans.
 

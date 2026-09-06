@@ -36,7 +36,7 @@ components/
 │   ├── AnnouncementBar.tsx  # Launch marquee (G8): SiteAnnouncement shape, id-scoped dismissal, measured N-copy gap-free stream, pill CTA; sticky with Header via the shop layout wrapper; reduced-motion reset lives UN-layered in globals.css (PR #36)
 │   ├── Header.tsx         # Site header with nav, cart, auth; chrome strings via useTranslations("header") from messages/uk.json (TASK-039 G9 superseded src/content/site.ts's site.header block) — sticky classes moved to the shop layout's shared wrapper (G8); mounts LocaleSwitcher
 │   ├── LocaleSwitcher.tsx  # UA | RU header toggle (TASK-039): useLocale()/useTranslations("common"), disables the active-locale button, calls the setLocale server action (src/i18n/actions.ts) inside useTransition
-│   ├── Footer.tsx         # Site footer with NewsletterSignup component
+│   ├── Footer.tsx         # Site footer with NewsletterSignup component; shop links include «Статус замовлення» → /track (G18)
 │   ├── NewsletterSignup.tsx  # Newsletter subscription form (email input, success state); copy via useTranslations("newsletter.signup") — byCode/fallback keys, t.has(key as never) guard (TASK-039 G9 superseded src/content/newsletter.ts, deleted)
 │   ├── CookieConsent.tsx  # GDPR cookie consent banner + GTM loader (Zustand persisted); copy via useTranslations("system.cookies") (TASK-039 G9 superseded src/content/system.ts, deleted)
 │   ├── StatusScreen.tsx   # Hook-free shared status-page treatment (icon/tone/title/description/meta/actions); no "use client" — server-usable, not-found.tsx renders it directly; server callers may only pass href actions since onClick functions can't cross the server→client boundary

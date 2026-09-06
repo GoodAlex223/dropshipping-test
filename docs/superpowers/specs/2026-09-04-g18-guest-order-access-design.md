@@ -1,7 +1,7 @@
 # G18 — Guest Order Access & Hardening: Design Spec
 
 **Date**: 2026-09-04
-**Status**: Approved 2026-09-04 (brainstormed section-by-section, then the written spec reviewed and approved by the user the same day); implementation plan follows.
+**Status**: Implemented — merged `a37c8d0` (PR [#44](https://github.com/GoodAlex223/dropshipping-test/pull/44), 2026-09-06). Approved 2026-09-04 (brainstormed section-by-section, then the written spec reviewed and approved by the user the same day). See § Supersessions & residuals at the end for what shipped differently.
 **Branch**: `feat/g18-guest-order-access` (from `main` @ `eef2e4e`)
 **Source**: WEEKLY.md G18 (🔵 User, 2 members, 7 SP, 🏆 Weekly Challenge) — guest order tracking (🔵 [2026-08-07] G2 post-gate, "recommended before real launch") + the G2 confirmation-page ownership check (🟤 rider [2026-08-06], pinned "before real customer traffic"; independently confirmed 3/3 by the G17 panel as a MEDIUM finding, 2026-09-02)
 **Program context**: `2026-07-14-mirox-shop-program-design.md` (Mirox rebrand + Ukraine launch). Closes the last pre-launch privacy item on the checkout surface. Does not depend on any TASK-056 client item, but note the email constraint in Problem §3.
@@ -190,3 +190,18 @@ Labels reused, not duplicated: `account.orderStatus.*`, `shipping.*`, `checkout.
 - **The 5/15-min lockout is a customer-facing wall as well as a control** — the 429 copy must say how long to wait (`retryAfterSeconds` is surfaced for that).
 - **Migration against real production data** — additive with defaults; verified by the migration running on the local DB first and by the Vercel build log after merge.
 - Effort: booked at 7 SP (5 tracking + 2 ownership check). The ownership-check half is small once §1 exists; the tracking half carries the two new pages, the catalog work in two locales, the E2E extension and the visual gate. No revision proposed at spec time.
+
+## Supersessions & residuals (close-out 2026-09-06)
+
+Frozen sections above are left as approved; this section records what the implementation, the final review and the PR #44 code review changed or bounded.
+
+- **§2 steps 4–6 superseded (lockout semantics).** The attempt is counted **before** the comparison and the lock decision reads the returned count (final review, `ae9ae75`). The PR #44 review then found the lock write zeroing the counter, which let siblings that pre-read the row before the lock landed increment from 0 and reach the comparison — five more guesses per lock cycle. Since `f25fa24` a lock write **keeps** the counter; it is reset lazily when an expired lock is observed (the next window opens at 1); late siblings past the cap re-lock without comparing. Net: at most five comparisons per 15-minute window. Cost: a clean success is two writes (increment, then reset).
+- **§5 superseded (catalog).** `track.status.heading` was not added — the status page reuses `checkout.confirmation.orderNumberLabel`. `LOOKUP_FAILED` was added to `track.byCode` so the coverage test asserts every code the route emits.
+- **§1 addendum.** The order-number gate shares `ORDER_NUMBER_MAX_LENGTH` (40) with the lookup schema, and a unit test asserts `generateOrderNumber()` satisfies `ORDER_NUMBER_PATTERN` — the generator and the gate are one contract; change them together.
+- **Residual: timing / side-effect oracle.** Unknown number and wrong e-mail return the identical 404, but an unknown number costs one read while a known one costs one or two writes. Accepted: weaker than the 429 the lockout itself discloses.
+- **Residual: a legitimate pair inside a burst.** With count-before-compare, a correct pair arriving inside a ≥6-wide concurrent burst on the same order is refused with 429 without comparison. Inherent to bounding comparisons per window; negligible at launch scale.
+- **Risk recorded: third-party lockout of the owner.** Anyone holding a leaked order number can keep the real customer locked out at five requests per fifteen minutes (480/day). Decision 1 accepted per-order-only; the no-code second line is a Vercel WAF rate-limit rule on the public POST routes — BACKLOG [2026-09-06].
+- **Side effect recorded.** Every lookup bumps `Order.updatedAt` (`@updatedAt`) and the two lockout columns ride the `...order` spreads into the customer/admin order JSON — BACKLOG [2026-09-06].
+- **Cookie note.** The grant cookie is host-only (`Path=/`, no `Domain`); on a custom domain a same-name cookie from a sibling subdomain could shadow it (deny, never forge). `__Host-` needs `Secure`, which the http CI rule forbids today — decide with TASK-056.
+- **Verified in production (2026-09-06, deployment `dpl_7vdWjdxhL9xaabVPz1YwrY62YDnK`):** migration `20260904190810_add_order_lookup_lockout` applied by the Vercel build; wrong e-mail and unknown number both 404 `ORDER_NOT_FOUND`; the right pair 200 + `Set-Cookie: og_<N>=…; Path=/; Max-Age=86400; Secure; HttpOnly; SameSite=lax`; cold `/track/<N>` → 307 to `/track?order=<N>`; cold `/checkout/confirmation?order=<N>` → server-component redirect with no order value in the body; `/track/` in robots, `/track` in the sitemap. The Preview environment does **not** migrate (`DIRECT_URL` unset there) — BACKLOG [2026-09-06].
+- **Open (user-side).** One hydration error was seen on `/track` in the user's browser on 2026-09-05; not reproducible in nine conditions — BACKLOG 🔵 [2026-09-06].

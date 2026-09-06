@@ -2,11 +2,35 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-09-04
+**Last Updated**: 2026-09-06
 
 ---
 
 ## 2026-08 (August)
+
+### [2026-09-06] G18 - Guest Order Access & Hardening (WEEKLY batch 🏆, 🔵 User)
+
+**Plan**: [2026-09-04_g18-guest-order-access.md](../archive/plans/2026-09-04_g18-guest-order-access.md) — 12-task SDD plan (spec: [2026-09-04-g18-guest-order-access-design.md](../superpowers/specs/2026-09-04-g18-guest-order-access-design.md), § Supersessions & residuals records what shipped differently)
+**Origin**: BACKLOG 🔵 [2026-08-07] guest order tracking ("recommended before real launch") + the subsumed 🟤 [2026-08-06] G2 hardening rider (confirmation-page ownership check, pinned "before real customer traffic"), independently confirmed by the G17 scan as a MEDIUM PII disclosure
+**Merge**: PR [#44](https://github.com/GoodAlex223/dropshipping-test/pull/44) → `a37c8d0` (2026-09-06, `--merge`, branch deleted). 21 commits; all six checks green on the final head `f25fa24` (60 E2E, chromium + webkit, CI's own `migrate deploy` exercised the new migration)
+
+**Summary**: one authorization rule now guards order data — owning session, else a valid signed per-order grant cookie, else a uniform redirect — and guests get a verified way back to an order: `/track` (order number + e-mail) → `POST /api/orders/lookup` → `/track/[orderNumber]` status page. The confirmation page no longer renders name, e-mail, address, items and totals to anyone holding the order number. Brainstormed and spec'd 2026-09-04 (six rulings: per-order lockout only, dedicated status page, no claim-by-e-mail without verification, signed httpOnly cookie, 24 h TTL, header untouched), executed subagent-driven the same day, visual gate approved 2026-09-05, merged 2026-09-06.
+
+**Key changes**:
+
+- **`src/lib/order-access.ts`** — `canAccessOrder()` (type guard), HMAC-SHA256 grants (`og_<N>` = `<expiry>.<hex>`, keyed with `NEXTAUTH_SECRET`, `Secure` iff https, `SameSite=Lax`, 24 h), timing-safe verify, e-mail digest compare, order-number gate sharing `ORDER_NUMBER_PATTERN` + `ORDER_NUMBER_MAX_LENGTH` with the lookup schema.
+- **`POST /api/orders/lookup`** — public; identical 404 for unknown number and wrong e-mail; per-order lockout on two additive `Order` columns (migration `20260904190810`): attempt counted before comparing, lock keeps the counter, lazy reset on expiry, 5 failures → 15 min, 429 + `Retry-After`. Success sets the grant.
+- **Pages** — confirmation page gated (absent and unauthorized redirect identically to `/track?order=N`; array-valued `?order=` guarded); new `/track` form (byCode toasts, hydration signal for E2E) and `/track/[orderNumber]` RSC status page (status badge with sr-only label, date, items, totals, COD, address, method, tracking). Entry points: footer «Статус замовлення», guest e-mail CTA «СТАТУС ЗАМОВЛЕННЯ» (the G2 "no button for guests" ruling superseded), confirmation not-found screen. `/track/` disallowed in robots, `/track` in the sitemap.
+- **Catalog** — `track.*` in uk + ru (ICU `{minutes}` on the lockout copy), `footer.links.track`, `checkout.confirmation.trackLink`; `messages/README.md` nuance entry.
+- **Review fixes** (`f25fa24`, from the PR #44 review): the lock write had zeroed the counter, so in-flight siblings compared from 0 — the burst bound was per reset, not per window; generator ↔ pattern contract test; shared 40-char cap on the page gate; one 429 builder; secret restore in the create-order test.
+
+**Verification**: 84 files / 1057 unit tests, lint + typecheck + prettier + i18n byte-diff clean; checkout E2E 3/3 locally, 60/60 in CI; cold-response leak probe asserts the rendered e-mail (not the never-rendered phone). **Production** (deployment `dpl_7vdWjdxhL9xaabVPz1YwrY62YDnK`): migration applied by the Vercel build (`Applying migration 20260904190810_add_order_lookup_lockout`), wrong e-mail / unknown number → identical 404, right pair → 200 + `Set-Cookie: og_<N>=…; Max-Age=86400; Secure; HttpOnly; SameSite=lax`, cold `/track/<N>` → 307, cold confirmation → server-component redirect with no order value in the body, robots/sitemap entries live.
+
+**Deliberately outstanding**: the Preview environment never migrates (`DIRECT_URL` unset there; setting it would let unmerged branches migrate production — filed 🟤); per-IP throttle stays a platform decision (WAF rule filed 🟤); claim-by-e-mail waits for e-mail verification (🟤); one user-reported hydration error on `/track` not reproduced in nine conditions (🔵). 14 riders filed under BACKLOG [2026-09-06].
+
+**Learnings**: the `/code-review` skill now fans out ten finder agents plus a verifier per candidate and burned the user's session limit in thirty minutes — its output was still useful (the counter-zeroing race was real and found twice), but the cost needs the user's go-ahead every time; a plan step saying `/code-review` means ask. `vi.clearAllMocks()` does not drain `mockResolvedValueOnce` queues: a route that throws mid-test leaves a value behind for the next test, so a genuine bug (a shorthand property naming an undefined local) showed up as a second, unrelated failure. Run `typecheck` before the test suite on any edit that renames a local. `pkill -f` matches the invoking shell whenever the literal pattern text appears anywhere in the command line, including in an `echo`.
+
+---
 
 ### [2026-09-04] G17 - Pre-Launch Security Scan (WEEKLY solo, 🟤 Auto)
 

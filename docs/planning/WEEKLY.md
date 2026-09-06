@@ -68,8 +68,8 @@ the rotated admin password and orders in the browser.
 
 > Guest order tracking (🔵 [2026-08-07], "recommended before real launch") and the G2 confirmation-page ownership check (subsumed 🟤 rider, pinned "**before real customer traffic**") share one design space: verified guest access to order data. Design constraints on record: never lookup by phone alone (order-enumeration risk — order# + email/phone pair); the post-checkout redirect must still show the just-created order (one-time grant / session), while cold visits require verification.
 
-- [ ] Guest order tracking: lookup by order number + email (form + API; rate-limit consideration); claim-by-email-at-registration decision in-plan (5) — BACKLOG [2026-08-07] G2 post-gate 🔵 [HIGH]
-- [ ] Confirmation-page ownership check (subsumed 🟤 rider): order PII no longer sits behind the order-number capability URL alone; same verification mechanism as the lookup (2) — BACKLOG [2026-08-06] G2 hardening bundle (the pinned privacy piece; the volume-triggered pieces stay BACKLOG'd)
+- [x] Guest order tracking: lookup by order number + email (form + API; rate-limit consideration); claim-by-email-at-registration decision in-plan (5) — BACKLOG [2026-08-07] G2 post-gate 🔵 [HIGH]
+- [x] Confirmation-page ownership check (subsumed 🟤 rider): order PII no longer sits behind the order-number capability URL alone; same verification mechanism as the lookup (2) — BACKLOG [2026-08-06] G2 hardening bundle (the pinned privacy piece; the volume-triggered pieces stay BACKLOG'd)
 
 ### G19. Launch Runbook + Deploy Verification [batch]
 
@@ -116,11 +116,11 @@ the rotated admin password and orders in the browser.
 ### Tuesday — Security + guest-access design
 
 - [x] **[G17](#g17-pre-launch-security-scan-solo)** 🟤 — **shipped PR #43 / `0bee3d2` (2026-09-04)**. Scan + triage ran as planned; delivery slipped past the Aug 24–28 window like G16. 9 panel-verified findings, 6 fixed, 3 filed; the HIGH was an abort-condition consult and closed in production. Run 2 (the `medium` depth scan) abandoned on cost — G17 ships run-1 coverage only.
-- **[G18](#g18-guest-order-access--hardening-batch)** 🔵 — part 1: design + API (the week's biggest design decision, front-loaded).
+- [x] **[G18](#g18-guest-order-access--hardening-batch)** 🔵 — **shipped PR #44 / `a37c8d0` (2026-09-06)**. Part 1: design + API — spec brainstormed and approved 2026-09-04, SDD execution the same day.
 
 ### Wednesday — Guest access lands
 
-- **[G18](#g18-guest-order-access--hardening-batch)** 🔵 — part 2: UI, visual gate, PR.
+- [x] **[G18](#g18-guest-order-access--hardening-batch)** 🔵 — part 2: UI, visual gate (approved 2026-09-05), PR #44 (review fixes `f25fa24`), merged 2026-09-06; production verified. Delivery slipped past the Aug 24–28 window like G16/G17.
 
 ### Thursday — Launch ops + polish
 
@@ -141,7 +141,7 @@ the rotated admin password and orders in the browser.
 | G15 | TASK-056 Client Round-Trip `[solo]`         | client comms    | 🔵 User     | 2      | 3        | Fri(pre)+Mon | ✅ `b836e77`                                |
 | G16 | Real-Product Intake Pair Session `[batch]`  | catalog/data    | 🔵 User     | 2      | 9        | Mon          | ✅ PR #41                                   |
 | G17 | Pre-Launch Security Scan `[solo]`           | security        | 🟤 Auto     | 2      | 3        | Tue          | ✅ `0bee3d2` / PR #43 (run-1 coverage only) |
-| G18 | Guest Order Access & Hardening `[batch]` 🏆 | checkout/orders | 🔵 User     | 2      | 7        | Tue–Wed      | ☐ Planned                                   |
+| G18 | Guest Order Access & Hardening `[batch]` 🏆 | checkout/orders | 🔵 User     | 2      | 7        | Tue–Wed      | ✅ `a37c8d0` / PR #44                       |
 | G19 | Launch Runbook + Deploy Verify `[batch]`    | ops/deploy      | 🔵 User     | 2      | 3        | Thu          | ☐ Planned                                   |
 | G20 | Pre-Launch Polish `[batch]`                 | storefront      | 🔵 User     | 2      | 4        | Thu          | ☐ Planned                                   |
 | G21 | Weekly Reviews `[batch]`                    | recurring       | ⚪ Overhead | 4      | 5        | Fri          | ☐ Planned                                   |

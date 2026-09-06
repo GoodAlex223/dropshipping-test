@@ -1,9 +1,9 @@
 # G18 — Guest Order Access & Hardening Plan
 
-**Last Updated**: 2026-09-04
-**Task**: G18 (WEEKLY [G18](../WEEKLY.md#g18-guest-order-access--hardening-batch)) · 🔵 BACKLOG [2026-08-07] guest order tracking + 🟤 [2026-08-06] G2 hardening bundle's ownership-check rider (G17 MEDIUM, confirmed 3/3)
+**Last Updated**: 2026-09-06
+**Task**: G18 (WEEKLY [G18](../../planning/WEEKLY.md#g18-guest-order-access--hardening-batch)) · 🔵 BACKLOG [2026-08-07] guest order tracking + 🟤 [2026-08-06] G2 hardening bundle's ownership-check rider (G17 MEDIUM, confirmed 3/3)
 **Branch**: `feat/g18-guest-order-access` (from `main` @ `eef2e4e`)
-**Status**: Planning — spec approved 2026-09-04, implementation not started
+**Status**: Complete — merged `a37c8d0` (PR [#44](https://github.com/GoodAlex223/dropshipping-test/pull/44), 2026-09-06); archived at close-out
 **Spec**: [2026-09-04-g18-guest-order-access-design.md](../../superpowers/specs/2026-09-04-g18-guest-order-access-design.md) — the plan argues from the spec; executors read both.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
@@ -1891,3 +1891,10 @@ Record the results in the Implementation Log.
 | Per-IP / per-e-mail throttle primitive (Upstash via Marketplace or Vercel WAF rules) | G17 🟤 entry; the lookup route is now a second unauthenticated consumer beside create-order | M      | H        |
 | Single JSON-array grant cookie if per-order cookies ever accumulate                  | Spec risk: bounded by TTL only today                                                        | S      | L        |
 | Phone as an alternative lookup factor                                                | Out of scope by decision; COD customers are phone-first                                     | S      | L        |
+
+### Close-out (2026-09-06)
+
+- Visual gate round 1 approved by the user («looks and works good»); parked E2E marker swap approved and shipped (`cd65d82`).
+- PR #44 opened 2026-09-05; CI green on `cd65d82` (60 E2E, chromium + webkit). The `/code-review` skill (10 finder angles) ran at the plan's instruction and burned the user's session limit — see memory `code-review-skill-cost-2026-09`; the verification round was cancelled and the 43 candidates hand-triaged. Four fixed in `f25fa24`: the lock write zeroed the counter (burst bound was per reset, not per window), generator ↔ pattern contract test, shared 40-char cap for the page gate, one 429 builder + secret restore in the create-order test. Rest filed as BACKLOG [2026-09-06] riders or declined.
+- Merged `a37c8d0` (`--merge`), branches deleted, main pulled. Production verified (see the spec's § Supersessions & residuals).
+- One user-reported hydration error on `/track` investigated to nine clean conditions; not a code change; filed 🔵.

@@ -40,6 +40,7 @@ app/
 │   ├── categories/        # Category index; [slug] is a thin 307 to the catalog (G12)
 │   ├── checkout/          # Checkout + confirmation page
 │   ├── feedback/          # /feedback page + co-located client form (guest-capable, G8)
+│   ├── track/             # /track lookup form (guest, G18) + [orderNumber]/ status page — grant-or-session gated via canAccessOrder()
 │   └── products/          # Product listing + detail
 │       └── [slug]/        # Product detail page, client component, opengraph-image.tsx
 ├── newsletter/            # Newsletter public pages
@@ -69,7 +70,7 @@ app/
 │   │   ├── subscribe/route.ts    # POST (create subscriber, send confirmation)
 │   │   ├── confirm/route.ts      # GET (validate token, activate subscription)
 │   │   └── unsubscribe/route.ts  # POST (verify HMAC token, unsubscribe)
-│   ├── orders/            # Customer order API
+│   ├── orders/            # Customer order API; orders/lookup is PUBLIC (G18) — see the API auth exception below
 │   ├── products/          # Public product API
 │   │   └── [slug]/reviews/  # Product-specific review list
 │   └── reviews/           # Customer review API (create, update, delete, eligibility check)
@@ -96,7 +97,7 @@ app/
 - **Page files**: `page.tsx` for routes, `layout.tsx` for nested layouts, `loading.tsx` for Suspense
 - **Client components**: Form components and interactive pages use `"use client"` directive (e.g., `login-form.tsx`, `products-content.tsx`, `product-detail-client.tsx`)
 - **API routes**: Export named HTTP method functions (`GET`, `POST`, `PUT`, `DELETE`)
-- **API auth**: Admin endpoints call `requireAdmin()` first; customer endpoints call `requireAuth()`
+- **API auth**: Admin endpoints call `requireAdmin()` first; customer endpoints call `requireAuth()` — **exception (G18)**: `api/orders/lookup` is public by design, the order-number + e-mail pair is the credential and the route carries its own per-order lockout; adding `requireAuth()` there would break guest tracking
 - **Dynamic segments**: `[id]` for admin resources, `[slug]` for public-facing pages
 - **Static export control**: Use `export const dynamic = "force-dynamic"` when routes need runtime data
 - **Error handling**: Wrap API handlers in try/catch, return standardized error responses via `apiError()`; use bare `catch` syntax when error variable unused (ESLint pattern)
@@ -111,6 +112,7 @@ app/
 - **Feed validation**: Use strict Zod schemas (e.g., `google-shopping.ts`) to validate feed items before XML serialization; enforce title/description length limits, price format, GTIN format, and enum values
 - **Performance optimizations**: Root layout includes resource hints (preconnect/dns-prefetch) in `<head>`; Web Vitals reporter integrated via providers; deferred theme font loading with `preload: false` and `display: swap`; shop pages (home, product detail, category) use blur placeholders for images
 - **Query param validation**: API routes parse numeric filters with `parseInt(value, 10)` which returns NaN for invalid input; validate with `!isNaN(num) && num >= min && num <= max`; spread validated value conditionally into Prisma query (`...(valid ? { field: num } : {})`); pattern avoids throwing on malformed user input (e.g., rating filter in `/api/products/[slug]/reviews`)
+- **Coded order-lookup outcomes (G18)**: `api/orders/lookup` answers `ORDER_NOT_FOUND` (identical for unknown number and wrong e-mail), `TOO_MANY_ATTEMPTS` (429 + `Retry-After` + `retryAfterSeconds`), `VALIDATION_ERROR`, `LOOKUP_FAILED`; the `/track` form maps them through `track.byCode` with the same `t.has` guard
 - **Coded newsletter/feedback outcomes**: `api/newsletter/{subscribe,confirm,unsubscribe}` attach a machine `code` to every response (`apiError()`'s third arg on error paths, a `code` key inside the `apiSuccess()` payload on success paths — e.g. `ALREADY_SUBSCRIBED`, `LINK_EXPIRED`, `CONFIRMED`); `error`/`message` prose stays English for logs/consumers, while the `newsletter/confirm`, `newsletter/unsubscribe` pages and the `/feedback` form (`FEEDBACK_SENT`/`VALIDATION_ERROR`/`SEND_FAILED`, G8) map `code` → locale copy via each namespace's own `byCode` object in `messages/{uk,ru}.json`, guarded by `t.has(key as never)` (TASK-039 G9 superseded the G2 `create-order`/G4/G8-era `src/content/{newsletter,feedback}.ts` byCode maps — both files deleted)
 - **Account + newsletter pages render via next-intl**: `(shop)/account/**` (client components) call `useTranslations("account")`; `newsletter/{confirm,unsubscribe}` call `useTranslations("newsletter.confirm"/"newsletter.unsubscribe")` — no inline literals, no `src/content/` copy modules (TASK-039 G9 superseded G4's `src/content/{account,newsletter}.ts` copy sourcing; both files are now deleted — `account.ts`'s label maps proved consumer-less in PR #37 review round 2: admin status badges now source labels from the catalog via `admin.*` since G13, reusing `account.orderStatus`/`account.paymentStatus`). The account layout nav intentionally omits «Адреси»/«Налаштування»: `/account/addresses` and `/account/settings` don't exist yet, so the links (and their overview cards) were dropped rather than left dead; restoring them is BACKLOG'd until those pages are built
 
