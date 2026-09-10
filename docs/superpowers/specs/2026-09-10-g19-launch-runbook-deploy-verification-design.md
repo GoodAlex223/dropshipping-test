@@ -45,6 +45,12 @@ Rulings taken with the user during the 2026-09-10 brainstorm, in order:
 
 1. **Smoke script ships as a local CLI, not CI wiring.** A `deployment_status`-triggered workflow is the right end state and is exactly what the [2026-08-18] rider asks for, but verifying that it fires — with the correct `environment` string, from the Git integration rather than the Actions job — requires a production deploy whose timing we do not control. Shipping an unverified CI control during launch week would be a fresh instance of the failure mode this group exists to close. The wiring is filed 🟤 (§ Out of scope).
 2. **The staleness check has three outcomes, not two.** `CHANGED` passes; `UNCHANGED` fails; **`NO-BASELINE` also fails** (exit non-zero) unless `--allow-missing-baseline` is passed explicitly. A missing state file must not render the check silently inconclusive — a check that cannot fail looks exactly like one that passes.
+
+> **Superseded 2026-09-10 (final branch review).** A fourth outcome, `NO-CSS`, was added during
+> execution: it fires when the page yields zero CSS hashes, is checked **before** the stored-baseline
+> guard, and is deliberately never waivable by `--allow-missing-baseline` (unlike `NO-BASELINE`). See
+> §3 and `scripts/smoke-lib.ts`.
+
 3. **One document, two parts**, at `docs/deployment/launch-runbook.md`: Part 1 the one-time cutover, Part 2 the recurring every-deploy checks. Two separate docs would split what launch day executes together, since the cutover's own post phase _is_ the recurring checklist.
 4. **The full 13-row probe set**, not the four rows the WEEKLY line names. The extras are data rows on an existing engine, and the feed-item-count row guards the one failure class here that has actually bitten.
 5. **Discovery over hardcoding.** The R2 image URL, product slugs and CSS hashes are all read out of the target's own HTML at run time. Nothing pins `pub-444210ee….r2.dev` or a product name, so the script survives catalog edits and the domain swap without an edit.
@@ -118,11 +124,21 @@ Row 6 resolves to exactly one of:
 - **`UNCHANGED`** — identical sets. **Fail.** After a CSS/JS-affecting deploy this is the stale-build-cache signature; the runbook's remedy (Part 2) is a cache-off redeploy.
 - **`NO-BASELINE`** — no stored entry for this origin. **Fail**, with a message naming `--allow-missing-baseline` and `--save-baseline`. The set is still written, so the _next_ run is meaningful.
 
+> A fourth outcome, `NO-CSS`, was added during execution — see the superseded note under Decision 2
+> above, and `scripts/smoke-lib.ts`.
+
 `--baseline <file>` / `--save-baseline <file>` provide the stateless two-step for a fresh machine or a clean clone.
 
 Exit code is `0` if and only if every row passed. `--json` emits the full result array for future CI consumption without changing the exit contract.
 
 A deliberate limitation, stated so it is not mistaken for a bug: row 6 compares against _the last run_, not against _the last deploy_. Two runs with no deploy between them report `UNCHANGED` and fail. That is the correct bias for a post-deploy check — a false alarm costs one glance, a missed stale build cost this project two deploys — and Part 2 of the runbook says to run it once, after deploying.
+
+> **Addendum 2026-09-10 (final branch review).** This comparison is only meaningful if the previous
+> deploy was also checked: the baseline advances on every run, including a failing one, so a run
+> skipped on a CSS-changing deploy silently widens the window the next comparison can see, and can let
+> a stale deploy exit `0` as `CHANGED` against the older stored hash. No cheap code fix exists —
+> production's response headers expose no deployment identifier (`x-vercel-id` is a request id, not a
+> deploy id) — so this is documented rather than resolved; see the runbook's Part 2.
 
 ### §4 `docs/deployment/launch-runbook.md`
 

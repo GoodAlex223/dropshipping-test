@@ -21,7 +21,7 @@
 - **`scripts/**/\*.ts`IS linted** —`npm run lint`is`eslint . --ext .ts,.tsx` with no scripts exclusion.
 - **No module-scope side effects in `scripts/smoke-lib.ts`.** It is imported by the test; anything that runs at import time would run during the suite.
 - **Discovery over hardcoding (spec Decision 5).** No product name, product slug or CDN hostname may be written into the script. The CSS hashes, product slugs and the remote image URL are all read out of the target's own homepage HTML at run time. The single exception is row 5's category slug `hudi`, which is a route-shape assertion and is called out in the script header comment.
-- **Three-state staleness (spec Decision 2)**: `CHANGED` passes · `UNCHANGED` fails · `NO-BASELINE` fails unless `--allow-missing-baseline`. A missing state file must never make the check silently inconclusive.
+- **Four-state staleness (spec Decision 2, extended during execution)**: `CHANGED` passes · `UNCHANGED` fails · `NO-BASELINE` fails unless `--allow-missing-baseline` · `NO-CSS` fails always and is never waivable. A missing state file must never make the check silently inconclusive.
 - **Exit code is `0` if and only if every row passed.** `--json` changes output only, never the exit contract.
 - **State file is keyed by target origin** so a preview run cannot clobber the production baseline.
 - **Docs freshness is enforced by a test.** `docs/planning` and `docs/deployment` are both indexed directories, walked recursively — every new `.md` in them needs a `docs/README.md` row in the same commit, and the index's own `**Last Updated**` header must be ≥ every date it lists. `prettier --write` must be idempotent on every touched `.md`.
@@ -209,7 +209,7 @@ git commit -m "feat(g19): extraction helpers for the post-deploy smoke script"
 **Interfaces:**
 
 - Consumes: nothing from Task 1.
-- Produces: `type StalenessOutcome = "CHANGED" | "UNCHANGED" | "NO-BASELINE"` · `interface SmokeState` · `compareBaseline(observed: string[], stored: string[] | null): StalenessOutcome` · `stalenessPasses(outcome: StalenessOutcome, allowMissing: boolean): boolean` · `readBaselineFor(state: SmokeState, origin: string): string[] | null` · `mergeState(state: SmokeState, origin: string, cssHashes: string[], observedAt: string): SmokeState`.
+- Produces: `type StalenessOutcome = "CHANGED" | "UNCHANGED" | "NO-BASELINE" | "NO-CSS"` · `interface SmokeState` · `compareBaseline(observed: string[], stored: string[] | null): StalenessOutcome` · `stalenessPasses(outcome: StalenessOutcome, allowMissing: boolean): boolean` · `readBaselineFor(state: SmokeState, origin: string): string[] | null` · `mergeState(state: SmokeState, origin: string, cssHashes: string[], observedAt: string): SmokeState`.
 
 - [ ] **Step 1: Write the failing test**
 

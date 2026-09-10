@@ -10,7 +10,8 @@
  *
  * Flags:
  *   --url <target>              required; origin to probe
- *   --baseline <file>           read the CSS-hash baseline from this file
+ *   --baseline <file>           read/write the CSS-hash baseline at this file (read at the start,
+ *                               overwritten with the observed hashes at the end of the run)
  *   --save-baseline <file>      write the observed baseline here and exit 0
  *   --allow-missing-baseline    NO-BASELINE stops being a failure
  *   --json                      emit results as JSON (exit contract unchanged)
@@ -139,6 +140,7 @@ async function main(): Promise<void> {
     );
     writeFileSync(options.baselineFile, `${JSON.stringify(state, null, 2)}\n`);
     console.log(`baseline saved to ${options.baselineFile}: ${cssHashes.join(", ") || "(none)"}`);
+    console.log("no probes were run — this exit 0 reflects the baseline save only, not a pass");
     return;
   }
 
@@ -173,10 +175,11 @@ async function main(): Promise<void> {
   // every remote host 400s and the three rejection rows below would go green
   // on a broken deploy. This row is what gives them meaning.
   if (remoteImage) {
-    await probe(
-      "GET /_next/image (real CDN)",
-      imageProbeUrl(origin, remoteImage),
-      assertStatus(200)
+    const remoteHost = new URL(remoteImage).host;
+    await probe("GET /_next/image (real CDN)", imageProbeUrl(origin, remoteImage), (res) =>
+      res.status === 200
+        ? { status: "pass", detail: `200 — ${remoteHost}` }
+        : { status: "fail", detail: `expected 200, got ${res.status}` }
     );
   } else {
     rows.push({

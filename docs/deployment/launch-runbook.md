@@ -8,7 +8,8 @@ One-time real-domain cutover checklist, plus the checks to run after every produ
 
 **See also**: the
 [design spec](../superpowers/specs/2026-09-10-g19-launch-runbook-deploy-verification-design.md) this
-runbook implements (rationale, the 14-row probe table, risks), the
+runbook implements (rationale, the probe table — 13 numbered rows, one of which covers two URLs —
+and risks), the
 [implementation plan](../planning/plans/2026-09-10_g19-launch-runbook-deploy-verification.md) and its
 [Verification Log](../planning/plans/2026-09-10_g19-launch-runbook-deploy-verification.md#verification-log)
 (exactly what has and hasn't been run against live production), and
@@ -143,9 +144,9 @@ Only real, uploaded products are affected. The 8 seeded placeholders store root-
   name).
 - **Action:**
   1. Discover the _current_ CDN host rather than trusting this document's example — run
-     `npm run smoke -- --url https://dropshipping-test.vercel.app` (or curl the homepage and grep for
-     `_next/image?url=`) to read out whichever `pub-….r2.dev` host is live right now. As of the G19
-     Verification Log (2026-09-10) it was
+     `npm run smoke -- --url https://dropshipping-test.vercel.app` and read it straight off the
+     `GET /_next/image (real CDN)` row, whose detail now prints `200 — <host>` (or curl the homepage
+     and grep for `_next/image?url=` as a fallback). As of the G19 Verification Log (2026-09-10) it was
      `https://pub-444210ee6d61467894be231e22c9cd78.r2.dev`, but do not hardcode that — re-discover it
      at execution time, the same way `scripts/smoke.ts` itself does.
   2. There is **no existing script for this rewrite** — `scripts/` has none as of this writing.
@@ -452,11 +453,15 @@ Run this after every deploy meant to reach real users, not just the cutover.
    Once a baseline exists for this origin (after its first successful run — Step 14 above, for the
    cutover itself), drop `--allow-missing-baseline`. A missing baseline from here on means something
    actually went missing, not that the origin is new.
-2. **All 14 rows should read `PASS`.** If the CSS-hash row alone reads `UNCHANGED` and this deploy
-   changed CSS or JS: Vercel's build cache likely served a stale bundle — this has already happened in
-   this project's history (PR #35). Redeploy with the cache disabled
-   (`VERCEL_FORCE_NO_BUILD_CACHE=1`, or the dashboard's Redeploy with "Use existing Build Cache"
-   unchecked) and re-run; expect `CHANGED` this time.
+2. **All 14 rows should read `PASS`.** The CSS-hash row is the common exception, and it can go either
+   way: if this deploy **changed CSS** and the row reads `UNCHANGED`, Vercel's build cache likely
+   served a stale bundle — this has already happened in this project's history (PR #35); redeploy with
+   the cache disabled (`VERCEL_FORCE_NO_BUILD_CACHE=1`, or the dashboard's Redeploy with "Use existing
+   Build Cache" unchecked) and re-run, expecting `CHANGED` this time. (The row hashes
+   `/_next/static/css/*.css` only — it does not cover JS staleness.) If instead this deploy **changed
+   no CSS** — a server-only fix, a message-catalog copy change, and similar — then `UNCHANGED` is the
+   **expected** result: confirm from the diff that nothing CSS-affecting changed, and treat the row as
+   passing.
 3. If the CSS row instead reads `NO-CSS`, the deploy is very likely broken outright — the homepage
    served no stylesheet at all. Treat it like any other failing row: stop and diagnose, don't
    redeploy-and-hope.
@@ -468,3 +473,10 @@ Run this after every deploy meant to reach real users, not just the cutover.
    gitignored. Running it from a fresh clone or a different machine reports `NO-BASELINE` on its
    first run even against healthy, previously-verified production — that's the tool having no local
    memory yet, not a broken deploy.
+6. **The comparison is only meaningful if the previous deploy was also checked.** The baseline
+   advances on every run, including a failing one, so a skipped run silently widens the window the
+   next comparison can see: a stale-CSS deploy that goes unchecked can leave the following run
+   comparing against the older stored hash and reporting `CHANGED` — a pass — on a deploy that is
+   itself stale. There is no cheap code fix for this (production's response headers carry no
+   deployment identifier), so the only mitigation is procedural: run this after every deploy meant to
+   reach real users, and don't batch several deploys before checking.
