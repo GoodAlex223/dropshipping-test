@@ -158,9 +158,14 @@ Only real, uploaded products are affected. The 8 seeded placeholders store root-
      rows point at the new host" and "the next build's allow-list includes the new host", during
      which the real products' images 400. There is no zero-downtime version of this without a more
      elaborate dual-host setup, which is out of scope here; keep the window as short as practical.
-- **Verification:** query `ProductImage.url` in production afterward and confirm zero rows still
-  reference the old host. (The end-to-end proof — a 200 through the _new_ host — only lands after
-  Step 12's deploy; that's Step 14's "real CDN" row.)
+- **Verification:** query `ProductImage.url` in production and confirm zero rows still reference the
+  old host. Treat this as a first pass, not the final word: anyone uploading through
+  `/admin/products` after this point and before Step 12's deploy actually lands writes a row with
+  whatever host is live at upload time — the client is doing exactly this on an ongoing basis (see
+  "Do not re-seed production" below), so this is a realistic gap, not a hypothetical one. **Step 12
+  re-runs this exact check as a pre-flight gate immediately before triggering the deploy** — that is
+  what actually closes the window, not this step alone. (The end-to-end proof — a 200 through the
+  _new_ host — only lands after Step 12's deploy; that's Step 14's "real CDN" row.)
 
 #### Step 5 — Set `AWS_CLOUDFRONT_URL`
 
@@ -171,6 +176,8 @@ swap for _new_ uploads — Step 4 is what makes it safe for the images already i
 - **Who:** owner, in Vercel Production env vars.
 - **Depends on:** Step 1 (domain known). Do not run this until Step 4's backfill is ready to ship in
   the same window.
+- **Unblocked when:** Step 1 (№1) has closed — TASK-056 №1a needs no separate client action of its
+  own once the domain exists.
 - **Action:** set `AWS_CLOUDFRONT_URL=https://img.<domain>`, bound to the R2 bucket via Cloudflare's
   R2 custom-domain feature. The exact DNS mechanics (whether the zone needs to sit in Cloudflare, or
   a CNAME suffices from wherever Step 1 lands DNS) depend on where the domain's DNS actually ends up
@@ -206,6 +213,7 @@ client.
 - **Who:** client supplies the address; owner sets it.
 - **Depends on:** nothing else in this list — not gated on the domain, can happen whenever the client
   answers.
+- **Unblocked when:** the client answers TASK-056 №3 with the real recipient address.
 - **Verification:** the Vercel dashboard shows the new value for Production.
 
 #### Step 8 — Review `NEXT_PUBLIC_APP_URL` and `NEXT_PUBLIC_STORE_NAME`
@@ -228,6 +236,8 @@ still awaiting the client as of this writing.
 - **Who:** client supplies copy; dev builds and ships the routes (TASK-055).
 - **Depends on:** nothing here — not gated on the domain, can ship on the old domain ahead of
   cutover.
+- **Unblocked when:** the client supplies contact details (№4) and legal-page copy or lawyer sign-off
+  (№15).
 - **Verification:** `/contact` and the legal routes return 200 and show the client-approved copy, not
   placeholder text.
 
@@ -276,6 +286,13 @@ production.
   take effect) and Step 11 (domain attached). Step 6 (R2 CORS) does **not** gate this deploy — it's a
   Cloudflare-side setting that takes effect on its own; it only needs to land before anyone uploads a
   new image from the new domain's admin panel, whether that's before or after this step.
+- **Pre-flight, immediately before triggering the deploy below:** re-run Step 4's host-prefix query
+  against `ProductImage.url`. If every row is already on the new host, proceed. If any row is still on
+  the _old_ host, someone — most plausibly the client, entering products through `/admin/products` on
+  an ongoing basis (see "Do not re-seed production" below) — uploaded an image after Step 4's backfill
+  ran. Re-run Step 4's rewrite against those rows, confirm zero stragglers again, _then_ trigger the
+  deploy. This re-check is what actually closes the Step 4 → Step 12 window; Step 4's own check alone
+  cannot, since it runs before the window even opens.
 - **Action:** trigger a new production deployment through the **Vercel Git integration** — either
   push/merge to `main`, or use the dashboard's "Redeploy" on the current production commit. Given how
   much changed in this window, and this project's history of Vercel serving stale CSS across a deploy
@@ -285,6 +302,10 @@ production.
 - **Verification:** the Vercel dashboard shows a _new_ deployment (a fresh deployment ID and
   timestamp, not a reused/promoted old one), status "Ready", promoted to Production, sourced from the
   Git commit on `main`.
+- **Recovery, if a stranded image turns up anyway** (discovered later — a 400 a customer or the
+  client reports, or a broken image noticed in passing): re-run Step 4's backfill again. It's a
+  DB-only fix and needs no further redeploy — by then the live build's allow-list already includes
+  the new host, so the stranded row just needs to be updated to match it.
 
 #### Step 13 — Confirm migrations actually ran
 
@@ -355,7 +376,7 @@ the new domain rather than a stale one baked in before `NEXT_PUBLIC_APP_URL` was
   curl -s https://<domain>/robots.txt
   ```
   `robots.txt` should still disallow `/api/`, `/admin/`, `/checkout/`, `/cart`, `/account/`,
-  `/track/`, `/_next/` (per `tests/unit/robots.test.ts`) — same rules, new host.
+  `/track/`, `/_next/` (the full list in `src/app/robots.ts`) — same rules, new host.
 
 #### Step 18 — GA4 / GTM firing after consent
 
