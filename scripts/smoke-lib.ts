@@ -117,3 +117,114 @@ export function mergeState(
 ): SmokeState {
   return { ...state, [origin]: { cssHashes: [...cssHashes].sort(), observedAt } };
 }
+
+export interface HttpResponse {
+  status: number;
+  headers: Record<string, string>;
+  body: string;
+}
+
+export interface ProbeResult {
+  status: "pass" | "fail";
+  detail: string;
+}
+
+const pass = (detail: string): ProbeResult => ({ status: "pass", detail });
+const fail = (detail: string): ProbeResult => ({ status: "fail", detail });
+const wrongStatus = (expected: number, got: number) => fail(`expected ${expected}, got ${got}`);
+
+export function assertStatus(expected: number) {
+  return (res: HttpResponse): ProbeResult =>
+    res.status === expected ? pass(String(res.status)) : wrongStatus(expected, res.status);
+}
+
+/** The DB-backed string assertion. See spec §2.1: it lives on `/`, not `/products`. */
+export function assertHomepage(res: HttpResponse): ProbeResult {
+  if (res.status !== 200) return wrongStatus(200, res.status);
+  const slugs = extractProductSlugs(res.body);
+  return slugs.length > 0
+    ? pass(`200, ${slugs.length} product link(s)`)
+    : fail("200 but no /products/<slug> link in server HTML — DB-backed render missing");
+}
+
+export function assertProductsApi(res: HttpResponse): ProbeResult {
+  if (res.status !== 200) return wrongStatus(200, res.status);
+  let parsed: { data?: Array<{ slug?: unknown }> };
+  try {
+    parsed = JSON.parse(res.body);
+  } catch {
+    return fail("200 but the body is not JSON");
+  }
+  const slug = parsed.data?.[0]?.slug;
+  return typeof slug === "string" && slug.length > 0
+    ? pass(`200, first slug "${slug}"`)
+    : fail("200 but data[0].slug is missing — the catalog query returned nothing");
+}
+
+export function assertHealth(res: HttpResponse): ProbeResult {
+  if (res.status !== 200) return wrongStatus(200, res.status);
+  let parsed: { checks?: { database?: { status?: unknown } } };
+  try {
+    parsed = JSON.parse(res.body);
+  } catch {
+    return fail("200 but the body is not JSON");
+  }
+  const db = parsed.checks?.database?.status;
+  return db === "ok"
+    ? pass("200, database ok")
+    : fail(`200 but checks.database.status is ${JSON.stringify(db)}`);
+}
+
+/**
+ * 307 specifically, and to the catalog facet specifically. A redirect() thrown
+ * inside a Server Component is captured by Next's RedirectBoundary and emitted
+ * as <meta http-equiv="refresh"> on a 200 — which is why this asserts the
+ * status code and not the rendered body (G12).
+ */
+export function assertCategoryRedirect(res: HttpResponse): ProbeResult {
+  if (res.status !== 307) return wrongStatus(307, res.status);
+  const location = res.headers["location"];
+  return location === "/products?category=hudi"
+    ? pass("307 → /products?category=hudi")
+    : fail(`307 but location is ${JSON.stringify(location)}`);
+}
+
+export function countFeedItems(xml: string): number {
+  return (xml.match(/<item>/g) || []).length;
+}
+
+/**
+ * The feed route filters with validateFeedItemSafe, which drops an invalid item
+ * SILENTLY — production served a well-formed, empty, HTTP-200 feed for roughly
+ * two months before G16 noticed. A status check alone would not have caught it.
+ */
+export function assertFeed(res: HttpResponse): ProbeResult {
+  if (res.status !== 200) return wrongStatus(200, res.status);
+  const count = countFeedItems(res.body);
+  return count > 0
+    ? pass(`200, ${count} item(s)`)
+    : fail("200 but 0 <item> entries — every product was dropped from the feed");
+}
+
+const FALLBACK_CDN_HOST = "cdn.example.com";
+
+/**
+ * The lookalike host an `endsWith`-style allow-list would wrongly serve:
+ * the REAL CDN host with an attacker suffix. Built from the discovered host so
+ * the probe stays meaningful after the domain swap.
+ */
+export function buildLookalikeUrl(remoteImageUrl: string | null): string {
+  let host = FALLBACK_CDN_HOST;
+  if (remoteImageUrl) {
+    try {
+      host = new URL(remoteImageUrl).host;
+    } catch {
+      host = FALLBACK_CDN_HOST;
+    }
+  }
+  return `https://${host}.evil.example/x.png`;
+}
+
+export function exitCodeFor(results: ProbeResult[]): number {
+  return results.some((result) => result.status === "fail") ? 1 : 0;
+}

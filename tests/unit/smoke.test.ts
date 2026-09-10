@@ -7,6 +7,15 @@ import {
   stalenessPasses,
   readBaselineFor,
   mergeState,
+  assertStatus,
+  assertHomepage,
+  assertProductsApi,
+  assertHealth,
+  assertCategoryRedirect,
+  assertFeed,
+  countFeedItems,
+  buildLookalikeUrl,
+  exitCodeFor,
 } from "../../scripts/smoke-lib";
 
 const ORIGIN = "https://shop.example";
@@ -116,5 +125,118 @@ describe("state file", () => {
   it("stores hashes sorted so ordering churn never reads as CHANGED", () => {
     const state = mergeState({}, "https://shop.example", ["b", "a"], "2026-09-10T00:00:00.000Z");
     expect(state["https://shop.example"].cssHashes).toEqual(["a", "b"]);
+  });
+});
+
+function res(
+  status: number,
+  body = "",
+  headers: Record<string, string> = {}
+): { status: number; headers: Record<string, string>; body: string } {
+  return { status, body, headers };
+}
+
+describe("assertStatus", () => {
+  it("passes on the expected status and fails otherwise", () => {
+    expect(assertStatus(200)(res(200)).status).toBe("pass");
+    expect(assertStatus(200)(res(500)).status).toBe("fail");
+    expect(assertStatus(400)(res(200)).detail).toContain("expected 400, got 200");
+  });
+});
+
+describe("assertHomepage", () => {
+  it("passes when the server HTML carries a product link", () => {
+    expect(assertHomepage(res(200, `<a href="/products/futbolka-mirox">F</a>`)).status).toBe(
+      "pass"
+    );
+  });
+
+  it("fails on 200 with no product link — a rendered but DB-empty homepage", () => {
+    const result = assertHomepage(res(200, "<html><body>Mirox</body></html>"));
+    expect(result.status).toBe("fail");
+    expect(result.detail).toContain("no /products/<slug>");
+  });
+
+  it("fails on a non-200", () => {
+    expect(assertHomepage(res(500)).status).toBe("fail");
+  });
+});
+
+describe("assertProductsApi", () => {
+  it("passes when data[0].slug is a non-empty string", () => {
+    expect(assertProductsApi(res(200, JSON.stringify({ data: [{ slug: "x" }] }))).status).toBe(
+      "pass"
+    );
+  });
+
+  it("fails on an empty data array", () => {
+    expect(assertProductsApi(res(200, JSON.stringify({ data: [] }))).status).toBe("fail");
+  });
+
+  it("fails when the body is not JSON", () => {
+    expect(assertProductsApi(res(200, "<html>")).detail).toContain("not JSON");
+  });
+});
+
+describe("assertHealth", () => {
+  it("passes only when checks.database.status is ok", () => {
+    const ok = JSON.stringify({ checks: { database: { status: "ok" } } });
+    const bad = JSON.stringify({ checks: { database: { status: "error" } } });
+    expect(assertHealth(res(200, ok)).status).toBe("pass");
+    expect(assertHealth(res(200, bad)).status).toBe("fail");
+  });
+});
+
+describe("assertCategoryRedirect", () => {
+  it("passes on 307 to the catalog facet", () => {
+    const r = res(307, "", { location: "/products?category=hudi" });
+    expect(assertCategoryRedirect(r).status).toBe("pass");
+  });
+
+  // A page-level redirect() is emitted as <meta http-equiv="refresh"> on a 200,
+  // not a 3xx — the exact regression the G12 routing-layer redirect exists to
+  // prevent. A 200 here must fail.
+  it("fails on a 200 even when the body looks like a redirect", () => {
+    expect(assertCategoryRedirect(res(200, `<meta http-equiv="refresh"`)).status).toBe("fail");
+  });
+
+  it("fails on a 307 pointing somewhere else", () => {
+    expect(assertCategoryRedirect(res(307, "", { location: "/" })).status).toBe("fail");
+  });
+});
+
+describe("countFeedItems / assertFeed", () => {
+  it("counts item elements", () => {
+    expect(countFeedItems("<rss><item>a</item><item>b</item></rss>")).toBe(2);
+  });
+
+  it("fails a well-formed but empty feed", () => {
+    const result = assertFeed(res(200, "<rss><channel></channel></rss>"));
+    expect(result.status).toBe("fail");
+    expect(result.detail).toContain("0 <item>");
+  });
+});
+
+describe("buildLookalikeUrl", () => {
+  it("prefixes the real CDN host so a naive endsWith allow-list would serve it", () => {
+    expect(buildLookalikeUrl("https://pub-abc.r2.dev/products/a.jpg")).toBe(
+      "https://pub-abc.r2.dev.evil.example/x.png"
+    );
+  });
+
+  it("falls back to a literal host when nothing was discovered", () => {
+    expect(buildLookalikeUrl(null)).toBe("https://cdn.example.com.evil.example/x.png");
+  });
+});
+
+describe("exitCodeFor", () => {
+  it("is 0 only when every row passed", () => {
+    expect(exitCodeFor([{ status: "pass", detail: "" }])).toBe(0);
+    expect(
+      exitCodeFor([
+        { status: "pass", detail: "" },
+        { status: "fail", detail: "" },
+      ])
+    ).toBe(1);
   });
 });
