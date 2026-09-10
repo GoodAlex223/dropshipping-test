@@ -229,6 +229,13 @@ describe("compareBaseline", () => {
     expect(compareBaseline(["a"], null)).toBe("NO-BASELINE");
     expect(compareBaseline(["a"], [])).toBe("NO-BASELINE");
   });
+
+  // An empty observed set must never reach the "sets differ → CHANGED" branch:
+  // a site serving no CSS would otherwise report a passing, changed deploy.
+  it("reports NO-CSS when the page served no stylesheet at all", () => {
+    expect(compareBaseline([], ["a", "b"])).toBe("NO-CSS");
+    expect(compareBaseline([], null)).toBe("NO-CSS");
+  });
 });
 
 describe("stalenessPasses", () => {
@@ -241,6 +248,11 @@ describe("stalenessPasses", () => {
   it("lets NO-BASELINE pass only when explicitly allowed, and never UNCHANGED", () => {
     expect(stalenessPasses("NO-BASELINE", true)).toBe(true);
     expect(stalenessPasses("UNCHANGED", true)).toBe(false);
+  });
+
+  it("never passes NO-CSS, with or without --allow-missing-baseline", () => {
+    expect(stalenessPasses("NO-CSS", false)).toBe(false);
+    expect(stalenessPasses("NO-CSS", true)).toBe(false);
   });
 });
 
@@ -276,7 +288,7 @@ Expected: FAIL — `compareBaseline is not a function` (or an unresolved-export 
 Append to `scripts/smoke-lib.ts`:
 
 ```ts
-export type StalenessOutcome = "CHANGED" | "UNCHANGED" | "NO-BASELINE";
+export type StalenessOutcome = "CHANGED" | "UNCHANGED" | "NO-BASELINE" | "NO-CSS";
 
 export interface SmokeStateEntry {
   cssHashes: string[];
@@ -293,6 +305,11 @@ export interface SmokeState {
  * incident (Vercel served byte-identical stale CSS across two deploys).
  */
 export function compareBaseline(observed: string[], stored: string[] | null): StalenessOutcome {
+  // Checked FIRST. A page that served no stylesheet at all cannot be compared,
+  // and calling that "CHANGED" would pass a deploy whose CSS vanished entirely —
+  // the same "a check that cannot fail" trap NO-BASELINE guards, entered from
+  // the observed side instead of the stored side.
+  if (observed.length === 0) return "NO-CSS";
   if (stored === null || stored.length === 0) return "NO-BASELINE";
   const a = [...observed].sort().join(",");
   const b = [...stored].sort().join(",");
@@ -301,6 +318,8 @@ export function compareBaseline(observed: string[], stored: string[] | null): St
 
 export function stalenessPasses(outcome: StalenessOutcome, allowMissing: boolean): boolean {
   if (outcome === "CHANGED") return true;
+  // NO-CSS is deliberately NOT waivable: --allow-missing-baseline excuses a
+  // missing BASELINE, never a page that served no stylesheet.
   if (outcome === "NO-BASELINE") return allowMissing;
   return false;
 }
@@ -323,7 +342,7 @@ export function mergeState(
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run tests/unit/smoke.test.ts`
-Expected: PASS, 15 tests.
+Expected: PASS, 17 tests (7 from Task 1 + 10 here).
 
 Then: `npm run typecheck` — expected: clean.
 
@@ -457,6 +476,11 @@ describe("buildLookalikeUrl", () => {
 });
 
 describe("exitCodeFor", () => {
+  // Nothing verified must never read as success.
+  it("fails closed on an empty result set", () => {
+    expect(exitCodeFor([])).toBe(1);
+  });
+
   it("is 0 only when every row passed", () => {
     expect(exitCodeFor([{ status: "pass", detail: "" }])).toBe(0);
     expect(
@@ -586,15 +610,21 @@ export function buildLookalikeUrl(remoteImageUrl: string | null): string {
   return `https://${host}.evil.example/x.png`;
 }
 
+/**
+ * Fails CLOSED on an empty array. Zero collected results means nothing was
+ * verified, and "nothing was verified" must never read as success — the same
+ * trap compareBaseline's empty-observed guard closes, one level up at the
+ * aggregate gate.
+ */
 export function exitCodeFor(results: ProbeResult[]): number {
-  return results.some((result) => result.status === "fail") ? 1 : 0;
+  return results.length > 0 && results.every((result) => result.status === "pass") ? 0 : 1;
 }
 ```
 
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run tests/unit/smoke.test.ts`
-Expected: PASS, 31 tests (7 from Task 1 + 8 from Task 2 + 16 here).
+Expected: PASS, 34 tests (7 from Task 1 + 10 from Task 2 + 17 here).
 
 Then: `npm run typecheck` and `npm run lint` — expected: both clean.
 
@@ -670,10 +700,30 @@ import {
   type HttpResponse,
   type ProbeResult,
   type SmokeState,
+  type StalenessOutcome,
 } from "./smoke-lib";
 
 const DEFAULT_STATE_FILE = ".smoke-state.json";
 const TIMEOUT_MS = 20_000;
+
+// One message per outcome, read by BOTH branches, so the row can never print a
+// detail that disagrees with its own status.
+//
+// A full Record over the union — deliberately NOT Record<Exclude<…, "CHANGED">>.
+// stalenessPasses() returns an opaque boolean, so a ternary cannot narrow
+// `outcome` away from "CHANGED" in the fail branch; the three-key version needs
+// an `as Exclude<…>` cast to compile, and that cast asserts a guarantee living
+// in ANOTHER module. Change the pass rule in smoke-lib.ts and the cast silently
+// indexes a missing key, printing `FAIL  CSS chunk hashes  undefined`. One
+// unused entry is the cheaper trade, and the compiler still demands a message
+// for every outcome added later.
+const STALENESS_DETAIL: Record<StalenessOutcome, string> = {
+  CHANGED: "CHANGED — the served CSS differs from the previous run",
+  UNCHANGED: "UNCHANGED — the build cache may have served stale CSS; redeploy with the cache off",
+  "NO-BASELINE":
+    "NO-BASELINE — no stored hashes for this origin; re-run, or pass --allow-missing-baseline",
+  "NO-CSS": "NO-CSS — the page served no stylesheet at all; the deploy is very likely broken",
+};
 
 interface Options {
   url: string;
@@ -772,15 +822,10 @@ async function main(): Promise<void> {
   const outcome = compareBaseline(cssHashes, readBaselineFor(state, origin));
   rows.push({
     label: "CSS chunk hashes",
-    result: stalenessPasses(outcome, options.allowMissingBaseline)
-      ? { status: "pass", detail: `${outcome} (${cssHashes.join(", ") || "none"})` }
-      : {
-          status: "fail",
-          detail:
-            outcome === "UNCHANGED"
-              ? "UNCHANGED — the build cache may have served stale CSS; redeploy with the cache off"
-              : "NO-BASELINE — no stored hashes for this origin; re-run, or pass --allow-missing-baseline",
-        },
+    result: {
+      status: stalenessPasses(outcome, options.allowMissingBaseline) ? "pass" : "fail",
+      detail: `${STALENESS_DETAIL[outcome]}${cssHashes.length ? ` (${cssHashes.join(", ")})` : ""}`,
+    },
   });
 
   // The accept probe FIRST: if remotePatterns came back empty at build time,
