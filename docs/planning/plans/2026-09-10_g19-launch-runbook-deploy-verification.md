@@ -1789,3 +1789,52 @@ tests`; corrected on the PR to 86 / 1103 (+1 todo). Third round, third instance 
 reaching the code and stopping short of an artifact that lives outside git. The PR body has drifted
 in every round, and nothing in the repository can catch it — the only durable remedy is to treat the
 description as a deliverable and re-read it whenever a claim it repeats changes.
+
+**Fourth pass — the guard was pointed at the doc that expires.** `5a5f2d1` closed a real hole in
+`plan-snippets.test.ts`: an unresolvable `ts` fence was skipped rather than reported, so a snippet
+that is never diffed passed as a snippet that matches. That was correctly diagnosed and correctly
+fixed, and it was this plan's own defect.
+
+But the guard's scope had a larger gap than its implementation did. Close-out step 2 archives this
+plan to `docs/archive/plans/`, and the guard excludes archived plans **by construction** — rightly,
+since frozen records are supposed to drift. So every snippet it protects stops being checked the
+moment G19 closes. Meanwhile `docs/deployment/launch-runbook.md` is the opposite kind of document:
+it outlives the task, and it is executed during a production cutover — the one moment nobody is
+reading diffs. It quotes source verbatim in two places and nothing covered it:
+
+- four `scripts/vercel-build.sh` echo strings (Step 13), including both `⚠ WARNING:` variants;
+- `src/app/robots.ts`'s disallow list (Step 17).
+
+Every one of them still matched when checked — this was a coverage gap, not a live defect. Reword
+an `echo` in `vercel-build.sh`, though, and the runbook silently sends an operator hunting for a
+line that never prints, mid-cutover.
+
+**The guard: `tests/unit/doc-source-quotes.test.ts`.** The quotes here are inline backticked
+strings, not fenced blocks, so this is a different extraction rather than a wider glob. Both checks
+derive their expectations **from the source**, so coverage grows without a hand-maintained list:
+
+- Any backticked span in `docs/deployment/*.md` opening with `▶`, `✓` or `⚠` is a build-log line
+  being quoted — prose never starts with those — and must be a contiguous substring of some
+  `scripts/*.sh` echo. New quotes are picked up automatically.
+- Every entry parsed out of `robots.ts`'s `disallow: [...]` must appear backticked in the runbook.
+  This fails in **both** directions: a renamed entry stops matching, and a newly added entry fails
+  until the runbook lists it too.
+
+Mutation-tested in four directions, not asserted:
+
+```text
+reword a vercel-build echo the runbook quotes
+  -> FAIL  no script emits "▶ vercel-build: applying database migrations (prisma migrate deploy)"
+add "/internal/" to robots.ts disallow
+  -> FAIL  expected [ '/internal/' ] to deeply equal []
+rename "/cart" to "/basket"
+  -> FAIL  expected [ '/basket' ] to deeply equal []
+strip the runbook's quoted log lines entirely (vacuity check)
+  -> FAIL  expected 0 to be greater than 0
+restore all four
+  -> 3 passed
+```
+
+The vacuity case is the one that matters most here: an extraction that silently matches nothing is
+the same shape as a fence that is never diffed, and as `compareBaseline([], …)` before it. Every
+guard in this task now asserts it found something before asserting that something is correct.
