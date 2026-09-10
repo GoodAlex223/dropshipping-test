@@ -75,10 +75,12 @@ describe("extractProductSlugs", () => {
     expect(extractProductSlugs(html)).toEqual(["futbolka-mirox", "hudi-mirox-basic"]);
   });
 
-  // Load-bearing: /products ships a chunk path containing the literal
-  // "/products/page-<hash>.js". Counting that as a product would make the
-  // homepage's DB-backed assertion pass on a page with no products at all.
-  it("ignores /_next chunk paths that contain /products/", () => {
+  // The real chunk path the catalog page ships. Counting it as a product would
+  // make the homepage's DB-backed assertion pass on a page with no products at
+  // all. Note what actually rejects it: PRODUCT_SLUG_RE's lookahead, because
+  // `.js` follows the segment. This case passes with or without the /_next
+  // strip — it guards the observed input, not the strip.
+  it("ignores the catalog page's real /_next chunk path", () => {
     const html = `<script src="/_next/static/chunks/app/(shop)/products/page-9a0c2f2d3d5cd602.js"></script>`;
     expect(extractProductSlugs(html)).toEqual([]);
   });
@@ -138,10 +140,17 @@ export function extractCssHashes(html: string): string[] {
 /**
  * Product slugs linked from server-rendered HTML.
  *
- * `/_next/**` is stripped FIRST and deliberately: the catalog page ships a
- * chunk named `/_next/static/chunks/app/(shop)/products/page-<hash>.js`, which
- * a naive match would report as the product "page-<hash>" — turning the
+ * The danger being defended against: a `/_next/**` asset path that contains a
+ * literal `/products/` segment would be reported as a product, turning the
  * homepage's DB-backed assertion into one that passes on an empty catalog.
+ *
+ * Two mechanisms do that work, and they cover different shapes. PRODUCT_SLUG_RE's
+ * lookahead rejects anything followed by a file extension, which is what rules out
+ * the catalog page's real chunk, `…/products/page-<hash>.js` (the `.` is not in the
+ * lookahead set). Stripping `/_next/**` first covers the shapes the lookahead does
+ * NOT catch — a `/products/<segment>` followed by `/`, `?`, `#` or a quote, as in
+ * `/_next/static/media/products/hero-banner/1x.avif`. Both cases are tested; the
+ * second one fails if the strip is removed, the first does not.
  */
 export function extractProductSlugs(html: string): string[] {
   const withoutAssets = html.replace(NEXT_ASSET_RE, " ");
@@ -186,7 +195,7 @@ export function findRemoteImageUrl(html: string, targetOrigin: string): string |
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run tests/unit/smoke.test.ts`
-Expected: PASS, 7 tests.
+Expected: PASS, 8 tests.
 
 Then: `npm run typecheck` — expected: clean (this file is inside the tsconfig include).
 
@@ -343,7 +352,7 @@ export function mergeState(
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run tests/unit/smoke.test.ts`
-Expected: PASS, 17 tests (7 from Task 1 + 10 here).
+Expected: PASS, 18 tests (8 from Task 1 + 10 here).
 
 Then: `npm run typecheck` — expected: clean.
 
@@ -625,7 +634,7 @@ export function exitCodeFor(results: ProbeResult[]): number {
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run tests/unit/smoke.test.ts`
-Expected: PASS, 35 tests (7 from Task 1 + 10 from Task 2 + 18 here — 17 as first written, plus the `/_next` strip's negative control added by the PR #45 review round).
+Expected: PASS, 35 tests (8 from Task 1 + 10 from Task 2 + 17 here). Task 1 carries 8, not the 7 it shipped with: the `/_next` strip's negative control added by the PR #45 review round lives in the `extractProductSlugs` describe, which Task 1 writes.
 
 Then: `npm run typecheck` and `npm run lint` — expected: both clean.
 
@@ -670,7 +679,8 @@ Create `scripts/smoke.ts`:
  *
  * Flags:
  *   --url <target>              required; origin to probe
- *   --baseline <file>           read the CSS-hash baseline from this file
+ *   --baseline <file>           read/write the CSS-hash baseline at this file (read at the start,
+ *                               overwritten with the observed hashes at the end of the run)
  *   --save-baseline <file>      write the observed baseline here and exit 0
  *   --allow-missing-baseline    NO-BASELINE stops being a failure
  *   --json                      emit results as JSON (exit contract unchanged)
@@ -836,10 +846,11 @@ async function main(): Promise<void> {
   // every remote host 400s and the three rejection rows below would go green
   // on a broken deploy. This row is what gives them meaning.
   if (remoteImage) {
-    await probe(
-      "GET /_next/image (real CDN)",
-      imageProbeUrl(origin, remoteImage),
-      assertStatus(200)
+    const remoteHost = new URL(remoteImage).host;
+    await probe("GET /_next/image (real CDN)", imageProbeUrl(origin, remoteImage), (res) =>
+      res.status === 200
+        ? { status: "pass", detail: `200 — ${remoteHost}` }
+        : { status: "fail", detail: `expected 200, got ${res.status}` }
     );
   } else {
     rows.push({
@@ -1709,3 +1720,40 @@ reliable check is to diff embedded snippets against their source file rather tha
 `"feat(g19): origin-keyed baseline state with three-state staleness"`. That is a verbatim quote of
 real commit `b222db2`, whose message genuinely said that — the plan records what was run, and
 editing it would falsify the record rather than correct it.
+
+**Third propagation pass — and the guard that ends the series.** The second pass fixed one count
+and one snippet, then reported both embedded snippets "verified equal to their source files
+programmatically". That verification was scoped to the paragraphs it had just edited, so it could
+not have found what remained: **three more drifted snippets and two more stale counts.** A check
+narrowed to what you already know is broken is the same "cannot fail" shape this plan has now
+diagnosed three times.
+
+Found by diffing every fenced `ts` block against the file its heading names, rather than grepping
+for known-bad phrases:
+
+- **Task 1's test snippet** still carried the `// Load-bearing:` comment and the old test name
+  `it("ignores /_next chunk paths that contain /products/")` — finding 2's own text, surviving two
+  passes at finding 2.
+- **Task 1's `smoke-lib.ts` snippet** still carried the old `extractProductSlugs` JSDoc.
+- **Task 4's `smoke.ts` snippet** predated `3a2f2fb`: the `--baseline` flag description lacked the
+  read/write wording, and the real-CDN row still showed a bare `assertStatus(200)` where the
+  shipped row resolves `remoteHost` and reports `200 — <host>`.
+- **Two counts upstream of the one that was fixed.** The negative control lives in the
+  `extractProductSlugs` describe, which **Task 1** writes — so Task 1 is 8 (was 7) and Task 2 is 18
+  (was 17). The second pass credited the extra test to Task 3, whose snippet still contains 17.
+  Correct breakdown: 8 + 10 + 17 = 35.
+
+All snippet text above was copied from the source files programmatically, never retyped.
+
+**The guard: `tests/unit/plan-snippets.test.ts`.** It parses every fenced `ts` block in
+`docs/planning/plans/*.md`, resolves the source file from the heading above the fence, and asserts
+every non-blank line appears verbatim in that file. Archived plans under `docs/archive/plans/` are
+excluded by construction — they are frozen records and are supposed to drift. Import lines are
+checked as a **subset** rather than skipped, since plans build a test file's import incrementally,
+so a symbol the plan names that no longer exists still fails. A `snippets.length > 0` assertion
+guards the parser itself: one that silently matched nothing would pass forever.
+
+Mutation-tested rather than assumed. Reverting a snippet comment to its superseded wording fails
+with `plan:312 not in scripts/smoke-lib.ts`; renaming an imported symbol fails with
+`imports missing symbol: extractProductSlugsRenamed`; restoring both returns 8 passed. The fourth
+recurrence fails CI instead of needing a reviewer to notice it.
