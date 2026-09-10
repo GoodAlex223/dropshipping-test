@@ -1872,3 +1872,34 @@ immediately, so the exemption cannot outlive the condition that justifies it.
 so a quoted directory or extensionless binary is not checked. Widening it would start flagging prose
 (`docker-compose up -d`, bare tool names), and the failure direction is a missed check rather than a
 false alarm.
+
+### Closing round — two corrections to the record
+
+The closing review found no outstanding findings and recommended merge. Two of its rulings correct
+statements this thread made loosely, and both are recorded here rather than only in PR comments.
+
+**`loadState`'s `JSON.parse(...) as SmokeState` fails closed on every shape, but not identically.**
+Earlier responses said it degrades to `NO-BASELINE` via `readBaselineFor`'s `Array.isArray` guard.
+That is true for `"abc"`, `[]` and `{cssHashes: "nope"}` — all print a clean
+`FAIL  CSS chunk hashes  NO-BASELINE` row and exit 1. A state file containing literal `null` behaves
+differently: it parses successfully, then throws `Cannot read properties of null` inside
+`readBaselineFor`, which `main().catch()` converts to exit 1 **with no row table printed at all**.
+Measured against the live target, not reasoned:
+
+| `.smoke-state.json` | exit | output                                    |
+| ------------------- | ---- | ----------------------------------------- |
+| `null`              | 1    | no rows; `Cannot read properties of null` |
+| `"abc"`             | 1    | `FAIL  CSS chunk hashes  NO-BASELINE`     |
+| `[]`                | 1    | `FAIL  CSS chunk hashes  NO-BASELINE`     |
+
+Still fails closed, so it stays deferred — the same triage the whole-branch review reached. But an
+operator hitting it mid-cutover gets a stack trace instead of the 14 rows, in a script whose value is
+legible failure output. The two-line shape check in `loadState` remains the fix if it ever bites; the
+reason it is not being made now is that the deliverables have been unchanged since `01bd910` and this
+round is closing, not extending.
+
+**`CHANGED` has never been witnessed live, and that must not close silently.** It is the only
+`StalenessOutcome` representing a _passing_ post-deploy check, and it cannot be observed before a real
+deploy. The closing review's ruling is adopted: this is a **close-out obligation**, not merely a line
+in the Verification Log. The first production deploy after merge is what confirms it, and the close-out
+record must say whether it did.
