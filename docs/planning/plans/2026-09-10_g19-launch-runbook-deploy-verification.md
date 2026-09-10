@@ -625,7 +625,7 @@ export function exitCodeFor(results: ProbeResult[]): number {
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run tests/unit/smoke.test.ts`
-Expected: PASS, 34 tests (7 from Task 1 + 10 from Task 2 + 17 here).
+Expected: PASS, 35 tests (7 from Task 1 + 10 from Task 2 + 18 here — 17 as first written, plus the `/_next` strip's negative control added by the PR #45 review round).
 
 Then: `npm run typecheck` and `npm run lint` — expected: both clean.
 
@@ -675,9 +675,12 @@ Create `scripts/smoke.ts`:
  *   --allow-missing-baseline    NO-BASELINE stops being a failure
  *   --json                      emit results as JSON (exit contract unchanged)
  *
- * Everything except the category slug `hudi` (row 5, a route-shape assertion)
- * is discovered from the target's own homepage at run time, so the script
- * survives catalog edits and the real-domain cutover without an edit.
+ * Route paths are literals here — they are the probe definitions. What is
+ * discovered from the target's own homepage at run time is the DATA: the CSS
+ * chunk hashes, the product slugs, and the remote image URL the rejection
+ * probes are built from. Nothing pins a product name or a CDN hostname, so the
+ * script survives catalog edits and the real-domain cutover without an edit.
+ * (Spec Decision 5 states the same scope.)
  *
  * See docs/deployment/launch-runbook.md and
  * docs/superpowers/specs/2026-09-10-g19-launch-runbook-deploy-verification-design.md
@@ -1692,3 +1695,17 @@ correction above are the propagation half.
 **Residual after this round:** the spec's Decision 2 still reads "three outcomes, not two", which
 is correct treatment — it is a frozen design doc and carries a `Superseded 2026-09-10` note
 directly beneath it. Do not "fix" it.
+
+**Second propagation pass.** The pass above was itself incomplete, in the shape it diagnosed: a
+keyword sweep finds prose but not a _count_ or a _code snippet_ quoting the old text. Three more
+instances, corrected here — Task 3 Step 4's expected test count (34, now 35 after the negative
+control), Task 4's embedded `scripts/smoke.ts` header snippet (still carrying the "everything
+except `hudi`" overclaim finding 3 removed from the shipped file), and the PR #45 description
+itself, which repeated both the old count and the overclaim. The lesson is not "sweep harder": a
+doc that _quotes_ code has no keyword in common with the change that invalidates it, so the
+reliable check is to diff embedded snippets against their source file rather than grep for phrases.
+
+**Recorded, not fixed:** Task 2 Step 5's commit-message block still reads
+`"feat(g19): origin-keyed baseline state with three-state staleness"`. That is a verbatim quote of
+real commit `b222db2`, whose message genuinely said that — the plan records what was run, and
+editing it would falsify the record rather than correct it.
