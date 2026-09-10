@@ -300,9 +300,10 @@ export interface SmokeState {
 }
 
 /**
- * Three outcomes, not two. An absent baseline is NOT a pass: a check that
- * cannot fail looks exactly like one that passes, and this one guards a real
- * incident (Vercel served byte-identical stale CSS across two deploys).
+ * Four outcomes, and only CHANGED passes. Neither an absent baseline nor an
+ * absent stylesheet is a pass: a check that cannot fail looks exactly like one
+ * that passes, and this one guards a real incident (Vercel served
+ * byte-identical stale CSS across two deploys).
  */
 export function compareBaseline(observed: string[], stored: string[] | null): StalenessOutcome {
   // Checked FIRST. A page that served no stylesheet at all cannot be compared,
@@ -1645,3 +1646,49 @@ during the fix round.
   evidence, but did not check the claim's completeness against `StalenessOutcome`'s actual
   membership — a real miss, recorded here rather than smoothed over, since the point of this
   document is to be honest about what was and wasn't caught, and by whom.
+
+### PR #45 review round — 2026-09-10
+
+Three findings, all accepted, all in the "a comment describes behaviour the code does not have"
+class. No functional change to any probe. Fixes in `01bd910`; this entry and the Step 3 snippet
+correction above are the propagation half.
+
+1. **`compareBaseline`'s docstring still opened "Three outcomes, not two"** while the function
+   returned four. `NO-CSS` was added mid-branch and the final review round (`3a2f2fb`) propagated
+   "four-state" into the README, the spec, this plan's prose and the runbook — the docstring
+   sitting directly above the function was the one surface missed. The Step 3 implementation
+   snippet in this file carried the same stale docstring above an already-updated body, and is
+   corrected in the same commit as this entry.
+
+2. **The test labelled "Load-bearing" was not.** `PRODUCT_SLUG_RE`'s lookahead already rejected the
+   fixture — the segment is followed by `.js`, and `.` is not in the lookahead set — so it returned
+   `[]` with _and_ without the `/_next` strip. Deleting the strip would have failed nothing: it was
+   untested shipped code. The finding was about a comment; the fix went further, because the
+   comment was wrong for a reason worth keeping. The existing case keeps its fixture (it guards a
+   real observed input) with a comment that now names the lookahead as what rejects it, and a
+   second case was added as a genuine negative control:
+   `/_next/static/media/products/hero-banner/1x.avif`, whose `/products/` segment ends in `/` —
+   which the lookahead _does_ admit, so only the strip stops it. Verified by neutering the strip:
+   the new case fails with `["hero-banner"]` while all 34 others pass. 35 smoke tests, was 34.
+
+3. **`smoke.ts`'s header overclaimed what is discovered at run time** — "everything except the
+   category slug `hudi`" — when eight probed paths are literals. Narrowed to the scope spec
+   Decision 5 already stated correctly: the route paths _are_ the probe definitions; what is
+   discovered is the data (CSS hashes, product slugs, the remote image URL).
+
+**Recorded, not fixed**, with the reasoning, so the next reader does not re-litigate them:
+
+- **The `/_next` strip guards a shape that does not currently occur.** Every real Next asset path
+  ends in an extension, so today the lookahead does all the work and the strip is defence in depth.
+  Kept — the cost is one `String.replace`, the failure it prevents is a homepage assertion that
+  passes on an empty catalog — but it is now honestly labelled and, for the first time, tested.
+- **`scripts/smoke.ts`'s `JSON.parse(...) as SmokeState`.** An ordinary parse-result assertion on
+  data the next call runtime-checks: `readBaselineFor`'s `Array.isArray(entry.cssHashes)` degrades
+  a bad shape to `null` → `NO-BASELINE` → non-zero exit. Fails closed; left alone rather than
+  widened in a comment-only round.
+- **`CHANGED` still has never been witnessed live.** Unchanged by this round, and unchangeable
+  before a real deploy — see the bullet above.
+
+**Residual after this round:** the spec's Decision 2 still reads "three outcomes, not two", which
+is correct treatment — it is a frozen design doc and carries a `Superseded 2026-09-10` note
+directly beneath it. Do not "fix" it.
