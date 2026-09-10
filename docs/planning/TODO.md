@@ -1,6 +1,6 @@
 # TODO
 
-**Last Updated**: 2026-09-01
+**Last Updated**: 2026-09-10
 
 Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-shop-program-design.md) · Current week: [WEEKLY.md](WEEKLY.md)
 
