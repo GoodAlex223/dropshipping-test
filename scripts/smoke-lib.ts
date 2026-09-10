@@ -68,7 +68,7 @@ export function findRemoteImageUrl(html: string, targetOrigin: string): string |
   return null;
 }
 
-export type StalenessOutcome = "CHANGED" | "UNCHANGED" | "NO-BASELINE";
+export type StalenessOutcome = "CHANGED" | "UNCHANGED" | "NO-BASELINE" | "NO-CSS";
 
 export interface SmokeStateEntry {
   cssHashes: string[];
@@ -85,6 +85,11 @@ export interface SmokeState {
  * incident (Vercel served byte-identical stale CSS across two deploys).
  */
 export function compareBaseline(observed: string[], stored: string[] | null): StalenessOutcome {
+  // Checked FIRST. A page that served no stylesheet at all cannot be compared,
+  // and calling that "CHANGED" would pass a deploy whose CSS vanished entirely —
+  // the same "a check that cannot fail" trap NO-BASELINE guards, entered from
+  // the observed side instead of the stored side.
+  if (observed.length === 0) return "NO-CSS";
   if (stored === null || stored.length === 0) return "NO-BASELINE";
   const a = [...observed].sort().join(",");
   const b = [...stored].sort().join(",");
@@ -93,6 +98,8 @@ export function compareBaseline(observed: string[], stored: string[] | null): St
 
 export function stalenessPasses(outcome: StalenessOutcome, allowMissing: boolean): boolean {
   if (outcome === "CHANGED") return true;
+  // NO-CSS is deliberately NOT waivable: --allow-missing-baseline excuses a
+  // missing BASELINE, never a page that served no stylesheet.
   if (outcome === "NO-BASELINE") return allowMissing;
   return false;
 }

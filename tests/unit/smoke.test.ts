@@ -71,6 +71,13 @@ describe("compareBaseline", () => {
     expect(compareBaseline(["a"], null)).toBe("NO-BASELINE");
     expect(compareBaseline(["a"], [])).toBe("NO-BASELINE");
   });
+
+  // An empty observed set must never reach the "sets differ → CHANGED" branch:
+  // a site serving no CSS would otherwise report a passing, changed deploy.
+  it("reports NO-CSS when the page served no stylesheet at all", () => {
+    expect(compareBaseline([], ["a", "b"])).toBe("NO-CSS");
+    expect(compareBaseline([], null)).toBe("NO-CSS");
+  });
 });
 
 describe("stalenessPasses", () => {
@@ -83,6 +90,11 @@ describe("stalenessPasses", () => {
   it("lets NO-BASELINE pass only when explicitly allowed, and never UNCHANGED", () => {
     expect(stalenessPasses("NO-BASELINE", true)).toBe(true);
     expect(stalenessPasses("UNCHANGED", true)).toBe(false);
+  });
+
+  it("never passes NO-CSS, with or without --allow-missing-baseline", () => {
+    expect(stalenessPasses("NO-CSS", false)).toBe(false);
+    expect(stalenessPasses("NO-CSS", true)).toBe(false);
   });
 });
 
