@@ -230,6 +230,11 @@ describe("buildLookalikeUrl", () => {
 });
 
 describe("exitCodeFor", () => {
+  // Nothing verified must never read as success.
+  it("fails closed on an empty result set", () => {
+    expect(exitCodeFor([])).toBe(1);
+  });
+
   it("is 0 only when every row passed", () => {
     expect(exitCodeFor([{ status: "pass", detail: "" }])).toBe(0);
     expect(

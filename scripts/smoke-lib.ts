@@ -225,6 +225,12 @@ export function buildLookalikeUrl(remoteImageUrl: string | null): string {
   return `https://${host}.evil.example/x.png`;
 }
 
+/**
+ * Fails CLOSED on an empty array. Zero collected results means nothing was
+ * verified, and "nothing was verified" must never read as success — the same
+ * trap compareBaseline's empty-observed guard closes, one level up at the
+ * aggregate gate.
+ */
 export function exitCodeFor(results: ProbeResult[]): number {
-  return results.some((result) => result.status === "fail") ? 1 : 0;
+  return results.length > 0 && results.every((result) => result.status === "pass") ? 0 : 1;
 }
