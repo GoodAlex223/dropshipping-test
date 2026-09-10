@@ -32,8 +32,22 @@ interface Snippet {
   body: string[];
 }
 
-function collectSnippets(): Snippet[] {
+/**
+ * A fence whose heading names no existing source file cannot be diffed, so it
+ * would be skipped — and a skipped snippet is exactly the "cannot fail" shape
+ * this guard exists to close, one level up. They are collected and asserted
+ * empty rather than dropped, so the choice becomes explicit: name the file, or
+ * tag an illustrative block as something other than `ts`.
+ */
+interface Unresolved {
+  plan: string;
+  line: number;
+  heading: string;
+}
+
+function collectSnippets(): { found: Snippet[]; unresolved: Unresolved[] } {
   const found: Snippet[] = [];
+  const unresolved: Unresolved[] = [];
   for (const file of readdirSync(PLANS_DIR).filter((f) => f.endsWith(".md"))) {
     const plan = join(PLANS_DIR, file);
     const lines = readFileSync(plan, "utf8").split("\n");
@@ -42,11 +56,16 @@ function collectSnippets(): Snippet[] {
       let end = i + 1;
       while (end < lines.length && lines[end].trim() !== "```") end++;
       const source = sourcePathAbove(lines, i);
-      if (source) found.push({ plan, source, startLine: i + 2, body: lines.slice(i + 1, end) });
+      if (source) {
+        found.push({ plan, source, startLine: i + 2, body: lines.slice(i + 1, end) });
+      } else {
+        const heading = lines.slice(Math.max(0, i - 5), i).filter((l) => l.trim());
+        unresolved.push({ plan, line: i + 1, heading: heading[heading.length - 1] ?? "(none)" });
+      }
       i = end;
     }
   }
-  return found;
+  return { found, unresolved };
 }
 
 /**
@@ -65,12 +84,21 @@ function importSymbolsMissing(planLine: string, source: string): string[] {
     .filter((s) => s && !new RegExp(`\\b${s}\\b`).test(sourceImports));
 }
 
-const snippets = collectSnippets();
+const { found: snippets, unresolved } = collectSnippets();
 
 describe("plan snippets match the code they quote", () => {
   it("finds embedded snippets to check", () => {
     // Guards the guard: a parser that silently matched nothing would pass forever.
     expect(snippets.length).toBeGreaterThan(0);
+  });
+
+  it("leaves no ts fence unchecked", () => {
+    // Every `ts` fence must resolve to a source file, or it is never diffed at
+    // all. To fix a failure here: name the file in backticks on the line above
+    // the fence, or — if the block is illustrative and quotes no real source —
+    // tag it as ```text so it is deliberately out of scope rather than silently
+    // skipped.
+    expect(unresolved.map((u) => `${u.plan}:${u.line}  heading: ${u.heading}`)).toEqual([]);
   });
 
   for (const { plan, source, startLine, body } of snippets) {

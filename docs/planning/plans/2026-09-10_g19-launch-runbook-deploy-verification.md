@@ -1757,3 +1757,35 @@ Mutation-tested rather than assumed. Reverting a snippet comment to its supersed
 with `plan:312 not in scripts/smoke-lib.ts`; renaming an imported symbol fails with
 `imports missing symbol: extractProductSlugsRenamed`; restoring both returns 8 passed. The fourth
 recurrence fails CI instead of needing a reviewer to notice it.
+
+### Third pass — the guard had the same hole it was built to close
+
+`c797955`'s five fixes and its count re-attribution (Task 1 carries 8, rather than crediting the
+extra test to Task 3) both check out against the shipped files. The guard was mutation-tested here
+rather than taken on report: drifting a snippet line fails with a precise location, and neutering
+the parser trips the `snippets.length > 0` assertion.
+
+But the guard skipped what it could not resolve. `sourcePathAbove` returns `null` when no
+backticked, existing `.ts` path appears within five lines above a fence, and an unresolved fence was
+**dropped rather than reported**. Demonstrated by appending a `ts` block headed "Add this to the
+CLI:" whose body exists in no source file: **9 tests, all green.** A snippet that is never diffed is
+a check that cannot fail — the exact shape the guard exists to close, one level up from the drift it
+catches.
+
+Closed here: unresolved fences are collected and asserted empty, with the remedy in the failure
+message — name the file above the fence, or tag a genuinely illustrative block as `text` so it is
+deliberately out of scope rather than invisibly skipped. Mutation-tested both ways: the previously
+silent case now fails naming the plan line and heading; the `text` escape hatch passes. The active
+plan today has 7 fences, 7 resolved, 0 unresolved — so this changes no current result, which is
+exactly why it needed a test rather than a note.
+
+**Recorded, not fixed:** the diff is line-membership, not sequence. A snippet whose lines all exist
+in the source but in a different order, or drawn from unrelated functions, still passes. Tightening
+to sequence would break plans that legitimately quote fragments, and the looseness fails in the safe
+direction — a missed drift, never a false alarm.
+
+**Also stale, outside the repo:** the PR #45 description's gate line still read `85 files / 1094
+tests`; corrected on the PR to 86 / 1103 (+1 todo). Third round, third instance of a correction
+reaching the code and stopping short of an artifact that lives outside git. The PR body has drifted
+in every round, and nothing in the repository can catch it — the only durable remedy is to treat the
+description as a deliverable and re-read it whenever a claim it repeats changes.
