@@ -77,8 +77,8 @@ the rotated admin password and orders in the browser.
 
 > The operational half of launch readiness: the user-raised runbook (🔵 [2026-08-10]) plus the smoke-check 🟤 riders it subsumes ([2026-07-21] post-deploy smoke test; [2026-08-14] served-asset staleness check; [2026-08-18] "nothing verifies a Vercel production deploy except a human looking at it").
 
-- [ ] Write the production-launch deploy runbook (pre / while / post) as an executable checklist doc, indexed in docs/README.md at authoring time (2) — BACKLOG [2026-08-10] G5 user-raised 🔵 [HIGH]
-- [ ] Post-deploy smoke script: fetch `/`, `/products`, a DB-backed route (assert 200 + a DB-backed string), `/categories/hudi` (assert 307), and assert the served CSS chunk hash changed vs the previous deploy (1) — subsumed 🟤 riders [2026-07-21] + [2026-08-14] + [2026-08-18]
+- [x] Write the production-launch deploy runbook (pre / while / post) as an executable checklist doc, indexed in docs/README.md at authoring time (2) — BACKLOG [2026-08-10] G5 user-raised 🔵 [HIGH]
+- [x] Post-deploy smoke script: fetch `/`, `/products`, a DB-backed route (assert 200 + a DB-backed string), `/categories/hudi` (assert 307), and assert the served CSS chunk hash changed vs the previous deploy (1) — subsumed 🟤 riders [2026-07-21] + [2026-08-14] + [2026-08-18]
 
 ### G20. Pre-Launch Polish [batch]
 
@@ -124,7 +124,7 @@ the rotated admin password and orders in the browser.
 
 ### Thursday — Launch ops + polish
 
-- **[G19](#g19-launch-runbook--deploy-verification-batch)** 🔵 — runbook + smoke script.
+- [x] **[G19](#g19-launch-runbook--deploy-verification-batch)** 🔵 — **shipped PR [#45](https://github.com/GoodAlex223/dropshipping-test/pull/45) / `735533a` (2026-09-10)**. Ran long: 5 review rounds past the first green, all documentation and guard work — the deliverables were unchanged after `01bd910`. `CHANGED`, the one staleness outcome never witnessed live, was settled on the merge deploy: 14/14 pass, exit 0.
 - **[G20](#g20-pre-launch-polish-batch)** 🔵 — polish batch.
 
 ### Friday — Reviews + close
@@ -142,7 +142,7 @@ the rotated admin password and orders in the browser.
 | G16 | Real-Product Intake Pair Session `[batch]`  | catalog/data    | 🔵 User     | 2      | 9        | Mon          | ✅ PR #41                                   |
 | G17 | Pre-Launch Security Scan `[solo]`           | security        | 🟤 Auto     | 2      | 3        | Tue          | ✅ `0bee3d2` / PR #43 (run-1 coverage only) |
 | G18 | Guest Order Access & Hardening `[batch]` 🏆 | checkout/orders | 🔵 User     | 2      | 7        | Tue–Wed      | ✅ `a37c8d0` / PR #44                       |
-| G19 | Launch Runbook + Deploy Verify `[batch]`    | ops/deploy      | 🔵 User     | 2      | 3        | Thu          | ☐ Planned                                   |
+| G19 | Launch Runbook + Deploy Verify `[batch]`    | ops/deploy      | 🔵 User     | 2      | 3        | Thu          | ✅ PR #45 / `735533a`                       |
 | G20 | Pre-Launch Polish `[batch]`                 | storefront      | 🔵 User     | 2      | 4        | Thu          | ☐ Planned                                   |
 | G21 | Weekly Reviews `[batch]`                    | recurring       | ⚪ Overhead | 4      | 5        | Fri          | ☐ Planned                                   |
 |     | **Total**                                   |                 |             | **16** | **34**   |              |                                             |

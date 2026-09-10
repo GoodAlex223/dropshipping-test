@@ -10,8 +10,8 @@ One-time real-domain cutover checklist, plus the checks to run after every produ
 [design spec](../superpowers/specs/2026-09-10-g19-launch-runbook-deploy-verification-design.md) this
 runbook implements (rationale, the probe table — 13 numbered rows, one of which covers two URLs —
 and risks), the
-[implementation plan](../planning/plans/2026-09-10_g19-launch-runbook-deploy-verification.md) and its
-[Verification Log](../planning/plans/2026-09-10_g19-launch-runbook-deploy-verification.md#verification-log)
+[implementation plan](../archive/plans/2026-09-10_g19-launch-runbook-deploy-verification.md) and its
+[Verification Log](../archive/plans/2026-09-10_g19-launch-runbook-deploy-verification.md#verification-log)
 (exactly what has and hasn't been run against live production), and
 [deployment/setup.md](setup.md) for local/general environment variable setup.
 

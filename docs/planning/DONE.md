@@ -2,11 +2,39 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-09-06
+**Last Updated**: 2026-09-10
 
 ---
 
 ## 2026-08 (August)
+
+### [2026-09-10] G19 - Launch Runbook & Deploy Verification (WEEKLY batch, 🔵 User)
+
+**Plan**: [2026-09-10_g19-launch-runbook-deploy-verification.md](../archive/plans/2026-09-10_g19-launch-runbook-deploy-verification.md) · **Spec**: [2026-09-10-g19-launch-runbook-deploy-verification-design.md](../superpowers/specs/2026-09-10-g19-launch-runbook-deploy-verification-design.md)
+**Merged**: `735533a` — PR [#45](https://github.com/GoodAlex223/dropshipping-test/pull/45), 27 commits, 14 files, +3729/-92
+
+**Why**: production is deployed by the Vercel Git integration, and the Actions "Deploy to Vercel" job is a validated no-op. Every production deploy in this project's history was confirmed by a person opening the site. This converts that ritual into a command that exits non-zero. Demonstrated at merge: the Deploy job reported **success** while `Checkout`, `Build`, `Deploy to Vercel` and `Run database migrations` were all **skipped** — only the config validation ran.
+
+**Shipped**
+
+- **`npm run smoke -- --url <target>`** — `scripts/smoke.ts` (I/O, orchestration, exit code) over `scripts/smoke-lib.ts` (pure, unit-tested). 14 probe rows; exit 0 only if every row passes. Each row derives from a failure this repo actually suffered: stale CSS across two deploys, prod schema drift, a well-formed HTTP-200 feed that silently held zero items for two months, the `/_next/image` SSRF, the G12 routing-layer 307. Everything but the `hudi` slug is discovered from the target's own HTML at run time, so it survives catalog edits and the domain swap.
+- **`docs/deployment/launch-runbook.md`** — 19 steps (Pre/While/Post) plus an every-deploy section. Every step carries an owner and a verification line; TASK-056-gated steps are ⛔ BLOCKED with the named unblocking condition.
+- **Three guards**: `smoke.test.ts` (35), `plan-snippets.test.ts` (9, added in review), `doc-source-quotes.test.ts` (6, added in review). Suite 87 files / 1110 passing.
+- **Collateral**: `setup.md`'s superseded checklist repointed and its dead Stripe rows removed; four subsumed 🟤 riders closed; `TODO.md`'s TASK-056 row 1a corrected.
+
+**Found along the way** — the domain swap is **not** a one-variable change. `ProductImage.url` stores an absolute URL baked at upload (`src/lib/s3.ts:84`) and `cdnRemotePatterns()` allows exactly one host, so repointing `AWS_CLOUDFRONT_URL` without a same-window `ProductImage.url` backfill 400s every real-product image at cutover. Five review passes over those files never surfaced it; writing an executable checklist did, because a checklist must say what you actually type. Procedure now lives in runbook Steps 4 and 12 with a pre-flight gate on the redeploy.
+
+**Verification** — asymmetric by construction, and stated as such rather than smoothed over. The smoke half was exercised against live production with **each failure class forced to fire**: `UNCHANGED`, `NO-BASELINE` (waived and unwaived), `NO-CSS`, and the unreachable-origin path. `CHANGED` — the only outcome representing a _passing_ post-deploy check — could not be observed during the work and was carried as an explicit close-out obligation; **it was settled on the merge deploy itself: 14 passed, 0 failed, exit 0.** The cutover half cannot be rehearsed (no domain exists) and ships reviewed, not executed.
+
+**Review** — 5 rounds past the first green, all documentation and guards; the deliverables were unchanged after `01bd910`. The recurring finding was one defect class: a check that cannot fail looks exactly like one that passes. It appeared four times — `compareBaseline([], stored)` returning CHANGED, `exitCodeFor([])` returning 0, an untested `/_next` strip, and a plan snippet silently skipped because its heading resolved to nothing. Each was caught by a reviewer refusing to defer to plan authority.
+
+**Deploy-tied work**: the `ProductImage.url` backfill is tied to the domain cutover, not to the next promotion, and its record is runbook Steps 4/12 plus TASK-056 row 1a. Deliberately not duplicated into a new Deploy Window section — a fourth copy is a fourth thing that can drift.
+
+**Caught by close-out itself**: archiving the plan emptied `docs/planning/plans/`, and `plan-snippets.test.ts`'s guard-the-guard assertion (`snippets.length > 0`) failed — it could not tell "the parser matched nothing" from "there are no active plans right now", which is the normal state between tasks. Reworked to compare against an independently counted fence total: fails on a broken parser, passes on an empty directory. Mutation-tested all three states. A fifth instance of the branch's own theme, found by the archive step the branch's guard did not anticipate.
+
+**Follow-ups**: 5 🟤 in BACKLOG `[2026-09-10]` — `deployment_status` wiring, the `ProductImage.url` backfill, `setup.md`'s Stripe Required Variables, `loadState`'s null-shape guard, and the PR-description drift (5 of 5 rounds; the remedy is a merge-convention step, not a fourth guard).
+
+---
 
 ### [2026-09-06] G18 - Guest Order Access & Hardening (WEEKLY batch 🏆, 🔵 User)
 

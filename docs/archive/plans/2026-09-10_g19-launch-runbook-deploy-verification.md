@@ -1,7 +1,7 @@
 # G19 — Launch Runbook & Deploy Verification Plan
 
 **Last Updated**: 2026-09-10
-**Task**: G19 (WEEKLY [G19](../WEEKLY.md#g19-launch-runbook--deploy-verification-batch)) · 🔵 BACKLOG [2026-08-10] production-launch deploy runbook + three subsumed 🟤 riders ([2026-07-21] smoke test · [2026-08-14] served-asset staleness · [2026-08-18] nothing verifies a deploy) + two folded-in 🟤 entries ([2026-09-04] probe rejections not renders · [2026-09-06] Preview never migrates)
+**Task**: G19 (WEEKLY [G19](../../planning/WEEKLY.md#g19-launch-runbook--deploy-verification-batch)) · 🔵 BACKLOG [2026-08-10] production-launch deploy runbook + three subsumed 🟤 riders ([2026-07-21] smoke test · [2026-08-14] served-asset staleness · [2026-08-18] nothing verifies a deploy) + two folded-in 🟤 entries ([2026-09-04] probe rejections not renders · [2026-09-06] Preview never migrates)
 **Branch**: `feat/g19-launch-runbook-deploy-verification` (from `main` @ `0c8f62c`)
 **Status**: In progress
 **Spec**: [2026-09-10-g19-launch-runbook-deploy-verification-design.md](../../superpowers/specs/2026-09-10-g19-launch-runbook-deploy-verification-design.md) — the plan argues from the spec; executors read both.

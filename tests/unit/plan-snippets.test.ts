@@ -86,10 +86,37 @@ function importSymbolsMissing(planLine: string, source: string): string[] {
 
 const { found: snippets, unresolved } = collectSnippets();
 
+/**
+ * Counted independently of the collector, by the crudest means available, so it
+ * cannot share a bug with it. This is what lets the guard-the-guard assertion
+ * below tell "the parser matched nothing" apart from "there are no active plans
+ * right now" — a legitimate state, since close-out archives a plan the moment
+ * its task ships, and this directory is empty between tasks.
+ */
+function countFences(): number {
+  if (!existsSync(PLANS_DIR)) return 0;
+  return readdirSync(PLANS_DIR)
+    .filter((f) => f.endsWith(".md"))
+    .reduce(
+      (n, f) =>
+        n +
+        readFileSync(join(PLANS_DIR, f), "utf8")
+          .split("\n")
+          .filter((l) => l.startsWith("```ts")).length,
+      0
+    );
+}
+
+const fenceCount = countFences();
+
 describe("plan snippets match the code they quote", () => {
-  it("finds embedded snippets to check", () => {
-    // Guards the guard: a parser that silently matched nothing would pass forever.
-    expect(snippets.length).toBeGreaterThan(0);
+  it("accounts for every ts fence in the active plans", () => {
+    // Guards the guard. A parser that silently matched nothing would pass
+    // forever — but an empty docs/planning/plans/ is legitimate (close-out
+    // archives each plan when its task ships), so asserting "> 0" would fail
+    // on a healthy repo between tasks. Comparing against an independent count
+    // fails on a broken parser and passes on an empty directory.
+    expect(snippets.length + unresolved.length).toBe(fenceCount);
   });
 
   it("leaves no ts fence unchecked", () => {
