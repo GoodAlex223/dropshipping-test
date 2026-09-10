@@ -24,10 +24,17 @@ export function extractCssHashes(html: string): string[] {
 /**
  * Product slugs linked from server-rendered HTML.
  *
- * `/_next/**` is stripped FIRST and deliberately: the catalog page ships a
- * chunk named `/_next/static/chunks/app/(shop)/products/page-<hash>.js`, which
- * a naive match would report as the product "page-<hash>" — turning the
+ * The danger being defended against: a `/_next/**` asset path that contains a
+ * literal `/products/` segment would be reported as a product, turning the
  * homepage's DB-backed assertion into one that passes on an empty catalog.
+ *
+ * Two mechanisms do that work, and they cover different shapes. PRODUCT_SLUG_RE's
+ * lookahead rejects anything followed by a file extension, which is what rules out
+ * the catalog page's real chunk, `…/products/page-<hash>.js` (the `.` is not in the
+ * lookahead set). Stripping `/_next/**` first covers the shapes the lookahead does
+ * NOT catch — a `/products/<segment>` followed by `/`, `?`, `#` or a quote, as in
+ * `/_next/static/media/products/hero-banner/1x.avif`. Both cases are tested; the
+ * second one fails if the strip is removed, the first does not.
  */
 export function extractProductSlugs(html: string): string[] {
   const withoutAssets = html.replace(NEXT_ASSET_RE, " ");
@@ -80,9 +87,10 @@ export interface SmokeState {
 }
 
 /**
- * Three outcomes, not two. An absent baseline is NOT a pass: a check that
- * cannot fail looks exactly like one that passes, and this one guards a real
- * incident (Vercel served byte-identical stale CSS across two deploys).
+ * Four outcomes, and only CHANGED passes. Neither an absent baseline nor an
+ * absent stylesheet is a pass: a check that cannot fail looks exactly like one
+ * that passes, and this one guards a real incident (Vercel served
+ * byte-identical stale CSS across two deploys).
  */
 export function compareBaseline(observed: string[], stored: string[] | null): StalenessOutcome {
   // Checked FIRST. A page that served no stylesheet at all cannot be compared,

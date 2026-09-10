@@ -41,11 +41,22 @@ describe("extractProductSlugs", () => {
     expect(extractProductSlugs(html)).toEqual(["futbolka-mirox", "hudi-mirox-basic"]);
   });
 
-  // Load-bearing: /products ships a chunk path containing the literal
-  // "/products/page-<hash>.js". Counting that as a product would make the
-  // homepage's DB-backed assertion pass on a page with no products at all.
-  it("ignores /_next chunk paths that contain /products/", () => {
+  // The real chunk path the catalog page ships. Counting it as a product would
+  // make the homepage's DB-backed assertion pass on a page with no products at
+  // all. Note what actually rejects it: PRODUCT_SLUG_RE's lookahead, because
+  // `.js` follows the segment. This case passes with or without the /_next
+  // strip — it guards the observed input, not the strip.
+  it("ignores the catalog page's real /_next chunk path", () => {
     const html = `<script src="/_next/static/chunks/app/(shop)/products/page-9a0c2f2d3d5cd602.js"></script>`;
+    expect(extractProductSlugs(html)).toEqual([]);
+  });
+
+  // The negative control for the /_next strip itself: `/products/hero-banner`
+  // is followed by `/`, which IS in the lookahead set, so the lookahead lets it
+  // through and only the strip stops it. Delete the strip and this test fails
+  // with ["hero-banner"] — which is the whole point of having it.
+  it("ignores a /_next asset path whose /products/ segment ends in a delimiter", () => {
+    const html = `<link rel="preload" as="image" href="/_next/static/media/products/hero-banner/1x.avif" />`;
     expect(extractProductSlugs(html)).toEqual([]);
   });
 });

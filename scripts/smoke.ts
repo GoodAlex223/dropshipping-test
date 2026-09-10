@@ -16,9 +16,12 @@
  *   --allow-missing-baseline    NO-BASELINE stops being a failure
  *   --json                      emit results as JSON (exit contract unchanged)
  *
- * Everything except the category slug `hudi` (row 5, a route-shape assertion)
- * is discovered from the target's own homepage at run time, so the script
- * survives catalog edits and the real-domain cutover without an edit.
+ * Route paths are literals here — they are the probe definitions. What is
+ * discovered from the target's own homepage at run time is the DATA: the CSS
+ * chunk hashes, the product slugs, and the remote image URL the rejection
+ * probes are built from. Nothing pins a product name or a CDN hostname, so the
+ * script survives catalog edits and the real-domain cutover without an edit.
+ * (Spec Decision 5 states the same scope.)
  *
  * See docs/deployment/launch-runbook.md and
  * docs/superpowers/specs/2026-09-10-g19-launch-runbook-deploy-verification-design.md
