@@ -199,7 +199,7 @@ git commit -m "feat(g19): extraction helpers for the post-deploy smoke script"
 
 ---
 
-### Task 2: Baseline state and three-state staleness
+### Task 2: Baseline state and staleness comparison
 
 **Files:**
 
@@ -1075,6 +1075,7 @@ git commit -m "docs(g19): production launch runbook — cutover checklist + ever
 
 - Modify: `docs/deployment/setup.md` (the `## Pre-deployment Checklist` section, currently at line 527)
 - Modify: `docs/planning/BACKLOG.md`
+- Modify: `docs/planning/TODO.md` (correct the TASK-056 item 1a note — see Step 2b)
 - Modify: `docs/README.md` (bump setup.md's `Last Updated` row, since its content changed)
 
 **Interfaces:**
@@ -1096,9 +1097,18 @@ Under a `### [2026-09-10] From: G19 launch runbook + deploy verification` intake
 
 Then mark the four subsumed riders as delivered, in place, with the standard strikethrough-plus-resolution form: the [2026-07-21] post-deploy smoke test, the [2026-08-14] served-asset staleness check, the [2026-08-18] "nothing verifies a Vercel production deploy" entry, and the [2026-09-04] "must probe rejections, not just renders" entry. The [2026-09-06] Preview-never-migrates entry is **documented, not resolved** — leave it open and note that the runbook now records it.
 
+- [ ] **Step 2b: File the CDN-backfill finding, and correct the live doc it contradicts**
+
+Task 6 discovered, and the controller verified at source, that the production domain swap is **not** the one-variable change this project has been recording. `src/lib/s3.ts:84` returns `publicUrl = ${CDN_URL}/${key}` — an absolute URL — and `src/app/api/admin/products/[id]/images/route.ts:90` persists it verbatim into `ProductImage.url`. `next.config.mjs`'s `cdnRemotePatterns()` derives exactly **one** allowed hostname from `AWS_CLOUDFRONT_URL`. So repointing that variable at `img.<domain>` strands every existing real-product image on the old `pub-….r2.dev` host, which is then absent from `remotePatterns`, and all of them 400 through `/_next/image`. A `ProductImage.url` backfill must run alongside the swap.
+
+Two consequences, and the second is the one that matters most:
+
+1. Add a 🟤 entry to the same `[2026-09-10]` intake group describing the backfill requirement, citing `s3.ts:84`, the images route, and `cdnRemotePatterns()`, and noting that the runbook's Step 4 + Step 12 pre-flight gate now carry the procedure.
+2. **Correct `docs/planning/TODO.md`.** Its TASK-056 response-tracking table, row №1a, currently tells the client this is "now a one-variable swap plus a redeploy". That is a **live** doc asserting something now known false — not a frozen plan that takes a superseded note. Rewrite that cell to state the backfill requirement and point at the runbook. Leave the row's 📨 status alone; only the internal-touchpoint text is wrong.
+
 - [ ] **Step 3: Run the docs linter**
 
-Run: `npx prettier --write docs/deployment/setup.md docs/planning/BACKLOG.md docs/README.md`
+Run: `npx prettier --write docs/deployment/setup.md docs/planning/BACKLOG.md docs/planning/TODO.md docs/README.md`
 Run: `npx vitest run tests/unit/docs-freshness.test.ts`
 Expected: PASS.
 
@@ -1110,8 +1120,8 @@ Expected: all four clean. This is the pre-PR gate.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add docs/deployment/setup.md docs/planning/BACKLOG.md docs/README.md
-git commit -m "docs(g19): repoint the superseded pre-deployment checklist, file the CI follow-up"
+git add docs/deployment/setup.md docs/planning/BACKLOG.md docs/planning/TODO.md docs/README.md
+git commit -m "docs(g19): repoint the superseded checklist, file the CI and CDN-backfill follow-ups"
 ```
 
 ---
