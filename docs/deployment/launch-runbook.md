@@ -22,7 +22,7 @@ it literally, including inside shell commands.
 
 **Part 1 has never been executed.** No real domain exists yet — TASK-056 item №1 is still awaiting
 the client — so every fact below (env var names, file paths, script behavior, the
-`vercel-build.sh` migration chain, the Resend/R2 constraints) has been checked against this
+`scripts/vercel-build.sh` migration chain, the Resend/R2 constraints) has been checked against this
 repository's actual code and configuration, but the _sequence_, run top to bottom against a real
 cutover, has not been rehearsed. If a step turns out to be wrong or mis-ordered on the day this is
 actually run, **fix it in this file in place** — don't route around it silently, and don't let this

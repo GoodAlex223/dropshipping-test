@@ -631,18 +631,18 @@ authoritative for deploy-time verification and this list does not duplicate it.
 
 ## Deployment File Reference
 
-| File                           | Purpose                   |
-| ------------------------------ | ------------------------- |
-| `.github/workflows/ci.yml`     | CI pipeline configuration |
-| `.github/workflows/deploy.yml` | Deployment pipeline       |
-| `Dockerfile`                   | Application container     |
-| `Dockerfile.workers`           | Workers container         |
-| `docker-compose.yml`           | Development services      |
-| `docker-compose.prod.yml`      | Production deployment     |
-| `.dockerignore`                | Docker build exclusions   |
-| `ecosystem.config.js`          | PM2 process configuration |
-| `sentry.*.config.ts`           | Sentry error tracking     |
-| `instrumentation.ts`           | Next.js instrumentation   |
+| File                           | Purpose                                       |
+| ------------------------------ | --------------------------------------------- |
+| `.github/workflows/ci.yml`     | CI pipeline configuration                     |
+| `.github/workflows/deploy.yml` | Deployment pipeline                           |
+| `Dockerfile`                   | Application container                         |
+| `Dockerfile.workers`           | Workers container                             |
+| `docker-compose.yml`           | Development services                          |
+| `docker-compose.prod.yml`      | Production deployment                         |
+| `.dockerignore`                | Docker build exclusions                       |
+| `ecosystem.config.js`          | PM2 process configuration                     |
+| `sentry.*.config.ts`           | Sentry error tracking — Not Yet Implemented   |
+| `instrumentation.ts`           | Next.js instrumentation — Not Yet Implemented |
 
 ---
 

@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { readdirSync, existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
@@ -81,5 +81,82 @@ describe("deployment docs quote source accurately", () => {
     // added to robots.ts fails until the runbook lists it too.
     const absent = entries.filter((e) => !runbook.includes(`\`${e}\``));
     expect(absent).toEqual([]);
+  });
+});
+
+/**
+ * Everything a deployment doc quotes in backticks that names something real —
+ * an npm script an operator types, a repo file they open — must still resolve.
+ * The runbook is executed during a production cutover, the one moment nobody is
+ * reading diffs, so an instruction naming a script that was renamed sends them
+ * hunting mid-outage.
+ *
+ * Expectations come from package.json and the filesystem, never a hand list, so
+ * coverage grows by itself. The single exemption is derived from the doc's own
+ * words rather than an allowlist: a path under a heading or on a line saying
+ * "Not Yet Implemented" is describing future work, and starts being checked the
+ * moment that marker is removed.
+ */
+const NOT_YET = /not yet implemented/i;
+
+interface Quote {
+  doc: string;
+  line: number;
+  text: string;
+  exempt: boolean;
+}
+
+function quotedSpans(): Quote[] {
+  const out: Quote[] = [];
+  for (const file of readdirSync(DOCS_DIR).filter((f) => f.endsWith(".md"))) {
+    const doc = join(DOCS_DIR, file);
+    let section = "";
+    readFileSync(doc, "utf8")
+      .split("\n")
+      .forEach((line, i) => {
+        if (/^#{2,4} /.test(line)) section = line;
+        for (const text of line.match(/`[^`\n]+`/g) ?? []) {
+          out.push({
+            doc,
+            line: i + 1,
+            text: text.slice(1, -1),
+            exempt: NOT_YET.test(line) || NOT_YET.test(section),
+          });
+        }
+      });
+  }
+  return out;
+}
+
+const quotes = quotedSpans();
+const npmScripts = new Set(
+  Object.keys(JSON.parse(readFileSync("package.json", "utf8")).scripts ?? {})
+);
+
+describe("deployment docs name things that still exist", () => {
+  const scriptQuotes = quotes.flatMap((q) =>
+    [...q.text.matchAll(/npm run ([a-z0-9:-]+)/g)].map((m) => ({ ...q, script: m[1] }))
+  );
+  const pathQuotes = quotes.filter((q) => /^[\w./-]+\.(ts|tsx|sh|mjs)$/.test(q.text));
+
+  it("has npm-script and file-path quotes to check", () => {
+    // Guards the guard: an extraction that silently matched nothing would pass
+    // forever — the same shape as a fence that is never diffed.
+    expect(scriptQuotes.length).toBeGreaterThan(0);
+    expect(pathQuotes.length).toBeGreaterThan(0);
+  });
+
+  it("quotes only npm scripts that package.json defines", () => {
+    const missing = scriptQuotes
+      .filter((q) => !npmScripts.has(q.script))
+      .map((q) => `${q.doc}:${q.line}  npm run ${q.script} is not a package.json script`);
+    expect(missing).toEqual([]);
+  });
+
+  it("quotes only repo paths that exist, unless marked not yet implemented", () => {
+    const missing = pathQuotes
+      .filter((q) => !q.exempt && !existsSync(q.text))
+      .map((q) => `${q.doc}:${q.line}  ${q.text} does not exist`);
+    expect(missing).toEqual([]);
   });
 });

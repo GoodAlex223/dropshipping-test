@@ -1838,3 +1838,37 @@ restore all four
 The vacuity case is the one that matters most here: an extraction that silently matches nothing is
 the same shape as a fence that is never diffed, and as `compareBaseline([], …)` before it. Every
 guard in this task now asserts it found something before asserting that something is correct.
+
+### Fourth pass — guarding the doc that outlives the task
+
+`6d823c1`'s point is the sharpest of the thread and it is about scope, not code: the plan-snippets
+guard protects a document that **expires**. Close-out archives this plan, archived plans are excluded
+by construction, and every snippet it covers stops being checked the moment G19 closes. The runbook
+is the opposite — it outlives the task and is executed during a cutover, when nobody is reading
+diffs. Its `vercel-build.sh` log lines and `robots.ts` disallow list are now covered, and both
+mutation-tested here rather than accepted: renaming a disallow entry fails, and the guard-the-guard
+assertion trips when the extraction matches nothing.
+
+That guard covers what the runbook quotes _verbatim_. It did not cover what the runbook tells an
+operator to **type or open**: `npm run <script>` names and repo file paths. Rename the script or move
+the file and the runbook silently sends someone hunting mid-cutover — the same failure the log-line
+check exists to prevent, one category across. Two doc defects were sitting in that gap:
+
+- the runbook quoted a bare `vercel-build.sh` where every other reference uses `scripts/vercel-build.sh`;
+- `setup.md`'s Deployment File Reference table listed `instrumentation.ts` and `sentry.*.config.ts`
+  as deployment files with no hint they do not exist, while the section above says plainly that Sentry
+  is not implemented.
+
+Both corrected, then the guard extended to enforce the rule: every quoted `npm run` name must exist in
+`package.json`, and every quoted repo path must exist on disk. Expectations come from `package.json`
+and the filesystem, never a list.
+
+The one exemption is derived from the doc's own words rather than allowlisted: a path under a heading
+or on a line reading "Not Yet Implemented" is describing future work. Mutation-tested that this
+self-heals — deleting the marker from setup.md's Sentry heading makes those four paths start failing
+immediately, so the exemption cannot outlive the condition that justifies it.
+
+**Recorded, not fixed:** the path check recognises paths by extension (`.ts`, `.tsx`, `.sh`, `.mjs`),
+so a quoted directory or extensionless binary is not checked. Widening it would start flagging prose
+(`docker-compose up -d`, bare tool names), and the failure direction is a missed check rather than a
+false alarm.
