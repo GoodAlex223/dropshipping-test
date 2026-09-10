@@ -28,6 +28,7 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:rotate-password": "tsx scripts/rotate-password.ts",
     "db:delete-test-accounts": "tsx scripts/delete-test-accounts.ts",
+    "smoke": "tsx scripts/smoke.ts",
     "workers": "tsx src/workers/index.ts",
     "workers:forward": "tsx src/workers/order-forwarding.worker.ts",
     "workers:sync": "tsx src/workers/order-status-sync.worker.ts",
