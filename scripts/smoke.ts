@@ -47,10 +47,19 @@ import {
 const DEFAULT_STATE_FILE = ".smoke-state.json";
 const TIMEOUT_MS = 20_000;
 
-// One message per failing outcome. A lookup, not a ternary: a ternary silently
-// mislabels any outcome it does not name, and Exclude<> makes the compiler
-// demand a message for every new one.
-const STALENESS_FAILURE_DETAIL: Record<Exclude<StalenessOutcome, "CHANGED">, string> = {
+// One message per outcome, read by BOTH branches, so the row can never print a
+// detail that disagrees with its own status.
+//
+// A full Record over the union — deliberately NOT Record<Exclude<…, "CHANGED">>.
+// stalenessPasses() returns an opaque boolean, so a ternary cannot narrow
+// `outcome` away from "CHANGED" in the fail branch; the three-key version needs
+// an `as Exclude<…>` cast to compile, and that cast asserts a guarantee living
+// in ANOTHER module. Change the pass rule in smoke-lib.ts and the cast silently
+// indexes a missing key, printing `FAIL  CSS chunk hashes  undefined`. One
+// unused entry is the cheaper trade, and the compiler still demands a message
+// for every outcome added later.
+const STALENESS_DETAIL: Record<StalenessOutcome, string> = {
+  CHANGED: "CHANGED — the served CSS differs from the previous run",
   UNCHANGED: "UNCHANGED — the build cache may have served stale CSS; redeploy with the cache off",
   "NO-BASELINE":
     "NO-BASELINE — no stored hashes for this origin; re-run, or pass --allow-missing-baseline",
@@ -154,17 +163,10 @@ async function main(): Promise<void> {
   const outcome = compareBaseline(cssHashes, readBaselineFor(state, origin));
   rows.push({
     label: "CSS chunk hashes",
-    result: stalenessPasses(outcome, options.allowMissingBaseline)
-      ? { status: "pass", detail: `${outcome} (${cssHashes.join(", ") || "none"})` }
-      : {
-          status: "fail",
-          // stalenessPasses() returning false guarantees outcome !== "CHANGED"
-          // (see its implementation in smoke-lib.ts), but that guarantee isn't
-          // visible to the type checker through an opaque boolean return — assert
-          // it here rather than widening STALENESS_FAILURE_DETAIL to a key this
-          // branch can never actually use.
-          detail: STALENESS_FAILURE_DETAIL[outcome as Exclude<StalenessOutcome, "CHANGED">],
-        },
+    result: {
+      status: stalenessPasses(outcome, options.allowMissingBaseline) ? "pass" : "fail",
+      detail: `${STALENESS_DETAIL[outcome]}${cssHashes.length ? ` (${cssHashes.join(", ")})` : ""}`,
+    },
   });
 
   // The accept probe FIRST: if remotePatterns came back empty at build time,
