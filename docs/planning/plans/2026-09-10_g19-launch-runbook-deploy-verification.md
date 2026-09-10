@@ -1128,6 +1128,13 @@ Executed 2026-09-10 on `feat/g19-launch-runbook-deploy-verification`, against pr
 output of this session, not reconstructed. `scripts/smoke.ts` and `scripts/smoke-lib.ts` were not
 edited at any point.
 
+**Corrected once, in a fix round prompted by review.** The first pass of this log claimed more
+than it had shown: it named three staleness outcomes as the complete set of what was live-reachable
+and never mentioned the fourth (`NO-CSS`) at all. Nothing in Steps 1–3 below was altered to produce
+the correction — the "Fix round 1" section after Step 2 is purely additive new evidence, and the
+Summary/Discrepancies sections were edited in place to stop overclaiming. Both states are visible
+in git history; this file only shows the corrected version.
+
 ### Step 1 — Establish a baseline, then observe the pass/fail paths
 
 **1a. Save a fresh baseline:**
@@ -1349,6 +1356,148 @@ This is the only exit-0 run observed in this entire session. It required both an
 file and the flag together — exactly the documented contract — and it is the only run in which
 all 14 rows were seen passing simultaneously.
 
+### Fix round 1 (post-review) — witness NO-CSS live, confirm origin-keying
+
+Review of the first version of this log found a real gap: `StalenessOutcome` has **four** members
+(`CHANGED` / `UNCHANGED` / `NO-BASELINE` / `NO-CSS`), and Steps 1–2 above only ever reached three
+of them live. `NO-CSS` — fired when the homepage serves zero `/_next/static/css/*.css` links, and
+deliberately never waivable by `--allow-missing-baseline` — was neither exercised nor named
+anywhere in the original log, while its summary claimed "the only reachable live outcomes" in a
+way that silently generalised past the one outcome nobody had tried. That claim was false:
+`NO-CSS` is trivially reachable by pointing the script at any reachable non-Next.js host. This
+section fixes the gap by actually witnessing it, rather than by softening the summary's wording.
+
+**1. Force `NO-CSS` — point at a host with no CSS chunk links at all:**
+
+```
+$ npm run smoke -- --url https://example.com ; echo "exit: $?"
+
+> dropshipping@0.1.0 smoke
+> tsx scripts/smoke.ts --url https://example.com
+
+
+  smoke check → https://example.com
+
+  FAIL  GET /                            200 but no /products/<slug> link in server HTML — DB-backed render missing
+  FAIL  GET /products                    expected 200, got 404
+  FAIL  GET /api/products                expected 200, got 404
+  FAIL  GET /api/health                  expected 200, got 404
+  FAIL  GET /categories/hudi             expected 307, got 404
+  FAIL  CSS chunk hashes                 NO-CSS — the page served no stylesheet at all; the deploy is very likely broken
+  FAIL  GET /_next/image (real CDN)      no remote image found on the homepage — the rejection probes below prove nothing
+  FAIL  GET /_next/image (arbitrary)     expected 400, got 404
+  FAIL  GET /_next/image (metadata)      expected 400, got 404
+  FAIL  GET /_next/image (lookalike)     expected 400, got 404
+  FAIL  GET /feed/google-shopping.xml    expected 200, got 404
+  FAIL  GET /track                       expected 200, got 404
+  FAIL  GET /sitemap.xml                 expected 200, got 404
+  FAIL  GET /robots.txt                  expected 200, got 404
+
+  0 passed, 14 failed
+
+exit: 1
+```
+
+`NO-CSS` fired, exactly as documented — no surprise here, but it is now witnessed instead of
+assumed. The other 13 rows failing too is expected noise (`example.com` has none of this site's
+routes, as the brief anticipated when it warned "expect most other rows to fail as well"); the CSS
+row is the one being read.
+
+**2. Confirm the flag does not waive it — the more important half, since non-waivability is the
+property with actual consequences:**
+
+```
+$ npm run smoke -- --url https://example.com --allow-missing-baseline ; echo "exit: $?"
+
+> dropshipping@0.1.0 smoke
+> tsx scripts/smoke.ts --url https://example.com --allow-missing-baseline
+
+
+  smoke check → https://example.com
+
+  FAIL  GET /                            200 but no /products/<slug> link in server HTML — DB-backed render missing
+  FAIL  GET /products                    expected 200, got 404
+  FAIL  GET /api/products                expected 200, got 404
+  FAIL  GET /api/health                  expected 200, got 404
+  FAIL  GET /categories/hudi             expected 307, got 404
+  FAIL  CSS chunk hashes                 NO-CSS — the page served no stylesheet at all; the deploy is very likely broken
+  FAIL  GET /_next/image (real CDN)      no remote image found on the homepage — the rejection probes below prove nothing
+  FAIL  GET /_next/image (arbitrary)     expected 400, got 404
+  FAIL  GET /_next/image (metadata)      expected 400, got 404
+  FAIL  GET /_next/image (lookalike)     expected 400, got 404
+  FAIL  GET /feed/google-shopping.xml    expected 200, got 404
+  FAIL  GET /track                       expected 200, got 404
+  FAIL  GET /sitemap.xml                 expected 200, got 404
+  FAIL  GET /robots.txt                  expected 200, got 404
+
+  0 passed, 14 failed
+
+exit: 1
+```
+
+Confirmed: `--allow-missing-baseline` does **not** waive `NO-CSS` — the CSS row still reads `FAIL`
+with the identical detail text, live, against a real reachable host, not merely inside a fixture.
+
+**3. Confirm origin-keying survived — production's baseline untouched alongside the new entry:**
+
+```
+$ cat .smoke-state.json
+{
+  "https://dropshipping-test.vercel.app": {
+    "cssHashes": [
+      "143491e5ab2efd5e",
+      "1ee63df177967359"
+    ],
+    "observedAt": "2026-09-10T06:23:23.116Z"
+  },
+  "https://example.com": {
+    "cssHashes": [],
+    "observedAt": "2026-09-10T06:42:27.227Z"
+  }
+}
+```
+
+Production's entry kept its original two hashes and its original `observedAt` timestamp
+(`06:23:23.116Z`, last written in step 2.4, before either `example.com` run) — the two
+`example.com` runs above wrote their own key and did not touch it. To confirm this isn't merely a
+static read but a guarantee the next production run actually relies on:
+
+```
+$ npm run smoke -- --url https://dropshipping-test.vercel.app ; echo "exit: $?"
+
+> dropshipping@0.1.0 smoke
+> tsx scripts/smoke.ts --url https://dropshipping-test.vercel.app
+
+
+  smoke check → https://dropshipping-test.vercel.app
+
+  PASS  GET /                            200, 4 product link(s)
+  PASS  GET /products                    200
+  PASS  GET /api/products                200, first slug "olimpiyka-lampasy-bila"
+  PASS  GET /api/health                  200, database ok
+  PASS  GET /categories/hudi             307 → /products?category=hudi
+  FAIL  CSS chunk hashes                 UNCHANGED — the build cache may have served stale CSS; redeploy with the cache off (143491e5ab2efd5e, 1ee63df177967359)
+  PASS  GET /_next/image (real CDN)      200
+  PASS  GET /_next/image (arbitrary)     400
+  PASS  GET /_next/image (metadata)      400
+  PASS  GET /_next/image (lookalike)     400
+  PASS  GET /feed/google-shopping.xml    200, 8 item(s)
+  PASS  GET /track                       200
+  PASS  GET /sitemap.xml                 200
+  PASS  GET /robots.txt                  200
+
+  13 passed, 1 failed
+
+exit: 1
+```
+
+Production reports `UNCHANGED` — not `NO-BASELINE` — with the same two hashes it has carried all
+session. Had the two origins shared one flat baseline instead of being keyed separately, the
+`example.com` run's empty hash set would have overwritten production's stored entry and this run
+would have reported `NO-BASELINE` instead of `UNCHANGED`. It did not. Origin-keying, previously
+established only by `mergeState`/`readBaselineFor`'s unit tests (Task 2), is now also a witnessed
+live property, not merely an inferred one.
+
 ### Step 3 — Confirm the SSRF rows are not vacuous
 
 Discovered the real R2 CDN URL from the live homepage, the same way the brief's snippet does:
@@ -1413,11 +1562,23 @@ vacuous: a build with an empty `remotePatterns` would 400 the real CDN host too,
 
 ### Summary — what was actually observed failing vs. only ever observed passing
 
-| Row                                                                                                                                                                                           | Observed FAILING live, this session                                | Observed PASSING live, this session                                                     |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
-| CSS chunk hashes                                                                                                                                                                              | Yes — `UNCHANGED` (steps 1b, 1c, 2.2) and `NO-BASELINE` (step 2.3) | Yes — `NO-BASELINE` waived by `--allow-missing-baseline` (step 2.4; the one exit-0 run) |
-| Whole-script unreachable-origin path (not a row — the top-level catch)                                                                                                                        | Yes — step 2.1, `fetch failed`, exit 1, no row table printed       | n/a                                                                                     |
-| GET / , GET /products, GET /api/products, GET /api/health, GET /categories/hudi, GET /\_next/image ×4, GET /feed/google-shopping.xml, GET /track, GET /sitemap.xml, GET /robots.txt (13 rows) | **No** — never observed failing against production in this session | Yes — passed in all 5 live table runs (1b, 1c, 2.2, 2.3, 2.4)                           |
+**`StalenessOutcome` has four members, so the "CSS chunk hashes" row gets its own breakdown rather
+than one summary-table cell** (cramming all four into one cell is exactly how the first version of
+this log lost track of one of them):
+
+| Outcome       | Witnessed live?                                 | Where                                                                              |
+| ------------- | ----------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `UNCHANGED`   | Yes — fails                                     | steps 1b, 1c, 2.2 (production; baseline present and hashes match)                  |
+| `NO-BASELINE` | Yes — fails without the flag, passes with it    | step 2.3 (fails), step 2.4 (passes, the session's only exit-0 run)                 |
+| `NO-CSS`      | Yes — fails, and the flag does **not** waive it | Fix round 1 (this log): `example.com`, with and without `--allow-missing-baseline` |
+| `CHANGED`     | **No — never witnessed live**                   | requires a real deploy changing the served CSS; did not happen this session        |
+
+| Row                                                                                                                                                                                           | Observed FAILING live, this session                                               | Observed PASSING live, this session                                                               |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| CSS chunk hashes                                                                                                                                                                              | Yes — 3 of 4 outcomes (`UNCHANGED`, `NO-BASELINE`, `NO-CSS`); see breakdown above | Yes — `NO-BASELINE` waived (step 2.4); `CHANGED` never observed either way                        |
+| Whole-script unreachable-origin path (not a row — the top-level catch)                                                                                                                        | Yes — step 2.1, `fetch failed`, exit 1, no row table printed                      | n/a                                                                                               |
+| Origin-keying (not a row — a property of the state file)                                                                                                                                      | n/a                                                                               | Yes — Fix round 1: production's baseline survived two `example.com` runs untouched                |
+| GET / , GET /products, GET /api/products, GET /api/health, GET /categories/hudi, GET /\_next/image ×4, GET /feed/google-shopping.xml, GET /track, GET /sitemap.xml, GET /robots.txt (13 rows) | **No** — never observed failing against production in this session                | Yes — passed in all 6 live table runs against production (1b, 1c, 2.2, 2.3, 2.4, fix-round check) |
 
 The 13 assertion rows' failure branches were **not** reproduced against production. Per the
 brief's own instruction ("note that in the log rather than trying to break production"), they are
@@ -1430,10 +1591,13 @@ inputs, not that anyone has currently made production emit those inputs. This se
 attempt to take the site down, corrupt the feed, or break the DB connection to force those rows
 red for real — doing that to production was out of scope and would have been actively harmful.
 
-Two failure classes were exercised end-to-end against the live target in this session: the
-three-state staleness logic (`UNCHANGED`, `NO-BASELINE`, and `NO-BASELINE`-waived-to-pass — all
-three witnessed, not assumed), and the whole-script unreachable-origin path. Both fired exactly as
-documented, with zero edits to `scripts/smoke.ts` or `scripts/smoke-lib.ts`.
+Three things were exercised end-to-end against a live target in this session, not two: the
+**four**-state staleness logic (three of its four outcomes witnessed failing, one of those three
+also witnessed passing when waived, the fourth — `CHANGED` — never witnessed at all; see the
+breakdown above), the whole-script unreachable-origin path, and (fix round 1) origin-keying as a
+live property of the state file rather than only a unit-tested one. All three held exactly as
+documented, with zero edits to `scripts/smoke.ts` or `scripts/smoke-lib.ts` at any point, including
+during the fix round.
 
 ### Discrepancies / anything unexpected
 
@@ -1444,8 +1608,10 @@ documented, with zero edits to `scripts/smoke.ts` or `scripts/smoke-lib.ts`.
   fetch, before any row exists, caught by `main().catch()` rather than the per-row `probe()`
   wrapper. Both paths correctly exit non-zero, but the shapes differ, which matters for anyone
   writing an alert on top of this script's output later.
-- No row other than the CSS-staleness row was ever observed failing against the live site. This
-  matches the brief's own expectation and is the deliberate scope of this task, not a gap.
+- No row other than the CSS-staleness row was ever observed failing **against production**. This
+  matches the brief's own expectation and is the deliberate scope of this task, not a gap. (Every
+  row failed against `example.com` in the fix round, but that target was used once, deliberately,
+  only to force `NO-CSS` — it says nothing about production's other 13 rows.)
 - `npm run smoke -- --save-baseline <file>` takes a separate code path (`saveBaselineOnly`) that
   never builds the row table or touches `exitCodeFor` — it prints one line and exits 0 on any
   successful fetch. By design (Task 4), but worth naming: the "exits 0 only if every row passed"
@@ -1455,11 +1621,14 @@ documented, with zero edits to `scripts/smoke.ts` or `scripts/smoke-lib.ts`.
   `.smoke-state.json`, which this session deleted and rewrote several times per the steps above
   and left present with a valid baseline afterward.
 - **`CHANGED` — the outcome a real post-deploy run is supposed to produce — was never observed
-  live in this session**, and could not have been: it requires the served CSS hashes to actually
-  differ from the stored baseline, which only happens after a real deploy, and this session did
-  not trigger one (out of scope — this task verifies the script, not the deploy pipeline). Every
-  live run here saw the same two hashes throughout (`143491e5ab2efd5e`, `1ee63df177967359`), so
-  the only reachable live outcomes were `UNCHANGED`, `NO-BASELINE`, and `NO-BASELINE`-waived.
-  `CHANGED` is covered only by `compareBaseline`'s fixture-based unit tests (Task 2). The next
-  real production deploy is the first opportunity to see it fire live, and that is exactly the
-  scenario the launch runbook (Task 6) points at.
+  live in this session**, and could not have been against production specifically: it requires the
+  served CSS hashes to actually differ from the stored baseline, which only happens after a real
+  deploy, and no deploy happened this session (out of scope — this task verifies the script, not
+  the deploy pipeline). `CHANGED` is covered only by `compareBaseline`'s fixture-based unit tests
+  (Task 2). The next real production deploy is the first opportunity to see it fire live, and that
+  is exactly the scenario the launch runbook (Task 6) points at.
+- **The `NO-CSS` gap itself was caught by review, not by this session's own self-review pass.** The
+  first version of this log's self-review confirmed every _documented_ claim was backed by
+  evidence, but did not check the claim's completeness against `StalenessOutcome`'s actual
+  membership — a real miss, recorded here rather than smoothed over, since the point of this
+  document is to be honest about what was and wasn't caught, and by whom.
