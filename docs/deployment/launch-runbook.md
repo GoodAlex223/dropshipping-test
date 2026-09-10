@@ -14,6 +14,9 @@ runbook implements (rationale, the 14-row probe table, risks), the
 (exactly what has and hasn't been run against live production), and
 [deployment/setup.md](setup.md) for local/general environment variable setup.
 
+Throughout this document, `<domain>` stands for whichever real domain Step 1 settles on — substitute
+it literally, including inside shell commands.
+
 ## Reliability of this document
 
 **Part 1 has never been executed.** No real domain exists yet — TASK-056 item №1 is still awaiting
@@ -59,7 +62,7 @@ numbers from the TASK-056 client ask; the full tracking table with current statu
 | 9   | Legal pages live                            | client+dev   | ⛔ BLOCKED — №4, №15             |
 | 10  | DECISION: keep or deactivate placeholders   | client       | decision gate — no deploy needed |
 | 11  | Attach domain + confirm SSL                 | owner        | waits on 1                       |
-| 12  | Deploy via Git integration                  | owner/dev    | waits on 3, 4, 5, 6, 8, 11       |
+| 12  | Deploy via Git integration                  | owner/dev    | waits on 3, 4, 5, 8, 11          |
 | 13  | Confirm migrations ran in the build log     | dev/owner    | waits on 12                      |
 | 14  | Run `npm run smoke`                         | dev          | waits on 12                      |
 | 15  | Real COD order + e-mail check               | dev/client   | waits on 14                      |
@@ -87,7 +90,7 @@ numbers from the TASK-056 client ask; the full tracking table with current statu
 - **Verification:** `dig NS <domain>` resolves, and you can personally add/edit a DNS record for it
   (prove it with a harmless TXT record) without relaying a request through the client live.
 
-Settle the apex-vs-`www` question here too — it feeds Steps 3, 6 and 8 below and should not be
+Settle the apex-vs-`www` question here too — it feeds Steps 6, 8 and 11 below and should not be
 re-litigated at each one.
 
 #### Step 2 — Resend SPF + DKIM verified on the real domain
@@ -111,8 +114,9 @@ verify. Do not attempt this before Step 1 closes; it cannot succeed.
 
 - **Who:** owner, in the Vercel project's Production environment variables.
 - **Depends on:** Step 2 (verified, not just added).
-- **Action:** set `EMAIL_FROM=noreply@<domain>`. **Do not redeploy yet** — batch this with Steps 5,
-  6 and 8 into the single deploy at Step 12.
+- **Action:** set `EMAIL_FROM=noreply@<domain>`. **Do not redeploy yet** — batch this with Steps 5
+  and 8 into the single deploy at Step 12. (Step 6, the R2 CORS rule, is independent and needs no
+  deploy at all.)
 - **Verification:** the Vercel dashboard shows the new value for the Production scope. (It has no
   effect on the live site until Step 12's deploy — Vercel env vars are read at build/runtime start,
   not hot-reloaded.)
@@ -268,13 +272,16 @@ no-op that has never once run `prisma migrate deploy`. A green badge on that job
 production.
 
 - **Who:** owner (or dev, if triggering via `git push`/merge to `main`).
-- **Depends on:** Steps 3, 4, 5, 6 and 8 (every Pre-phase env var / data change ready to bake in at
-  once) and Step 11 (domain attached).
+- **Depends on:** Steps 3, 4, 5 and 8 (every Pre-phase env var / data change that needs a rebuild to
+  take effect) and Step 11 (domain attached). Step 6 (R2 CORS) does **not** gate this deploy — it's a
+  Cloudflare-side setting that takes effect on its own; it only needs to land before anyone uploads a
+  new image from the new domain's admin panel, whether that's before or after this step.
 - **Action:** trigger a new production deployment through the **Vercel Git integration** — either
   push/merge to `main`, or use the dashboard's "Redeploy" on the current production commit. Given how
-  much changed in this window, and this project's two-time history of Vercel serving stale CSS across
-  a deploy (PR #35/#36), do this one with the build cache off: `VERCEL_FORCE_NO_BUILD_CACHE=1`, or the
-  dashboard's Redeploy with "Use existing Build Cache" unchecked.
+  much changed in this window, and this project's history of Vercel serving stale CSS across a deploy
+  (PR #35 — a changed `globals.css` did not bust the build cache; only a cache-off redeploy did), do
+  this one with the build cache off: `VERCEL_FORCE_NO_BUILD_CACHE=1`, or the dashboard's Redeploy with
+  "Use existing Build Cache" unchecked.
 - **Verification:** the Vercel dashboard shows a _new_ deployment (a fresh deployment ID and
   timestamp, not a reused/promoted old one), status "Ready", promoted to Production, sourced from the
   Git commit on `main`.
@@ -288,9 +295,10 @@ production.
   `⚠ WARNING: DIRECT_URL is not set — skipping migrations` and **not**
   `⚠ WARNING: prisma migrate deploy FAILED`. `scripts/vercel-build.sh` makes migration failure
   non-fatal by design (a broken migration must not strand prod on the previous build), so a green
-  deploy status does **not** imply this succeeded — you have to read the log line itself. (This
-  cutover adds no new migration, so this step is really a rehearsal of the discipline Part 2 asks for
-  on every future deploy, not one expected to find anything new here.)
+  deploy status does **not** imply this succeeded — you have to read the log line itself. As of this
+  writing there is no migration queued specifically for the cutover, but by the time this document
+  actually runs, ordinary feature work may well have added some — this step has to actually catch
+  those, not just rehearse the discipline Part 2 asks for on every deploy.
 
 ---
 
@@ -418,14 +426,14 @@ backfill first — is documented in place at Step 4, since it's only actionable 
 Run this after every deploy meant to reach real users, not just the cutover.
 
 1. ```bash
-   npm run smoke -- --url https://<production-domain>
+   npm run smoke -- --url https://<domain>
    ```
    Once a baseline exists for this origin (after its first successful run — Step 14 above, for the
    cutover itself), drop `--allow-missing-baseline`. A missing baseline from here on means something
    actually went missing, not that the origin is new.
 2. **All 14 rows should read `PASS`.** If the CSS-hash row alone reads `UNCHANGED` and this deploy
-   changed CSS or JS: Vercel's build cache likely served a stale bundle — this has already happened
-   twice in this project's history (PR #35/#36). Redeploy with the cache disabled
+   changed CSS or JS: Vercel's build cache likely served a stale bundle — this has already happened in
+   this project's history (PR #35). Redeploy with the cache disabled
    (`VERCEL_FORCE_NO_BUILD_CACHE=1`, or the dashboard's Redeploy with "Use existing Build Cache"
    unchecked) and re-run; expect `CHANGED` this time.
 3. If the CSS row instead reads `NO-CSS`, the deploy is very likely broken outright — the homepage
