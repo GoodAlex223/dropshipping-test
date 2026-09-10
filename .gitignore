@@ -73,3 +73,6 @@ docs/real_products/
 # claude-security scan reports (self-gitignoring too; second latch because this repo is PUBLIC
 # and reports can describe unfixed findings). To commit one deliberately: git add -f
 CLAUDE-SECURITY-*/
+
+# Post-deploy smoke baseline (per-origin CSS chunk hashes, local to one machine)
+.smoke-state.json
