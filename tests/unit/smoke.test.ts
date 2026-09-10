@@ -1,5 +1,13 @@
 import { describe, it, expect } from "vitest";
-import { extractCssHashes, extractProductSlugs, findRemoteImageUrl } from "../../scripts/smoke-lib";
+import {
+  extractCssHashes,
+  extractProductSlugs,
+  findRemoteImageUrl,
+  compareBaseline,
+  stalenessPasses,
+  readBaselineFor,
+  mergeState,
+} from "../../scripts/smoke-lib";
 
 const ORIGIN = "https://shop.example";
 
@@ -47,5 +55,54 @@ describe("findRemoteImageUrl", () => {
   it("skips images served from the target's own host", () => {
     const html = `<img src="/_next/image?url=https%3A%2F%2Fshop.example%2Fa.jpg&amp;w=128&amp;q=75"/>`;
     expect(findRemoteImageUrl(html, ORIGIN)).toBeNull();
+  });
+});
+
+describe("compareBaseline", () => {
+  it("reports CHANGED when the hash set differs", () => {
+    expect(compareBaseline(["b", "c"], ["a", "b"])).toBe("CHANGED");
+  });
+
+  it("reports UNCHANGED for the same set regardless of order", () => {
+    expect(compareBaseline(["b", "a"], ["a", "b"])).toBe("UNCHANGED");
+  });
+
+  it("reports NO-BASELINE for a missing or empty stored set", () => {
+    expect(compareBaseline(["a"], null)).toBe("NO-BASELINE");
+    expect(compareBaseline(["a"], [])).toBe("NO-BASELINE");
+  });
+});
+
+describe("stalenessPasses", () => {
+  it("passes only on CHANGED by default", () => {
+    expect(stalenessPasses("CHANGED", false)).toBe(true);
+    expect(stalenessPasses("UNCHANGED", false)).toBe(false);
+    expect(stalenessPasses("NO-BASELINE", false)).toBe(false);
+  });
+
+  it("lets NO-BASELINE pass only when explicitly allowed, and never UNCHANGED", () => {
+    expect(stalenessPasses("NO-BASELINE", true)).toBe(true);
+    expect(stalenessPasses("UNCHANGED", true)).toBe(false);
+  });
+});
+
+describe("state file", () => {
+  it("keys baselines by origin so a preview run cannot clobber production", () => {
+    const prod = "https://shop.example";
+    const preview = "https://preview-abc.vercel.app";
+    let state = mergeState({}, prod, ["aaa"], "2026-09-10T00:00:00.000Z");
+    state = mergeState(state, preview, ["zzz"], "2026-09-10T01:00:00.000Z");
+
+    expect(readBaselineFor(state, prod)).toEqual(["aaa"]);
+    expect(readBaselineFor(state, preview)).toEqual(["zzz"]);
+  });
+
+  it("returns null for an origin the state file has never seen", () => {
+    expect(readBaselineFor({}, "https://shop.example")).toBeNull();
+  });
+
+  it("stores hashes sorted so ordering churn never reads as CHANGED", () => {
+    const state = mergeState({}, "https://shop.example", ["b", "a"], "2026-09-10T00:00:00.000Z");
+    expect(state["https://shop.example"].cssHashes).toEqual(["a", "b"]);
   });
 });

@@ -67,3 +67,46 @@ export function findRemoteImageUrl(html: string, targetOrigin: string): string |
   }
   return null;
 }
+
+export type StalenessOutcome = "CHANGED" | "UNCHANGED" | "NO-BASELINE";
+
+export interface SmokeStateEntry {
+  cssHashes: string[];
+  observedAt: string;
+}
+
+export interface SmokeState {
+  [origin: string]: SmokeStateEntry;
+}
+
+/**
+ * Three outcomes, not two. An absent baseline is NOT a pass: a check that
+ * cannot fail looks exactly like one that passes, and this one guards a real
+ * incident (Vercel served byte-identical stale CSS across two deploys).
+ */
+export function compareBaseline(observed: string[], stored: string[] | null): StalenessOutcome {
+  if (stored === null || stored.length === 0) return "NO-BASELINE";
+  const a = [...observed].sort().join(",");
+  const b = [...stored].sort().join(",");
+  return a === b ? "UNCHANGED" : "CHANGED";
+}
+
+export function stalenessPasses(outcome: StalenessOutcome, allowMissing: boolean): boolean {
+  if (outcome === "CHANGED") return true;
+  if (outcome === "NO-BASELINE") return allowMissing;
+  return false;
+}
+
+export function readBaselineFor(state: SmokeState, origin: string): string[] | null {
+  const entry = state[origin];
+  return entry && Array.isArray(entry.cssHashes) ? entry.cssHashes : null;
+}
+
+export function mergeState(
+  state: SmokeState,
+  origin: string,
+  cssHashes: string[],
+  observedAt: string
+): SmokeState {
+  return { ...state, [origin]: { cssHashes: [...cssHashes].sort(), observedAt } };
+}
