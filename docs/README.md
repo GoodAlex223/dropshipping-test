@@ -81,8 +81,9 @@ Central index for all project documentation.
 
 ## Implementation Plans
 
-| Plan | Task | Status | Started |
-| ---- | ---- | ------ | ------- |
+| Plan                                                                                                                        | Task                                     | Status | Started    |
+| --------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- | ------ | ---------- |
+| [2026-09-10_g19-launch-runbook-deploy-verification.md](planning/plans/2026-09-10_g19-launch-runbook-deploy-verification.md) | G19 Launch Runbook & Deploy Verification | ACTIVE | 2026-09-10 |
 
 ### Archived Plans
 
