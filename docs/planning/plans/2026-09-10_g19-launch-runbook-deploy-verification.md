@@ -1118,3 +1118,348 @@ git commit -m "docs(g19): repoint the superseded pre-deployment checklist, file 
 - **Do not push or open a PR without the user's word.** Repo convention: wait for approval.
 - **The runbook cannot be dry-run.** No domain exists (TASK-056 №1 is still awaiting the client), so Part 1 ships verified by review only. Do not write a Verification Log entry implying otherwise — the asymmetry between the two halves is recorded deliberately in spec §6 and must survive into the close-out.
 - **`/products` is client-rendered.** If you find yourself adding a product-content assertion there, re-read spec §2.1 first; that assertion cannot pass and its absence is intentional.
+
+---
+
+## Verification Log
+
+Executed 2026-09-10 on `feat/g19-launch-runbook-deploy-verification`, against production
+`https://dropshipping-test.vercel.app`. Every block below is pasted from the actual terminal
+output of this session, not reconstructed. `scripts/smoke.ts` and `scripts/smoke-lib.ts` were not
+edited at any point.
+
+### Step 1 — Establish a baseline, then observe the pass/fail paths
+
+**1a. Save a fresh baseline:**
+
+```
+$ npm run smoke -- --url https://dropshipping-test.vercel.app --save-baseline .smoke-state.json
+
+> dropshipping@0.1.0 smoke
+> tsx scripts/smoke.ts --url https://dropshipping-test.vercel.app --save-baseline .smoke-state.json
+
+baseline saved to .smoke-state.json: 143491e5ab2efd5e, 1ee63df177967359
+EXIT_CODE: 0
+```
+
+**1b. Run again immediately — no deploy happened in between:**
+
+```
+$ npm run smoke -- --url https://dropshipping-test.vercel.app
+
+> dropshipping@0.1.0 smoke
+> tsx scripts/smoke.ts --url https://dropshipping-test.vercel.app
+
+
+  smoke check → https://dropshipping-test.vercel.app
+
+  PASS  GET /                            200, 4 product link(s)
+  PASS  GET /products                    200
+  PASS  GET /api/products                200, first slug "olimpiyka-lampasy-bila"
+  PASS  GET /api/health                  200, database ok
+  PASS  GET /categories/hudi             307 → /products?category=hudi
+  FAIL  CSS chunk hashes                 UNCHANGED — the build cache may have served stale CSS; redeploy with the cache off (143491e5ab2efd5e, 1ee63df177967359)
+  PASS  GET /_next/image (real CDN)      200
+  PASS  GET /_next/image (arbitrary)     400
+  PASS  GET /_next/image (metadata)      400
+  PASS  GET /_next/image (lookalike)     400
+  PASS  GET /feed/google-shopping.xml    200, 8 item(s)
+  PASS  GET /track                       200
+  PASS  GET /sitemap.xml                 200
+  PASS  GET /robots.txt                  200
+
+  13 passed, 1 failed
+
+EXIT_CODE: 1
+```
+
+Confirmed: 14 result lines, `UNCHANGED` fires for real against production (not just in a
+fixture), and the run exits 1, matching spec §3's deliberate bias.
+
+**1c. Confirm the "pass path" with `--allow-missing-baseline`:**
+
+```
+$ npm run smoke -- --url https://dropshipping-test.vercel.app --allow-missing-baseline
+
+> dropshipping@0.1.0 smoke
+> tsx scripts/smoke.ts --url https://dropshipping-test.vercel.app --allow-missing-baseline
+
+
+  smoke check → https://dropshipping-test.vercel.app
+
+  PASS  GET /                            200, 4 product link(s)
+  PASS  GET /products                    200
+  PASS  GET /api/products                200, first slug "olimpiyka-lampasy-bila"
+  PASS  GET /api/health                  200, database ok
+  PASS  GET /categories/hudi             307 → /products?category=hudi
+  FAIL  CSS chunk hashes                 UNCHANGED — the build cache may have served stale CSS; redeploy with the cache off (143491e5ab2efd5e, 1ee63df177967359)
+  PASS  GET /_next/image (real CDN)      200
+  PASS  GET /_next/image (arbitrary)     400
+  PASS  GET /_next/image (metadata)      400
+  PASS  GET /_next/image (lookalike)     400
+  PASS  GET /feed/google-shopping.xml    200, 8 item(s)
+  PASS  GET /track                       200
+  PASS  GET /sitemap.xml                 200
+  PASS  GET /robots.txt                  200
+
+  13 passed, 1 failed
+
+EXIT_CODE: 1
+```
+
+**Nuance, stated plainly:** this command did **not** exit 0. By this point in the sequence the
+state file was not missing — 1b had just rewritten it with the same hashes — so the outcome was
+still `UNCHANGED`, and per the documented contract `--allow-missing-baseline` waives
+`NO-BASELINE` only, never `UNCHANGED`. The flag behaved exactly as designed; the expectation that
+this command would be "the clean pass" was mine going in, not a property the script promises. The
+useful evidence this step actually produced is that the 13 non-staleness rows passed live.
+
+### Step 2 — Force each failure class
+
+**2.1 Unreachable origin (request-failure path):**
+
+```
+$ npm run smoke -- --url https://dropshipping-test.vercel.app.invalid
+
+> dropshipping@0.1.0 smoke
+> tsx scripts/smoke.ts --url https://dropshipping-test.vercel.app.invalid
+
+fetch failed
+EXIT_CODE: 1
+```
+
+Fires for real, but in a different shape than the 13 assertion rows: the homepage `GET /` fetch
+(which seeds the CSS hashes / product slugs / remote-image URL every later row depends on) runs
+_before_ the per-row `probe()` try/catch exists, so a DNS failure there is caught by the top-level
+`main().catch()` handler, not by any row's own error handling. The result is a single `fetch
+failed` line on stderr and exit 1 — no 14-row table at all, because no row was ever pushed. This
+is worth flagging: the "14 result lines" invariant holds only when the origin itself is reachable.
+
+**2.2 UNCHANGED path again — the brief's own repeat, no tampering needed:**
+
+```
+$ npm run smoke -- --url https://dropshipping-test.vercel.app
+
+> dropshipping@0.1.0 smoke
+> tsx scripts/smoke.ts --url https://dropshipping-test.vercel.app
+
+
+  smoke check → https://dropshipping-test.vercel.app
+
+  PASS  GET /                            200, 4 product link(s)
+  PASS  GET /products                    200
+  PASS  GET /api/products                200, first slug "olimpiyka-lampasy-bila"
+  PASS  GET /api/health                  200, database ok
+  PASS  GET /categories/hudi             307 → /products?category=hudi
+  FAIL  CSS chunk hashes                 UNCHANGED — the build cache may have served stale CSS; redeploy with the cache off (143491e5ab2efd5e, 1ee63df177967359)
+  PASS  GET /_next/image (real CDN)      200
+  PASS  GET /_next/image (arbitrary)     400
+  PASS  GET /_next/image (metadata)      400
+  PASS  GET /_next/image (lookalike)     400
+  PASS  GET /feed/google-shopping.xml    200, 8 item(s)
+  PASS  GET /track                       200
+  PASS  GET /sitemap.xml                 200
+  PASS  GET /robots.txt                  200
+
+  13 passed, 1 failed
+
+EXIT_CODE: 1
+```
+
+Third consecutive identical result — `UNCHANGED` is stable and repeatable, as expected for a
+target with no deploy in between.
+
+**2.3 Absent baseline — the NO-BASELINE path:**
+
+```
+$ rm -f .smoke-state.json && ls -la .smoke-state.json
+ls: cannot access '.smoke-state.json': No such file or directory
+
+$ npm run smoke -- --url https://dropshipping-test.vercel.app
+
+> dropshipping@0.1.0 smoke
+> tsx scripts/smoke.ts --url https://dropshipping-test.vercel.app
+
+
+  smoke check → https://dropshipping-test.vercel.app
+
+  PASS  GET /                            200, 4 product link(s)
+  PASS  GET /products                    200
+  PASS  GET /api/products                200, first slug "olimpiyka-lampasy-bila"
+  PASS  GET /api/health                  200, database ok
+  PASS  GET /categories/hudi             307 → /products?category=hudi
+  FAIL  CSS chunk hashes                 NO-BASELINE — no stored hashes for this origin; re-run, or pass --allow-missing-baseline (143491e5ab2efd5e, 1ee63df177967359)
+  PASS  GET /_next/image (real CDN)      200
+  PASS  GET /_next/image (arbitrary)     400
+  PASS  GET /_next/image (metadata)      400
+  PASS  GET /_next/image (lookalike)     400
+  PASS  GET /feed/google-shopping.xml    200, 8 item(s)
+  PASS  GET /track                       200
+  PASS  GET /sitemap.xml                 200
+  PASS  GET /robots.txt                  200
+
+  13 passed, 1 failed
+
+EXIT_CODE: 1
+```
+
+`ls` confirms the file was genuinely gone before the run. `NO-BASELINE` is a distinct outcome from
+`UNCHANGED` (different detail text, same underlying hashes) and fails without the flag, as
+required.
+
+**2.4 Addition beyond the brief's literal steps — confirm the flag actually waives NO-BASELINE
+to a real exit-0 pass.**
+
+The task context explicitly lists "`--allow-missing-baseline` waives `NO-BASELINE` only" as a
+claim to confirm rather than assume. Steps 1c and 2.2 only ever showed the flag failing to waive
+`UNCHANGED`, because a baseline was always present by that point (the script rewrites state on
+every run, including failed ones). To actually see the flag waive something, the state file has
+to be deleted immediately before a run that also carries the flag:
+
+```
+$ rm -f .smoke-state.json && npm run smoke -- --url https://dropshipping-test.vercel.app --allow-missing-baseline
+
+> dropshipping@0.1.0 smoke
+> tsx scripts/smoke.ts --url https://dropshipping-test.vercel.app --allow-missing-baseline
+
+
+  smoke check → https://dropshipping-test.vercel.app
+
+  PASS  GET /                            200, 4 product link(s)
+  PASS  GET /products                    200
+  PASS  GET /api/products                200, first slug "olimpiyka-lampasy-bila"
+  PASS  GET /api/health                  200, database ok
+  PASS  GET /categories/hudi             307 → /products?category=hudi
+  PASS  CSS chunk hashes                 NO-BASELINE — no stored hashes for this origin; re-run, or pass --allow-missing-baseline (143491e5ab2efd5e, 1ee63df177967359)
+  PASS  GET /_next/image (real CDN)      200
+  PASS  GET /_next/image (arbitrary)     400
+  PASS  GET /_next/image (metadata)      400
+  PASS  GET /_next/image (lookalike)     400
+  PASS  GET /feed/google-shopping.xml    200, 8 item(s)
+  PASS  GET /track                       200
+  PASS  GET /sitemap.xml                 200
+  PASS  GET /robots.txt                  200
+
+  14 passed, 0 failed
+
+EXIT_CODE: 0
+```
+
+This is the only exit-0 run observed in this entire session. It required both an absent state
+file and the flag together — exactly the documented contract — and it is the only run in which
+all 14 rows were seen passing simultaneously.
+
+### Step 3 — Confirm the SSRF rows are not vacuous
+
+Discovered the real R2 CDN URL from the live homepage, the same way the brief's snippet does:
+
+```
+$ BASE=https://dropshipping-test.vercel.app
+$ REAL=$(curl -s $BASE/ | grep -o 'url=https%3A%2F%2F[^"&]*' | head -1 | sed 's/^url=//')
+$ echo "$REAL"
+https%3A%2F%2Fpub-444210ee6d61467894be231e22c9cd78.r2.dev%2Fproducts%2F1788304633006-photo_1_2026-08-21_13-03-41.jpg
+
+decoded: https://pub-444210ee6d61467894be231e22c9cd78.r2.dev/products/1788304633006-photo_1_2026-08-21_13-03-41.jpg
+```
+
+Built the lookalike host the same way `buildLookalikeUrl()` does — the real host with an
+`.evil.example` suffix appended — then ran all four probes by hand:
+
+```
+$ curl -s -o /dev/null -w "real      -> %{http_code}\n" "$BASE/_next/image?url=$REAL&w=640&q=75"
+real      -> 200
+$ curl -s -o /dev/null -w "arbitrary -> %{http_code}\n" "$BASE/_next/image?url=https%3A%2F%2Fexample.invalid%2Fx.png&w=640&q=75"
+arbitrary -> 400
+$ curl -s -o /dev/null -w "metadata  -> %{http_code}\n" "$BASE/_next/image?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2F&w=640&q=75"
+metadata  -> 400
+$ curl -s -o /dev/null -w "lookalike -> %{http_code}\n" "$BASE/_next/image?url=https%3A%2F%2Fpub-444210ee6d61467894be231e22c9cd78.r2.dev.evil.example%2Fx.png&w=640&q=75"
+lookalike -> 400
+```
+
+Result: `200, 400, 400, 400` — matches expectation exactly on all four.
+
+**Extra corroboration, beyond the brief** (to rule out "these are all 400 because the whole route
+is broken," which would make the rejections meaningless the same way an empty allow-list would):
+pulled headers/body for the real and the arbitrary case.
+
+```
+$ curl -s -D - -o /dev/null "$BASE/_next/image?url=$REAL&w=640&q=75" | grep -i -E "^HTTP|content-type"
+HTTP/2 200
+content-type: image/jpeg
+
+$ curl -s -D - "$BASE/_next/image?url=https%3A%2F%2Fexample.invalid%2Fx.png&w=640&q=75" | tail -c 500
+HTTP/2 400
+cache-control: public, max-age=0, must-revalidate
+content-type: text/plain; charset=utf-8
+date: Thu, 10 Sep 2026 06:23:54 GMT
+server: Vercel
+strict-transport-security: max-age=63072000; includeSubDomains; preload
+x-vercel-error: INVALID_IMAGE_OPTIMIZE_REQUEST
+x-vercel-id: arn1::jg4ff-1789021434365-909a47ad4e89
+content-length: 84
+
+Bad request
+
+INVALID_IMAGE_OPTIMIZE_REQUEST
+
+arn1::jg4ff-1789021434365-909a47ad4e89
+```
+
+The 200 is genuine image bytes (`content-type: image/jpeg`); the 400 carries Vercel's own
+`x-vercel-error: INVALID_IMAGE_OPTIMIZE_REQUEST` — Next's image optimizer's `remotePatterns`
+allow-list rejecting the host by name, not a generic WAF/edge 400 that would reject every request
+indiscriminately. That distinction is what makes the three rejection rows meaningful rather than
+vacuous: a build with an empty `remotePatterns` would 400 the real CDN host too, and it does not.
+
+### Summary — what was actually observed failing vs. only ever observed passing
+
+| Row                                                                                                                                                                                           | Observed FAILING live, this session                                | Observed PASSING live, this session                                                     |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
+| CSS chunk hashes                                                                                                                                                                              | Yes — `UNCHANGED` (steps 1b, 1c, 2.2) and `NO-BASELINE` (step 2.3) | Yes — `NO-BASELINE` waived by `--allow-missing-baseline` (step 2.4; the one exit-0 run) |
+| Whole-script unreachable-origin path (not a row — the top-level catch)                                                                                                                        | Yes — step 2.1, `fetch failed`, exit 1, no row table printed       | n/a                                                                                     |
+| GET / , GET /products, GET /api/products, GET /api/health, GET /categories/hudi, GET /\_next/image ×4, GET /feed/google-shopping.xml, GET /track, GET /sitemap.xml, GET /robots.txt (13 rows) | **No** — never observed failing against production in this session | Yes — passed in all 5 live table runs (1b, 1c, 2.2, 2.3, 2.4)                           |
+
+The 13 assertion rows' failure branches were **not** reproduced against production. Per the
+brief's own instruction ("note that in the log rather than trying to break production"), they are
+covered instead by the 34 fixture-based unit tests in `tests/unit/smoke.test.ts` (Task 3), which
+call each `assert*` function directly against constructed `HttpResponse` fixtures (wrong status,
+empty `data[]`, a non-JSON body, a redirect to the wrong location, a 200 that merely _looks_ like
+a redirect, an empty feed, and so on) with no network involved. That is real but narrower evidence
+than "observed failing live": it establishes the assertion logic is correct against constructed
+inputs, not that anyone has currently made production emit those inputs. This session did not
+attempt to take the site down, corrupt the feed, or break the DB connection to force those rows
+red for real — doing that to production was out of scope and would have been actively harmful.
+
+Two failure classes were exercised end-to-end against the live target in this session: the
+three-state staleness logic (`UNCHANGED`, `NO-BASELINE`, and `NO-BASELINE`-waived-to-pass — all
+three witnessed, not assumed), and the whole-script unreachable-origin path. Both fired exactly as
+documented, with zero edits to `scripts/smoke.ts` or `scripts/smoke-lib.ts`.
+
+### Discrepancies / anything unexpected
+
+- Step 1c did not produce the "clean pass" the brief's step ordering seems to anticipate. Not a
+  defect — see the Nuance note under 1c: `--allow-missing-baseline` did exactly what its own
+  detail message and the spec say it does; my expectation was the thing that needed correcting.
+- The unreachable-origin failure (2.1) does not print a 14-row table — it dies on the very first
+  fetch, before any row exists, caught by `main().catch()` rather than the per-row `probe()`
+  wrapper. Both paths correctly exit non-zero, but the shapes differ, which matters for anyone
+  writing an alert on top of this script's output later.
+- No row other than the CSS-staleness row was ever observed failing against the live site. This
+  matches the brief's own expectation and is the deliberate scope of this task, not a gap.
+- `npm run smoke -- --save-baseline <file>` takes a separate code path (`saveBaselineOnly`) that
+  never builds the row table or touches `exitCodeFor` — it prints one line and exits 0 on any
+  successful fetch. By design (Task 4), but worth naming: the "exits 0 only if every row passed"
+  invariant applies to the probe-and-report mode, not the save-baseline mode.
+- Production stayed reachable and unmodified by this session throughout (confirmed with a plain
+  `curl` before starting); the only local file touched outside the plan doc was the gitignored
+  `.smoke-state.json`, which this session deleted and rewrote several times per the steps above
+  and left present with a valid baseline afterward.
+- **`CHANGED` — the outcome a real post-deploy run is supposed to produce — was never observed
+  live in this session**, and could not have been: it requires the served CSS hashes to actually
+  differ from the stored baseline, which only happens after a real deploy, and this session did
+  not trigger one (out of scope — this task verifies the script, not the deploy pipeline). Every
+  live run here saw the same two hashes throughout (`143491e5ab2efd5e`, `1ee63df177967359`), so
+  the only reachable live outcomes were `UNCHANGED`, `NO-BASELINE`, and `NO-BASELINE`-waived.
+  `CHANGED` is covered only by `compareBaseline`'s fixture-based unit tests (Task 2). The next
+  real production deploy is the first opportunity to see it fire live, and that is exactly the
+  scenario the launch runbook (Task 6) points at.
