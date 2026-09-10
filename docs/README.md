@@ -143,7 +143,7 @@ See [archive/README.md](archive/README.md) for more historical plans.
 
 | Document                                                     | Purpose                                                                                                     | Last Updated |
 | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- | ------------ |
-| [deployment/setup.md](deployment/setup.md)                   | Environment setup                                                                                           | 2026-02-10   |
+| [deployment/setup.md](deployment/setup.md)                   | Environment setup                                                                                           | 2026-09-10   |
 | [deployment/launch-runbook.md](deployment/launch-runbook.md) | **Launch runbook** — one-time real-domain cutover checklist + every-deploy checks (invokes `npm run smoke`) | 2026-09-10   |
 
 ### Testing

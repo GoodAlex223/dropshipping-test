@@ -2,7 +2,7 @@
 
 Environment setup and deployment documentation for the Dropshipping E-commerce Platform.
 
-**Last Updated**: 2026-02-10
+**Last Updated**: 2026-09-10
 
 ---
 
@@ -526,11 +526,15 @@ Configure monitoring service (UptimeRobot, Better Uptime, Pingdom) to check:
 
 ## Pre-deployment Checklist
 
+Setup-time checks only — is the environment configured, at all. For the checks that confirm a
+specific deploy actually worked (the smoke script, migration confirmation, CSS-staleness,
+cutover sequencing), see [`launch-runbook.md`](launch-runbook.md) instead — that document is
+authoritative for deploy-time verification and this list does not duplicate it.
+
 ### Environment
 
 - [ ] All required environment variables set
 - [ ] Production database connection string
-- [ ] Stripe live keys configured
 - [ ] S3/R2 bucket configured
 - [ ] Redis configured (if using workers)
 
@@ -538,7 +542,6 @@ Configure monitoring service (UptimeRobot, Better Uptime, Pingdom) to check:
 
 - [ ] NEXTAUTH_SECRET is unique and secure (min 32 chars)
 - [ ] Database credentials are secure
-- [ ] Stripe webhook secret configured
 - [ ] CORS configured for storage
 - [ ] SSL certificate installed
 
@@ -557,7 +560,6 @@ Configure monitoring service (UptimeRobot, Better Uptime, Pingdom) to check:
 
 ### External Services
 
-- [ ] Stripe webhook endpoint configured
 - [ ] Email service configured (Resend)
 - [ ] CDN configured (images)
 
