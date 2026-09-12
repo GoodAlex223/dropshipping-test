@@ -198,7 +198,7 @@ The defect: `await request.json()` throws a `SyntaxError` on a malformed body, w
 
 `null` then flows into the route's existing validation. Routes using `safeParse` return their existing `VALIDATION_ERROR` 400; routes using throwing `.parse()` raise a `ZodError` and land on their existing 400 branch. **No route gains a new branch.**
 
-**Scope — 8 handlers** (user ruling 2026-09-12: all public POST routes, not just the two named in the backlog):
+**Scope — 9 handlers** (user ruling 2026-09-12: all public POST routes, not just the two named in the backlog):
 
 | Route                                         | Handler | Guard       | Parse style |
 | --------------------------------------------- | ------- | ----------- | ----------- |
@@ -211,10 +211,19 @@ The defect: `await request.json()` throws a `SyntaxError` on a malformed body, w
 | `src/app/api/reviews/route.ts`                | POST    | requireAuth | see step    |
 | `src/app/api/reviews/[id]/route.ts`           | PUT     | requireAuth | see step    |
 
-**Excluded, with reason** (not silently skipped):
+**Amended 2026-09-12 after the PR #46 review — scope is now 9 handlers, no exclusions.**
+The review caught that excluding `create-payment-intent` as "dormant" while fixing
+`confirm-order` — equally dormant, equally caller-less, and named in the same breath by
+[create-order/route.ts:13](../../../src/app/api/checkout/create-order/route.ts#L13)'s own
+"the dormant Stripe path (create-payment-intent + confirm-order)" — was an uneven rule
+rather than a reason. Verified by grep: **neither route has a caller**. The user ruled to
+fix it too, so the route gained the idiom, the test's `EXCLUDED` list was deleted outright,
+and the BACKLOG entry that existed only to track the exception was removed. The guard now
+covers **10 of 10** public JSON routes with no escape hatch.
 
-- `src/app/api/checkout/create-payment-intent/route.ts` — the Stripe payment-intent path is **dormant since G2** (2026-08-06). Touching it would imply it is live.
-- All 15 `src/app/api/admin/**` handlers — `requireAdmin()`-guarded, so an authenticated administrator is the only caller that can send a malformed body; near-zero exposure against a large diff days before launch.
+**Still excluded, by user ruling and unchanged:**
+
+- All 15 `src/app/api/admin/**` handlers — `requireAdmin()`-guarded, so an authenticated administrator is the only caller that can send a malformed body; near-zero exposure against a large diff days before launch. Filed 🟤 BACKLOG [2026-09-12].
 
 - [x] **Step 1: Write the failing tests** — one per handler, POSTing a body that is not valid JSON, asserting **400** and (where the route has one) the `VALIDATION_ERROR` code. Run red: each must currently fail with 500, which is the proof the tests are not vacuous.
 - [x] **Step 2: Implement** the `.catch(() => null)` on each of the 8 handlers.

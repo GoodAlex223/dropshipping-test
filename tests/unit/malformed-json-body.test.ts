@@ -49,6 +49,7 @@ import { POST as confirmOrderPost } from "@/app/api/checkout/confirm-order/route
 import { POST as reviewsPost } from "@/app/api/reviews/route";
 import { PUT as reviewPut } from "@/app/api/reviews/[id]/route";
 import { POST as lookupPost } from "@/app/api/orders/lookup/route";
+import { POST as paymentIntentPost } from "@/app/api/checkout/create-payment-intent/route";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
@@ -140,6 +141,16 @@ describe("malformed JSON body → 400, never 5xx", () => {
       call: (req) => reviewPut(req, createRouteParams({ id: "rev-1" })),
     },
     {
+      // Dormant since G2 (no caller), but a public POST handler all the same —
+      // and `confirm-order` above is equally dormant, so excluding only this
+      // one was an uneven rule rather than a reason (PR #46 review). Both are
+      // fixed; there is no exclusion list any more.
+      name: "POST /api/checkout/create-payment-intent",
+      url: "/api/checkout/create-payment-intent",
+      method: "POST",
+      call: (req) => paymentIntentPost(req),
+    },
+    {
       // Already correct — G18 fixed this one, and the same-shaped assertion
       // here keeps it that way rather than trusting the convention to hold.
       name: "POST /api/orders/lookup (G18 regression)",
@@ -171,7 +182,6 @@ describe("malformed JSON body → 400, never 5xx", () => {
     const listed = new Set(cases.map((c) => c.url.replace(/\/rev-1$/, "/[id]")));
     for (const file of publicJsonRoutes()) {
       const url = "/" + file.replace(/^src\/app\//, "").replace(/\/route\.ts$/, "");
-      if (EXCLUDED.some((e) => file.includes(e))) continue;
       expect(listed.has(url), `${url} is public but has no behavioral test here`).toBe(true);
     }
   });
@@ -179,14 +189,11 @@ describe("malformed JSON body → 400, never 5xx", () => {
 
 /**
  * Public API routes are every `route.ts` under `src/app/api` that parses a
- * JSON body and is NOT admin-guarded. Documented exclusions below.
+ * JSON body and is NOT admin-guarded. There are deliberately NO exclusions:
+ * every such route is fixed and behaviorally tested, so this guard has no
+ * escape hatch to drift through. Admin routes are out of scope by ruling
+ * (an authenticated administrator is the only reachable caller).
  */
-const EXCLUDED = [
-  // Stripe payment-intent path, dormant since G2 (2026-08-06). Touching it
-  // would imply it is live.
-  "checkout/create-payment-intent",
-];
-
 function walk(dir: string): string[] {
   return readdirSync(dir).flatMap((entry) => {
     const path = join(dir, entry);
@@ -216,10 +223,9 @@ describe("public JSON routes guard the parse", () => {
     // An empty list would make every assertion below vacuously pass — the
     // classic shape of a guard that cannot fail. Compare against a floor
     // derived from the routes this suite actually imports.
-    expect(routes.length).toBeGreaterThanOrEqual(7);
+    expect(routes.length).toBeGreaterThanOrEqual(10);
 
     const offenders = routes.filter((file) => {
-      if (EXCLUDED.some((e) => file.includes(e))) return false;
       const src = readFileSync(file, "utf8");
       // Every `request.json()` occurrence must carry the catch, not just one.
       return /request\.json\(\)(?!\s*\.catch)/.test(src);
