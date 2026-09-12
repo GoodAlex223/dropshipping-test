@@ -1,9 +1,9 @@
 # G20 — Pre-Launch Polish Plan
 
 **Last Updated**: 2026-09-12
-**Task**: G20 (WEEKLY [G20](../WEEKLY.md#g20-pre-launch-polish-batch)) · 🔵 User (by steer, 2026-08-11 "ask + polish", confirmed 2026-08-20) · members are 🟤-origin: BACKLOG [2026-08-15] G14 audit (mobile rail) + TODO.md § Medium Priority [2026-08-14] (G8 feedback/marquee residue)
+**Task**: G20 (WEEKLY [G20](../../planning/WEEKLY.md#g20-pre-launch-polish-batch)) · 🔵 User (by steer, 2026-08-11 "ask + polish", confirmed 2026-08-20) · members are 🟤-origin: BACKLOG [2026-08-15] G14 audit (mobile rail) + TODO.md § Medium Priority [2026-08-14] (G8 feedback/marquee residue)
 **Branch**: `feat/g20-pre-launch-polish` (from `main` @ `6e98f4d`)
-**Status**: In progress
+**Status**: COMPLETE — merged as `baef19b` via PR [#46](https://github.com/GoodAlex223/dropshipping-test/pull/46), 2026-09-12
 **Spec**: none — classified **bounded** at brainstorming (2026-09-12): both members change flows that already exist in this repo. Design approved in chat; this plan is the project-convention record.
 
 > **For agentic workers:** steps use checkbox (`- [ ]`) syntax for tracking. TDD per task: failing test first, run it red, then implement.

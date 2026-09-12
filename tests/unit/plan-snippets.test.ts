@@ -48,6 +48,13 @@ interface Unresolved {
 function collectSnippets(): { found: Snippet[]; unresolved: Unresolved[] } {
   const found: Snippet[] = [];
   const unresolved: Unresolved[] = [];
+  // Same guard countFences() below already carries, and for the same reason:
+  // git does not track empty directories, so archiving the last active plan
+  // makes `docs/planning/plans` VANISH rather than go empty — the normal state
+  // between tasks. Without this, readdirSync throws ENOENT and the whole file
+  // fails to collect, which is what turned main red on `6e98f4d` the moment
+  // G19's close-out archived its plan. Nothing to check is a pass, not a crash.
+  if (!existsSync(PLANS_DIR)) return { found, unresolved };
   for (const file of readdirSync(PLANS_DIR).filter((f) => f.endsWith(".md"))) {
     const plan = join(PLANS_DIR, file);
     const lines = readFileSync(plan, "utf8").split("\n");

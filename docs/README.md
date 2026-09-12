@@ -33,9 +33,9 @@ Central index for all project documentation.
 | Document                                                                                                             | Purpose                                                                       | Last Updated |
 | -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------ |
 | [planning/README.md](planning/README.md)                                                                             | Planning overview                                                             | 2026-01-05   |
-| [planning/WEEKLY.md](planning/WEEKLY.md)                                                                             | Current week's plan                                                           | 2026-08-20   |
-| [planning/TODO.md](planning/TODO.md)                                                                                 | Active tasks                                                                  | 2026-09-10   |
-| [planning/DONE.md](planning/DONE.md)                                                                                 | Completed tasks                                                               | 2026-09-10   |
+| [planning/WEEKLY.md](planning/WEEKLY.md)                                                                             | Current week's plan                                                           | 2026-09-12   |
+| [planning/TODO.md](planning/TODO.md)                                                                                 | Active tasks                                                                  | 2026-09-12   |
+| [planning/DONE.md](planning/DONE.md)                                                                                 | Completed tasks                                                               | 2026-09-12   |
 | [planning/BACKLOG.md](planning/BACKLOG.md)                                                                           | Unprioritized ideas                                                           | 2026-09-12   |
 | [planning/ROADMAP.md](planning/ROADMAP.md)                                                                           | Long-term vision                                                              | 2026-07-14   |
 | [planning/GOALS.md](planning/GOALS.md)                                                                               | Objectives & metrics                                                          | 2026-01-26   |
@@ -81,9 +81,8 @@ Central index for all project documentation.
 
 ## Implementation Plans
 
-| Plan                                                                                      | Task                  | Status | Started    |
-| ----------------------------------------------------------------------------------------- | --------------------- | ------ | ---------- |
-| [2026-09-12_g20-pre-launch-polish.md](planning/plans/2026-09-12_g20-pre-launch-polish.md) | G20 Pre-Launch Polish | ACTIVE | 2026-09-12 |
+| Plan | Task | Status | Started |
+| ---- | ---- | ------ | ------- |
 
 ### Archived Plans
 
@@ -121,6 +120,7 @@ Central index for all project documentation.
 | [2026-08-26_g16-real-product-intake.md](archive/plans/2026-08-26_g16-real-product-intake.md)                               | G16 Real-Product Intake                  | COMPLETE | 2026-09-01 |
 | [2026-09-04_g18-guest-order-access.md](archive/plans/2026-09-04_g18-guest-order-access.md)                                 | G18 Guest Order Access & Hardening       | COMPLETE | 2026-09-06 |
 | [2026-09-10_g19-launch-runbook-deploy-verification.md](archive/plans/2026-09-10_g19-launch-runbook-deploy-verification.md) | G19 Launch Runbook & Deploy Verification | COMPLETE | 2026-09-10 |
+| [2026-09-12_g20-pre-launch-polish.md](archive/plans/2026-09-12_g20-pre-launch-polish.md)                                   | G20 Pre-Launch Polish                    | COMPLETE | 2026-09-12 |
 
 See [archive/README.md](archive/README.md) for more historical plans.
 

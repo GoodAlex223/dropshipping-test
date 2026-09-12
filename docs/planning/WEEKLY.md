@@ -86,8 +86,26 @@ the rotated admin password and orders in the browser.
 
 > Sourced 🔵 under the user's 2026-08-11 "ask + polish" pre-launch steer, confirmed 2026-08-20 (G13/G14 subsumption precedent); member origins are 🟤 and cited. The checkout distraction-free header is **deliberately deferred** (user-ratified 2026-08-20): restructuring checkout chrome days before launch risks more than it buys.
 
-- [ ] Mobile «Новинки» horizontal-scroll rail per [`Mirox Mobile.dc.html`](../design/design_handoff_mirox/Mirox%20Mobile.dc.html) (~160px cards below `sm:`), with its own visual-gate round (2) — BACKLOG [2026-08-15] G14 audit
-- [ ] G8 feedback/marquee residue batch (one commit, ranked by the PR #35 re-review): malformed-JSON body → 400 `VALIDATION_ERROR` on feedback + newsletter subscribe, `observer.observe(first)` font-swap guard in [AnnouncementBar.tsx](../../src/components/common/AnnouncementBar.tsx), the listed test-debt, static-variant inset note (2) — TODO.md § Medium Priority [2026-08-14]
+- [x] Mobile «Новинки» horizontal-scroll rail per [`Mirox Mobile.dc.html`](../design/design_handoff_mirox/Mirox%20Mobile.dc.html) (~160px cards below `sm:`), with its own visual-gate round (2) — BACKLOG [2026-08-15] G14 audit
+- [x] G8 feedback/marquee residue batch (one commit, ranked by the PR #35 re-review): malformed-JSON body → 400 `VALIDATION_ERROR` on feedback + newsletter subscribe, `observer.observe(first)` font-swap guard in [AnnouncementBar.tsx](../../src/components/common/AnnouncementBar.tsx), the listed test-debt, static-variant inset note (2) — TODO.md § Medium Priority [2026-08-14]
+
+**As delivered (2026-09-12)**: both members shipped as planned, plus a **third member added by user
+ruling** — the Member 1 visual gate measured the homepage at 396px against a 390px viewport, and the
+cause was the footer's copyright nav (`flex gap-6`, five UA labels, no wrap) pushing _every_ page
+carrying the footer, not the new rail. 4 → **5 SP**. The mobile-PDP contextual header was **assessed
+and deferred** (2–3 SP, filed 🟤) as the backlog entry asked, not built. Member 2's scope grew from 8
+to 9 handlers during PR review: excluding `create-payment-intent` as "dormant" while fixing the
+equally dormant `confirm-order` was an uneven rule, so the route was fixed and the exclusion list
+deleted — the guard now covers 10/10 public JSON routes.
+
+**Production caveat, open at close-out**: the merge deploy (`baef19b`) serves the new HTML with
+**stale CSS** from Vercel's build cache (third recurrence of a documented failure mode). Every
+utility new to this change — `.gap-x-6`, `.gap-y-2`, `.-mr-4`, `.pr-4`, `.sm:overflow-visible`,
+`.sm:mr-0`, `.sm:pr-0` — is missing from the served chunks, so the footer links sit at 0px gap in
+production while the sideways-scroll half of the fix _did_ land. `npm run smoke` caught it and exits
+
+1. The remedy is owner-side (dashboard Redeploy with the build cache **unchecked**, or
+   `VERCEL_FORCE_NO_BUILD_CACHE=1`) and is filed 🟠 🟤 [2026-09-12].
 
 ### G21. Weekly Reviews [batch]
 
@@ -125,7 +143,7 @@ the rotated admin password and orders in the browser.
 ### Thursday — Launch ops + polish
 
 - [x] **[G19](#g19-launch-runbook--deploy-verification-batch)** 🔵 — **shipped PR [#45](https://github.com/GoodAlex223/dropshipping-test/pull/45) / `735533a` (2026-09-10)**. Ran long: 5 review rounds past the first green, all documentation and guard work — the deliverables were unchanged after `01bd910`. `CHANGED`, the one staleness outcome never witnessed live, was settled on the merge deploy: 14/14 pass, exit 0.
-- **[G20](#g20-pre-launch-polish-batch)** 🔵 — polish batch.
+- [x] **[G20](#g20-pre-launch-polish-batch)** 🔵 — **shipped PR [#46](https://github.com/GoodAlex223/dropshipping-test/pull/46) / `baef19b` (2026-09-12)**. Both planned members landed; a third was added mid-branch by user ruling when the Member 1 visual gate found the footer pushing every mobile page 6px sideways (4 → 5 SP). Code review returned **zero findings**; its one sub-threshold note (an uneven dormant-route exclusion) was verified and acted on rather than argued. **Production is NOT fully live**: the merge deploy serves new HTML against stale CSS from Vercel's build cache — third recurrence — so the footer links render with no gap until an owner does a cache-off redeploy. Caught by `npm run smoke` (exit 1), filed 🟠 🟤.
 
 ### Friday — Reviews + close
 
@@ -143,7 +161,7 @@ the rotated admin password and orders in the browser.
 | G17 | Pre-Launch Security Scan `[solo]`           | security        | 🟤 Auto     | 2      | 3        | Tue          | ✅ `0bee3d2` / PR #43 (run-1 coverage only) |
 | G18 | Guest Order Access & Hardening `[batch]` 🏆 | checkout/orders | 🔵 User     | 2      | 7        | Tue–Wed      | ✅ `a37c8d0` / PR #44                       |
 | G19 | Launch Runbook + Deploy Verify `[batch]`    | ops/deploy      | 🔵 User     | 2      | 3        | Thu          | ✅ PR #45 / `735533a`                       |
-| G20 | Pre-Launch Polish `[batch]`                 | storefront      | 🔵 User     | 2      | 4        | Thu          | ☐ Planned                                   |
+| G20 | Pre-Launch Polish `[batch]`                 | storefront      | 🔵 User     | 3      | 5        | Thu          | ✅ PR #46 / `baef19b`                       |
 | G21 | Weekly Reviews `[batch]`                    | recurring       | ⚪ Overhead | 4      | 5        | Fri          | ☐ Planned                                   |
 |     | **Total**                                   |                 |             | **16** | **34**   |              |                                             |
 

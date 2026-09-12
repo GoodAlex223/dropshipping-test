@@ -2,11 +2,74 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-09-10
+**Last Updated**: 2026-09-12
 
 ---
 
 ## 2026-08 (August)
+
+### [2026-09-12] G20 - Pre-Launch Polish (WEEKLY batch, 🔵 User by steer)
+
+**Plan**: [2026-09-12_g20-pre-launch-polish.md](../archive/plans/2026-09-12_g20-pre-launch-polish.md) · **PR**: [#46](https://github.com/GoodAlex223/dropshipping-test/pull/46) merged `baef19b` · **SP**: 4 planned → **5 delivered**
+
+The last polish group before launch. Two planned members, plus a third added mid-branch by user
+ruling. Classified **bounded** at brainstorming — both planned members changed flows that already
+existed — so no design spec was written.
+
+**Member 1 — mobile «Новинки» rail.** One element carries both layouts: a horizontal scroller of
+160px cards below `sm:`, the pre-existing grid above. `-mr-4 pr-4` cancels the `.container` inset on
+the right only, so cards bleed off the viewport edge per `Mirox Mobile.dc.html`. Verified against
+the live DOM at 390/768/1280 rather than from source. Deliberately excluded: scroll-snap, a
+scrollbar-hiding utility (sidesteps Tailwind v4's `@layer` drop), and a `tabIndex` on the scroller.
+
+**Member 2 — G8 residue batch.** Malformed JSON now answers 400 instead of 5xx across every public
+JSON route, using the `request.json().catch(() => null)` idiom G18 introduced — `null` falls into
+each route's existing validation, so no route gained a branch. Plus `observer.observe(first)` in
+`AnnouncementBar` (a late font swap resizes the copy, not the viewport), the six test-debt items the
+PR #35 re-review listed, and a note on the unreachable static-announcement inset.
+
+**Member 3 — footer mobile overflow (added by user ruling).** The Member 1 visual gate measured the
+homepage document at 396px against a 390px viewport. Cause was not the rail: the footer's copyright
+nav was `flex gap-6` with no wrap, ~380px of UA labels in a 358px container, so **every page carrying
+the footer** scrolled sideways. Fixed with `flex-wrap`; proven pre-existing by measuring three
+rail-free pages first.
+
+**Key changes**
+
+- `src/components/home/ProductRail.tsx` — dual-mode responsive rail + card wrappers
+- 9 API handlers — the malformed-body idiom; `src/components/common/Footer.tsx` — `flex-wrap`
+- `src/components/common/AnnouncementBar.tsx` — observe the marquee copy as well as the viewport
+- `tests/unit/malformed-json-body.test.ts` (new) — behavioral tests + a source enumeration guard
+- `tests/e2e/mobile-overflow.spec.ts` (new) — sets its own viewport, because CI runs desktop projects only
+- `tests/unit/plan-snippets.test.ts` — ENOENT fix (see below); `CLAUDE.md` — malformed-body pattern
+
+**Learnings**
+
+- **Guards were mutation-tested before being trusted.** Every test that passed on first write was
+  proven to fail against a deliberate mutation (`/\r?\n/g`→`/\n/g`, `min(5)`→`min(6)`,
+  `max(100)`→`max(99)`, the contact-row guard→`true`, `-mr-4`→`-mr-6`). The pre-existing rejection
+  tests survived both schema mutations, which is precisely the gap the boundary tests fill.
+- **`/etc/environment` still carries `NODE_ENV=development`**, which corrupts responsive utilities in
+  a local `next build`. Since this task was entirely responsive utilities, every compiled-CSS check
+  ran `env -u NODE_ENV npm run build` — without it the check could not have failed.
+- **A review's sub-threshold note can still be right.** Code review returned zero findings, but noted
+  that excluding `create-payment-intent` as "dormant" while fixing the equally dormant
+  `confirm-order` was uneven. Verified by grep (neither has a caller), then fixed the route and
+  deleted the exclusion list — a simpler end state than the special case.
+- **Archiving the last active plan broke `main` on G19 and would have again.** `plan-snippets.test.ts`
+  called `readdirSync` on `docs/planning/plans` without an existence guard; git does not track empty
+  directories, so archiving makes the directory vanish. Fixed here, verified by running the suite
+  with the directory moved away.
+
+**Open at close-out (not a regression in this branch)**
+
+Production serves the new HTML against **stale CSS** from Vercel's build cache — third recurrence.
+Utilities new to this change (`.gap-x-6`, `.gap-y-2`, `.-mr-4`, `.pr-4`, `.sm:overflow-visible`,
+`.sm:mr-0`, `.sm:pr-0`) are absent from the served chunks, so footer links render at 0px gap while
+the sideways-scroll fix itself did land. `npm run smoke` caught it and exits 1. Remedy is owner-side:
+a Redeploy with the build cache unchecked. Filed 🟠 🟤 [2026-09-12].
+
+---
 
 ### [2026-09-10] G19 - Launch Runbook & Deploy Verification (WEEKLY batch, 🔵 User)
 
