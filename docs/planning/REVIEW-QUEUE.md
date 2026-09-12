@@ -412,7 +412,8 @@ as new errands. If the queue is worked as a batch, work the folds at the same ti
   already carry a queued propagation row (run 1's rows 1–3 plus this run's `testing.md` row), which
   is the whole reason to fold rather than file. The other two wait on an edit nobody has scheduled:
   Phase 4 "whenever it is next edited", and the judgement-over-rules rewrite at the Cleanup Week.
-  The sixth item adds no host to that tally — run 2 had already folded it into `documentation.md`.
+  That count includes the sixth, which contributes a host like the rest — what it spares, per the note
+  above, is a new **fold** rather than a new file.
 - **Stack-specific technical facts, 2026-08-17 → 2026-09-12** (slot 4, grouped) — `defer`.
   Six facts, no process rule among them (GFM table pipes; the CSS-verification and Next minifier
   gotchas; Server Component `redirect()` not being a 3xx; Vitest `once` queues leaking across
