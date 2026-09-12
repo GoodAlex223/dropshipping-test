@@ -378,4 +378,39 @@ describe("generateFeedbackEmailHtml", () => {
     const html = generateFeedbackEmailHtml({ message: "перший рядок\nдругий рядок" });
     expect(html).toContain("перший рядок<br>другий рядок");
   });
+
+  // Windows browsers submit textarea content with CRLF. The substitution is
+  // /\r?\n/g, so the \r must be consumed rather than surviving into the HTML
+  // as a stray character — tested separately from the \n case because a
+  // pattern of just /\n/g passes the test above and fails this one.
+  it("converts CRLF newlines to a single <br>, leaving no stray carriage return", () => {
+    const html = generateFeedbackEmailHtml({ message: "перший рядок\r\nдругий рядок" });
+    expect(html).toContain("перший рядок<br>другий рядок");
+    expect(html).not.toContain("\r");
+    // Exactly one <br> for one line break — a /\n/g pattern would leave the
+    // \r in place, and a /\r|\n/g pattern would emit two.
+    expect(html.match(/перший рядок(<br>)+другий рядок/)?.[0]).toBe("перший рядок<br>другий рядок");
+  });
+
+  it("renders the name row alone when only a name was left", () => {
+    const html = generateFeedbackEmailHtml({ name: "Олена", message: "Лише ім'я, без пошти" });
+    expect(html).toContain("Олена");
+    expect(html).toContain("Ім'я:");
+    // The email row and the anonymous fallback must BOTH be absent — a
+    // partial contact is neither "no contacts" nor a reason to render an
+    // empty e-mail line.
+    expect(html).not.toContain("Email:");
+    expect(html).not.toContain("Відправник не залишив контактів.");
+  });
+
+  it("renders the email row alone when only an email was left", () => {
+    const html = generateFeedbackEmailHtml({
+      email: "olena@example.com",
+      message: "Лише пошта, без імені",
+    });
+    expect(html).toContain("olena@example.com");
+    expect(html).toContain("Email:");
+    expect(html).not.toContain("Ім'я:");
+    expect(html).not.toContain("Відправник не залишив контактів.");
+  });
 });

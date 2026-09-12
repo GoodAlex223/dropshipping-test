@@ -168,6 +168,14 @@ export function AnnouncementBar() {
     if (typeof ResizeObserver !== "undefined") {
       observer = new ResizeObserver(measure);
       observer.observe(viewport);
+      // The copy is observed too, not just the viewport: a late webfont swap
+      // resizes the TEXT while the viewport stays exactly as wide as it was,
+      // so a viewport-only observer never fires and `--marquee-shift` keeps a
+      // shift measured against the fallback font — one copy width out of step
+      // with what is actually rendered, which shows up as a seam in the
+      // stream. Both targets share the one observer, so the existing
+      // `disconnect()` below still tears everything down.
+      observer.observe(first);
     }
     return () => observer?.disconnect();
   }, [marqueeVisible]);
@@ -206,6 +214,17 @@ export function AnnouncementBar() {
             </div>
           </div>
         ) : (
+          /*
+           * ⚠️ Before activating this variant, fix the inset first (G8
+           * residue item 4). The row above is `pr-3` with no matching `pl-3`
+           * — deliberate for the marquee, whose stream must start flush at
+           * the left edge, but wrong here: `text-center` centres within a
+           * box that is 3 units short on the right only, so the copy sits
+           * visibly left of true centre with the dismiss button beside it.
+           * The variant is unreachable today (`site.announcement.marquee` is
+           * `true`), which is why this is a note rather than a change — a
+           * fix now would be untestable through the UI.
+           */
           <p className="flex-1 text-center text-xs tracking-wide">{renderCopy(false)}</p>
         )}
         <button

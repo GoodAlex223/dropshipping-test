@@ -72,6 +72,30 @@ describe("FeedbackForm", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  // Distinct from the whitespace test below: there the CLIENT short-circuits
+  // before any request. Here the request goes out and the SERVER answers 400
+  // VALIDATION_ERROR — the byCode branch, which resolves to different copy
+  // than the SEND_FAILED/fallback string every other error path shows.
+  it("maps a server VALIDATION_ERROR to its own toast copy, not the generic fallback", async () => {
+    fetchMock.mockResolvedValue({ ok: false, json: async () => ({ code: "VALIDATION_ERROR" }) });
+    renderWithIntl(<FeedbackForm />);
+
+    fireEvent.change(screen.getByLabelText("Повідомлення"), {
+      target: { value: "Достатньо довге повідомлення" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Надіслати" }));
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith("Перевірте заповнені поля — щось не так.")
+    );
+    // Asserting the fallback was NOT used is the half with teeth: both
+    // branches call toast.error, so a broken t.has() guard would still toast.
+    expect(toast.error).not.toHaveBeenCalledWith(
+      "Не вдалося надіслати повідомлення. Спробуйте пізніше."
+    );
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
   it("falls back to the generic Ukrainian error when fetch rejects", async () => {
     fetchMock.mockRejectedValue(new Error("offline"));
     renderWithIntl(<FeedbackForm />);

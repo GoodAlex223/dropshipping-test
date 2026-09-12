@@ -111,4 +111,44 @@ describe("AnnouncementBar", () => {
     expect(screen.queryByText(TEXT)).not.toBeInTheDocument();
     expect(window.localStorage.getItem("mirox:announcement-dismissed:launch-2026-08")).toBe("1");
   });
+  // A late webfont swap changes the width of the marquee COPY, not the
+  // viewport — so observing only the viewport leaves `--marquee-shift` stuck
+  // at its pre-swap value and the stream shows a seam where the shift no
+  // longer equals one copy width. Observing the first copy as well is what
+  // makes either resize re-measure. (G8 residue item 2, PR #35 re-review.)
+  it("observes the first copy as well as the viewport, so a font swap re-measures", () => {
+    const observed: Element[] = [];
+    const disconnect = vi.fn();
+    class StubResizeObserver {
+      observe(target: Element) {
+        observed.push(target);
+      }
+      unobserve() {}
+      disconnect = disconnect;
+    }
+    const original = (globalThis as { ResizeObserver?: unknown }).ResizeObserver;
+    (globalThis as { ResizeObserver?: unknown }).ResizeObserver = StubResizeObserver;
+
+    try {
+      const { container, unmount } = renderWithIntl(<AnnouncementBar />);
+
+      const track = container.querySelector(".animate-marquee");
+      expect(track).not.toBeNull();
+      const viewport = track!.parentElement;
+      const firstCopy = track!.querySelector("span:not(.marquee-duplicate)");
+      expect(viewport).not.toBeNull();
+      expect(firstCopy).not.toBeNull();
+
+      // Identity, not count: asserting `observed.length === 2` would pass if
+      // the viewport were observed twice.
+      expect(observed).toContain(viewport);
+      expect(observed).toContain(firstCopy);
+
+      // One observer, so the existing single disconnect() still tears both down.
+      unmount();
+      expect(disconnect).toHaveBeenCalled();
+    } finally {
+      (globalThis as { ResizeObserver?: unknown }).ResizeObserver = original;
+    }
+  });
 });

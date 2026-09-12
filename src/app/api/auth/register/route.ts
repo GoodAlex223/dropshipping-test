@@ -10,7 +10,7 @@ const SALT_ROUNDS = 12;
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
 
     const validatedFields = registerSchema.safeParse(body);
 

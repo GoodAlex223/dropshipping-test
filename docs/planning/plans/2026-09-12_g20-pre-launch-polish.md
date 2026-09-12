@@ -109,7 +109,36 @@ precisely the one that drops these.
 
 The backlog entry asks for this to be _assessed_ in the same pass, not built (user ruling 2026-09-12, mirroring the 2026-08-20 checkout-header deferral).
 
-- [ ] Compare the mockup's mobile PDP header (back arrow + product name) against the shipped PDP; write the delta, a recommendation, and an effort estimate into this plan and file the BACKLOG entry. **No implementation.**
+- [x] Compare the mockup's mobile PDP header (back arrow + product name) against the shipped PDP; write the delta, a recommendation, and an effort estimate into this plan and file the BACKLOG entry. **No implementation.**
+
+**Assessment (2026-09-12).** The mockup's mobile PDP replaces the global chrome
+with a contextual header — back arrow, product name centred, wishlist heart
+right; no logo, nav, search, cart icon or announcement bar. Shipped keeps the
+full sticky `Header` + `AnnouncementBar` from the shop layout and offers a text
+breadcrumb («Головна / Каталог / {name}», `product-detail-client.tsx:200`) as
+the only back affordance. The `ArrowLeft` button at line 434 is in the
+**not-found** branch, not the product view — worth stating, because grepping
+that file for a back arrow finds it and suggests the affordance already exists.
+
+Four deltas: no contextual back arrow · product name absent from the header ·
+heart absent (already TASK-041, not double-counted here) · chrome not stripped.
+
+**Recommendation: defer**, same class as the deferred checkout header. Three
+reasons, in order of weight:
+
+1. It cannot be done inside the PDP. `src/app/(shop)/layout.tsx` wraps
+   `Header`/`AnnouncementBar` for the whole route group, so stripping them on
+   one route needs a route-scoped layout override or a pathname conditional
+   that would push that layout client-side.
+2. It collides with a standing ruling. The announcement bar is sticky **by the
+   2026-08-12 gate decision**; hiding it on the PDP re-opens that decision
+   rather than implementing around it.
+3. The capability is not missing — the breadcrumb already provides the way
+   back. This is polish, and it is structurally invasive polish on the route
+   that carries the conversion, days before launch.
+
+Estimated **2–3 SP** including its own visual-gate round. Filed 🟤 BACKLOG
+[2026-09-12]; revisit post-launch alongside the checkout header.
 
 ---
 
@@ -143,39 +172,53 @@ The defect: `await request.json()` throws a `SyntaxError` on a malformed body, w
 - `src/app/api/checkout/create-payment-intent/route.ts` — the Stripe payment-intent path is **dormant since G2** (2026-08-06). Touching it would imply it is live.
 - All 15 `src/app/api/admin/**` handlers — `requireAdmin()`-guarded, so an authenticated administrator is the only caller that can send a malformed body; near-zero exposure against a large diff days before launch.
 
-- [ ] **Step 1: Write the failing tests** — one per handler, POSTing a body that is not valid JSON, asserting **400** and (where the route has one) the `VALIDATION_ERROR` code. Run red: each must currently fail with 500, which is the proof the tests are not vacuous.
-- [ ] **Step 2: Implement** the `.catch(() => null)` on each of the 8 handlers.
-- [ ] **Step 3: Verify** each route's _existing_ tests still pass — the `null` body must not disturb any success or validation path.
+- [x] **Step 1: Write the failing tests** — one per handler, POSTing a body that is not valid JSON, asserting **400** and (where the route has one) the `VALIDATION_ERROR` code. Run red: each must currently fail with 500, which is the proof the tests are not vacuous.
+- [x] **Step 2: Implement** the `.catch(() => null)` on each of the 8 handlers.
+- [x] **Step 3: Verify** each route's _existing_ tests still pass — the `null` body must not disturb any success or validation path.
 
 ### Task 2.2: `observer.observe(first)` font-swap guard
 
 [src/components/common/AnnouncementBar.tsx](../../../src/components/common/AnnouncementBar.tsx) observes only the marquee **viewport**. A late webfont swap changes the width of the **copy**, not the viewport — so `--marquee-shift` keeps a pre-swap value and the marquee shows a seam. Fix: observe the first copy as well, so either resize re-measures.
 
-- [ ] **Step 1: Write the failing test** — a stub `ResizeObserver` recording its observed targets; assert both the viewport and the first copy are observed. Run red.
-- [ ] **Step 2: Implement** — add `observer.observe(first)` next to the existing `observer.observe(viewport)`; the existing `observer.disconnect()` cleanup already covers both.
+- [x] **Step 1: Write the failing test** — a stub `ResizeObserver` recording its observed targets; assert both the viewport and the first copy are observed. Run red.
+- [x] **Step 2: Implement** — add `observer.observe(first)` next to the existing `observer.observe(viewport)`; the existing `observer.disconnect()` cleanup already covers both.
 
 ### Task 2.3: Test debt
 
 The six paths the PR #35 re-review listed as untested:
 
-- [ ] whitespace-only honeypot (`website: "   "` — currently passes the `.trim() !== ""` check and sends; confirm intended)
-- [ ] JSON-parse route paths (covered by Task 2.1's tests — cross-referenced, not duplicated)
-- [ ] `VALIDATION_ERROR` toast path in the feedback form
-- [ ] `\r\n` newline handling in the feedback email template
-- [ ] name-only / email-only conditional template rows
-- [ ] boundary values: name=100, message=5 and message=2000
+- [x] whitespace-only honeypot (`website: "   "` — currently passes the `.trim() !== ""` check and sends; confirm intended)
+- [x] JSON-parse route paths (covered by Task 2.1's tests — cross-referenced, not duplicated)
+- [x] `VALIDATION_ERROR` toast path in the feedback form
+- [x] `\r\n` newline handling in the feedback email template
+- [x] name-only / email-only conditional template rows
+- [x] boundary values: name=100, message=5 and message=2000
+
+**These are coverage debt, not bug fixes** — every one passed on first run
+against unchanged source. An always-green test proves nothing, so each was
+mutation-checked before being trusted:
+
+| Mutation                                      | Caught by                                       |
+| --------------------------------------------- | ----------------------------------------------- |
+| `/\r?\n/g` → `/\n/g` in the feedback template | the CRLF test only — the `\n` test still passed |
+| contact-row guard `data.name` → `true`        | the email-only and anonymous tests              |
+| `message.min(5)` → `.min(6)`                  | the 5-character boundary test                   |
+| `name.max(100)` → `.max(99)`                  | the 100-character boundary test                 |
+
+The pre-existing rejection tests (4 chars, 2001 chars) survived both schema
+mutations, which is precisely the gap these fill.
 
 ### Task 2.4: Static-variant inset note
 
 The non-marquee announcement variant has an asymmetric `pr-3`-only inset. It is unreachable today (`site.announcement.marquee === true`).
 
-- [ ] Add a code comment recording the asymmetry and that it must be fixed **before** that variant is ever activated. **No behavior change.**
+- [x] Add a code comment recording the asymmetry and that it must be fixed **before** that variant is ever activated. **No behavior change.**
 
 ---
 
 ## Close-out
 
-- [ ] Extract improvements → BACKLOG.md (min 2, 🟤 for Claude-surfaced) and actionable items → TODO.md
+- [x] Extract improvements → BACKLOG.md (min 2, 🟤 for Claude-surfaced) and actionable items → TODO.md
 - [ ] Archive this plan → `docs/archive/plans/` — **four** edits: move the file, move its index row to the archive table, repoint inbound links, fix this file's own outbound relative links (depth changes by one)
 - [ ] WEEKLY.md: G20 Summary-Table status → `✅ PR #N` and the Thursday Daily-Schedule entry
 - [ ] TODO.md → DONE.md transition; commit docs; capture durable learnings → memory

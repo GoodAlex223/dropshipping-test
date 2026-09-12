@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
   if (error) return error;
 
   try {
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
     const validationResult = createReviewSchema.safeParse(body);
     if (!validationResult.success) {
       return apiError(validationResult.error.issues[0].message, 400);

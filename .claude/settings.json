@@ -11,6 +11,7 @@
     "chrome-devtools-mcp@claude-plugins-official": true,
     "playground@claude-plugins-official": true,
     "vercel@claude-plugins-official": true,
-    "cloudflare@claude-plugins-official": true
+    "cloudflare@claude-plugins-official": true,
+    "claude-security@claude-plugins-official": true
   }
 }
