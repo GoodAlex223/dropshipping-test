@@ -406,8 +406,13 @@ as new errands. If the queue is worked as a batch, work the folds at the same ti
   wording. The sixth is a **re-park rather than a new fold-in**: "claimed records must exist" was
   already folded against run 1 row 2 by run 2, and run 3 carries new content into the same host (its
   2026-09-02 update, that a propagation grep must enumerate its targets first). **Re-trigger for all
-  six**: the named host is touched. Working them as separate errands
-  would open five edits against four files that already have queued edits.
+  six**: the named host is touched. Filing them as separate errands would open one edit per item
+  across **six** host files — `POLICIES/code-review.md`, `critical-thinking.md`, `testing.md`,
+  `manual-testing.md`, `documentation.md` and the instruction files — and **four** of those six
+  already carry a queued propagation row (run 1's rows 1–3 plus this run's `testing.md` row), which
+  is the whole reason to fold rather than file. The other two wait on an edit nobody has scheduled:
+  Phase 4 "whenever it is next edited", and the judgement-over-rules rewrite at the Cleanup Week.
+  The sixth item adds no host to that tally — run 2 had already folded it into `documentation.md`.
 - **Stack-specific technical facts, 2026-08-17 → 2026-09-12** (slot 4, grouped) — `defer`.
   Six facts, no process rule among them (GFM table pipes; the CSS-verification and Next minifier
   gotchas; Server Component `redirect()` not being a 3xx; Vitest `once` queues leaking across
