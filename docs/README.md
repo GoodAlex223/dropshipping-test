@@ -40,7 +40,7 @@ Central index for all project documentation.
 | [planning/ROADMAP.md](planning/ROADMAP.md)                                                                           | Long-term vision                                                              | 2026-07-14   |
 | [planning/GOALS.md](planning/GOALS.md)                                                                               | Objectives & metrics                                                          | 2026-01-26   |
 | [planning/MILESTONES.md](planning/MILESTONES.md)                                                                     | Key targets                                                                   | 2026-01-26   |
-| [planning/REVIEW-QUEUE.md](planning/REVIEW-QUEUE.md)                                                                 | Weekly Reviews cross-week state — Reviewed log, Next-up parks, conventions    | 2026-08-15   |
+| [planning/REVIEW-QUEUE.md](planning/REVIEW-QUEUE.md)                                                                 | Weekly Reviews cross-week state — Reviewed log, Next-up parks, conventions    | 2026-09-12   |
 | [planning/audits/2026-08-04-storefront-staleness-audit.md](planning/audits/2026-08-04-storefront-staleness-audit.md) | Storefront EN-string/staleness audit — G2/G4 definitive scope + TASK-056 gaps | 2026-08-04   |
 
 ### Architecture & Design
