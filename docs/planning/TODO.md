@@ -124,6 +124,42 @@ verify that out-of-tree work landed. Kept separate from the in-tree spawned task
       as the standard the diff is judged against, so decisions made and recorded inside the
       branch are visible. Its corollary belongs in the same paragraph: several agents agreeing
       about the same truncated input is not corroboration.
+- [ ] **Propagate "verify the rejection, not the render" to `~/.claude/POLICIES/security.md`** —
+      _filed 2026-09-12, G21 run 3._ Verified absent: `POLICIES/security.md` names the allowlist
+      only as an authoring requirement (its validation table reads _"Emails | Format, domain
+      allowlist if applicable"_ and _"URLs | Protocol (https only), domain allowlist"_), and
+      nothing in the global tree says how a guard fix is **verified**. The rule: when you close an
+      allowlist, auth check or input filter, the evidence is the set of inputs that are now
+      **refused** — probe those. A working happy path is consistent with the guard having done
+      nothing at all, because that is exactly what a no-op guard looks like from the feature side.
+      Derived here from G17 finding F6 (image-optimizer SSRF): the fix was only proved in
+      production when arbitrary hosts, cloud-metadata addresses and lookalike domains all
+      returned 400 — the real images rendering proved only that nothing had broken.
+- [ ] **Propagate the non-vacuous-assertion technique to `~/.claude/POLICIES/testing.md`** —
+      _filed 2026-09-12, G21 run 3._ **Only the missing half**: the principle is already global
+      twice over — `~/.claude/CLAUDE.md:41` _"a check that cannot fail looks exactly like one that
+      passes"_ and `POLICIES/critical-thinking.md:77` _"Could this check have failed? | A guard
+      that cannot fail looks identical to a guard that passes"_ — but `POLICIES/testing.md`
+      contains no technique for building one that can go red (greps for `vacuous`,
+      `toBeGreaterThan`, `independently`, `count` all return zero). The rule: assert against an
+      **independently computed** expected value, never against "not empty".
+      `expect(set.length).toBeGreaterThan(0)` smuggles in the premise that the set is never
+      legitimately empty, which is usually the very assumption under test. G19 shipped this defect
+      **5× in one PR**. Two worked examples belong with it: a guard that reads a directory needs a
+      case for the directory being **gone** (git does not track empty directories, so the last
+      file moved out turns the check into an ENOENT — this broke `main` on G19's own close-out),
+      and a test can be vacuous through its **fixture** rather than its assertion, when the
+      fixture cannot express the failing case at all.
+- [ ] **Propagate "a doc that quotes code shares no keyword with the change that invalidates it"
+      to `~/.claude/POLICIES/documentation.md`** — _filed 2026-09-12, G21 run 3._ Verified absent:
+      the global tree covers only the findable direction — `CLAUDE.md:79` _"References deleted
+      code → update or archive"_ and `TEMPLATES/docs_template/README.md:174` _"References deleted
+      code/features"_ both assume the doc **names** the thing that changed. A quoted snippet is
+      the case where it does not: rename the symbol and the doc still reads correctly while
+      sharing no token with the diff, so no keyword sweep can find it. The rule: diff quoted
+      snippets against their source rather than grepping for them, audit what a sweep **skips**
+      rather than what it matched, and aim any automated guard at the doc that persists — not at
+      the change that invalidated it. Cost this pattern five review rounds on PR #45.
 
 #### [TASK-055] Content & legal pages
 
