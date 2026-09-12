@@ -85,6 +85,19 @@ describe("POST /api/feedback", () => {
     expect(mockSend).not.toHaveBeenCalled();
   });
 
+  // The drop test is `website && website.trim() !== ""`, so a honeypot holding
+  // only whitespace is treated as EMPTY and the feedback is sent for real.
+  // That is the deliberate fail-open choice — a stray space from an
+  // autofill/proxy must not silently swallow a genuine message — and it is
+  // pinned here because the guard is one `.trim()` away from the opposite
+  // behavior, with no user-visible signal either way.
+  it("treats a whitespace-only honeypot as unfilled and sends the feedback", async () => {
+    const res = await POST(feedbackRequest({ message: "Цілком нормальний текст", website: "   " }));
+    expect(res.status).toBe(201);
+    expect((await res.json()).code).toBe("FEEDBACK_SENT");
+    expect(mockSend).toHaveBeenCalledTimes(1);
+  });
+
   it("returns 500 SEND_FAILED when the send reports failure", async () => {
     mockSend.mockResolvedValue({ success: false, error: "FEEDBACK_EMAIL not configured" });
     const res = await POST(feedbackRequest({ message: "Довге повідомлення" }));

@@ -18,7 +18,7 @@ const paymentIntentSchema = checkoutSchema.extend({
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
     const data = paymentIntentSchema.parse(body);
 
     // Validate cart items and get current prices

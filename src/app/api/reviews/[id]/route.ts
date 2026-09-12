@@ -25,7 +25,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       return apiError("You can only edit your own reviews", 403);
     }
 
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
     const validationResult = updateReviewSchema.safeParse(body);
     if (!validationResult.success) {
       return apiError(validationResult.error.issues[0].message, 400);

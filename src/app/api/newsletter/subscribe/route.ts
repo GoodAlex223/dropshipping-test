@@ -13,7 +13,7 @@ import { sendNewsletterConfirmationEmail } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
     const result = subscribeNewsletterSchema.safeParse(body);
 
     // `error`/`message` strings are for logs/API consumers; clients map

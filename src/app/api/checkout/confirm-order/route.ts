@@ -34,7 +34,7 @@ const confirmOrderSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
     const data = confirmOrderSchema.parse(body);
 
     // Verify payment intent is successful

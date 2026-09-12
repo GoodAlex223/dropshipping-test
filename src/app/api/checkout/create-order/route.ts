@@ -30,7 +30,7 @@ const createOrderSchema = checkoutSchema.extend({
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
     const data = createOrderSchema.parse(body);
 
     const deliveryMethod = getDeliveryMethod(data.shippingMethod);

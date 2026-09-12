@@ -7,9 +7,20 @@ export function createNextRequest(options: {
   url: string;
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: Record<string, unknown>;
+  /**
+   * Body sent verbatim, bypassing `JSON.stringify` — the only way to hand a
+   * handler something `request.json()` cannot parse. `body` covers the happy
+   * path; this covers the malformed-payload contract (G20). Passing both is a
+   * test bug, so it throws rather than silently picking one.
+   */
+  rawBody?: string;
   searchParams?: Record<string, string>;
 }): NextRequest {
-  const { url, method = "GET", body, searchParams } = options;
+  const { url, method = "GET", body, rawBody, searchParams } = options;
+
+  if (body !== undefined && rawBody !== undefined) {
+    throw new Error("createNextRequest: pass either `body` or `rawBody`, not both");
+  }
 
   const fullUrl = new URL(url, "http://localhost:3000");
   if (searchParams) {
@@ -18,10 +29,13 @@ export function createNextRequest(options: {
     });
   }
 
+  const payload =
+    rawBody !== undefined ? rawBody : body !== undefined ? JSON.stringify(body) : undefined;
+
   return new NextRequest(fullUrl, {
     method,
-    ...(body && {
-      body: JSON.stringify(body),
+    ...(payload !== undefined && {
+      body: payload,
       headers: { "Content-Type": "application/json" },
     }),
   });

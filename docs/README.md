@@ -2,7 +2,7 @@
 
 Central index for all project documentation.
 
-**Last Updated**: 2026-09-10
+**Last Updated**: 2026-09-12
 
 ---
 
@@ -36,7 +36,7 @@ Central index for all project documentation.
 | [planning/WEEKLY.md](planning/WEEKLY.md)                                                                             | Current week's plan                                                           | 2026-08-20   |
 | [planning/TODO.md](planning/TODO.md)                                                                                 | Active tasks                                                                  | 2026-09-10   |
 | [planning/DONE.md](planning/DONE.md)                                                                                 | Completed tasks                                                               | 2026-09-10   |
-| [planning/BACKLOG.md](planning/BACKLOG.md)                                                                           | Unprioritized ideas                                                           | 2026-09-10   |
+| [planning/BACKLOG.md](planning/BACKLOG.md)                                                                           | Unprioritized ideas                                                           | 2026-09-12   |
 | [planning/ROADMAP.md](planning/ROADMAP.md)                                                                           | Long-term vision                                                              | 2026-07-14   |
 | [planning/GOALS.md](planning/GOALS.md)                                                                               | Objectives & metrics                                                          | 2026-01-26   |
 | [planning/MILESTONES.md](planning/MILESTONES.md)                                                                     | Key targets                                                                   | 2026-01-26   |
@@ -81,8 +81,9 @@ Central index for all project documentation.
 
 ## Implementation Plans
 
-| Plan | Task | Status | Started |
-| ---- | ---- | ------ | ------- |
+| Plan                                                                                      | Task                  | Status | Started    |
+| ----------------------------------------------------------------------------------------- | --------------------- | ------ | ---------- |
+| [2026-09-12_g20-pre-launch-polish.md](planning/plans/2026-09-12_g20-pre-launch-polish.md) | G20 Pre-Launch Polish | ACTIVE | 2026-09-12 |
 
 ### Archived Plans
 
