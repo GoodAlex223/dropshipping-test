@@ -50,7 +50,7 @@ Source: BACKLOG [2026-08-15] G14 audit. Mockup: [`Mirox Mobile.dc.html`](../../d
 - **No `scrollbar-hide` utility** — mobile scrollbars are already overlay-style, and skipping it avoids the Tailwind-v4 `@layer` landmine entirely.
 - **No `tabIndex` on the scroller** — its children are links, so the region is already keyboard-reachable; adding one would create a redundant desktop tab stop.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Extend `tests/unit/product-rail.test.tsx`:
 
@@ -58,10 +58,52 @@ Extend `tests/unit/product-rail.test.tsx`:
 2. every card sits in a fixed-width wrapper that releases at `sm:`;
 3. **the bleed guard with teeth** — extract the negative-margin value and the padding value from the class list and assert they are numerically equal, so an edit to one without the other fails.
 
-- [ ] **Step 2: Implement** the class changes and the wrapper element.
-- [ ] **Step 3: Verify** — `npm run test:run`, `npm run lint`, `npm run typecheck`.
-- [ ] **Step 4: Compiled-CSS check** — `env -u NODE_ENV npm run build`, then grep the emitted CSS chunk for the `sm:` grid rules and the margin/padding pair. Record the grep output in this plan; a check with no quoted matched line proves nothing ([[concept-grep-proves-nothing]]).
+- [x] **Step 2: Implement** the class changes and the wrapper element.
+- [x] **Step 3: Verify** — `npm run test:run`, `npm run lint`, `npm run typecheck`.
+- [x] **Step 4: Compiled-CSS check** — `env -u NODE_ENV npm run build`, then grep the emitted CSS chunk for the `sm:` grid rules and the margin/padding pair. Record the grep output in this plan; a check with no quoted matched line proves nothing ([[concept-grep-proves-nothing]]).
 - [ ] **Step 5: Visual gate** — `rm -rf .next`, dev server, homepage at 390px and at ≥`sm:`, screenshots delivered as one Artifact URL.
+
+**Step 1 evidence (guard proven to fail).** The bleed test was mutation-checked
+before being trusted: changing `-mr-4` → `-mr-6` in the component produced
+
+```
+AssertionError: expected [ '-mr-6', 'mt-8', 'flex', …(10) ] to include '-mr-4'
+× bleeds right by exactly the container's own horizontal padding
+Tests  1 failed | 5 passed (6)
+```
+
+so the pair assertion is a control, not a restatement.
+
+**Step 4 evidence (compiled CSS, `env -u NODE_ENV npm run build`, exit 0).**
+Two CSS chunks are emitted; the rail's rules live in
+`.next/static/css/1587a4d57afeb6c7.css`. Matched lines, quoted:
+
+```
+.overflow-x-auto{overflow-x:auto}
+.-mr-4{margin-right:calc(var(--spacing)*-4)}
+.pr-4{padding-right:calc(var(--spacing)*4)}
+.w-40{width:calc(var(--spacing)*40)}
+.shrink-0{flex-shrink:0}
+.container{…;padding-inline:calc(var(--spacing)*4);…}
+```
+
+`.container`'s inline padding is `spacing*4` and the rail's bleed pair is
+`-4` / `+4` — an exact cancellation, confirmed against the build output rather
+than the className. The `sm:` resets all compiled **inside** a
+`@media (min-width:40rem)` block (3 such blocks, 2093 bytes total):
+
+```
+.sm\:grid{display:grid}
+.sm\:overflow-visible{overflow:visible}
+.sm\:mr-0{margin-right:calc(var(--spacing)*0)}
+.sm\:pr-0{padding-right:calc(var(--spacing)*0)}
+.sm\:w-auto{width:auto}
+.sm\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+```
+
+The presence of populated `min-width:40rem` blocks is itself the evidence the
+`env -u NODE_ENV` workaround did its job — a NODE_ENV-contaminated build is
+precisely the one that drops these.
 
 ### Task 1.2: Mobile-PDP contextual header — assessment only
 
