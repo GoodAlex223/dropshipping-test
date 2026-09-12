@@ -61,7 +61,48 @@ Extend `tests/unit/product-rail.test.tsx`:
 - [x] **Step 2: Implement** the class changes and the wrapper element.
 - [x] **Step 3: Verify** — `npm run test:run`, `npm run lint`, `npm run typecheck`.
 - [x] **Step 4: Compiled-CSS check** — `env -u NODE_ENV npm run build`, then grep the emitted CSS chunk for the `sm:` grid rules and the margin/padding pair. Record the grep output in this plan; a check with no quoted matched line proves nothing ([[concept-grep-proves-nothing]]).
-- [ ] **Step 5: Visual gate** — `rm -rf .next`, dev server, homepage at 390px and at ≥`sm:`, screenshots delivered as one Artifact URL.
+- [x] **Step 5: Visual gate** — `rm -rf .next`, dev server, homepage at 390px and at ≥`sm:`, screenshots delivered as one Artifact URL.
+
+**Gate round 1 (2026-09-12)** — <https://claude.ai/code/artifact/c287738f-4733-4cb1-8170-ba1aa2ce0aa2>
+
+Captured with Playwright driven directly from the repo (`--no-sandbox`; the MCP
+browser cannot sandbox as root in this container), `deviceScaleFactor: 2`, on a
+cleared `.next`. Every number was read off the live DOM in the same pass rather
+than restated from source:
+
+| viewport | display | overflow-x | margin/padding-right | card width | scroll / client |
+| -------- | ------- | ---------- | -------------------- | ---------- | --------------- |
+| 390      | flex    | auto       | −16px / 16px         | 160px      | 728 / 374       |
+| 768      | grid    | visible    | 0px / 0px            | 224px      | 720 / 720       |
+| 1280     | grid    | visible    | 0px / 0px            | 286px      | 1216 / 1216     |
+
+The rail's right edge lands at exactly 390 at mobile — full bleed, no overhang —
+and the bleed pair is fully zeroed above the breakpoint, so the desktop grid is
+unchanged. **Verdict: matches the mockup.**
+
+**One finding, pre-existing and out of scope.** At 390px the _document_ is 396px
+wide — the homepage scrolls sideways by 6px. The rail does not cause it: its own
+right edge is 390 and everything beyond sits inside the scroller. Walking the DOM
+for elements overflowing **without a clipping ancestor** returns exactly one
+culprit, the footer's `nav.flex.gap-6`. Proven pre-existing by measuring three
+rail-free pages:
+
+```
+path        docScrollWidth  hasRail  offending nav right
+/                      396    true                  396
+/feedback              396   false                  396
+/track                 396   false                  396
+/cart                  396   false                  396
+```
+
+Filed 🟤 BACKLOG [2026-09-12]; surfaced to the user as a decision rather than
+absorbed, since it is live on every mobile page but belongs to neither G20 member.
+
+**Second observation, no action.** The shipped card is 421px tall against the
+mockup's ~260px, because `ProductCard` also carries category, short description,
+swatch and size list. That component is shared with the catalog, quick view and
+bought-together, so slimming it here would change four surfaces. The backlog item
+asked for 160px-wide cards in a scroller; card density is a separate question.
 
 **Step 1 evidence (guard proven to fail).** The bleed test was mutation-checked
 before being trusted: changing `-mr-4` → `-mr-6` in the component produced
