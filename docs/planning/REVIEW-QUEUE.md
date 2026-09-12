@@ -394,7 +394,7 @@ as new errands. If the queue is worked as a batch, work the folds at the same ti
   it runs Prisma against Neon and Docker. **Re-trigger**: a migration workflow problem that
   `prisma migrate` plus `scripts/vercel-build.sh` cannot answer.
 
-- **Slot 4 fold-in defers (5, all verified absent globally)** — every one is deferred on
+- **Slot 4 fold-in defers (6, all verified absent globally)** — every one is deferred on
   **routing, not value**, and each names an existing unworked row as its host, per the standing note
   that this queue is worked as a batch: "diff-scoped review is blind to deletion fallout" → run 1
   row 3 (`POLICIES/code-review.md`); "an unverified reproduction premise inverts the fix" → the
@@ -403,7 +403,10 @@ as new errands. If the queue is worked as a batch, work the folds at the same ti
   example; "real-data intake finds what review cannot" (fixture-side vacuity) → run 1 row 1
   (`POLICIES/manual-testing.md`); "underspecified predicates manufacture disagreement" → the
   judgement-over-rules rewrite parked from run 2, which is the one edit that owns rules about rule
-  wording. **Re-trigger for all five**: the named host is touched. Working them as separate errands
+  wording. The sixth is a **re-park rather than a new fold-in**: "claimed records must exist" was
+  already folded against run 1 row 2 by run 2, and run 3 carries new content into the same host (its
+  2026-09-02 update, that a propagation grep must enumerate its targets first). **Re-trigger for all
+  six**: the named host is touched. Working them as separate errands
   would open five edits against four files that already have queued edits.
 - **Stack-specific technical facts, 2026-08-17 → 2026-09-12** (slot 4, grouped) — `defer`.
   Six facts, no process rule among them (GFM table pipes; the CSS-verification and Next minifier
