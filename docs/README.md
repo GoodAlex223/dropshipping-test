@@ -2,7 +2,7 @@
 
 Central index for all project documentation.
 
-**Last Updated**: 2026-09-10
+**Last Updated**: 2026-09-12
 
 ---
 
@@ -81,8 +81,9 @@ Central index for all project documentation.
 
 ## Implementation Plans
 
-| Plan | Task | Status | Started |
-| ---- | ---- | ------ | ------- |
+| Plan                                                                                      | Task                  | Status | Started    |
+| ----------------------------------------------------------------------------------------- | --------------------- | ------ | ---------- |
+| [2026-09-12_g20-pre-launch-polish.md](planning/plans/2026-09-12_g20-pre-launch-polish.md) | G20 Pre-Launch Polish | ACTIVE | 2026-09-12 |
 
 ### Archived Plans
 
