@@ -264,6 +264,7 @@ The review explicitly did not re-run build/typecheck/E2E or reproduce the 307, t
 **Plan**: none — same spec-only route as runs 1 and 2 (decision §2.4). Run 3 executes an existing recipe; no new methodology, so there is nothing to archive.
 **Durable state**: [REVIEW-QUEUE.md](REVIEW-QUEUE.md) — this run appended **17 rows**, closed 1 park, rewrote 1 park condition, and re-checked all 13 standing parks
 **Spec**: [2026-08-10-g6-weekly-reviews-design.md](../superpowers/specs/2026-08-10-g6-weekly-reviews-design.md) — gained a §12 recording what run 3 changed in it
+**PR**: [#47](https://github.com/GoodAlex223/dropshipping-test/pull/47) — docs-only, nothing to verify in a running app; `docs-freshness` 109 passed and `prettier --check "docs/**/*.md"` clean before opening
 
 **Summary**: Third run of the standing ⚪ Overhead batch, and the first where the interesting results came from the **parks** rather than from discovery. Docs-only, all four slots sequential in-session (Convention 8). **17 rows: 1 adopt · 10 defer · 1 pass · 3 propagate, plus 2 process rows** (3 / 1 / 2 / 11 by slot).
 

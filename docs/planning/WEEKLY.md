@@ -179,7 +179,7 @@ Filed 🟤 to amend the wording, with the ask-first and never-relaunch constrain
 | G18 | Guest Order Access & Hardening `[batch]` 🏆 | checkout/orders | 🔵 User     | 2      | 7        | Tue–Wed      | ✅ `a37c8d0` / PR #44                       |
 | G19 | Launch Runbook + Deploy Verify `[batch]`    | ops/deploy      | 🔵 User     | 2      | 3        | Thu          | ✅ PR #45 / `735533a`                       |
 | G20 | Pre-Launch Polish `[batch]`                 | storefront      | 🔵 User     | 3      | 5        | Thu          | ✅ PR #46 / `baef19b`                       |
-| G21 | Weekly Reviews `[batch]`                    | recurring       | ⚪ Overhead | 4      | 5        | Fri          | ☐ Planned                                   |
+| G21 | Weekly Reviews `[batch]`                    | recurring       | ⚪ Overhead | 4      | 5        | Fri          | ✅ PR #47                                   |
 |     | **Total**                                   |                 |             | **16** | **34**   |              |                                             |
 
 _Source legend: 🔵 User · 🟡 Ops · 🟤 Auto · ⚪ Overhead (exempt from the quota denominator). Status on completion: `✅ PR #N` (the number, never a bare ✅)._
