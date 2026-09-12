@@ -95,8 +95,11 @@ path        docScrollWidth  hasRail  offending nav right
 /cart                  396   false                  396
 ```
 
-Filed 🟤 BACKLOG [2026-09-12]; surfaced to the user as a decision rather than
-absorbed, since it is live on every mobile page but belongs to neither G20 member.
+**Superseded 2026-09-12**: surfaced to the user as a decision rather than
+absorbed, and the user ruled to **fix it now** — see Member 3 below. No BACKLOG
+entry was ever written for it (an earlier revision of this paragraph claimed one
+had been filed; it had not — the 2026-09-12 group holds four entries, none of
+them this). The fix, not a file, is the record.
 
 **Second observation, no action.** The shipped card is 421px tall against the
 mockup's ~260px, because `ProductCard` also carries category, short description,
@@ -254,6 +257,66 @@ mutations, which is precisely the gap these fill.
 The non-marquee announcement variant has an asymmetric `pr-3`-only inset. It is unreachable today (`site.announcement.marquee === true`).
 
 - [x] Add a code comment recording the asymmetry and that it must be fixed **before** that variant is ever activated. **No behavior change.**
+
+---
+
+## Member 3 — Footer mobile overflow (added 2026-09-12 by user ruling)
+
+Not in the original G20 scope. Raised by the Member 1 visual gate, surfaced as a
+decision, and pulled in on the user's word: _"Lets do 'The homepage scrolls
+sideways 6px on mobile — pre-existing, and not the rail' now."_
+
+**The defect.** `Footer.tsx`'s copyright-row nav was `flex gap-6` with no wrap.
+Five Ukrainian labels — Каталог · Категорії · Новинки · Статус замовлення ·
+Зворотний зв'язок — total ~380px of content against 358px of container at a
+390px viewport (390 − 2×16 of `.container` inset). Flex items refuse to shrink
+below their content width, so the row ran to x=396 and dragged the **document**
+with it: every page carrying the footer scrolled sideways by 6px.
+
+**The fix.** `flex flex-wrap gap-x-6 gap-y-2`. Asymmetric gaps because the row
+gap only ever applies once wrapping happens, where a 24px gap between stacked
+lines reads as a hole rather than line spacing. Desktop is unchanged — at `lg`
+the content fits one line and never wraps.
+
+- [x] **Step 1: Write the failing test** — `tests/e2e/mobile-overflow.spec.ts`,
+      five pages at 390px, asserting `document.scrollWidth <= clientWidth`. Run
+      red: all five failed, and the failure message named the culprit itself
+      (`<nav class="flex gap-6"> right=396`), so the next person does not repeat
+      the scripted DOM walk this investigation needed.
+- [x] **Step 2: Implement** the wrap.
+- [x] **Step 3: Verify** — green on **chromium and webkit**, the two projects
+      `ci.yml` actually runs.
+
+**Why an E2E test and why it sets its own viewport.** Nothing here is visible to
+jsdom — it needs real layout, real fonts, a real viewport. And CI runs
+`--project=chromium --project=webkit`, both _desktop_ devices: a spec relying on
+the `Mobile Chrome` / `Mobile Safari` projects would pass locally and never run
+on the branch that matters. The spec calls `page.setViewportSize()` instead.
+A unit test asserting `flex-wrap` is in the className would only restate the fix.
+
+**Measured after (via `footer nav`, `/track`):**
+
+| viewport | nav right | lines | doc scroll / client |
+| -------- | --------- | ----- | ------------------- |
+| 390      | 374       | 2     | 390 / 390           |
+| 1280     | 1248      | 1     | 1280 / 1280         |
+
+**Pre-existing local E2E failures, explicitly not caused by this change.** Six
+specs fail locally both with and without the fix — an **identical set**, which is
+the comparison that settles it:
+
+```
+baseline (change stashed):  cart 10/62/85/107 + checkout 20/123  → 6 failed
+with the fix, isolated:     cart 10/62/85/107 + checkout 20/123  → 6 failed
+```
+
+Cause is local seed data, not code: the failure snapshot shows
+`button "ДОДАТИ В КОШИК" [disabled]` and `button "Один розмір" [disabled]` — the
+first product on the local `/products` is out of stock, so the click never
+resolves. CI seeds its own database and builds the app rather than running
+`next dev`, so CI is the arbiter here ([[local-failure-masks-later-assertions]]).
+Two further specs (`navigation`, `products`) failed in one loaded run and pass
+green in isolation — contention, not regression: 21/21 pass.
 
 ---
 

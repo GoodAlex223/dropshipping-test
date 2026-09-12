@@ -81,7 +81,17 @@ export function Footer() {
           <span>
             &copy; {new Date().getFullYear()} {site.name}. {tBrand("tagline")}
           </span>
-          <nav className="flex gap-6">
+          {/* flex-wrap, not plain flex: the five UA labels total ~380px, which
+              does not fit 358px of container at a 390px viewport, and flex
+              items refuse to shrink below their content — so an unwrapped row
+              pushed the whole DOCUMENT to 396px and every page carrying the
+              footer scrolled sideways by 6px (found by the G20 visual gate;
+              guarded by tests/e2e/mobile-overflow.spec.ts). Asymmetric gaps
+              because the row gap only ever applies once wrapping happens,
+              where 24px between stacked lines reads as a gap in the row
+              rather than line spacing. Desktop is unchanged: at `lg` the
+              content fits on one line and never wraps. */}
+          <nav className="flex flex-wrap gap-x-6 gap-y-2">
             {shopLinks.map((l) => (
               <Link key={l.key} href={l.href} className="hover:text-foreground transition-colors">
                 {t(`links.${l.key}`)}
