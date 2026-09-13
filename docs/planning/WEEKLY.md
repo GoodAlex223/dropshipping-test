@@ -113,10 +113,27 @@ production while the sideways-scroll half of the fix _did_ land. `npm run smoke`
 
 > Run 3. Read [REVIEW-QUEUE.md](REVIEW-QUEUE.md) first — the run recipe (incl. the step-5 re-check pass), the standing launch-push lens (high adopt bar, re-scope after launch), and Convention-4 cheap checks on all parks. Two parks interact with this very week: `resend`'s condition ("sending domain provisioned") may FIRE if G15's domain item lands mid-week, and `security-guidance`'s re-trigger reads G17's scan results (a recurring vulnerability class un-defers it). Sequential in-session (Convention 8).
 
-- [ ] Plugins ×2: best not-yet-reviewed from the official store AND from the wider internet, each row tagged `source:` (2)
-- [ ] Claude best-practices: top not-yet-reviewed candidate via date-aware web search (1)
-- [ ] Non-Claude AI best-practices — the bias-watch counter stands at **0 of 2** under the rewritten methodology-aimed condition (1)
-- [ ] Cross-project propagation: window = shipped since run 2 — PRs #39/#40, G11 merge `745e039`, G12 merge `9fc4fd3`, memory files 2026-08-15 → run day (1)
+- [x] Plugins ×2: best not-yet-reviewed from the official store AND from the wider internet, each row tagged `source:` (2)
+- [x] Claude best-practices: top not-yet-reviewed candidate via date-aware web search (1)
+- [x] Non-Claude AI best-practices — the bias-watch counter stands at **0 of 2** under the rewritten methodology-aimed condition (1)
+- [x] Cross-project propagation: window = shipped since run 2 — PRs #39/#40, G11 merge `745e039`, G12 merge `9fc4fd3`, memory files 2026-08-15 → run day (1)
+
+**As delivered (2026-09-12)**: run 3 wrote **17 rows — 1 adopt · 10 defer · 1 pass · 3 propagate, plus 2
+process rows** (3 / 1 / 2 / 11 by slot). The slot-4 window was **widened by user ruling at the brainstorm**,
+exactly as at G10: the list above was written 2026-08-20, before G16–G20 existed, and the slot's own
+definition ("shipped since run 2") governs — so the scan covered PRs #40–#46, the G11/G12/G15 bare merges and
+every memory file touched 2026-08-17 → 2026-09-12.
+
+Both parks this group was told to watch resolved, neither the way the plan expected. `resend` did **not**
+fire — the sending domain is still unprovisioned, so the standing no-order-email gap is untouched. Reading
+G17's results moved `security-guidance` off the board a different way: Convention 2's exclusion set shows it
+already enabled globally, so the park **closed by adoption** rather than by verdict. `logic-lens`'s condition
+did fire, on 24 threshold recurrences, and still deferred — the re-check found the plugin documents how to
+change its own 80 gate, which is a cheaper instrument aimed at the real mechanism than a second reviewer is.
+
+The adopt is slot 2's: Convention 8 bans subagent fan-out on evidence that only covers background Workflow
+runs, while bounded foreground dispatch has been measured safe here (G17: 38 agents, +550 MiB, `oom_kill 0`).
+Filed 🟤 to amend the wording, with the ask-first and never-relaunch constraints written into it.
 
 ---
 
@@ -162,7 +179,7 @@ production while the sideways-scroll half of the fix _did_ land. `npm run smoke`
 | G18 | Guest Order Access & Hardening `[batch]` 🏆 | checkout/orders | 🔵 User     | 2      | 7        | Tue–Wed      | ✅ `a37c8d0` / PR #44                       |
 | G19 | Launch Runbook + Deploy Verify `[batch]`    | ops/deploy      | 🔵 User     | 2      | 3        | Thu          | ✅ PR #45 / `735533a`                       |
 | G20 | Pre-Launch Polish `[batch]`                 | storefront      | 🔵 User     | 3      | 5        | Thu          | ✅ PR #46 / `baef19b`                       |
-| G21 | Weekly Reviews `[batch]`                    | recurring       | ⚪ Overhead | 4      | 5        | Fri          | ☐ Planned                                   |
+| G21 | Weekly Reviews `[batch]`                    | recurring       | ⚪ Overhead | 4      | 5        | Fri          | ✅ PR #47                                   |
 |     | **Total**                                   |                 |             | **16** | **34**   |              |                                             |
 
 _Source legend: 🔵 User · 🟡 Ops · 🟤 Auto · ⚪ Overhead (exempt from the quota denominator). Status on completion: `✅ PR #N` (the number, never a bare ✅)._

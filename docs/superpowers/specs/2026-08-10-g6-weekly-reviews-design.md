@@ -334,3 +334,29 @@ this document asserts:
 - **Convention 7's re-trigger partially fired** — slot 2 produced a candidate whose sharpest target is the
   _global_ `~/.claude` tree, for which this repo has no sink. Recorded in `REVIEW-QUEUE.md` § Next-up, not
   acted on: one occurrence is not the pattern the convention asks for.
+
+---
+
+## 12. Run 3 (2026-09-12, WEEKLY G21) — what the design produced on its third execution
+
+Recorded here only where run 3 changed something this document asserts. The conventions list is **unchanged
+at 10 items** and still aligns 1:1 with §"Conventions seeded on this first run"; one amendment to Convention 8
+was filed 🟤 rather than applied, so nothing propagates back beyond this note.
+
+- **Convention 1's cadence evidence was refreshed again.** It cited runs 1 and 2 (9 and 14 rows); run 3 wrote
+  **17** (3 / 1 / 2 / 11 by slot, 2 of them process rows). The note now says which slot is growing and why —
+  slot 4 went 5 → 8 → 11 because its window is everything shipped since the previous run, and the runs are
+  drifting further apart. §11 predicted the spread was "real and widening"; a third data point confirms it.
+- **A park closed itself, which the design did not anticipate.** `security-guidance` was a run 2 `defer`
+  waiting on a cost condition, and it was resolved instead by **adoption elsewhere** — it now reads `true` in
+  the live `~/.claude/settings.json`. Convention 2's exclusion set is what detected this, so no verdict was
+  needed and its source was never re-read. Worth stating as design behaviour: a park's exit is not only its
+  own re-trigger firing, and Convention 2 must therefore run **before** a park re-review, not after.
+- **A fired condition does not oblige an adopt.** `logic-lens`'s condition fired on hard evidence (24
+  threshold recurrences), but the candidate had not moved since run 2 and the re-check surfaced a cheaper
+  instrument aimed at the actual mechanism. Its re-trigger was rewritten so recurrence count alone no longer
+  fires it — a condition that keeps firing while its answer keeps being "no" is a mis-specified condition.
+- **Step 5 caught one real defect**, on its second outing as a formal step: check 4 (attribution inside the
+  declared window) found the grouped stack-facts row citing **PRs #40, #44, #46**, of which only #44 and #46
+  were origins at all — verified against the memory files themselves, the correct set is the G11 and G12
+  merges plus PRs #41/#43, #44 and #46. Every other Origin cell was checked the same way and held.
