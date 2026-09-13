@@ -360,3 +360,14 @@ was filed 🟤 rather than applied, so nothing propagates back beyond this note.
   declared window) found the grouped stack-facts row citing **PRs #40, #44, #46**, of which only #44 and #46
   were origins at all — verified against the memory files themselves, the correct set is the G11 and G12
   merges plus PRs #41/#43, #44 and #46. Every other Origin cell was checked the same way and held.
+- **What step 5 does not cover** (added at close-out, from the PR review). Both review findings were figures
+  **derived inside a sentence** — a count of host files and a count of queued rows — and check 1 passed over
+  them because it enumerates claim _shapes_ ("N rows", "N adopts") rather than any recountable figure. The
+  run's verdicts, windows and tallies held under four independent re-derivations; every defect was in prose
+  _about_ the counts. Filed 🟤 at close-out.
+- **A candidate produced by a run's own review does not become a row in that run.** The review surfaced a
+  portable lesson (a repair written into a paragraph can contradict a sibling repair four lines away; re-read
+  the whole unit after the _last_ edit). Its sink is the same as any other candidate's, but it must enter the
+  way the others did — written into the memory file slot 4 scans, then ruled on by the **next** run — because
+  the slot tables record what a scan found before the PR existed. Back-dating a post-scan lesson into them
+  would be the `claimed-records-must-exist` failure, committed in the table that files a row about it.

@@ -133,6 +133,11 @@ change its own 80 gate, which is a cheaper instrument aimed at the real mechanis
 
 The adopt is slot 2's: Convention 8 bans subagent fan-out on evidence that only covers background Workflow
 runs, while bounded foreground dispatch has been measured safe here (G17: 38 agents, +550 MiB, `oom_kill 0`).
+
+Merged `05edce3` on 2026-09-13 after **4 review rounds**. Both findings were in one bullet's trailing clause,
+and neither touched a verdict, a window or a tally. Two items were closed as record rather than diff: the
+gate-suppression instance, and the routing of the review's own fix-chain lesson — written into the memory
+file that slot 4 scans, rather than back-dated into a table that records what the scan found.
 Filed 🟤 to amend the wording, with the ask-first and never-relaunch constraints written into it.
 
 ---
@@ -164,7 +169,7 @@ Filed 🟤 to amend the wording, with the ask-first and never-relaunch constrain
 
 ### Friday — Reviews + close
 
-- **[G21](#g21-weekly-reviews-batch)** ⚪ — run 3, all four slots.
+- [x] **[G21](#g21-weekly-reviews-batch)** ⚪ — **shipped PR [#47](https://github.com/GoodAlex223/dropshipping-test/pull/47) / `05edce3` (2026-09-13)**. All four slots ran; the slot-4 window was widened by user ruling at the brainstorm. **4 review rounds, 2 findings**, both in the same bullet's trailing clause and both about figures derived in prose — the verdicts, windows and tallies survived four independent re-derivations untouched. Round 1 was **gate-suppressed at 75 against the 80 gate** and proved real _and_ understated: recurrence 25, and the measured instance the 🟤 rubric entry had been missing.
 - Close-out: statuses → `✅ PR #N`, as-delivered quota recompute, next-week seed list; slack for G17-finding fixes and client-response interrupts.
 
 ---
