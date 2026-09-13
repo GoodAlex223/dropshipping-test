@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-09-12
+**Last Updated**: 2026-09-13
 
 ---
 
@@ -1193,6 +1193,13 @@ Next-up parks (`defer`) or recorded as rows only (`pass`).
 **Origin**: final whole-branch review of G11 (`feat/g11-docs-freshness-linter`). One follow-up split out of the `[2026-08-01] From: PR #26 review` entry closed by this branch (its rubric-severity half was never built, only its index↔header half shipped), plus one new gap the linter's own scope revealed while verifying it. Both 🟤 Auto-Generated.
 
 - [ ] 🟤 **Reword the code-review skill's severity rubric so doc-drift findings can clear the gate** — split out as its own anchor because the parent entry (`[2026-08-01] From: PR #26 review`) is now marked `[x]` + strikethrough for its index↔header half, and a future BACKLOG reap would otherwise treat the whole entry as closed and sweep this still-open half to the 🪦 section along with it. The mechanism recorded on the parent stands: the code-review rubric only emits 0/25/50/75/100, so an 80 gate is in practice a 100 gate — doc-drift findings top out at 75 by construction and nothing between 75 and 100 is reachable. This is the `code-review-threshold-understates-doc-findings` memory's pattern, at its **20th recorded recurrence** as of this branch's own review (most recently G13/PR #40, 2026-08-17) — the recurrence count itself is the evidence this needs a durable anchor rather than another chat mention. (Med value, Low-Med effort)
+      **Measured instance added 2026-09-13 (PR #47 / G21 run 3 review).** Until now this entry named
+      the mechanism with no suppressed finding attached to it. It has one: the round-1 finding on
+      PR #47 scored **75** against the 80 gate (reviewer-reported), so under the procedure it would
+      never have been posted — and it was real _and understated_, wrong on both of the figures it
+      questioned rather than merely stale. Recurrence **25**. That is the shape any reword has to
+      clear: not "a doc finding was missed", but "a correct finding about counts not matching their
+      source scored 75, which this rubric cannot distinguish from 0".
       **Design input added 2026-09-12 (G21 run 3, slot 3 — evidence, not a new entry).** The authoring
       side of this problem has a vendor-neutral standard: **EARS** (Easy Approach to Requirements Syntax
       — Mavin et al., Rolls-Royce, IEEE RE09 2009), which Kiro's spec flow adopts as

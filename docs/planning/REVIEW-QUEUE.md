@@ -2,7 +2,7 @@
 
 Durable cross-week state for the **Weekly Reviews** batch (⚪ Overhead, quota-exempt, ~5 SP, scheduled late-week).
 
-**Last Updated**: 2026-09-12
+**Last Updated**: 2026-09-13
 **First run**: 2026-08-10 (WEEKLY G6, week of 2026-08-03) · design: [2026-08-10-g6-weekly-reviews-design.md](../superpowers/specs/2026-08-10-g6-weekly-reviews-design.md)
 **Latest run**: 2026-09-12 (WEEKLY G21, week of 2026-08-24) — run 3, executing the recipe below; no new
 methodology. **17 rows: 1 adopt · 10 defer · 1 pass · 3 propagate, plus 2 process rows** (3 / 1 / 2 / 11 by
@@ -421,6 +421,23 @@ as new errands. If the queue is worked as a batch, work the folds at the same ti
   `@layer utilities` in prod). **Re-trigger**: a second project adopts this stack — then
   `LANGUAGES/typescript.md` / `LANGUAGES/javascript.md` host them. The two with the widest reach if
   it ever fires are the GFM pipe-escaping rule and the Vitest `once`-queue leak.
+
+- **Filed on the PR #47 review, not by the slot-4 scan** — no verdict, in no tally, and
+  deliberately **not** a seventh fold-in. The candidate is the lesson this run's own review
+  produced: _repairing two review points inside the same paragraph is what made the two repairs
+  disagree_, whose control is to re-read the whole unit after the **last** edit rather than after
+  each one. Review round 4 re-raised it as unrouted, and it was — it existed only as `DONE.md`
+  prose, which slot 4 does not scan. Routed by fixing its **source**: it is now the fourth failure
+  mode in the `review-fix-chains-and-lazy-diagnostics` memory file, which is the kind of artefact
+  every slot-4 row above cites. It is not filed as a run-3 slot-4 row because those rows are the
+  output of a scan that ran before this PR existed, each citing a memory file that already held its
+  lesson at scan time; back-dating a lesson written **after** the scan into that table would be the
+  `claimed-records-must-exist` failure this same run filed a row about. Absence pre-verified so the
+  next run need not re-derive it: across `~/.claude`, excluding `projects/` and `plugins/` per the
+  Convention 9 corollary, greps for `re-read.*(whole|entire) (unit|paragraph)`, `after the last
+edit`, `fix.chain` and `downstream` return a single unrelated hit (`WORKFLOW.md:203`, about
+  workflow phases). **Next run's slot 4 owes it a verdict**; the likely host is run 1 propagation
+  row 3 (`POLICIES/code-review.md`), which already carries the deletion-fallout fold.
 
 #### Park re-checks performed on 2026-09-12 (run 3, Convention 4 — cheap checks only)
 
