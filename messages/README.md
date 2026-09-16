@@ -1,9 +1,11 @@
 # Message catalogs (TASK-039)
 
 - `uk.json` — source of truth; the schema. Every UI string lives here.
-- `ru.json` — **DRAFT — agent-translated 2026-08-14, pending client sign-off
-  (TASK-056 rider, pre-launch week)**. RU deep-merges over UK at request time;
-  a missing RU key renders the UA value.
+- `ru.json` — agent-translated 2026-08-14; **ACCEPTED 2026-09-16 by client delegation**
+  (TASK-056 item 20 — the client asked us to decide; ruled: «Нова Пошта» stays
+  undeclined, «ё» stays; the nuance list below remains the read-through
+  checklist, one human pass by the user still pending, non-blocking). RU
+  deep-merges over UK at request time; a missing RU key renders the UA value.
 
 Nuance-flagged for review (gate + client): `home.hero.*`, `brand.*`,
 `site.announcement.*`, `home.whyChooseUs.*`, testimonial/claims copy.

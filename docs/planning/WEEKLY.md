@@ -10,8 +10,8 @@
 
 ## Parallel Work
 
-- **Client round-trip tracking (G15)** — responses are processed as they arrive, as welcome interrupts. The **domain → Resend DNS → `EMAIL_FROM` flip → redeploy** chain is pre-authorized interrupt work: it closes the standing "real customers receive no order email" gap the moment the client's domain lands.
-- **TASK-055 content/legal pages** — still blocked on client/lawyer copy; the G15 ask requests it. The pages get built the week the copy arrives (they gate TASK-048 per decision doc §5.3).
+- **Client round-trip tracking (G15)** — responses are processed as they arrive, as welcome interrupts. _(2026-09-16: the response arrived as a blanket delegation — processed, see G15; only the domain purchase remains open.)_ The **domain → Resend DNS → `EMAIL_FROM` flip → redeploy** chain is pre-authorized interrupt work: it closes the standing "real customers receive no order email" gap the moment the client's domain lands.
+- **TASK-055 content/legal pages** — ~~still blocked on client/lawyer copy; the G15 ask requests it~~ **unblocked 2026-09-16**: the client delegated the copy, we draft it ourselves. The pages get built the week the copy arrives (they gate TASK-048 per decision doc §5.3).
 
 ---
 
@@ -27,6 +27,7 @@ _Group IDs continue from prior weeks (G1–G14 are permanently taken by DONE.md 
 
 - [x] _(2026-08-21)_ Draft the consolidated ask document (client-facing, UA) from the TASK-056 checklist: photography (hero/product/measurement), logo vector, real socials + claims re-confirmation, size charts, legal-page copy / lawyer engagement, contact details, bank-card + WhatsApp details, free-shipping threshold, announcement copy, **domain purchase + email chain** (Resend DNS → `EMAIL_FROM`), NP API key + the Ukrposhta carrier question, `FEEDBACK_EMAIL` recipient, RU catalog sign-off package (nuance list in [messages/README.md](../../messages/README.md)) + the RU product-copy opt-in question (2) — TODO.md TASK-056 [HIGH]
 - [x] _(2026-08-21 — sent by the user the same day as drafted, ahead of the Monday plan; send date + 📨 statuses recorded on the TODO TASK-056 tracking table)_ Hand off for sending Monday; record the send date + per-item response tracking on TODO TASK-056; process same-week responses as interrupts (1) — TODO.md TASK-056
+- [x] _(2026-09-16)_ **Client replied — blanket delegation («вирішуйте самі»), no facts.** Processed as the interrupt this group planned for: every judgment item decided by us (user-approved in-session), every fact-only item given a recorded fallback — per-row record on the TODO TASK-056 table; confirmation back drafted → [reference/2026-09-16-client-reply.md](../reference/2026-09-16-client-reply.md). Consequences: **TASK-055 unblocked** (we draft all 7 pages); Ukrposhta ruled out and the RU product-copy sketch declined (both BACKLOG entries reaped → 🪦); RU catalog DRAFT label lifted; **the domain purchase is the one remaining 🔴** and needs a payer (`miroxshop.com.ua` recommended — free at a UA registrar; `mirox.shop`/`miroxshop.com` taken).
 
 ### G16. Real-Product Intake Pair Session [batch]
 

@@ -2,7 +2,7 @@
 
 Ideas and tasks not yet prioritized for active development.
 
-**Last Updated**: 2026-09-13
+**Last Updated**: 2026-09-16
 
 ---
 
@@ -698,7 +698,7 @@ Client's 20-item improvement list, mapped against the Mirox program spec. 15/20 
   `eslint-disable-line react-hooks/set-state-in-effect` suppressions (cart page, CookieConsent,
   CartDrawer, product-detail-client's `setHydrated`) and only Header.tsx is unsuppressed/latent.
   Sweep = replace four suppressions with the `useSyncExternalStore` gate + fix Header.
-  (Med value, Low effort) [PR #29 review rounds 5–6, 2026-08-07]
+  (Med value, Low effort) [PR #29 review rounds 5–6, 2026-08-07] **2026-09-16**: the client's NP key is no longer a gate — TASK-056 item 7 was decided under the client's blanket delegation as **Nova Poshta only, no Ukrposhta**, and the address/warehouse reference methods accept any NP key, so the picker runs on our own account key.
 
 ### [2026-08-08] From: G3 params fix (spec §5)
 
@@ -992,20 +992,7 @@ not close, plus a dormant-route parity gap surfaced while verifying the fix.
 items from the same batch (feedback form, launch-announcement marquee) were placed in
 [TODO.md](TODO.md) § Medium Priority instead.
 
-- [ ] 🔵 **Replace free-text city/branch checkout fields with real carrier, city and branch dropdowns** — Add a delivery-carrier choice (Ukrposhta / Nova Poshta), then city selection and branch (відділення) selection as dropdown menus populated with real options rather than typed text (выбор города, вариант отправки(укр пошта, нова пошта), выбор города и выбор отделения как дропдаун меню с реальными вариантами); affected: [src/app/(shop)/checkout/page.tsx:~392-420](<../../src/app/(shop)/checkout/page.tsx#L392-L420>) (city and `line1` are plain free-text `<Input>`s), [src/lib/shipping.ts:7-11](../../src/lib/shipping.ts#L7-L11) (`DELIVERY_METHODS` hardcodes three Nova Poshta options) [possible-dup-of: "Nova Poshta branch drop-down selector" — [2026-08-07] From: G2 post-gate review]
-
-  **What is genuinely new here versus the [2026-08-07] entry it duplicates**: that entry covers the
-  city → warehouse picker for **Nova Poshta only**. **Ukrposhta as a second carrier has zero
-  mentions anywhere in this repo** — verified by grep across `src/`, `docs/planning/` and
-  `docs/superpowers/specs/`, including the [Ukraine payments & delivery decision
-  doc](../superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md), which evaluated
-  Nova Poshta and never assessed Ukrposhta. So this is not a gap in an existing plan but an
-  uncosted **carrier-strategy decision**: a second carrier means a second address/branch API, a
-  second rate table (the current 80/120/70 UAH numerics are NP published rates), and a second
-  fulfilment path for the supplier-forwarding workers. Decide the carrier question before designing
-  the picker, since the picker's data source depends on the answer. Both halves stay client-gated —
-  the NP branch API needs the client's NP API key, and Ukrposhta would need its own credentials.
-  (High value, Med effort) `[relates-to: TASK-049]`
+- ~~Replace free-text city/branch checkout fields with real carrier, city and branch dropdowns~~ — **reaped 2026-09-16 → 🪦 section** (Ukrposhta ruled OUT under the client's TASK-056 delegation; the Nova-Poshta-only picker half lives in the [2026-08-07] entry above, now on our own NP key).
 
 ### [2026-08-11] From: Weekly planning steer (user-raised)
 
@@ -1064,13 +1051,6 @@ deferral's missing recording was re-raised by PR #37 review round 4. 🔵 User-F
 and the final whole-branch review's deferred minors (agents). First three 🔵 User-Flagged; the
 rest 🟤 Auto-Generated.
 
-- 🔵 **DB-content localization decision — RU product copy** — product/category names,
-  descriptions and variant values have no locale dimension (G9 spec scope ruling: DB data stays
-  UA in RU mode). If wanted: `ProductTranslation`/`CategoryTranslation` tables (locale →
-  name/description, RU falling back to UA like the catalog merge) + a second-language tab in
-  the admin forms. Doubles the client's per-product content workload — put the question to the
-  client in the TASK-056 round-trip (rider recorded there) and build only on opt-in.
-  (Med value, High effort) [G9 gate Q2, 2026-08-15]
 - 🔵 **Transactional-email localization** — emails are deliberately UA-only (G5 shell,
   `lang="uk"`). Honest design: persist the customer's locale on Order/Subscriber at creation
   (the checkout/subscribe handlers can read `NEXT_LOCALE`; background workers have no request
@@ -1433,29 +1413,38 @@ Ideas that might be valuable but aren't prioritized.
 
 ---
 
+### [2026-09-16] From: TASK-056 client delegation (G15 response processing)
+
+**Origin**: the client answered the 2026-08-21 consolidated ask with a blanket delegation and no facts; decisions were taken by us (user-approved 2026-09-16) — see the TODO TASK-056 tracking table and [reference/2026-09-16-client-reply.md](../reference/2026-09-16-client-reply.md). 🟤 Auto-Generated.
+
+- [ ] 🟤 **Telegram-manager link in the WhatsApp slot** — `WHATSAPP_HREF` stays `null` by decision (TASK-056 row 6), so the checkout payment step and the order e-mail render no manager link at all; the real manager handle `@mirox_manager` exists (verified 2026-09-16) and could occupy that slot (`src/content/checkout.ts` `contacts` + the e-mail contact block in `src/lib/email-templates/layout.ts`). Small, but touches a checkout surface → visual gate. (Med value, Low effort) `[relates-to: TASK-056 rows 4/6, TASK-055 /contact]`
+- [ ] 🟤 **Logo vector by tracing** — `public/images/logo.png` stays raster by decision (TASK-056 row 11); if crispness on retina/print ever matters, potrace/Illustrator image-trace of the PNG is an hour, not a client dependency. (Low value, Low effort) `[relates-to: TASK-056 row 11]`
+
 ## Rejected Ideas
 
 Ideas considered but decided against (with reasoning).
 
-| Idea                                                                                                 | Reason for Rejection                                                                                                                                                                                           | Date       |
-| ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| Database sessions instead of JWT                                                                     | JWT is more scalable for serverless, simpler setup                                                                                                                                                             | 2026-01-13 |
-| Live catalog is the old electronics seed with dead images (was under [2026-07-24] visual audit)      | reaped: prod re-seeded to the Mirox catalog 2026-07-31 and again 2026-08-04 (colorways), verified live; catalog is deliberately placeholder — real products arrive at launch deployment (user note 2026-08-04) | 2026-08-04 |
-| Prices render in USD vs UAH-facing rebrand (was under [2026-07-21] TASK-035)                         | reaped: `formatPrice()` UAH display shipped site-wide in TASK-057; §7.4 compliance verification remains a TASK-039 AC                                                                                          | 2026-08-04 |
-| `?sort=newest` deep links inert until TASK-036 (was under [2026-07-21] TASK-035)                     | reaped: TASK-036 shipped sorting and retargeted all links — zero `sort=newest` left in `src/`                                                                                                                  | 2026-08-04 |
-| Header «Бестселери» admin-curated, not sales-ranked (was under [2026-07-29] TASK-057)                | reaped: Header links `/products?sort=popular` (real `getSalesRanking()`) since TASK-036                                                                                                                        | 2026-08-04 |
-| Reconcile stale seed counts "16 cat/50+ products" vs 15/21 (was under [2026-07-14] resumption audit) | reaped: TASK-057 replaced the catalog wholesale (8 SKUs, 2+6 categories) and CLAUDE.md documents it — both sides of the comparison no longer exist                                                             | 2026-08-04 |
-| Replace site-level placeholder OG image (was under [2026-02-02] TASK-019)                            | reaped: root `opengraph-image.tsx` generated Mirox card shipped in TASK-035/PR #21, verified live                                                                                                              | 2026-08-04 |
-| Seed demo reviews (was under [2026-02-05] TASK-023)                                                  | reaped: `prisma/seed-data/reviews.ts` ships 8 reviews since TASK-022, Ukrainian set since TASK-057                                                                                                             | 2026-08-04 |
-| [TASK-013] Enhanced Features umbrella (was under Post-MVP Features)                                  | reaped → 🪦 section below: all open subs superseded by program tasks TASK-041/042/046; recommendations shipped as BoughtTogether (TASK-037)                                                                    | 2026-08-11 |
-| [TASK-015] Growth Features umbrella (was under Post-MVP Features)                                    | reaped → 🪦 section below: i18n → TASK-039 (WEEKLY G9); analytics dashboard duplicates the [2026-02-01] entry; multi-currency/loyalty = spec v2.0 directions                                                   | 2026-08-11 |
-| Extract hardcoded USD to `NEXT_PUBLIC_CURRENCY` env var (was under [2026-02-01] TASK-018)            | reaped → 🪦 section below: superseded by the shipped `formatPrice()`/§7.4 UAH architecture; transaction currency is a TASK-048 decision                                                                        | 2026-08-11 |
-| Seed demo products with brand/barcode/MPN for feed testing (was under [2026-02-02] TASK-020)         | reaped → 🪦 section below: electronics demo catalog replaced by the deliberately-placeholder Mirox seed; realistic feed content waits for real products (TASK-054/056)                                         | 2026-08-11 |
-| Manual Testing Plan (was the sole "Deferred Tasks" member; section removed with it)                  | reaped → 🪦 section below: implicitly delivered by `docs/TESTING_CHECKLIST.md` (323 lines) + the standing visual-fidelity gate + live user testing rounds                                                      | 2026-08-11 |
-| Products↔categories sort-set unification (was under [2026-08-08] From: G4 brainstorm)                | reaped → 🪦 section below: its own subsumption condition fired — G12 retired `/categories/[slug]` + `category-client.tsx`, so there is no second sort set to unify                                             | 2026-08-20 |
-| next-intl `useExtracted` design input for TASK-039 (was under [2026-08-10] From: G6 run 1)           | reaped → 🪦 section below: consumed — G9's library decision weighed exactly this input and TASK-039 shipped (PR #37)                                                                                           | 2026-08-20 |
-| G13 duplicate-value sync test (was under [2026-08-15] From: G9 close-out)                            | reaped → 🪦 section below: mooted by its own condition — G13 reuses `account.orderStatus`/`paymentStatus` keys directly (PR #40)                                                                               | 2026-08-20 |
-| [TASK-014] Additional Integrations umbrella (was under Post-MVP Features; section removed with it)   | reaped → 🪦 section below: payments → TASK-048 + the payments decision doc; supplier APIs / shipping calculators → spec v2.0 directions; automated inventory sync is an explicit GOALS.md Non-Goal             | 2026-08-20 |
+| Idea                                                                                                      | Reason for Rejection                                                                                                                                                                                           | Date       |
+| --------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| Database sessions instead of JWT                                                                          | JWT is more scalable for serverless, simpler setup                                                                                                                                                             | 2026-01-13 |
+| Live catalog is the old electronics seed with dead images (was under [2026-07-24] visual audit)           | reaped: prod re-seeded to the Mirox catalog 2026-07-31 and again 2026-08-04 (colorways), verified live; catalog is deliberately placeholder — real products arrive at launch deployment (user note 2026-08-04) | 2026-08-04 |
+| Prices render in USD vs UAH-facing rebrand (was under [2026-07-21] TASK-035)                              | reaped: `formatPrice()` UAH display shipped site-wide in TASK-057; §7.4 compliance verification remains a TASK-039 AC                                                                                          | 2026-08-04 |
+| `?sort=newest` deep links inert until TASK-036 (was under [2026-07-21] TASK-035)                          | reaped: TASK-036 shipped sorting and retargeted all links — zero `sort=newest` left in `src/`                                                                                                                  | 2026-08-04 |
+| Header «Бестселери» admin-curated, not sales-ranked (was under [2026-07-29] TASK-057)                     | reaped: Header links `/products?sort=popular` (real `getSalesRanking()`) since TASK-036                                                                                                                        | 2026-08-04 |
+| Reconcile stale seed counts "16 cat/50+ products" vs 15/21 (was under [2026-07-14] resumption audit)      | reaped: TASK-057 replaced the catalog wholesale (8 SKUs, 2+6 categories) and CLAUDE.md documents it — both sides of the comparison no longer exist                                                             | 2026-08-04 |
+| Replace site-level placeholder OG image (was under [2026-02-02] TASK-019)                                 | reaped: root `opengraph-image.tsx` generated Mirox card shipped in TASK-035/PR #21, verified live                                                                                                              | 2026-08-04 |
+| Seed demo reviews (was under [2026-02-05] TASK-023)                                                       | reaped: `prisma/seed-data/reviews.ts` ships 8 reviews since TASK-022, Ukrainian set since TASK-057                                                                                                             | 2026-08-04 |
+| [TASK-013] Enhanced Features umbrella (was under Post-MVP Features)                                       | reaped → 🪦 section below: all open subs superseded by program tasks TASK-041/042/046; recommendations shipped as BoughtTogether (TASK-037)                                                                    | 2026-08-11 |
+| [TASK-015] Growth Features umbrella (was under Post-MVP Features)                                         | reaped → 🪦 section below: i18n → TASK-039 (WEEKLY G9); analytics dashboard duplicates the [2026-02-01] entry; multi-currency/loyalty = spec v2.0 directions                                                   | 2026-08-11 |
+| Extract hardcoded USD to `NEXT_PUBLIC_CURRENCY` env var (was under [2026-02-01] TASK-018)                 | reaped → 🪦 section below: superseded by the shipped `formatPrice()`/§7.4 UAH architecture; transaction currency is a TASK-048 decision                                                                        | 2026-08-11 |
+| Seed demo products with brand/barcode/MPN for feed testing (was under [2026-02-02] TASK-020)              | reaped → 🪦 section below: electronics demo catalog replaced by the deliberately-placeholder Mirox seed; realistic feed content waits for real products (TASK-054/056)                                         | 2026-08-11 |
+| Manual Testing Plan (was the sole "Deferred Tasks" member; section removed with it)                       | reaped → 🪦 section below: implicitly delivered by `docs/TESTING_CHECKLIST.md` (323 lines) + the standing visual-fidelity gate + live user testing rounds                                                      | 2026-08-11 |
+| Products↔categories sort-set unification (was under [2026-08-08] From: G4 brainstorm)                     | reaped → 🪦 section below: its own subsumption condition fired — G12 retired `/categories/[slug]` + `category-client.tsx`, so there is no second sort set to unify                                             | 2026-08-20 |
+| next-intl `useExtracted` design input for TASK-039 (was under [2026-08-10] From: G6 run 1)                | reaped → 🪦 section below: consumed — G9's library decision weighed exactly this input and TASK-039 shipped (PR #37)                                                                                           | 2026-08-20 |
+| G13 duplicate-value sync test (was under [2026-08-15] From: G9 close-out)                                 | reaped → 🪦 section below: mooted by its own condition — G13 reuses `account.orderStatus`/`paymentStatus` keys directly (PR #40)                                                                               | 2026-08-20 |
+| [TASK-014] Additional Integrations umbrella (was under Post-MVP Features; section removed with it)        | reaped → 🪦 section below: payments → TASK-048 + the payments decision doc; supplier APIs / shipping calculators → spec v2.0 directions; automated inventory sync is an explicit GOALS.md Non-Goal             | 2026-08-20 |
+| Ukrposhta as a second delivery carrier (was under [2026-08-10] user-raised carrier/city/branch dropdowns) | reaped → 🪦 section below: client delegated TASK-056 item 7 and we ruled Nova Poshta only; NP-only picker stays live in the [2026-08-07] entry                                                                 | 2026-09-16 |
+| Dual-language (RU) product copy — `ProductTranslation` tables (was under [2026-08-15] G9 close-out)       | reaped → 🪦 section below: client delegated TASK-056 item 21 and we ruled no dual-language catalog; DB content stays UA in RU mode                                                                             | 2026-09-16 |
 
 ---
 
@@ -1628,6 +1617,37 @@ now-removed "Post-MVP Features (Moved from TODO)" section — TASK-013/015 were 
 - [ ] Multiple supplier API integrations
 - [ ] Automated inventory sync
 - [ ] Shipping rate calculators
+
+### ~~Replace free-text city/branch checkout fields with real carrier (Ukrposhta / Nova Poshta), city and branch dropdowns~~ — reaped 2026-09-16
+
+**Reaped because**: the carrier-strategy decision it asked for was taken under the client's TASK-056 blanket delegation (2026-09-16, user-approved): **Nova Poshta only, no Ukrposhta** — a second carrier means a second API, rate table and fulfilment path for a store that has never shipped by Ukrposhta. The Nova-Poshta-only city → branch picker half stays live in the [2026-08-07] "Nova Poshta branch drop-down selector" entry, now runnable on our own NP account key. _(Was under: [2026-08-10] user-raised, manual testing/review of the live site.)_
+
+- [ ] 🔵 **Replace free-text city/branch checkout fields with real carrier, city and branch dropdowns** — Add a delivery-carrier choice (Ukrposhta / Nova Poshta), then city selection and branch (відділення) selection as dropdown menus populated with real options rather than typed text (выбор города, вариант отправки(укр пошта, нова пошта), выбор города и выбор отделения как дропдаун меню с реальными вариантами); affected: [src/app/(shop)/checkout/page.tsx:~392-420](<../../src/app/(shop)/checkout/page.tsx#L392-L420>) (city and `line1` are plain free-text `<Input>`s), [src/lib/shipping.ts:7-11](../../src/lib/shipping.ts#L7-L11) (`DELIVERY_METHODS` hardcodes three Nova Poshta options) [possible-dup-of: "Nova Poshta branch drop-down selector" — [2026-08-07] From: G2 post-gate review]
+
+  **What is genuinely new here versus the [2026-08-07] entry it duplicates**: that entry covers the
+  city → warehouse picker for **Nova Poshta only**. **Ukrposhta as a second carrier has zero
+  mentions anywhere in this repo** — verified by grep across `src/`, `docs/planning/` and
+  `docs/superpowers/specs/`, including the [Ukraine payments & delivery decision
+  doc](../superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md), which evaluated
+  Nova Poshta and never assessed Ukrposhta. So this is not a gap in an existing plan but an
+  uncosted **carrier-strategy decision**: a second carrier means a second address/branch API, a
+  second rate table (the current 80/120/70 UAH numerics are NP published rates), and a second
+  fulfilment path for the supplier-forwarding workers. Decide the carrier question before designing
+  the picker, since the picker's data source depends on the answer. Both halves stay client-gated —
+  the NP branch API needs the client's NP API key, and Ukrposhta would need its own credentials.
+  (High value, Med effort) `[relates-to: TASK-049]`
+
+### ~~DB-content localization decision — RU product copy~~ — reaped 2026-09-16
+
+**Reaped because**: the client delegated TASK-056 item 21 and we ruled **no dual-language catalog** (2026-09-16, user-approved) — product/category names, descriptions and variant values stay UA in RU mode (G9 spec scope ruling stands); the design sketch below is preserved in case the client ever opts in. _(Was under: [2026-08-15] From: G9 close-out.)_
+
+- 🔵 **DB-content localization decision — RU product copy** — product/category names,
+  descriptions and variant values have no locale dimension (G9 spec scope ruling: DB data stays
+  UA in RU mode). If wanted: `ProductTranslation`/`CategoryTranslation` tables (locale →
+  name/description, RU falling back to UA like the catalog merge) + a second-language tab in
+  the admin forms. Doubles the client's per-product content workload — put the question to the
+  client in the TASK-056 round-trip (rider recorded there) and build only on opt-in.
+  (Med value, High effort) [G9 gate Q2, 2026-08-15]
 
 ---
 
