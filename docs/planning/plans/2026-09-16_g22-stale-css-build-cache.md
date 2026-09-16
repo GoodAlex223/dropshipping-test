@@ -71,8 +71,8 @@ The seven utilities new in PR #46 and absent from production CSS (from the G20 c
 - [x] Runbook Part 2 step 2: a CSS-affecting deploy reading `UNCHANGED` → first confirm the build log shows the purge line; the cache-off redeploy is the fallback. Part 1 Step 12: the purge covers the cache-off concern; keep the env var / dashboard option as the fallback. The quoted log line is guarded by `tests/unit/doc-source-quotes.test.ts`.
 - [x] `CLAUDE.md`: add the step to the "Operative reality" `vercel-build` chain; update the stale-cache clause under Known challenges.
 - [x] `doc-source-quotes`, `docs-freshness` and `plan-snippets` tests green; prettier clean. — V2
-- [ ] Commit; push → fix preview. Its log must show the restore, the purge line and a cold compile; its CSS must contain all seven utilities.
-- [ ] Escalation: still stale → widen to `rm -rf .next/cache` (update the test's eslint assertion); still stale → **stop and report** (the env var is the next option, and it is the user's call).
+- [x] Commit; push → fix preview. Its log must show the restore, the purge line and a cold compile; its CSS must contain all seven utilities. — `ea28cbe` + `c99af2b`, 7 of 7 (V3)
+- [x] Escalation: still stale → widen to `rm -rf .next/cache` (update the test's eslint assertion); still stale → **stop and report** (the env var is the next option, and it is the user's call). — not needed (V3)
 
 ## Task 5: PR, merge, production verification
 
@@ -103,6 +103,16 @@ The seven utilities new in PR #46 and absent from production CSS (from the G20 c
 - Red, before the script change: `deletes the webpack build cache before next build runs` failed with `expected [ 'npx next build webpack=present' ] to deeply equal [ 'npx next build webpack=absent' ]`. The scope test passed, as it must with no purge yet.
 - Green after it: `vercel-build.test.ts` 2/2, `doc-source-quotes.test.ts` still passing (8 tests across the two files).
 - Gates: `npm run typecheck` exit 0 · `npm run lint` exit 0 · `npm run test:run` exit 0 — 89 files, 1132 passed + 1 todo · `prettier --write` left every changed file unchanged.
+- Mutations, script restored from git after each (clean diff, 2/2 green again): the purge moved **after** `npx next build` → `deletes the webpack build cache before next build runs` red; the purge widened to `rm -rf .next/cache` → `keeps the rest of the restored cache` red.
+
+### V3 — Fix preview (2026-09-16)
+
+- Commits `ea28cbe` + `c99af2b` → `dpl_BTazsSsbBd5vzBunmFQviXX2EeVP` (`dropshipping-test-8plv1o6pv-goodalex223s-projects.vercel.app`).
+- Log, in order: `Restored build cache from previous deployment (BGKNZAmyupGi7LqrhW5crmNtJ68f)` — the stale control build (V1) → 23:14:42 `▶ vercel-build: clearing the webpack build cache (.next/cache/webpack)` → `▶ vercel-build: next build` → `Creating an optimized production build ...` 23:14:43 → `✓ Compiled successfully` 23:15:13 = **30 s** (V1: 8 s).
+- The cold compile logged, three times: `<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Parsing of /vercel/path0/node_modules/next-intl/dist/esm/production/extractor/format/index.js for build dependencies failed at 'import(t)'.` / `Build dependencies behind this expression are ignored and might cause incorrect cache invalidation.` Recorded as a lead for Improvement 1, not as the explanation.
+- Served CSS: `143491e5ab2efd5e.css` (28 010 B, unchanged — it never held these utilities) + `7f7016c66514cf76.css` (117 043 B). Utilities: **7 of 7**. The chunk hash equals G21's known-good preview, so the correct output is deterministic.
+- **Before/after on Vercel: 0 of 7 (8 s cached compile) → 7 of 7 (30 s cold compile)**, with the fix build restoring the very cache that produced the stale control.
+- Prediction for production after merge: `143491e5ab2efd5e.css` + `7f7016c66514cf76.css`, so the smoke CSS row compares against the stale baseline pair and reads `CHANGED`.
 
 ---
 
@@ -110,7 +120,7 @@ The seven utilities new in PR #46 and absent from production CSS (from the G20 c
 
 Candidates for close-out extraction (minimum 2):
 
-1. **Root cause unidentified** — why Next 14.2.35's persistent webpack cache keeps serving a CSS module whose Tailwind-scanned sources changed, although the loader forwards the dependencies, and why the same cache chain sometimes refreshes on its own (G21's preview chain). Re-examine when the ROADMAP'd Next upgrade is scoped: if the upgrade fixes invalidation, the purge can go — measure before removing it.
+1. **Root cause unidentified** — why Next 14.2.35's persistent webpack cache keeps serving a CSS module whose Tailwind-scanned sources changed, although the loader forwards the dependencies, and why the same cache chain sometimes refreshes on its own (G21's preview chain). One lead from V3: on a fresh cache, webpack warns that build dependencies behind `next-intl`'s extractor `import(t)` are ignored and "might cause incorrect cache invalidation". Re-examine when the ROADMAP'd Next upgrade is scoped: if the upgrade fixes invalidation, the purge can go — measure before removing it (the V1/V3 before/after pair is the template).
 2. **`scripts/smoke.ts`'s `UNCHANGED` detail still says "redeploy with the cache off"** — after this change the first check is the purge line in the build log; the message will steer an operator to the fallback first.
 3. **Local `npm run build` keeps the same hazard** — the purge is Vercel-only, and the stale `.next/cache` corruptor is already recorded for local prod-build verification (TASK-037). A note or a `prebuild` step would close it for local visual gates.
 
@@ -120,6 +130,7 @@ Candidates for close-out extraction (minimum 2):
 
 - 2026-09-16 — Brainstorm (bounded). The user chose the build-script fix over the env var and the one-time redeploy; design approved in chat. Branch `chore/g22-cache-off-redeploy` created from `2804d66`.
 - 2026-09-16 — Task 1: control pushed (`217108c`), stale as expected (V1). Tasks 2–3: guard test red → purge → green, full gates green (V2). Task 4 docs: runbook Step 12 and Part 2 step 2 now lead with the purge line and keep the cache-off redeploy as the fallback (Part 2 step 2 also names "markup that only reuses existing utilities" as a legitimate `UNCHANGED`, the case that let PR #46's `flex-wrap` land while its gaps did not); the runbook's `**Last Updated**` and index row moved to 2026-09-16; `CLAUDE.md` chain + Known challenges updated.
+- 2026-09-16 — Guard mutations both red (V2). Fix pushed (`ea28cbe`, `c99af2b`); fix preview 7 of 7 with a cold compile on a restored stale cache (V3); escalation not needed. Next: PR + CI, then the merge waits for the user's go.
 
 ---
 
