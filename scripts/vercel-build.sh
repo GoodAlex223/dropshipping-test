@@ -47,12 +47,12 @@ echo "▶ vercel-build: prisma generate"
 npx prisma generate
 
 # Vercel restores the previous deployment's `.next/cache` before this script
-# runs, and Next's persistent webpack cache inside it has handed back a CSS
-# module compiled from an OLDER tree: production served new HTML against CSS
-# missing every Tailwind utility the change introduced (PR #35; PR #46 and every
-# deploy after it, until G22). Changed source did not reliably invalidate that
-# module, although Next does forward Tailwind's file dependencies to webpack —
-# the root cause is not identified. Deleting the compile cache makes every build
+# runs. Production has served new HTML against CSS missing every Tailwind
+# utility the change introduced (after PR #35, and on every deploy after PR #46
+# until G22), and the PR #46 case was measured to come from Next's persistent
+# webpack cache inside it: a CSS module compiled from an OLDER tree. Changed
+# source did not reliably invalidate that module, although Next does forward
+# Tailwind's file dependencies to webpack — the root cause is not identified. Deleting the compile cache makes every build
 # compile from the checked-out tree, at the price of a cold compile (the cached
 # one ran ~12 s). `node_modules` and `.next/cache/eslint` stay cached.
 echo "▶ vercel-build: clearing the webpack build cache (.next/cache/webpack)"

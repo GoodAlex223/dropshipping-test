@@ -13,8 +13,8 @@ import { join, resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 /**
- * Production served new HTML against stale CSS three times (PR #35, PR #46 and
- * every deploy after it): Vercel restores the previous build's `.next/cache`,
+ * Production served new HTML against stale CSS after PR #35, and again on every
+ * deploy after PR #46: Vercel restores the previous build's `.next/cache`,
  * and Next's persistent webpack cache kept handing back a CSS module compiled
  * from an older tree, so utilities new in a change never reached production.
  * `scripts/vercel-build.sh` therefore deletes the webpack cache before

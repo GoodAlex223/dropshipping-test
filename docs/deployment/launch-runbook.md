@@ -296,10 +296,10 @@ production.
   cannot, since it runs before the window even opens.
 - **Action:** trigger a new production deployment through the **Vercel Git integration** — either
   push/merge to `main`, or use the dashboard's "Redeploy" on the current production commit. A build
-  with the cache on is fine: this project's history of Vercel serving stale CSS across a deploy (PR
-  #35, and PR #46 with every deploy after it) came from Next's webpack compile cache inside the
-  restored build cache, and since G22 `scripts/vercel-build.sh` deletes that directory before
-  `next build`. In the build log, `▶ vercel-build: clearing the webpack build cache` must print before
+  with the cache on is fine: this project's history of Vercel serving stale CSS across a deploy (after
+  PR #35, and on every deploy after PR #46) is handled at the source since G22 —
+  `scripts/vercel-build.sh` deletes Next's webpack compile cache, where the PR #46 staleness was
+  measured to live, before `next build`. In the build log, `▶ vercel-build: clearing the webpack build cache` must print before
   `▶ vercel-build: next build`. If it does not, redeploy with the build cache off:
   `VERCEL_FORCE_NO_BUILD_CACHE=1`, or the dashboard's Redeploy with "Use existing Build Cache"
   unchecked.
@@ -458,9 +458,9 @@ Run this after every deploy meant to reach real users, not just the cutover.
    actually went missing, not that the origin is new.
 2. **All 14 rows should read `PASS`.** The CSS-hash row is the common exception, and it can go either
    way: if this deploy **changed CSS** and the row reads `UNCHANGED`, stale CSS may be back — Vercel's
-   restored build cache served it in this project's history (PR #35, and PR #46 with every deploy
-   after it until G22). Since G22 `scripts/vercel-build.sh` deletes Next's webpack compile cache
-   before building, so first confirm the build log shows
+   restored build cache served it in this project's history (after PR #35, and on every deploy after
+   PR #46 until G22). Since G22 `scripts/vercel-build.sh` deletes Next's webpack compile cache before
+   building, so the cache should not be the cause: first confirm the build log shows
    `▶ vercel-build: clearing the webpack build cache` before `▶ vercel-build: next build`, then check
    that the utilities new in this deploy are really absent from the served `/_next/static/css/*.css`.
    If they are, redeploy with the cache disabled entirely (`VERCEL_FORCE_NO_BUILD_CACHE=1`, or the

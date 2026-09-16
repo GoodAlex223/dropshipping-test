@@ -61,7 +61,7 @@ The seven utilities new in PR #46 and absent from production CSS (from the G20 c
 
 **Files:** Modify `scripts/vercel-build.sh`
 
-- [x] Before `next build`: a comment explaining why (stale CSS served from the restored compile cache, three recurrences, root cause unidentified, what is kept), then `echo "▶ vercel-build: clearing the webpack build cache (.next/cache/webpack)"` and `rm -rf .next/cache/webpack`.
+- [x] Before `next build`: a comment explaining why (stale CSS served from the restored compile cache after PR #35 and PR #46, root cause unidentified, what is kept), then `echo "▶ vercel-build: clearing the webpack build cache (.next/cache/webpack)"` and `rm -rf .next/cache/webpack`.
 - [x] Guard test green; then `npm run test:run`, `npm run typecheck`, `npm run lint`, `npm run format:check`. — V2
 
 ## Task 4: Docs, then the fix preview
@@ -114,6 +114,17 @@ The seven utilities new in PR #46 and absent from production CSS (from the G20 c
 - **Before/after on Vercel: 0 of 7 (8 s cached compile) → 7 of 7 (30 s cold compile)**, with the fix build restoring the very cache that produced the stale control.
 - Prediction for production after merge: `143491e5ab2efd5e.css` + `7f7016c66514cf76.css`, so the smoke CSS row compares against the stale baseline pair and reads `CHANGED`.
 
+### V4 — 390px footer check, proven against both states (2026-09-16)
+
+The Playwright MCP could not launch Chrome here (`Running as root without --no-sandbox is not supported`), so the check is a scratch Node script on the repo's own `playwright` (which launches without the sandbox): viewport 390×844, `/track`, the footer `nav` carrying `flex-wrap gap-x-6 gap-y-2`, computed gaps plus the measured pixel distance between its links.
+
+| Target           | CSS loaded                | `column-gap` | `row-gap` | Min gap, same line | Min gap, between lines | Doc width |
+| ---------------- | ------------------------- | ------------ | --------- | ------------------ | ---------------------- | --------- |
+| Production today | `143491e5…` + `61c0f068…` | `normal`     | `normal`  | **0 px**           | −0.25 px               | 390 / 390 |
+| Fix preview (V3) | `143491e5…` + `7f7016c6…` | `24px`       | `8px`     | **24 px**          | 7.75 px                | 390 / 390 |
+
+The check fails on stale CSS and passes on the fixed build, so its post-merge reading means something. Five links on two lines in both.
+
 ---
 
 ## Improvements
@@ -131,6 +142,8 @@ Candidates for close-out extraction (minimum 2):
 - 2026-09-16 — Brainstorm (bounded). The user chose the build-script fix over the env var and the one-time redeploy; design approved in chat. Branch `chore/g22-cache-off-redeploy` created from `2804d66`.
 - 2026-09-16 — Task 1: control pushed (`217108c`), stale as expected (V1). Tasks 2–3: guard test red → purge → green, full gates green (V2). Task 4 docs: runbook Step 12 and Part 2 step 2 now lead with the purge line and keep the cache-off redeploy as the fallback (Part 2 step 2 also names "markup that only reuses existing utilities" as a legitimate `UNCHANGED`, the case that let PR #46's `flex-wrap` land while its gaps did not); the runbook's `**Last Updated**` and index row moved to 2026-09-16; `CLAUDE.md` chain + Known challenges updated.
 - 2026-09-16 — Guard mutations both red (V2). Fix pushed (`ea28cbe`, `c99af2b`); fix preview 7 of 7 with a cold compile on a restored stale cache (V3); escalation not needed. Next: PR + CI, then the merge waits for the user's go.
+- 2026-09-16 — Deviation from Global Constraints: **three** pushes preceded the PR, not the two approved — the third, `d7792c4`, carried only this plan's V3 record (a docs-only preview build; nothing reached production).
+- 2026-09-16 — PR [#48](https://github.com/GoodAlex223/dropshipping-test/pull/48) opened; CI green on `d7792c4` with every job executing (Lint & Type Check 10/10 steps, Unit Tests 9/9, Build 9/9, E2E 16/16). No automated review comment posted. Footer check prepared against the live site (V4). Self-review of the whole diff found three wording defects, fixed in one commit: a "three times" claim listing two incidents (`CLAUDE.md`, the test's header comment, the PR body), a doubled conjunction in runbook Part 2 step 2, and the PR #35 incident attributed to the webpack cache in the runbook and the script comment, where only the PR #46 case was measured.
 
 ---
 
