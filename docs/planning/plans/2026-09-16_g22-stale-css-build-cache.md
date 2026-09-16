@@ -46,31 +46,31 @@ The seven utilities new in PR #46 and absent from production CSS (from the G20 c
 
 ## Task 1: Control preview (before the fix)
 
-- [ ] Commit this plan + its index row; push the branch.
-- [ ] Preview build log: which deployment's cache was restored; compile duration.
-- [ ] Preview CSS: expect `.gap-x-6` absent; record the chunk hashes. If it is **present**, record "control not stale — the before/after pair is inconclusive" and rely on Task 5's production evidence.
+- [x] Commit this plan + its index row; push the branch. — `217108c`
+- [x] Preview build log: which deployment's cache was restored; compile duration. — V1
+- [x] Preview CSS: expect `.gap-x-6` absent; record the chunk hashes. If it is **present**, record "control not stale — the before/after pair is inconclusive" and rely on Task 5's production evidence. — stale, 0 of 7 (V1)
 
 ## Task 2: Guard test (red first)
 
 **Files:** Create `tests/unit/vercel-build.test.ts`
 
-- [ ] Write the test. It runs the real `scripts/vercel-build.sh` through `bash` in a temp directory, with a minimal environment (`DIRECT_URL` unset, so migrations are skipped) and a fake `npx` first on `PATH` that appends `npx <args> webpack=<present|absent>` to a log. The temp directory is seeded with `.next/cache/webpack/client-production/0.pack` and `.next/cache/eslint/.cache`. Assertions: `next build` is invoked exactly once, it saw `webpack=absent`, and `.next/cache/eslint` still exists afterwards (pins the targeted scope — widening the purge is a deliberate edit to this test, per the Task 4 escalation).
-- [ ] Run it: red on `webpack=present`.
+- [x] Write the test. It runs the real `scripts/vercel-build.sh` through `bash` in a temp directory, with a minimal environment (`DIRECT_URL` unset, so migrations are skipped) and a fake `npx` first on `PATH` that appends `npx <args> webpack=<present|absent>` to a log. The temp directory is seeded with `.next/cache/webpack/client-production/0.pack` and `.next/cache/eslint/.cache`. Assertions: `next build` is invoked exactly once, it saw `webpack=absent`, and `.next/cache/eslint` still exists afterwards (pins the targeted scope — widening the purge is a deliberate edit to this test, per the Task 4 escalation).
+- [x] Run it: red on `webpack=present`. — V2
 
 ## Task 3: The purge
 
 **Files:** Modify `scripts/vercel-build.sh`
 
-- [ ] Before `next build`: a comment explaining why (stale CSS served from the restored compile cache, three recurrences, root cause unidentified, what is kept), then `echo "▶ vercel-build: clearing the webpack build cache (.next/cache/webpack)"` and `rm -rf .next/cache/webpack`.
-- [ ] Guard test green; then `npm run test:run`, `npm run typecheck`, `npm run lint`, `npm run format:check`.
+- [x] Before `next build`: a comment explaining why (stale CSS served from the restored compile cache, three recurrences, root cause unidentified, what is kept), then `echo "▶ vercel-build: clearing the webpack build cache (.next/cache/webpack)"` and `rm -rf .next/cache/webpack`.
+- [x] Guard test green; then `npm run test:run`, `npm run typecheck`, `npm run lint`, `npm run format:check`. — V2
 
 ## Task 4: Docs, then the fix preview
 
 **Files:** Modify `docs/deployment/launch-runbook.md`, `CLAUDE.md`
 
-- [ ] Runbook Part 2 step 2: a CSS-affecting deploy reading `UNCHANGED` → first confirm the build log shows the purge line; the cache-off redeploy is the fallback. Part 1 Step 12: the purge covers the cache-off concern; keep the env var / dashboard option as the fallback. The quoted log line is guarded by `tests/unit/doc-source-quotes.test.ts`.
-- [ ] `CLAUDE.md`: add the step to the "Operative reality" `vercel-build` chain; update the stale-cache clause under Known challenges.
-- [ ] `doc-source-quotes`, `docs-freshness` and `plan-snippets` tests green; prettier clean.
+- [x] Runbook Part 2 step 2: a CSS-affecting deploy reading `UNCHANGED` → first confirm the build log shows the purge line; the cache-off redeploy is the fallback. Part 1 Step 12: the purge covers the cache-off concern; keep the env var / dashboard option as the fallback. The quoted log line is guarded by `tests/unit/doc-source-quotes.test.ts`.
+- [x] `CLAUDE.md`: add the step to the "Operative reality" `vercel-build` chain; update the stale-cache clause under Known challenges.
+- [x] `doc-source-quotes`, `docs-freshness` and `plan-snippets` tests green; prettier clean. — V2
 - [ ] Commit; push → fix preview. Its log must show the restore, the purge line and a cold compile; its CSS must contain all seven utilities.
 - [ ] Escalation: still stale → widen to `rm -rf .next/cache` (update the test's eslint assertion); still stale → **stop and report** (the env var is the next option, and it is the user's call).
 
@@ -88,7 +88,21 @@ The seven utilities new in PR #46 and absent from production CSS (from the G20 c
 
 ## Verification Log
 
-_(filled during execution)_
+**Checker.** The seven utilities are counted as exact rule openings (`.gap-x-6{` … `.sm\:pr-0{`) in the downloaded chunks with a Node string split, not `grep` — `grep` in this container is `ugrep`, which rejected a `\{` pattern mid-run. Its positive control is G21's last preview chunk `7f7016c66514cf76.css`, which reads **7 of 7**, so a 0 below is a real absence and not a broken checker.
+
+### V1 — Control preview, before the fix (2026-09-16)
+
+- Commit `217108c` → `dpl_BGKNZAmyupGi7LqrhW5crmNtJ68f` (`dropshipping-test-mmo3y68mw-goodalex223s-projects.vercel.app`).
+- Log: `Restored build cache from previous deployment (2eyC3fTo4BAVWDmyix76tNUEHTci)` — production's latest build (`2804d66`).
+- Compile: `Creating an optimized production build ...` 22:53:18 → `✓ Compiled successfully` 22:53:26 = **8 s**.
+- Served CSS: `143491e5ab2efd5e.css` (28 010 B) + `61c0f0682ec37a4c.css` (116 674 B) — the production pair, byte for byte in size; the HTML carries `flex flex-wrap gap-x-6 gap-y-2`. Utilities: **0 of 7**.
+- **The control reproduces the bug**, so the before/after pair is meaningful.
+
+### V2 — Guard test red → green, gates (2026-09-16)
+
+- Red, before the script change: `deletes the webpack build cache before next build runs` failed with `expected [ 'npx next build webpack=present' ] to deeply equal [ 'npx next build webpack=absent' ]`. The scope test passed, as it must with no purge yet.
+- Green after it: `vercel-build.test.ts` 2/2, `doc-source-quotes.test.ts` still passing (8 tests across the two files).
+- Gates: `npm run typecheck` exit 0 · `npm run lint` exit 0 · `npm run test:run` exit 0 — 89 files, 1132 passed + 1 todo · `prettier --write` left every changed file unchanged.
 
 ---
 
@@ -105,6 +119,7 @@ Candidates for close-out extraction (minimum 2):
 ## Progress Log
 
 - 2026-09-16 — Brainstorm (bounded). The user chose the build-script fix over the env var and the one-time redeploy; design approved in chat. Branch `chore/g22-cache-off-redeploy` created from `2804d66`.
+- 2026-09-16 — Task 1: control pushed (`217108c`), stale as expected (V1). Tasks 2–3: guard test red → purge → green, full gates green (V2). Task 4 docs: runbook Step 12 and Part 2 step 2 now lead with the purge line and keep the cache-off redeploy as the fallback (Part 2 step 2 also names "markup that only reuses existing utilities" as a legitimate `UNCHANGED`, the case that let PR #46's `flex-wrap` land while its gaps did not); the runbook's `**Last Updated**` and index row moved to 2026-09-16; `CLAUDE.md` chain + Known challenges updated.
 
 ---
 
