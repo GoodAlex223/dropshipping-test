@@ -117,9 +117,9 @@ Improvements to existing functionality.
 **Origin**: docs/archive/plans/2026-01-22_seo-technical-setup.md
 
 - [ ] Replace placeholder SEO assets with branded images — OG image, favicons are simple placeholders
-- [ ] Add dynamic OG image generation — Use `opengraph-image.tsx` for product-specific social images
-- [ ] Add category metaTitle/metaDesc fields — Similar to Product model, for category SEO
-- [ ] Implement proper i18n with hreflang — Current setup is preparation only (`en`)
+- ~~Add dynamic OG image generation — Use `opengraph-image.tsx` for product-specific social images~~ — **reaped 2026-09-16 → 🪦 section** (implicitly delivered: the product `opengraph-image.tsx` and the site-wide root card are live).
+- ~~Add category metaTitle/metaDesc fields — Similar to Product model, for category SEO~~ — **reaped 2026-09-16 → 🪦 section** (the fields already exist on `Category`; G12 retired the only page that rendered them).
+- ~~Implement proper i18n with hreflang — Current setup is preparation only (`en`)~~ — **reaped 2026-09-16 → 🪦 section** (TASK-039 chose no per-locale URLs; the remainder is TASK-053 + the [2026-08-15] machine-metadata entry).
 
 ### [2026-02-01] From: TASK-018 Analytics Integration
 
@@ -142,7 +142,7 @@ Improvements to existing functionality.
 
 **Origin**: docs/archive/plans/2026-02-02_task-019-social-sharing.md
 
-- [ ] Add dynamic OG images for category pages — branded images with category name and product count
+- ~~Add dynamic OG images for category pages — branded images with category name and product count~~ — **reaped 2026-09-16 → 🪦 section** (G12 retired the category page).
 - [ ] Add share count tracking/display — track shares per platform, optionally show social proof
 - [ ] Add email sharing option — `mailto:` link with pre-filled subject and body
 - [ ] Preview OG images in admin panel — show social preview on product edit page
@@ -151,7 +151,7 @@ Improvements to existing functionality.
 
 **Origin**: docs/archive/plans/2026-02-04_task-026-fix-vercel-deploy-ci.md
 
-- [ ] Add Vercel deploy preview on PRs — deploy preview for pull requests (separate from production deploy on main)
+- ~~Add Vercel deploy preview on PRs — deploy preview for pull requests (separate from production deploy on main)~~ — **reaped 2026-09-16 → 🪦 section** (delivered by the Vercel Git integration; TASK-040 AC 2 already satisfied).
 - [ ] Add deploy status badge to README.md — workflow status badge for deployment visibility
 - [ ] Implement Slack/Discord notifications in deploy notify job — currently just echo, add real delivery
 - [ ] Add explicit default for `deployed` job output when validation skips — currently relies on bash `[ "" = "true" ]` evaluating false; an explicit `deployed: "false"` output in the skip path would be clearer
@@ -1420,6 +1420,13 @@ Ideas that might be valuable but aren't prioritized.
 - [ ] 🟤 **Telegram-manager link in the WhatsApp slot** — `WHATSAPP_HREF` stays `null` by decision (TASK-056 row 6), so the checkout payment step and the order e-mail render no manager link at all; the real manager handle `@mirox_manager` exists (verified 2026-09-16) and could occupy that slot (`src/content/checkout.ts` `contacts` + the e-mail contact block in `src/lib/email-templates/layout.ts`). Small, but touches a checkout surface → visual gate. (Med value, Low effort) `[relates-to: TASK-056 rows 4/6, TASK-055 /contact]`
 - [ ] 🟤 **Logo vector by tracing** — `public/images/logo.png` stays raster by decision (TASK-056 row 11); if crispness on retina/print ever matters, potrace/Illustrator image-trace of the PNG is an hour, not a client dependency. (Low value, Low effort) `[relates-to: TASK-056 row 11]`
 
+### [2026-09-16] From: Weekly planning review (user-raised)
+
+**Origin**: the user's review of the Sep 21–25 plan ([WEEKLY.md](WEEKLY.md), created 2026-09-16). Both 🔵 User-Flagged; **promoted same day** into WEEKLY. The same review recorded three rulings that are not backlog items: the domain is **not** bought for now ("maybe later"), **no new features** after the current plan — the site is declared «minimally ready for real operation» once the main functions land — and the Cleanup Week stays pinned after that declaration.
+
+- 🔵 **Handover & launch-options document** — everything runs on the user's own accounts (Vercel project + env, Neon, Cloudflare R2 `mirox-media`, the Resend key, the GitHub repo, GTM/GA4, any NP key) because the arrangement is verbal: the site is built in exchange for a developer credit, portfolio use and client reviews, and launching at the user's expense was never agreed. Needed when the main functions land: (a) an internal runbook — inventory of every service/credential on the user's identity with per-item transfer steps, cost and order of operations, plus a domain-purchase how-to (`.com.ua` registrar; Vercel does not sell it); (b) a client-facing UA proposal of three launch models — the client hands over core data and we obtain/connect everything; the client obtains everything and hands us credentials to connect; the client obtains and connects everything themselves — decided together with the user first (they have not settled it). One input to weigh there: interim customer e-mail from a subdomain of the user's own domain (Resend verifies subdomains), reversible at handover. (High value, Med effort) **Promoted same day** → WEEKLY [G27](WEEKLY.md) (week of 2026-09-21). [user, 2026-09-16]
+- 🔵 **Developer credit on the site** — a «Розроблено» line with a link to the user's personal site (all contact methods live there) so it is clear who built the store and how to reach them; part of the verbal agreement, not decoration. Footer line on every page plus a mention on `/about`; placement settled in the TASK-055 spec; URL still to be supplied by the user. (Med value, Low effort) **Promoted same day** → WEEKLY [G23](WEEKLY.md) member 5 (week of 2026-09-21). [user, 2026-09-16]
+
 ## Rejected Ideas
 
 Ideas considered but decided against (with reasoning).
@@ -1445,6 +1452,11 @@ Ideas considered but decided against (with reasoning).
 | [TASK-014] Additional Integrations umbrella (was under Post-MVP Features; section removed with it)        | reaped → 🪦 section below: payments → TASK-048 + the payments decision doc; supplier APIs / shipping calculators → spec v2.0 directions; automated inventory sync is an explicit GOALS.md Non-Goal             | 2026-08-20 |
 | Ukrposhta as a second delivery carrier (was under [2026-08-10] user-raised carrier/city/branch dropdowns) | reaped → 🪦 section below: client delegated TASK-056 item 7 and we ruled Nova Poshta only; NP-only picker stays live in the [2026-08-07] entry                                                                 | 2026-09-16 |
 | Dual-language (RU) product copy — `ProductTranslation` tables (was under [2026-08-15] G9 close-out)       | reaped → 🪦 section below: client delegated TASK-056 item 21 and we ruled no dual-language catalog; DB content stays UA in RU mode                                                                             | 2026-09-16 |
+| Add dynamic OG image generation via `opengraph-image.tsx` (was under [2026-01-22] TASK-017)               | reaped → 🪦 section below: implicitly delivered — `products/[slug]/opengraph-image.tsx` (TASK-019) and the site-wide root card (TASK-035, PR #21) are live                                                     | 2026-09-16 |
+| Add category metaTitle/metaDesc fields (was under [2026-01-22] TASK-017)                                  | reaped → 🪦 section below: the fields already exist on `Category` (schema) and G12 retired the only page that could render them                                                                                | 2026-09-16 |
+| Implement proper i18n with hreflang (was under [2026-01-22] TASK-017)                                     | reaped → 🪦 section below: TASK-039 shipped cookie-mode i18n with no per-locale URLs by decision; the SEO remainder is TASK-053 + the live 🟤 machine-metadata entry                                           | 2026-09-16 |
+| Add dynamic OG images for category pages (was under [2026-02-02] TASK-019)                                | reaped → 🪦 section below: G12 retired `/categories/[slug]`; no category page exists to carry a card                                                                                                           | 2026-09-16 |
+| Add Vercel deploy preview on PRs (was under [2026-02-04] TASK-026)                                        | reaped → 🪦 section below: delivered by the Vercel Git integration — the `vercel` bot posts a preview on every PR (verified on PRs #46/#47); TASK-040 AC 2 already satisfied                                   | 2026-09-16 |
 
 ---
 
@@ -1648,6 +1660,36 @@ now-removed "Post-MVP Features (Moved from TODO)" section — TASK-013/015 were 
   the admin forms. Doubles the client's per-product content workload — put the question to the
   client in the TASK-056 round-trip (rider recorded there) and build only on opt-in.
   (Med value, High effort) [G9 gate Q2, 2026-08-15]
+
+### ~~Add dynamic OG image generation — `opengraph-image.tsx` for product-specific social images~~ — reaped 2026-09-16
+
+**Reaped because**: implicitly delivered — `src/app/(shop)/products/[slug]/opengraph-image.tsx` (TASK-019) and the site-wide `src/app/opengraph-image.tsx` (TASK-035, PR #21) both exist and are live in production (user-approved reap, 2026-09-16 weekly-plan review). _(Was under: [2026-01-22] From: TASK-017 SEO Technical Setup.)_
+
+- [ ] Add dynamic OG image generation — Use `opengraph-image.tsx` for product-specific social images
+
+### ~~Add category metaTitle/metaDesc fields~~ — reaped 2026-09-16
+
+**Reaped because**: both halves are gone — `Category.metaTitle` / `metaDesc` already exist in `prisma/schema.prisma`, and the only page that could have rendered them, `/categories/[slug]`, was retired by G12 (routing-layer 307 in `next.config.mjs`, 2026-08-18). _(Was under: [2026-01-22] From: TASK-017 SEO Technical Setup.)_
+
+- [ ] Add category metaTitle/metaDesc fields — Similar to Product model, for category SEO
+
+### ~~Implement proper i18n with hreflang — current setup is preparation only (`en`)~~ — reaped 2026-09-16
+
+**Reaped because**: the premise is superseded — TASK-039 (G9, PR #37) shipped cookie-mode i18n with **no per-locale URLs** by decision, so hreflang alternates have nothing distinct to point at; the SEO-localization remainder is program task TASK-053 (spec v2.0) and the `alternates.languages` residue is the live 🟤 "Machine-metadata EN corners" [2026-08-15] entry — a duplicate of two live siblings. _(Was under: [2026-01-22] From: TASK-017 SEO Technical Setup.)_
+
+- [ ] Implement proper i18n with hreflang — Current setup is preparation only (`en`)
+
+### ~~Add dynamic OG images for category pages~~ — reaped 2026-09-16
+
+**Reaped because**: G12 retired `/categories/[slug]` (2026-08-18); no category page exists to carry a card. _(Was under: [2026-02-02] From: TASK-019 Social Sharing Enhancement.)_
+
+- [ ] Add dynamic OG images for category pages — branded images with category name and product count
+
+### ~~Add Vercel deploy preview on PRs~~ — reaped 2026-09-16
+
+**Reaped because**: delivered by the Vercel Git integration — the `vercel` bot posts the preview deployment on every PR (verified on PRs #46 and #47); previews sit behind Vercel Authentication and never migrate (launch runbook § Known limitations). Consequence recorded in WEEKLY (week of 2026-09-21) and on the TODO entry: TASK-040's AC 2 ("preview deploy per PR with URL comment") is already satisfied — re-scope TASK-040 before scheduling it. _(Was under: [2026-02-04] From: TASK-026 Fix Vercel Deploy in CI.)_
+
+- [ ] Add Vercel deploy preview on PRs — deploy preview for pull requests (separate from production deploy on main)
 
 ---
 

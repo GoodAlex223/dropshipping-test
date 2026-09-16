@@ -1,192 +1,127 @@
 # Weekly Plan
 
-**Week**: Monday August 24 – Friday August 28, 2026
-**Created**: 2026-08-20
-**Sources**: [MILESTONES.md](MILESTONES.md) · [ROADMAP.md](ROADMAP.md) · [GOALS.md](GOALS.md) · [BACKLOG.md](BACKLOG.md) · [TODO.md](TODO.md) · prior WEEKLY (2026-08-10 week, archived below) · [REVIEW-QUEUE.md](REVIEW-QUEUE.md) · git log (2 weeks)
-**Cleanup Week?**: No — overdue by cadence (🟤 pool ≫ 20 SP pending) under the standing user ruling (2026-08-11): the Cleanup Week runs **after site launch**.
-**Context**: **The pre-launch week, carried OVERDUE from its declared slot** — Aug 17–21 was consumed by the previous week's +4-day spillover and was never planned; the mandate moves, it does not reset. Theme (user-confirmed 2026-08-20): the TASK-056 client ask goes out Monday (drafted Fri Aug 21 as a user-approved head start), the client's **first 3 real products** (received 2026-08-20) are intaken in a pair session, and the launch gate hardens while the round-trip runs — security scan, guest order access + ownership check, deploy runbook + smoke, polish.
+**Week**: Monday September 21 – Friday September 25, 2026
+**Created**: 2026-09-16
+**Sources**: [MILESTONES.md](MILESTONES.md) · [ROADMAP.md](ROADMAP.md) · [GOALS.md](GOALS.md) · [BACKLOG.md](BACKLOG.md) · [TODO.md](TODO.md) · prior WEEKLY (2026-08-24 week, archived below) · [REVIEW-QUEUE.md](REVIEW-QUEUE.md) · git log (2 weeks) · [reference/2026-09-16-client-reply.md](../reference/2026-09-16-client-reply.md) · [deployment/launch-runbook.md](../deployment/launch-runbook.md)
+**Cleanup Week?**: No — overdue by cadence (never held; 🟤 pool ≫ 20 SP). The user re-confirmed on 2026-09-16 that it runs **after launch**, and redefined launch for this project: the domain purchase is deferred ("maybe later"), so "launch" is the «minimally ready for real operation» declaration that follows the main functions in this plan — under the same ruling's standing constraint, **no new features** beyond it.
+**Context**: **Own the content, then declare ready.** The client's 2026-09-16 blanket delegation moved the last blockers we can act on in-house: TASK-055's seven content/legal pages (three are payment-gateway prerequisites) are drafted and built by us (🏆), the Nova Poshta city/branch picker we told the client we would build runs on our own key, and two G16 defects on the client's self-service product-intake path are closed before they bite. Production is unblocked first (the 🟠 stale-CSS redeploy). The domain is not being bought for now (user ruling 2026-09-16), so the cutover chain is dormant; instead the week ends with the handover / launch-options document (G27) that turns "all main functions done" into a proposal the client can act on, plus the developer credit the verbal agreement provides for.
 
 ---
 
 ## Parallel Work
 
-- **Client round-trip tracking (G15)** — responses are processed as they arrive, as welcome interrupts. _(2026-09-16: the response arrived as a blanket delegation — processed, see G15; only the domain purchase remains open.)_ The **domain → Resend DNS → `EMAIL_FROM` flip → redeploy** chain is pre-authorized interrupt work: it closes the standing "real customers receive no order email" gap the moment the client's domain lands.
-- **TASK-055 content/legal pages** — ~~still blocked on client/lawyer copy; the G15 ask requests it~~ **unblocked 2026-09-16**: the client delegated the copy, we draft it ourselves. The pages get built the week the copy arrives (they gate TASK-048 per decision doc §5.3).
+- **Domain → cutover chain — DORMANT by ruling (2026-09-16: not buying the domain for now, maybe later).** The pre-authorized procedure in [launch-runbook.md](../deployment/launch-runbook.md) Part 1 (Resend DNS → `EMAIL_FROM` → `AWS_CLOUDFRONT_URL` flip **with the same-window `ProductImage.url` backfill**, Steps 4/12 → cache-off redeploy → Post checks + `npm run smoke`) stays the procedure for whenever a domain exists. Until then real customers receive **no order e-mail** (`EMAIL_FROM=onboarding@resend.dev` delivers only to the Resend owner) — [G27](#g27-handover--launch-options-document-solo) weighs the interim own-subdomain option.
+- **Client self-service product intake** — the client enters the remaining 5 real products through the admin with the UA intake guide (user ruling 2026-09-01). [G24](#g24-client-intake-safety-net-batch) hardens that path. Prod holds real data since 2026-09-01: `db:seed` against prod is destruction, `SEED_ALLOW_REMOTE=1` is retired for prod permanently.
+- **TASK-055 client review round-trip** — the drafted page copy goes to the client for review through the user (the reply promised «надішлемо на перегляд перед публікацією»); publication follows their OK **or three working days of silence** (ruled 2026-09-16 — the user expects the client to be slow).
+- **🟠 Stale production CSS (open since 2026-09-12, now the 3rd rebuild in a row)** — re-verified 2026-09-16: `/` serves `143491e5ab2efd5e.css` + `61c0f0682ec37a4c.css` and `.gap-x-6` resolves in neither, so the Sep 13 and Sep 16 pushes rebuilt **with** the cache. Owner action → [G22](#g22-production-cache-off-redeploy--smoke-re-verify-solo) Monday, doable any earlier day.
 
 ---
 
 ## Task Groups
 
-_Group IDs continue from prior weeks (G1–G14 are permanently taken by DONE.md and memory references); this week is G15–G21._
+_Group IDs continue from prior weeks (G1–G21 are permanently taken by DONE.md and memory references); this week is G22–G27._
 
-### G15. TASK-056 Client Round-Trip [solo]
+### G22. Production Cache-Off Redeploy + Smoke Re-verify [solo]
 
-🔵 User · client comms/content · **3 SP** · Fri (pre-week head start) + Mon
+🟡 Ops · ops/deploy · **1 SP** · Mon, first thing (owner action; any earlier day works)
 
-> The launch critical path: every remaining launch blocker is client-side (domain → order emails, legal copy → TASK-055 → TASK-048 prerequisites, photography, NP API key). Head start user-approved 2026-08-20 — the ask drafts **Fri Aug 21** so the client's multi-week clock starts before the weekend. The 3 real products received 2026-08-20 are **acknowledged** in the ask (with their remaining gaps: size charts, back-view images for the card hover-swap, GTIN/brand data); their intake is G16's job, not this group's.
+> The one scheduled group below the 2-SP floor — the urgent/deadline-bound exception: production has rendered the footer links at 0px gap on **every page** since PR #46 (2026-09-12), and each subsequent push rebuilt with the cache. Origin is the 🟠 🟤 [2026-09-12] G20 close-out entry (Claude-surfaced); sourced 🟡 by the intake rule's time-sensitive-ops routing. No Vercel CLI in this container; the Vercel MCP plugin's deploy tool is untested here and stays untouched — the dashboard click is the recorded remedy.
 
-- [x] _(2026-08-21)_ Draft the consolidated ask document (client-facing, UA) from the TASK-056 checklist: photography (hero/product/measurement), logo vector, real socials + claims re-confirmation, size charts, legal-page copy / lawyer engagement, contact details, bank-card + WhatsApp details, free-shipping threshold, announcement copy, **domain purchase + email chain** (Resend DNS → `EMAIL_FROM`), NP API key + the Ukrposhta carrier question, `FEEDBACK_EMAIL` recipient, RU catalog sign-off package (nuance list in [messages/README.md](../../messages/README.md)) + the RU product-copy opt-in question (2) — TODO.md TASK-056 [HIGH]
-- [x] _(2026-08-21 — sent by the user the same day as drafted, ahead of the Monday plan; send date + 📨 statuses recorded on the TODO TASK-056 tracking table)_ Hand off for sending Monday; record the send date + per-item response tracking on TODO TASK-056; process same-week responses as interrupts (1) — TODO.md TASK-056
-- [x] _(2026-09-16)_ **Client replied — blanket delegation («вирішуйте самі»), no facts.** Processed as the interrupt this group planned for: every judgment item decided by us (user-approved in-session), every fact-only item given a recorded fallback — per-row record on the TODO TASK-056 table; confirmation back drafted → [reference/2026-09-16-client-reply.md](../reference/2026-09-16-client-reply.md). Consequences: **TASK-055 unblocked** (we draft all 7 pages); Ukrposhta ruled out and the RU product-copy sketch declined (both BACKLOG entries reaped → 🪦); RU catalog DRAFT label lifted; **the domain purchase is the one remaining 🔴** and needs a payer (`miroxshop.com.ua` recommended — free at a UA registrar; `mirox.shop`/`miroxshop.com` taken).
+- [ ] Owner: Vercel dashboard → Redeploy the current production deployment with **"Use existing build cache" unchecked** (or set `VERCEL_FORCE_NO_BUILD_CACHE=1` in the project env and push). Then Claude: `npm run smoke -- --url https://dropshipping-test.vercel.app` exits 0 with the CSS-hash row `CHANGED`, and a 390px check of `/track`'s footer nav shows `.gap-x-6`/`.gap-y-2` resolved (links no longer touching); record the served chunk hashes in the close-out (1) — BACKLOG 🟠 🟤 [2026-09-12] G20 close-out [URGENT]
 
-### G16. Real-Product Intake Pair Session [batch]
+### G23. TASK-055 Content, Legal & Contact Pages [batch]
 
-🔵 User · catalog/data · **4 SP → revised 9 SP (spec §8, 2026-08-26)** · Mon (can pull forward to Fri if the user is available)
+🔵 User · content/storefront · **10 SP** · Mon–Wed · **🏆 Weekly Challenge**
 
-> User-raised 2026-08-20: the client delivered the first 3 real products — a live rehearsal of the real-data path before launch, run as a **pair session** (user + Claude) so problems are seen and fixed together. Environment decision at session start: prod admin (alongside the deliberately-placeholder catalog) vs local-first. **Landmine recorded up front**: once real data enters prod, `db:seed` against prod is destruction — the seed deletes the whole catalog tree by design; the user-gated re-seed runbook is effectively retired for prod from that moment.
+> Unblocked 2026-09-16: the client delegated the copy (TASK-056 item 15), so we draft all seven pages ourselves — AI-drafted UA copy, client reviews before publish. Three of the seven (public offer/terms, privacy, returns) are payment-gateway onboarding prerequisites per the [payments decision doc](../superpowers/specs/2026-07-16-ukraine-payments-delivery-decision.md) §5.3 item 9 and gate TASK-048; shipping the group also lifts the 2026-07-28 ruling that hid the header/footer info links (no-dead-links rule). Expect the **architectural** brainstorm path — seven routes with no existing flow — so a spec and an SDD plan precede the build. Decisions the spec must settle: content model for long-form copy (catalog keys via `t.rich` vs a typed `src/content/pages/` module — CLAUDE.md's "all display copy in `messages/*.json`" rule applies), UA-only copy with the RU toggle falling back to UA (recommended), slugs, and the developer-credit placement (member 5). **Publish protocol ruled 2026-09-16**: merge after the client's OK **or** after three working days of silence. Facts we do not hold stay out: no phone/address unless the client sends one (TASK-056 row 4), no third-party brand names and no authenticity claim (row 14), return window «14 днів» (user-approved 2026-07-28).
 
-> **Effort revision (2026-08-26, spec §8)**: the prep step found the admin path cannot carry a real product (no image/variant UI, no storage backend, no `styleGroup` field, no feed opt-out). Decision 1 (close the admin gap first) makes this a feature group — realistic 8–10 SP, booked as 9. Scheduling overflow surfaced to the user, not absorbed; pressure-valve order (G20 → G18 tracking half → G21) unchanged.
+- [ ] Brainstorm → spec → plan, then draft the seven pages' UA copy — legal three first (`/terms` public offer, `/privacy`, `/returns`), each checked against decision doc §5.3 item 9 and the brand posture above; `/contact` carries the TG channel, the reviews channel `t.me/mirox_vidgyk`, manager `@mirox_manager` and the `/feedback` form (3) — TODO.md TASK-055 [HIGH], unblocked 2026-09-16
+- [ ] Build the seven routes under `(shop)` — `/contact` per [`Mirox Contacts.dc.html`](../design/design_handoff_mirox/Mirox%20Contacts.dc.html) (social cards, delivery/payment + returns blocks, about + stat cards), the other six on the shared page shell; per-page metadata via `getTranslations`; sitemap rows; `Footer.tsx`'s `shopLinks` and the hidden header info links restored; unit tests with `renderWithIntl` + an E2E link sweep proving no footer/header link 404s; visual gate (4) — TODO.md TASK-055 AC 1 + AC 3
+- [ ] Manager-contact touchpoints single-sourced: a `@mirox_manager` Telegram link in `src/content/brand.ts` consumed by `/contact`, the checkout payment-step contacts (`src/content/checkout.ts`) and the order e-mail contact block (`src/content/emails.ts`) — today both surfaces render «напишіть менеджеру» with the channel (`t.me/mirox_shop`) and Instagram links and WhatsApp hidden (`WHATSAPP_HREF` null), so the client reply's п.5/п.6 statement («лишається «зв'яжіться з менеджером» (Telegram @mirox_manager)») names a handle the site does not yet link; visual gate on the payment step (1) — BACKLOG 🟤 [2026-09-16] TASK-056 delegation (subsumed; origin cited)
+- [ ] Client review package: the drafted copy as a paste-able UA doc under `docs/reference/`, handed to the user to send; publish after the client's OK or after the three-working-day silence window; tick §5.3 item 9's "published" half on the decision doc once live (1) — TODO.md TASK-055 AC 2 + the reply's review promise
+- [ ] Developer credit: a «Розроблено» line in the footer (every page) plus a short mention on `/about`, linking the user's personal site (all contact methods live there; **URL: user to supply**) — the credit the verbal agreement provides for (the site is built in exchange for the credit, portfolio use and client reviews); strings via the catalog; placement settled in the G23 spec (1) — user-raised 2026-09-16 (weekly-plan review) → BACKLOG 🔵 [2026-09-16], promoted same day
 
-- [x] Prep: dry-run the admin product-creation path on seed data — ProductForm fields incl. brand/MPN (Google Shopping), image upload path (S3 config in the target env), category assignment, comparePrice refine; variant names MUST be the canonical «Розмір»/«Колір» DATA values ([src/lib/variant-names.ts](../../src/lib/variant-names.ts) — a hand-typed "Size" breaks every storefront variant lookup); known gaps going in: no `styleGroup` field in the form (colorway linking needs DB access), Textarea ref-drop (validation errors can't autofocus) (1) — user-raised 2026-08-20 [HIGH]
-- [x] Pair session: enter the 3 products together; verify each end-to-end — PDP, catalog listing + filters, search, cart → COD checkout, Google Shopping feed row validity (`validateFeedItemSafe` must not silently drop them), sitemap + OG image; fix small problems live, file larger finds (3) — user-raised 2026-08-20 [HIGH]
+### G24. Client-Intake Safety Net [batch]
 
-### G17. Pre-Launch Security Scan [solo]
+🟤 Auto · admin/catalog · **3 SP** · Tue — **the week's single 🟤 group**
 
-🟤 Auto · security · **3 SP** · Tue — **the week's single 🟤 group**
+> Two G16-filed defects sit directly on the path the client is walking right now: creating products through the admin form with Ukrainian names, in a catalogue that is entirely third-party branded. Both are High value / Low effort in the BACKLOG and both protect the client's own intake rather than ours. TDD; the intake guide is updated alongside.
 
-> The G10 run-2 `adopt`, pinned by its own park condition to exactly this window ("pre-launch security pass is scheduled, or real customer traffic is imminent"). Runs Tuesday so findings can be triaged and the quick ones fixed inside the week.
+- [ ] `generateSlug` transliterates Cyrillic (uk → Latin map) instead of returning `""`, and `POST /api/admin/products` rejects an empty slug with a coded 400 instead of persisting an unreachable product; tests cover «Олімпійка з лампасами, чорна» → non-empty slug, the `${slug}-${suffix}` collision path, and the empty-slug rejection (2) — BACKLOG 🟤 [2026-09-01] G16 pair session
+- [ ] `excludeFromFeed` defaults **on** for new products in the form (`ProductForm` `defaultValues`), with the DB default and the Zod schema untouched — the schema deliberately carries no `.default()`, or partial PUTs would reset the flag; intake guide sentence updated (1) — BACKLOG 🟤 [2026-09-01] G16 pair session, option (a)
 
-- [x] Install `claude-security@claude-plugins-official` (v0.10.0, Anthropic) and run the scoped deep scan: auth (NextAuth v5 + middleware), API routes + `requireAdmin()`/`requireAuth()` guards, `/api/checkout/create-order` (guest COD, no auth), the HMAC unsubscribe token path, admin routes, secrets pass (2) — BACKLOG [2026-08-15] G10 run 2 adopt [HIGH]
-- [x] Triage findings: fix quick confirmed ones in-branch; file the rest 🟤 with severity. A severe finding (data exposure class) is an abort-condition consult with the user, not a silent fix (1)
+### G25. TASK-049 Nova Poshta City/Branch Picker [solo]
 
-**As delivered (2026-09-03)**: run 1 = `claude-security` **v0.11.0** (not v0.10.0), `low` effort over
-the **whole repository** rather than the scoped deep scan — 12 candidates → 9 panel-verified findings
-(1 HIGH, 7 MED, 1 LOW); 6 fixed in-branch with TDD, 3 filed 🟤. F1 was the abort-condition consult and
-was closed **end-to-end including production** (credential rotated, seeded test accounts deleted, both
-owner-executed and verified). The follow-up depth scan (`medium`, scoped `src`) was launched twice and
-**abandoned on cost** by user ruling — so the scoped-deep-scan half of task 1 was **not** delivered, and
-G17 carries run-1 coverage only: no directory in `src` is proven clean. Filed 🟤 [2026-09-03].
+🔵 User · checkout/delivery · **5 SP** (may prove 8 — checkout is the most review-sensitive surface) · Thu–Fri
 
-**Merged 2026-09-04** as `0bee3d2` (PR [#43](https://github.com/GoodAlex223/dropshipping-test/pull/43),
-10 commits, three review rounds ending in zero findings). F6's post-deploy check is **done**, not
-carried: the production optimizer serves the real R2 images (200) and rejects arbitrary, metadata and
-lookalike hosts (400) — so the SSRF is closed, not merely untriggered. Owner also verified PDP images,
-the rotated admin password and orders in the browser.
+> The 🔵 [2026-08-07] user ask (Q1: replace the free-text «Відділення / адреса» with the standard city → warehouse picker), un-gated 2026-09-16: TASK-056 item 7 ruled Nova Poshta only, and the address/warehouse reference methods accept any account's key, so the picker runs on **our own** NP key — the client was told so in the reply («зробимо на нашому ключі»). **Prerequisite**: that key in local `.env` and Vercel prod by Wed — the user will try to obtain one on their own account (ruling 2026-09-16); without it the group slips (valve #1). **This is the last feature under the no-new-features ruling.** Design source: decision doc §6.2–6.3 (`getCities` → `CityRef`; `getWarehouses` returns branches **and** lockers — filter `TypeOfWarehouseRef` for postomats, the inverted-UUID trap) and §6.7 (two dependent selects, server-proxied so the key never reaches the browser; directories cached daily). Prod has no Redis, so caching is `unstable_cache`/module-scope, not BullMQ's ioredis. Likely architectural at brainstorm (new API surface + a `shippingAddress` shape change), so spec + plan first.
 
-### G18. Guest Order Access & Hardening [batch]
+- [ ] Server-proxied directory routes (`/api/shipping/np/cities`, `/api/shipping/np/warehouses?city=<CityRef>&type=branch|postomat`) with the key server-side only, daily-TTL cache, coded outcomes, query validation via Zod; unit tests with mocked NP responses incl. the postomat filter (2) — decision doc §6.2/§6.3/§6.7
+- [ ] Checkout: city search → branch/postomat select replacing free-text `city`/`line1` for `np-office`/`np-postomat`; `np-courier` keeps a street address; store `CityRef`/`WarehouseRef` alongside the display strings (shape decision in the spec — additive to `shippingAddress`); hydration gate preserved; every string change sweeps every E2E locator type (checkout specs run in CI, not locally); visual gate at 390/768/1280 (3) — BACKLOG 🔵 [2026-08-07] G2 post-gate Q1 [HIGH]; spec TASK-049 (v1.4 B-track, pulled forward by the 2026-09-16 client statement)
 
-🔵 User · checkout/orders · **7 SP** · Tue–Wed · **🏆 Weekly Challenge**
-
-> Guest order tracking (🔵 [2026-08-07], "recommended before real launch") and the G2 confirmation-page ownership check (subsumed 🟤 rider, pinned "**before real customer traffic**") share one design space: verified guest access to order data. Design constraints on record: never lookup by phone alone (order-enumeration risk — order# + email/phone pair); the post-checkout redirect must still show the just-created order (one-time grant / session), while cold visits require verification.
-
-- [x] Guest order tracking: lookup by order number + email (form + API; rate-limit consideration); claim-by-email-at-registration decision in-plan (5) — BACKLOG [2026-08-07] G2 post-gate 🔵 [HIGH]
-- [x] Confirmation-page ownership check (subsumed 🟤 rider): order PII no longer sits behind the order-number capability URL alone; same verification mechanism as the lookup (2) — BACKLOG [2026-08-06] G2 hardening bundle (the pinned privacy piece; the volume-triggered pieces stay BACKLOG'd)
-
-### G19. Launch Runbook + Deploy Verification [batch]
-
-🔵 User · ops/deploy · **3 SP** · Thu
-
-> The operational half of launch readiness: the user-raised runbook (🔵 [2026-08-10]) plus the smoke-check 🟤 riders it subsumes ([2026-07-21] post-deploy smoke test; [2026-08-14] served-asset staleness check; [2026-08-18] "nothing verifies a Vercel production deploy except a human looking at it").
-
-- [x] Write the production-launch deploy runbook (pre / while / post) as an executable checklist doc, indexed in docs/README.md at authoring time (2) — BACKLOG [2026-08-10] G5 user-raised 🔵 [HIGH]
-- [x] Post-deploy smoke script: fetch `/`, `/products`, a DB-backed route (assert 200 + a DB-backed string), `/categories/hudi` (assert 307), and assert the served CSS chunk hash changed vs the previous deploy (1) — subsumed 🟤 riders [2026-07-21] + [2026-08-14] + [2026-08-18]
-
-### G20. Pre-Launch Polish [batch]
-
-🔵 User (by steer) · storefront · **4 SP** · Thu
-
-> Sourced 🔵 under the user's 2026-08-11 "ask + polish" pre-launch steer, confirmed 2026-08-20 (G13/G14 subsumption precedent); member origins are 🟤 and cited. The checkout distraction-free header is **deliberately deferred** (user-ratified 2026-08-20): restructuring checkout chrome days before launch risks more than it buys.
-
-- [x] Mobile «Новинки» horizontal-scroll rail per [`Mirox Mobile.dc.html`](../design/design_handoff_mirox/Mirox%20Mobile.dc.html) (~160px cards below `sm:`), with its own visual-gate round (2) — BACKLOG [2026-08-15] G14 audit
-- [x] G8 feedback/marquee residue batch (one commit, ranked by the PR #35 re-review): malformed-JSON body → 400 `VALIDATION_ERROR` on feedback + newsletter subscribe, `observer.observe(first)` font-swap guard in [AnnouncementBar.tsx](../../src/components/common/AnnouncementBar.tsx), the listed test-debt, static-variant inset note (2) — TODO.md § Medium Priority [2026-08-14]
-
-**As delivered (2026-09-12)**: both members shipped as planned, plus a **third member added by user
-ruling** — the Member 1 visual gate measured the homepage at 396px against a 390px viewport, and the
-cause was the footer's copyright nav (`flex gap-6`, five UA labels, no wrap) pushing _every_ page
-carrying the footer, not the new rail. 4 → **5 SP**. The mobile-PDP contextual header was **assessed
-and deferred** (2–3 SP, filed 🟤) as the backlog entry asked, not built. Member 2's scope grew from 8
-to 9 handlers during PR review: excluding `create-payment-intent` as "dormant" while fixing the
-equally dormant `confirm-order` was an uneven rule, so the route was fixed and the exclusion list
-deleted — the guard now covers 10/10 public JSON routes.
-
-**Production caveat, open at close-out**: the merge deploy (`baef19b`) serves the new HTML with
-**stale CSS** from Vercel's build cache (third recurrence of a documented failure mode). Every
-utility new to this change — `.gap-x-6`, `.gap-y-2`, `.-mr-4`, `.pr-4`, `.sm:overflow-visible`,
-`.sm:mr-0`, `.sm:pr-0` — is missing from the served chunks, so the footer links sit at 0px gap in
-production while the sideways-scroll half of the fix _did_ land. `npm run smoke` caught it and exits
-
-1. The remedy is owner-side (dashboard Redeploy with the build cache **unchecked**, or
-   `VERCEL_FORCE_NO_BUILD_CACHE=1`) and is filed 🟠 🟤 [2026-09-12].
-
-### G21. Weekly Reviews [batch]
+### G26. Weekly Reviews [batch]
 
 ⚪ Overhead · recurring reviews · **5 SP** · Fri
 
-> Run 3. Read [REVIEW-QUEUE.md](REVIEW-QUEUE.md) first — the run recipe (incl. the step-5 re-check pass), the standing launch-push lens (high adopt bar, re-scope after launch), and Convention-4 cheap checks on all parks. Two parks interact with this very week: `resend`'s condition ("sending domain provisioned") may FIRE if G15's domain item lands mid-week, and `security-guidance`'s re-trigger reads G17's scan results (a recurring vulnerability class un-defers it). Sequential in-session (Convention 8).
+> Run 4. Read [REVIEW-QUEUE.md](REVIEW-QUEUE.md) first — the run recipe (skeleton commit before research, step-5 re-check pass, Convention-4 cheap checks on every park). Window for slot 4 = shipped since run 3 (2026-09-12): PR #47 close-out (`05edce3` → `a2281a3`), the G15 response processing (`c574e0c`), this week's PRs, and every memory file touched 2026-09-13 → run day. Parks: `resend` **cannot fire** this week (domain deferred by ruling); the six slot-4 fold-in defers fire when a named host is touched; `neon` / `logic-lens` get cheap checks only (`git ls-remote`, no re-reading); EARS and the `sentry`/`prisma` runners-up likewise. **Slot 4 owes a verdict** on the fix-chain lesson (fourth failure mode in `review-fix-chains-and-lazy-diagnostics`; likely host = run-1 propagation row 3). **Standing-lens question for a process row**: the lens says "re-scope once the storefront has launched" — the user's 2026-09-16 ruling redefines launch as the «minimally ready» declaration expected right after this plan; rule whether that fires the re-scope now or at the declaration. Slot-3 bias counter stands at 0 of 2. Sequential in-session (Convention 8; its 🟤 amendment is pending and may be folded here if the conventions are touched).
 
-- [x] Plugins ×2: best not-yet-reviewed from the official store AND from the wider internet, each row tagged `source:` (2)
-- [x] Claude best-practices: top not-yet-reviewed candidate via date-aware web search (1)
-- [x] Non-Claude AI best-practices — the bias-watch counter stands at **0 of 2** under the rewritten methodology-aimed condition (1)
-- [x] Cross-project propagation: window = shipped since run 2 — PRs #39/#40, G11 merge `745e039`, G12 merge `9fc4fd3`, memory files 2026-08-15 → run day (1)
+- [ ] Plugins ×2: best not-yet-reviewed from the official store AND from the wider internet, each row tagged `source:` (2)
+- [ ] Claude best-practices: top not-yet-reviewed candidate via date-aware web search (1)
+- [ ] Non-Claude AI best-practices — methodology-aimed; the bias-watch counter advances only per the rewritten condition (1)
+- [ ] Cross-project propagation: the window above, memory files included (Convention 9); rule on the owed fix-chain verdict and the standing-lens question (1)
 
-**As delivered (2026-09-12)**: run 3 wrote **17 rows — 1 adopt · 10 defer · 1 pass · 3 propagate, plus 2
-process rows** (3 / 1 / 2 / 11 by slot). The slot-4 window was **widened by user ruling at the brainstorm**,
-exactly as at G10: the list above was written 2026-08-20, before G16–G20 existed, and the slot's own
-definition ("shipped since run 2") governs — so the scan covered PRs #40–#46, the G11/G12/G15 bare merges and
-every memory file touched 2026-08-17 → 2026-09-12.
+### G27. Handover & Launch-Options Document [solo]
 
-Both parks this group was told to watch resolved, neither the way the plan expected. `resend` did **not**
-fire — the sending domain is still unprovisioned, so the standing no-order-email gap is untouched. Reading
-G17's results moved `security-guidance` off the board a different way: Convention 2's exclusion set shows it
-already enabled globally, so the park **closed by adoption** rather than by verdict. `logic-lens`'s condition
-did fire, on 24 threshold recurrences, and still deferred — the re-check found the plugin documents how to
-change its own 80 gate, which is a cheaper instrument aimed at the real mechanism than a second reviewer is.
+🔵 User · docs/ops · **3 SP** · Thu
 
-The adopt is slot 2's: Convention 8 bans subagent fan-out on evidence that only covers background Workflow
-runs, while bounded foreground dispatch has been measured safe here (G17: 38 agents, +550 MiB, `oom_kill 0`).
+> User-raised 2026-09-16 at the plan review. Everything runs on the user's own accounts today — the Vercel project and its env, Neon, the Cloudflare R2 bucket `mirox-media`, the Resend key, the GitHub repo, GTM/GA4, any NP key — because the arrangement is verbal: the site is built in exchange for a developer credit, portfolio use and client reviews, and launching at the user's expense was never agreed; the client is not very invested. When the main functions land the user wants to say «all the essentials are done, the rest is optional» and put launch options to the client. **The launch model is decided together in an attended brainstorm** — the user has not settled it — and only then written up. Deliverable, not a feature: the no-new-features ruling is untouched.
 
-Merged `05edce3` on 2026-09-13 after **4 review rounds**. Both findings were in one bullet's trailing clause,
-and neither touched a verdict, a window or a tally. Two items were closed as record rather than diff: the
-gate-suppression instance, and the routing of the review's own fix-chain lesson — written into the memory
-file that slot 4 scans, rather than back-dated into a table that records what the scan found.
-Filed 🟤 to amend the wording, with the ask-first and never-relaunch constraints written into it.
+- [ ] Internal handover runbook (`docs/deployment/handover.md`, EN): inventory of every service, account, env variable and credential on the user's identity; per item — what the client must end up owning, transfer vs re-create, cost, downtime/risk, and the order of operations; the domain-purchase how-to (`.com.ua` through a Ukrainian registrar, ~200–400 UAH/yr; Vercel does not sell `.com.ua`) pointing at the launch runbook Part 1 for the cutover steps; indexed in docs/README.md at authoring time (2) — user-raised 2026-09-16 → BACKLOG 🔵 [2026-09-16], promoted same day
+- [ ] Launch-model proposal (client-facing, UA, messenger-paste format like the 2026-08-21 ask), after the brainstorm: the three models — (1) the client hands over their core data and we obtain and connect everything on their behalf; (2) the client obtains everything themselves and hands us the credentials to connect; (3) the client obtains **and** connects everything themselves — with what each needs from the client, what it costs, and the recommendation the brainstorm reached; plus the interim option to weigh, not decide: customer e-mail from a subdomain of the user's **own** domain (Resend verifies subdomains), which closes the no-order-e-mail gap without a purchase and is reversible at handover (1) — user-raised 2026-09-16
 
 ---
 
 ## Daily Schedule
 
-### Friday Aug 21 (pre-week) — Head start (user-approved 2026-08-20)
+### Monday — Production unblocked, the content group opens
 
-- **[G15](#g15-task-056-client-round-trip-solo)** 🔵 — part 1: the consolidated ask drafts today so it can reach the client before the weekend. _(Done 2026-08-21 — and part 2 as well: after two review rounds — user edits, the branded-goods advisory, item renumber to 21 — the user sent the ask the same day. The whole group landed Friday.)_
+- **[G22](#g22-production-cache-off-redeploy--smoke-re-verify-solo)** 🟡 — owner does the cache-off redeploy first thing; `npm run smoke` must come back `CHANGED`, exit 0.
+- **[G23](#g23-task-055-content-legal--contact-pages-batch)** 🔵 — part 1: brainstorm → spec → plan; legal copy drafted first (terms / privacy / returns against §5.3), then `/contact`.
 
-### Monday — Real data + the ask goes out
+### Tuesday — Build the pages, protect the client's intake
 
-- [x] **[G16](#g16-real-product-intake-pair-session-batch)** 🔵 — **shipped PR #41 / `36b5593` (2026-09-01)**. Ran long: the prep step turned it into a feature group (4 → 9 SP), and delivery slipped past the Aug 24–28 window. Local pass entered all 7 rows; production holds 2, the remaining 5 handed to the client with a written guide.
-- **[G15](#g15-task-056-client-round-trip-solo)** 🔵 — ~~part 2: finalize, hand off for sending, set up response tracking~~ _(moot — completed Fri 2026-08-21, ask already sent)_.
+- **[G23](#g23-task-055-content-legal--contact-pages-batch)** 🔵 — part 2: the seven routes, nav/footer restore incl. the developer credit, metadata + sitemap, tests.
+- **[G24](#g24-client-intake-safety-net-batch)** 🟤 — slug transliteration + feed default, TDD, intake guide updated.
 
-### Tuesday — Security + guest-access design
+### Wednesday — Content lands; picker go/no-go
 
-- [x] **[G17](#g17-pre-launch-security-scan-solo)** 🟤 — **shipped PR #43 / `0bee3d2` (2026-09-04)**. Scan + triage ran as planned; delivery slipped past the Aug 24–28 window like G16. 9 panel-verified findings, 6 fixed, 3 filed; the HIGH was an abort-condition consult and closed in production. Run 2 (the `medium` depth scan) abandoned on cost — G17 ships run-1 coverage only.
-- [x] **[G18](#g18-guest-order-access--hardening-batch)** 🔵 — **shipped PR #44 / `a37c8d0` (2026-09-06)**. Part 1: design + API — spec brainstormed and approved 2026-09-04, SDD execution the same day.
+- **[G23](#g23-task-055-content-legal--contact-pages-batch)** 🔵 — part 3: visual gate, PR + review, client review package handed over (silence window starts).
+- **[G25](#g25-task-049-nova-poshta-citybranch-picker-solo)** 🔵 — go/no-go on the NP API key; brainstorm + spec if go.
 
-### Wednesday — Guest access lands
+### Thursday — Delivery picker + the handover conversation
 
-- [x] **[G18](#g18-guest-order-access--hardening-batch)** 🔵 — part 2: UI, visual gate (approved 2026-09-05), PR #44 (review fixes `f25fa24`), merged 2026-09-06; production verified. Delivery slipped past the Aug 24–28 window like G16/G17.
-
-### Thursday — Launch ops + polish
-
-- [x] **[G19](#g19-launch-runbook--deploy-verification-batch)** 🔵 — **shipped PR [#45](https://github.com/GoodAlex223/dropshipping-test/pull/45) / `735533a` (2026-09-10)**. Ran long: 5 review rounds past the first green, all documentation and guard work — the deliverables were unchanged after `01bd910`. `CHANGED`, the one staleness outcome never witnessed live, was settled on the merge deploy: 14/14 pass, exit 0.
-- [x] **[G20](#g20-pre-launch-polish-batch)** 🔵 — **shipped PR [#46](https://github.com/GoodAlex223/dropshipping-test/pull/46) / `baef19b` (2026-09-12)**. Both planned members landed; a third was added mid-branch by user ruling when the Member 1 visual gate found the footer pushing every mobile page 6px sideways (4 → 5 SP). Code review returned **zero findings**; its one sub-threshold note (an uneven dormant-route exclusion) was verified and acted on rather than argued. **Production is NOT fully live**: the merge deploy serves new HTML against stale CSS from Vercel's build cache — third recurrence — so the footer links render with no gap until an owner does a cache-off redeploy. Caught by `npm run smoke` (exit 1), filed 🟠 🟤.
+- **[G25](#g25-task-049-nova-poshta-citybranch-picker-solo)** 🔵 — part 1: directory proxy + cache, TDD; G23 merge after review.
+- **[G27](#g27-handover--launch-options-document-solo)** 🔵 — the launch-model brainstorm with the user, then the inventory runbook and the UA proposal.
 
 ### Friday — Reviews + close
 
-- [x] **[G21](#g21-weekly-reviews-batch)** ⚪ — **shipped PR [#47](https://github.com/GoodAlex223/dropshipping-test/pull/47) / `05edce3` (2026-09-13)**. All four slots ran; the slot-4 window was widened by user ruling at the brainstorm. **4 review rounds, 2 findings**, both in the same bullet's trailing clause and both about figures derived in prose — the verdicts, windows and tallies survived four independent re-derivations untouched. Round 1 was **gate-suppressed at 75 against the 80 gate** and proved real _and_ understated: recurrence 25, and the measured instance the 🟤 rubric entry had been missing.
-- Close-out: statuses → `✅ PR #N`, as-delivered quota recompute, next-week seed list; slack for G17-finding fixes and client-response interrupts.
+- **[G26](#g26-weekly-reviews-batch)** ⚪ — run 4, sequential in-session.
+- **[G25](#g25-task-049-nova-poshta-citybranch-picker-solo)** 🔵 — part 2: checkout selects, visual gate, PR.
+- Close-out: statuses → `✅ PR #N`, as-delivered quota recompute, next-week seed list — expected seed: the «minimally ready» declaration and the Cleanup Week that follows it.
 
 ---
 
 ## Summary Table
 
-| ID  | Group                                       | Domain          | Source      | Tasks  | Total SP | Day          | Status                                      |
-| --- | ------------------------------------------- | --------------- | ----------- | ------ | -------- | ------------ | ------------------------------------------- |
-| G15 | TASK-056 Client Round-Trip `[solo]`         | client comms    | 🔵 User     | 2      | 3        | Fri(pre)+Mon | ✅ `b836e77`                                |
-| G16 | Real-Product Intake Pair Session `[batch]`  | catalog/data    | 🔵 User     | 2      | 9        | Mon          | ✅ PR #41                                   |
-| G17 | Pre-Launch Security Scan `[solo]`           | security        | 🟤 Auto     | 2      | 3        | Tue          | ✅ `0bee3d2` / PR #43 (run-1 coverage only) |
-| G18 | Guest Order Access & Hardening `[batch]` 🏆 | checkout/orders | 🔵 User     | 2      | 7        | Tue–Wed      | ✅ `a37c8d0` / PR #44                       |
-| G19 | Launch Runbook + Deploy Verify `[batch]`    | ops/deploy      | 🔵 User     | 2      | 3        | Thu          | ✅ PR #45 / `735533a`                       |
-| G20 | Pre-Launch Polish `[batch]`                 | storefront      | 🔵 User     | 3      | 5        | Thu          | ✅ PR #46 / `baef19b`                       |
-| G21 | Weekly Reviews `[batch]`                    | recurring       | ⚪ Overhead | 4      | 5        | Fri          | ✅ PR #47                                   |
-|     | **Total**                                   |                 |             | **16** | **34**   |              |                                             |
+| ID  | Group                                                    | Domain             | Source      | Tasks  | Total SP | Day     | Status    |
+| --- | -------------------------------------------------------- | ------------------ | ----------- | ------ | -------- | ------- | --------- |
+| G22 | Production Cache-Off Redeploy + Smoke Re-verify `[solo]` | ops/deploy         | 🟡 Ops      | 1      | 1        | Mon     | ☐ Planned |
+| G23 | TASK-055 Content, Legal & Contact Pages `[batch]` 🏆     | content/storefront | 🔵 User     | 5      | 10       | Mon–Wed | ☐ Planned |
+| G24 | Client-Intake Safety Net `[batch]`                       | admin/catalog      | 🟤 Auto     | 2      | 3        | Tue     | ☐ Planned |
+| G25 | TASK-049 Nova Poshta City/Branch Picker `[solo]`         | checkout/delivery  | 🔵 User     | 2      | 5        | Thu–Fri | ☐ Planned |
+| G26 | Weekly Reviews `[batch]`                                 | recurring          | ⚪ Overhead | 4      | 5        | Fri     | ☐ Planned |
+| G27 | Handover & Launch-Options Document `[solo]`              | docs/ops           | 🔵 User     | 2      | 3        | Thu     | ☐ Planned |
+|     | **Total**                                                |                    |             | **16** | **27**   |         |           |
 
 _Source legend: 🔵 User · 🟡 Ops · 🟤 Auto · ⚪ Overhead (exempt from the quota denominator). Status on completion: `✅ PR #N` (the number, never a bare ✅)._
 
@@ -194,49 +129,53 @@ _Source legend: 🔵 User · 🟡 Ops · 🟤 Auto · ⚪ Overhead (exempt from 
 
 ## Notes
 
-- _Brainstorm sanity-checks: week dates confirmed vs git/DONE (today Thu 2026-08-20; Aug 24 verified a Monday); **the previous week did NOT land inside its header** — Aug 10–14 delivery ran to Tue Aug 18 (+4 days, Spillover line recorded, archived below under its TRUE header); **what fell due during the spillover: the declared pre-launch week itself (Aug 17–21)** — consumed, never planned, Aug 19–20 idle in git → its mandate carries OVERDUE into this plan rather than resetting; velocity: two weeks running delivered fully but +4 days each (26/28 SP, then 40/40 planned-overload) → realistic in-window capacity ≈ 20–26 non-⚪ SP, this plan sits at 24; Cleanup Week overdue by cadence, user-pinned to after launch (2026-08-11); source quotas satisfiable (87.5% 🔵)._
-- **Discussion Phase (attended, 2026-08-20)**: 4 rulings via structured questions — (1) week window **Aug 24–28 + Fri Aug 21 head start** on the ask draft; (2) theme **A, launch-gate hardening** (over polish-forward and CI-forward/TASK-040); (3) **all 4 reap nominations approved** (the 5th, the Stripe live-mode Research Topics row, was not approved and stays live — re-nominate only on new evidence); (4) **polish included as 🔵 per the 2026-08-11 steer**, checkout distraction-free header deferred. **Same-day addendum (user)**: the client delivered the **first 3 real products** → G16 added (+4 SP, pair session, front-loaded Mon with a Fri pull-forward option).
-- **Backlog reaps (user-approved 2026-08-20, executed per the standing move-to-🪦 convention — marked and moved, not deleted)**:
-  1. **Products↔categories sort-set unification** · [2026-08-08] G4 brainstorm — its own subsumption condition fired: G12 retired `/categories/[slug]` and `category-client.tsx`, so there is no second sort set to unify.
-  2. **next-intl `useExtracted` design input for TASK-039** · [2026-08-10] G6 run 1 — consumed: G9's library decision weighed exactly this input and TASK-039 shipped (PR #37).
-  3. **G13 duplicate-value sync test** · [2026-08-15] G9 close-out — mooted by its own condition: G13 reuses `account.orderStatus`/`paymentStatus` keys directly (PR #40).
-  4. **[TASK-014] Additional Integrations umbrella** · Post-MVP Features (section removed with it, as with TASK-013/015) — payments → TASK-048 + the payments decision doc; supplier APIs / shipping calculators → spec v2.0 directions; automated inventory sync is an explicit GOALS.md Non-Goal.
-- **Capacity & pressure valve**: 29 non-⚪ SP (G16 **4 SP → revised 9 SP**, spec §8, 2026-08-26) against observed 20–26 — now above the band, not within it. Deferral order under pressure: **G20 polish first**, then G18's guest-tracking member slips to launch week (**the ownership check stays** — its "before real customer traffic" pin is the point); G21 may defer under its own hard-deadline rule. G16's fix-work is unknown-size by nature: small problems fixed live, larger finds filed rather than absorbed.
-- **Dependencies / risks**: G16 may surface real-data-path defects (that is its purpose) — Friday holds slack; the prod-seed destruction landmine is recorded in the group note. G17's findings are unknown-size; severe ones are an abort-condition consult. G18 must not break the post-checkout confirmation flow (one-time grant design decision in-plan) and touches checkout/account surfaces → visual gate + the standing rule: any string change sweeps every E2E locator type (specs that don't run locally run in CI). G21 runs sequential in-session (devcontainer fan-out OOM). Client responses are welcome interrupts — the domain → Resend DNS → `EMAIL_FROM` chain is pre-authorized (Parallel Work).
-- **Quota sourcing transparency**: G18/G19/G20 subsume 🟤-origin riders (2 + 1 + 2 SP) inside 🔵 groups under the G13/G14 subsumption precedent and the explicit user rulings (2026-08-11 steer; 2026-08-20 confirmation). Strict-origin accounting would read 🟤 at 8/24 (33%); the Quota Check below uses group sourcing, and this note is the honest record of the difference.
-- **Parked (carried)**: 📌 Process Rules section for BACKLOG.md + MILESTONES/GOALS refresh (Cleanup-Week fodder; both still show pre-Mirox January state); hydration console errors investigation (held since 2026-08-04); the cross-project propagation queue (6 TODO § 🔀 rows + 4 fold-ins, none actioned — candidate for a post-launch batch sitting); checkout distraction-free header (deferred 2026-08-20); TASK-040 CI extensions (next candidate week); admin dashboard stat-tile wiring.
+- _Brainstorm sanity-checks: week dates confirmed vs git/DONE (today Wed 2026-09-16; Sep 21 verified a Monday, Sep 25 a Friday); **the previous week did NOT land inside its header** — Aug 24–28 delivery ran to Sun 2026-09-13 (+16 days), and its header never carried the template's REQUIRED `**Spillover**` line (nothing in this repo enforces it — recorded in the archive below instead); **what fell due during the spillover**: the weeks of Aug 31–Sep 4 and Sep 7–11 were consumed by delivery and never planned, as is the current week (Sep 14–18: only the G21 close-out and the G15 response processing) — no scheduled mandate fell due in them (Weekly Reviews run 3 landed Sep 12 inside the spillover; the Cleanup Week was already overdue at Aug 24 and stays user-pinned post-launch); velocity 34 SP across 13 working days ≈ 2.6 SP/day, down from ≈ 5.7 (Aug 10–14, 40 SP in 7) and ≈ 3.7 (Aug 3–7, 26 SP in 7) → realistic in-window capacity ≈ 13–16 non-⚪ SP; this plan books 22 non-⚪ (27 total) after the user's two additions, with a declared valve; Cleanup Week overdue by cadence, user-pinned to after launch; source quotas satisfiable (81.8% 🔵)._
+- **Discussion Phase** — self-conducted on 2026-09-16 (unattended run; classification **bounded** — the planning docs it edits already exist), then **reviewed by the user the same day**. Themes weighed: **(A) Own the content** — chosen; **(B) Cutover rehearsal** — rejected, the runbook's steps are ⛔ BLOCKED on a domain that is now deferred; **(C) CI-forward** — rejected, TASK-040's value is post-launch and its AC 2 is already delivered (reap 5). **User rulings**: (1) the domain is **not** bought for now, maybe later — the cutover chain goes dormant; (2) the user will **try** to obtain an NP API key for G25; (3) TASK-055 publishes after the client's OK **or** three working days of silence — accepted, with the caveat that the client may not answer soon; (4) Cleanup Week confirmed post-launch, **and no new features** — the site is to be declared «minimally ready for real operation» once the main functions land; (5) all five reap nominations approved — **executed** (below). **Two additions**: the handover / launch-options document (→ G27, its own 🔵 group) and the developer credit (→ G23 member 5). "Everything else looks good" is the approval of the groups.
+- **Backlog reaps — executed 2026-09-16 (user-approved), per the standing move-to-🪦 convention (marked in place, body preserved under 🪦, tombstone row in Rejected Ideas)**:
+  1. **"Add dynamic OG image generation — use `opengraph-image.tsx`"** · [2026-01-22] From: TASK-017 · implicitly delivered: `src/app/(shop)/products/[slug]/opengraph-image.tsx` (TASK-019) and the site-wide `src/app/opengraph-image.tsx` (TASK-035 / PR #21) both exist and are live.
+  2. **"Add category metaTitle/metaDesc fields"** · [2026-01-22] From: TASK-017 · both halves gone: `Category.metaTitle`/`metaDesc` already exist (`prisma/schema.prisma:135-136`), and the only page that could render them, `/categories/[slug]`, was retired by G12 (routing-layer 307 in `next.config.mjs`).
+  3. **"Add dynamic OG images for category pages"** · [2026-02-02] From: TASK-019 · same G12 obsolescence — no category page exists to carry a card.
+  4. **"Implement proper i18n with hreflang — current setup is preparation only (`en`)"** · [2026-01-22] From: TASK-017 · premise superseded: TASK-039 shipped cookie-mode i18n with **no per-locale URLs** by decision, so hreflang alternates have nothing distinct to point at; the SEO-localization remainder is TASK-053 (spec v2.0) and the `alternates.languages` residue is the live 🟤 "Machine-metadata EN corners" [2026-08-15] entry — a duplicate of two live siblings.
+  5. **"Add Vercel deploy preview on PRs"** · [2026-02-04] From: TASK-026 · implicitly delivered by the Vercel Git integration: the `vercel` bot posts the preview on every PR (verified on PRs #46 and #47); previews sit behind Vercel Authentication and never migrate (runbook § Known limitations). Consequence: TASK-040's AC 2 is already satisfied — marked on the TODO entry; re-scope TASK-040 before scheduling it.
+  - _Considered, not nominated_: "Automated doc freshness check via git timestamps" ([2026-02-10] TASK-030) — G11 chose the index-row design over git timestamps, but the entry proposes a different instrument and its sibling row already records G11; leave it to the Cleanup Week's own audit.
+- **Capacity & pressure valve**: 22 non-⚪ SP against an observed 13–16 — the user's two additions are in, so the overload is stated rather than hidden. Deferral order under pressure: **G25 first** (largest, v1.4-track, prerequisite-gated — it slips cleanly to the following week), then **G24** (protects the client's intake, so it moves rather than drops), G26 under its own hard-deadline rule. **G23 and G27 do not valve**: G23 is the launch gate and the challenge; G27 is what the «minimally ready» declaration needs in hand. The unplanned days Thu Sep 17 – Fri Sep 18 can absorb G22's owner action and the NP-key prerequisite; a G23 copy-drafting head start (the G15 precedent) is available only on the user's say-so, not assumed.
+- **Dependencies / risks**: G22 is an owner action — nothing in this container can do it. G23 touches the footer (every page), the checkout payment step (member 3) and the e-mail shell → visual gate + the standing E2E-locator sweep; legal copy is drafted by us and must not assert facts we do not hold (no phone/address, no brand names, no ФОП/ТОВ details — §5.3 items 1–8 stay the client's); member 5 needs the personal-site URL from the user. G24 changes admin create-path behaviour the client is using live — ship with the intake-guide sentence, verify against a Ukrainian product name in the real admin. G25's key is external; its checkout change rides the hydration-gated form (G2 precedent: six review rounds) and four local checkout/cart E2E specs already fail on seed data (🟤 [2026-09-12]) — CI is the signal. G27's launch-model brainstorm needs the user present (Thu); the inventory half can be drafted without them. G26 runs sequential in-session. `NODE_ENV=development` in `/etc/environment` still corrupts local `next build` CSS — compiled-CSS checks run `env -u NODE_ENV npm run build`.
+- **Quota sourcing transparency**: G23 subsumes one 🟤-origin rider (the [2026-09-16] Telegram-manager link, 1 SP) under the G13/G14 subsumption precedent, and G22's origin is a Claude-surfaced 🟤 entry sourced 🟡 by the intake rule's time-sensitive routing. Strict-origin accounting would read 🟤 at 5/22 (22.7%) — still compliant; the Quota Check below uses group sourcing per the intake rule and the precedent, and this note is the honest record of the difference.
+- **Still open after the review**: the personal-site URL for the developer credit (G23 member 5); the launch model itself, decided in G27's Thursday brainstorm, with the own-subdomain e-mail interim as one input; whether the user's NP-key attempt succeeds by Wednesday (G25 go/no-go).
+- **Parked (carried)**: the domain purchase itself (deferred by ruling — maybe later; the runbook chain stays ready); TASK-040 CI extensions (AC 2 already delivered — re-scope first; next candidate is a post-launch week); the `/track` hydration error 🔵 [2026-09-06] (next evidence: the console `Warning:` line + an incognito check); transactional-e-mail and Zod validation-message localization 🔵 [2026-08-15] (post-launch); React-19-style `ui/` refs 🔵 [2026-08-15] (retires with the React 19 upgrade); the checkout distraction-free header and the mobile-PDP contextual header (deferred by ruling, and now also barred by no-new-features); MILESTONES/GOALS refresh (both still show January state — Cleanup Week); the cross-project propagation queue (9 TODO § 🔀 rows, all unchecked — a post-launch batch sitting); G17 re-run `low` scoped to `src` 🟤; `product.stock` variant decrement 🟤 and `isActive`/`isFeatured` `.default()` reset 🟤 (next 🟤 candidates — the latter is not UI-reachable today); the Convention 8 amendment 🟤 (G26 may fold it); the Vercel WAF rate-limit rule 🟤 and the `__Host-` cookie note (both decide at the domain).
+- **Process observations (Claude-surfaced; route at close-out per the intake rule)**: (a) the Aug 24–28 plan carried no `**Spillover**` line through a +16-day slip — the template calls the line REQUIRED past Friday+2, but this repo has no gate for it (the universal-config check is a PowerShell pre-commit hook absent here); the close-out procedure should add the line at the first close-out that lands late, or the archive note is the only record. (b) Live-config drift check: not applicable — this project maintains no live-config sync. (c) `OWNER-QUEUE.md`: absent; no owner-session tracks to weigh.
 
 ### Quota Check
 
-- 🔵 User-Flagged SP: 21 / 24 (87.5%) — must be ≥50% ✅
-- 🟡 Operational SP: 0 / 24 (0%) — must be ≤25% ✅ (no time-sensitive ops items this week; P2 superseded last week)
-- 🟤 Auto-Generated SP: 3 / 24 (12.5%) — must be ≤25% AND ≤1 group ✅ (one group: G17)
-- Cleanup Week status: **overdue by cadence** — user-pinned to run **after site launch** (ruling 2026-08-11)
+- 🔵 User-Flagged SP: 18 / 22 (81.8%) — must be ≥50% ✅
+- 🟡 Operational SP: 1 / 22 (4.5%) — must be ≤25% ✅ (G22, the urgent below-floor exception)
+- 🟤 Auto-Generated SP: 3 / 22 (13.6%) — must be ≤25% AND ≤1 group ✅ (one group: G24)
+- Cleanup Week status: **overdue by cadence** — user-pinned to run **after launch** (ruling 2026-08-11, re-confirmed 2026-09-16 with launch redefined as the «minimally ready» declaration)
 - Last Cleanup Week: never (the Feb 2026 freeze week predates the cadence)
-- Compliance: ✅ all quotas met — the cadence deviation is an explicit user ruling; see the sourcing-transparency note above for the subsumed 🟤 riders
-- _Denominator note_: Y = 29 total − 5 ⚪ (G21 Weekly Reviews) = 24. As-delivered quotas are recomputed at close-out per standing precedent.
+- Compliance: ✅ all quotas met — the cadence deviation is an explicit user ruling; see the sourcing-transparency note for the strict-origin reading
+- _Denominator note_: Y = 27 total − 5 ⚪ (G26 Weekly Reviews) = 22. As-delivered quotas are recomputed at close-out per standing precedent.
 
 ---
 
 ## Weekly Challenge 🏆
 
-**G18 — Guest Order Access & Hardening (🔵)**: the default-source pick and the week's most strategic feature. Guest COD customers are the launch's primary buyers, and today they have no way back to their order after the confirmation page — while that same page exposes order PII to anyone holding the URL. One verification mechanism ships both the feature and the pinned privacy fix.
+**G23 — TASK-055 Content, Legal & Contact Pages (🔵)**: the default-source pick and the last launch gate we control end to end. Three of the seven pages are payment-gateway onboarding prerequisites (§5.3 item 9) that block TASK-048, the footer has pointed at nothing since TASK-035 hid the info links, and yesterday's delegation removed the only reason they were not built — the copy. It now also carries the developer credit the verbal agreement provides for. Shipping it makes the store presentable to a real customer and to a gateway reviewer in the same week.
 
 ---
 
 ## Previous Week Summary
 
-**Week of Monday August 10 – Friday August 14, 2026** · **Spillover: delivery ran to Tue 2026-08-18** (+4 days past the Friday, recorded via the plan's own Spillover header line). **All 7 groups shipped** — 40/40 planned SP, the deliberate 2× overload accepted in advance ("yes, this week will be hard"); the pressure valve was never exercised.
+**Week of Monday August 24 – Friday August 28, 2026** (created 2026-08-20; archived under its TRUE header) · **Spillover: delivery ran to Sun 2026-09-13** (+16 days past the Friday; the header's REQUIRED `**Spillover**` line was never added — this note is the record). **All 7 groups shipped** — 34/34 SP (30 non-⚪: 27 🔵 = 90%, 3 🟤 = 10%); the pressure valve (G20 → G18's tracking half → G21) was never exercised, the week simply ran long.
 
-- **G8 Launch Feedback Loop** — ✅ PR #35 `a4114e6` + prod-CSS hotfix PR #36 `92236d4` (Thu Aug 14, +2 days): `/feedback` form + launch marquee, production live-verified after a cache-off redeploy.
-- **G9 TASK-039 i18n Foundation** — ✅ PR #37 `2c93da7` (Fri Aug 15): next-intl cookie mode, UA default + RU toggle; the 474-key RU catalog is a DRAFT pending client sign-off (→ this week's G15 ask).
-- **G14 Rebrand Residuals** — ✅ PR #38 `caf8103` (Fri Aug 15): «Розмір»/«Колір» via data migration (P2 re-seed superseded); design-gap audit verdict: the storefront matches its handoff; 2 finds filed (→ G20 + the deferred checkout header).
-- **G10 Weekly Reviews run 2** — ✅ PR #39 `85caf2b` (Sat Aug 15): 14 rows — 1 adopt (`claude-security` → this week's G17) · 7 defer · 2 pass · 3 propagate.
-- **G13 Admin Translation & Alignment** — ✅ PR #40 `56328f0` (Aug 17, the accepted weekend spill): `admin.*` 520 keys, UA-only by decision, provider split, monochrome badges, infinite-refetch loop killed.
-- **G11 Docs-Freshness Linter** — ✅ `745e039` (Aug 17, no PR — branch never pushed): five guarded checks; the OVERDUE 🟤 retired; 14 drift instances fixed.
-- **G12 Categories→Catalog Redesign 🏆** — ✅ merged `9fc4fd3` (Tue Aug 18, no PR — reviewed as a local branch): routing-layer 307, DB-driven category facet, parent rollup fix («Всі» 0 → 7); −576 net lines. CI (E2E 60/60) + prod deploy verified post-merge.
-- **As delivered**: 40/40 SP (31 🔵 / 35 non-⚪ = 89%); unit suite 701 → **868 | 1 todo** across the week.
-- **The declared pre-launch week (Mon Aug 17 – Fri Aug 21) was consumed by this spillover and never planned** — G13/G11 merged Mon Aug 17, G12 Tue Aug 18, Aug 19–20 idle. Its mandate (TASK-056 un-defer, client ask + polish, user-ready) carries **OVERDUE** into the current plan above.
-- **Carried forward**: TASK-056 + client chases (→ G15/G16); the pre-launch hardening set (→ G17–G19); NP webhook question; §5.3 payments checklist; G14 audit finds (→ G20 + deferred header).
+- **G15 TASK-056 Client Round-Trip** — ✅ `b836e77` (Fri Aug 21, no PR — the pre-week head start): the 21-item UA ask drafted, twice reviewed and **sent by the user the same day**. **Reply arrived 2026-09-16 as a blanket delegation with no facts** — all 22 rows decided by us (user-approved; `c574e0c`, reply doc `docs/reference/2026-09-16-client-reply.md`): TASK-055 unblocked, Nova Poshta only, RU catalog accepted, no dual-language products, two BACKLOG entries reaped → 🪦; the domain purchase was the one open item and is now **deferred by user ruling (2026-09-16: not buying for now)**.
+- **G16 Real-Product Intake** — ✅ PR #41 `36b5593` (+ close-out PR #42; DONE.md dates it 2026-09-01): the prep step found the admin could not carry a real product at all (no image/variant UI, no storage, no `styleGroup`, no feed opt-out) → 4 → **9 SP**. Cloudflare R2 live, `excludeFromFeed` added, the Google Shopping feed worked for the first time ever (0 → 8 items); prod holds 2 of 7 real rows, the client enters the rest with a written UA guide. Two pre-existing bugs found by real data, 10 🟤 filed.
+- **G17 Pre-Launch Security Scan** — ✅ PR #43 `0bee3d2` (Sep 4): `claude-security` v0.11.0 low/whole-repo, 12 candidates → 9 panel-verified findings, 6 fixed in-branch; the HIGH (seeded admin credential live in prod and published in the README) closed end-to-end incl. production. Run 2 abandoned on cost — **run-1 coverage only, never a clean bill of health**.
+- **G18 Guest Order Access & Hardening 🏆** — ✅ PR #44 `a37c8d0` (Sep 6): one authorization rule (`canAccessOrder`), signed per-order grant cookie, `/track` lookup with per-order lockout; the PR review fixed the counter-zeroing race; production verified; 14 riders filed; the `/code-review` skill burned a session limit (memory `code-review-skill-cost-2026-09`).
+- **G19 Launch Runbook + Deploy Verification** — ✅ PR #45 `735533a` (Sep 10): `npm run smoke` (14 probe rows, exit 0 only if all pass) + the 19-step cutover runbook; the Actions Deploy job proved a no-op at merge; the runbook found the `ProductImage.url` backfill that five review passes missed; 5 review rounds, deliverables unchanged after `01bd910`.
+- **G20 Pre-Launch Polish** — ✅ PR #46 `baef19b` (Sep 12): mobile «Новинки» rail + the G8 residue (malformed JSON → 400 on all 10 public routes) + a footer overflow the gate found (4 → 5 SP); first zero-finding code review; close-out found `main` red since G19 (empty `docs/planning/plans` broke a guard) and **stale production CSS, 3rd recurrence — still OPEN** (→ this week's G22).
+- **G21 Weekly Reviews run 3** — ✅ PR #47 `05edce3` (Sep 13): 17 rows (1 adopt · 10 defer · 1 pass · 3 propagate + 2 process); a park closed itself by adoption, a fired park still deferred; 4 review rounds, both findings prose-derived figures; threshold-suppression recurrence 25.
+- **As delivered**: 34/34 SP; unit suite 868 → **1128 + 1 todo** (88 files); CI E2E 60/60 (chromium + webkit); prod verified functionally after every merge deploy except the stale-CSS caveat above.
+- **What fell due during the spillover**: the weeks of Aug 31–Sep 4 and Sep 7–11 were consumed by delivery and never planned; the Cleanup Week (already overdue) stays user-pinned post-launch. Nothing else scheduled fell due.
+- **Carried forward**: TASK-055 (→ G23), the NP picker (→ G25), the G16 intake riders (→ G24), the 🟠 stale-CSS redeploy (→ G22), the domain chain (dormant), TASK-040, the propagation queue, the G2 volume-triggered hardening pieces (idempotency token, CSPRNG suffix), the NP status-webhook question (TASK-049/050).
 
-_Full detail: [DONE.md](DONE.md) · the prior plan in git history of this file (pre-2026-08-20 version)._
+_Full detail: [DONE.md](DONE.md) · the prior plan in git history of this file (pre-2026-09-16 version)._

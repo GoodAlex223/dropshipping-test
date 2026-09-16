@@ -33,7 +33,7 @@ Central index for all project documentation.
 | Document                                                                                                             | Purpose                                                                       | Last Updated |
 | -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------ |
 | [planning/README.md](planning/README.md)                                                                             | Planning overview                                                             | 2026-01-05   |
-| [planning/WEEKLY.md](planning/WEEKLY.md)                                                                             | Current week's plan                                                           | 2026-09-13   |
+| [planning/WEEKLY.md](planning/WEEKLY.md)                                                                             | Current week's plan                                                           | 2026-09-16   |
 | [planning/TODO.md](planning/TODO.md)                                                                                 | Active tasks                                                                  | 2026-09-16   |
 | [planning/DONE.md](planning/DONE.md)                                                                                 | Completed tasks                                                               | 2026-09-13   |
 | [planning/BACKLOG.md](planning/BACKLOG.md)                                                                           | Unprioritized ideas                                                           | 2026-09-16   |
