@@ -82,8 +82,9 @@ Central index for all project documentation.
 
 ## Implementation Plans
 
-| Plan | Task | Status | Started |
-| ---- | ---- | ------ | ------- |
+| Plan                                                                                              | Task                                      | Status      | Started    |
+| ------------------------------------------------------------------------------------------------- | ----------------------------------------- | ----------- | ---------- |
+| [2026-09-16_g22-stale-css-build-cache.md](planning/plans/2026-09-16_g22-stale-css-build-cache.md) | G22 Stale Production CSS: Build-Cache Fix | IN PROGRESS | 2026-09-16 |
 
 ### Archived Plans
 
