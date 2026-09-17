@@ -14,11 +14,11 @@ import { afterEach, describe, expect, it } from "vitest";
 
 /**
  * Production served new HTML against stale CSS after PR #35, and again on every
- * deploy after PR #46: Vercel restores the previous build's `.next/cache`,
- * and Next's persistent webpack cache kept handing back a CSS module compiled
- * from an older tree, so utilities new in a change never reached production.
- * `scripts/vercel-build.sh` therefore deletes the webpack cache before
- * `next build` (G22).
+ * deploy after PR #46. Vercel restores the previous build's `.next/cache`; for
+ * the PR #46 case, deleting Next's persistent webpack cache inside it was
+ * measured to turn a stale build (0 of 7 new utilities) into a correct one
+ * (7 of 7). The PR #35 case was never measured. `scripts/vercel-build.sh`
+ * therefore deletes the webpack cache before `next build` (G22).
  *
  * This runs the REAL script with a fake `npx` that records, at the moment each
  * command runs, whether the webpack cache still exists. A test that only read

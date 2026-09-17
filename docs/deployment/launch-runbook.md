@@ -2,7 +2,7 @@
 
 One-time real-domain cutover checklist, plus the checks to run after every production deploy.
 
-**Last Updated**: 2026-09-16
+**Last Updated**: 2026-09-17
 
 ---
 
@@ -295,17 +295,20 @@ production.
   deploy. This re-check is what actually closes the Step 4 → Step 12 window; Step 4's own check alone
   cannot, since it runs before the window even opens.
 - **Action:** trigger a new production deployment through the **Vercel Git integration** — either
-  push/merge to `main`, or use the dashboard's "Redeploy" on the current production commit. A build
-  with the cache on is fine: this project's history of Vercel serving stale CSS across a deploy (after
-  PR #35, and on every deploy after PR #46) is handled at the source since G22 —
-  `scripts/vercel-build.sh` deletes Next's webpack compile cache, where the PR #46 staleness was
-  measured to live, before `next build`. In the build log, `▶ vercel-build: clearing the webpack build cache` must print before
-  `▶ vercel-build: next build`. If it does not, redeploy with the build cache off:
-  `VERCEL_FORCE_NO_BUILD_CACHE=1`, or the dashboard's Redeploy with "Use existing Build Cache"
-  unchecked.
+  push/merge to `main`, or use the dashboard's "Redeploy" on the current production commit. Build this
+  one with the cache off: the dashboard's Redeploy with "Use existing Build Cache" unchecked, or
+  `VERCEL_FORCE_NO_BUILD_CACHE=1` in the project env (delete the variable once this deploy is live —
+  while it is set, every build skips the cache). Ordinary deploys can keep the cache on: from G22 on,
+  `scripts/vercel-build.sh` deletes Next's webpack compile cache before `next build`, and that was
+  measured to clear the PR #46 staleness (the cause after PR #35 was never measured). The cutover is
+  the exception because a lot changed in this window, and Step 14's smoke run cannot catch stale CSS
+  on a brand-new origin: its CSS row reads `NO-BASELINE`.
 - **Verification:** the Vercel dashboard shows a _new_ deployment (a fresh deployment ID and
   timestamp, not a reused/promoted old one), status "Ready", promoted to Production, sourced from the
-  Git commit on `main`.
+  Git commit on `main`. Its build log shows `▶ vercel-build: clearing the webpack build cache` before
+  `▶ vercel-build: next build`. If that line is missing, the build did not run this repo's current
+  `scripts/vercel-build.sh`: the deployed commit predates G22, or the project's Build Command bypasses
+  the script (then Step 13's migration line is missing too). Fix that before going further.
 - **Recovery, if a stranded image turns up anyway** (discovered later — a 400 a customer or the
   client reports, or a broken image noticed in passing): re-run Step 4's backfill again. It's a
   DB-only fix and needs no further redeploy — by then the live build's allow-list already includes
@@ -459,16 +462,27 @@ Run this after every deploy meant to reach real users, not just the cutover.
 2. **All 14 rows should read `PASS`.** The CSS-hash row is the common exception, and it can go either
    way: if this deploy **changed CSS** and the row reads `UNCHANGED`, stale CSS may be back — Vercel's
    restored build cache served it in this project's history (after PR #35, and on every deploy after
-   PR #46 until G22). Since G22 `scripts/vercel-build.sh` deletes Next's webpack compile cache before
-   building, so the cache should not be the cause: first confirm the build log shows
-   `▶ vercel-build: clearing the webpack build cache` before `▶ vercel-build: next build`, then check
-   that the utilities new in this deploy are really absent from the served `/_next/static/css/*.css`.
-   If they are, redeploy with the cache disabled entirely (`VERCEL_FORCE_NO_BUILD_CACHE=1`, or the
-   dashboard's Redeploy with "Use existing Build Cache" unchecked) and re-run, expecting `CHANGED` this
-   time. (The row hashes `/_next/static/css/*.css` only — it does not cover JS staleness.) If instead
-   this deploy **changed no CSS** — a server-only fix, a message-catalog copy change, markup that only
+   PR #46 until G22). Diagnose in this order:
+   - **Confirm the symptom.** Download the stylesheets the homepage links (`/_next/static/css/*.css`)
+     and search them for each rule this deploy adds, as literal text rather than a regex — e.g.
+     `grep -F '.gap-x-6{'`. All found → the stylesheet is current; treat the row as passing.
+   - **Check the build log.** `▶ vercel-build: clearing the webpack build cache` must print before
+     `▶ vercel-build: next build`. If it is missing, the build did not run this repo's current
+     `scripts/vercel-build.sh`: the deployed commit predates G22, or the project's Build Command
+     bypasses the script (then Part 1 Step 13's migration line is missing too). Fix that and redeploy
+     — a cache-off redeploy alone would hide it.
+   - **Purge line printed, rules still absent.** The webpack compile cache was already deleted before
+     this build, so the rest of the restored cache is the remaining suspect: redeploy with the cache
+     disabled entirely (the dashboard's Redeploy with "Use existing Build Cache" unchecked, or
+     `VERCEL_FORCE_NO_BUILD_CACHE=1` — delete that variable afterwards) and re-run, expecting
+     `CHANGED` this time. If even a cache-off build serves the old stylesheet, the cache is not the
+     cause: stop and diagnose.
+
+   (The row hashes `/_next/static/css/*.css` only — it does not cover JS staleness.) If instead this
+   deploy **changed no CSS** — a server-only fix, a message-catalog copy change, markup that only
    reuses utilities the stylesheet already has, and similar — then `UNCHANGED` is the **expected**
    result: confirm from the diff that nothing CSS-affecting changed, and treat the row as passing.
+
 3. If the CSS row instead reads `NO-CSS`, the deploy is very likely broken outright — the homepage
    served no stylesheet at all. Treat it like any other failing row: stop and diagnose, don't
    redeploy-and-hope.

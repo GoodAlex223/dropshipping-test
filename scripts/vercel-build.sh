@@ -52,9 +52,10 @@ npx prisma generate
 # until G22), and the PR #46 case was measured to come from Next's persistent
 # webpack cache inside it: a CSS module compiled from an OLDER tree. Changed
 # source did not reliably invalidate that module, although Next does forward
-# Tailwind's file dependencies to webpack — the root cause is not identified. Deleting the compile cache makes every build
-# compile from the checked-out tree, at the price of a cold compile (the cached
-# one ran ~12 s). `node_modules` and `.next/cache/eslint` stay cached.
+# Tailwind's file dependencies to webpack — the root cause is not identified.
+# Deleting the compile cache makes every build compile from the checked-out
+# tree, at the price of a cold compile (measured on Vercel: 8–12 s cached,
+# ~30 s cold). `node_modules` and `.next/cache/eslint` stay cached.
 echo "▶ vercel-build: clearing the webpack build cache (.next/cache/webpack)"
 rm -rf .next/cache/webpack
 
