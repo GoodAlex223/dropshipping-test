@@ -24,6 +24,11 @@ function getPath(obj: unknown, path: string): unknown {
  *
  * Call at module scope, BEFORE importing the component under test — vi.mock is
  * hoisted, and this wraps it.
+ *
+ * The call looks like a no-op because Vitest hoists the `vi.mock` out of this
+ * function body — but the call is what anchors the import of this module, and
+ * TS import-elision drops an import whose only binding is never used, taking
+ * the mock with it. Do not remove the call.
  */
 export function mockServerIntl() {
   vi.mock("next-intl/server", () => ({

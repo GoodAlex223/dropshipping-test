@@ -1,7 +1,13 @@
 // `readonly MessageValue[]` covers structured catalog content such as
 // `pages.*.sections` (G23) — an array of { heading, body[], list? } objects —
 // which plain string/nested-object messages never needed before.
-type MessageValue = string | MessageTree | readonly MessageValue[];
+//
+// `undefined` is there for the OPTIONAL member of such an object: TypeScript
+// infers `list?: undefined` on the sections that carry no list, and a property
+// typed `undefined` blocks the implicit index signature that makes the element
+// assignable to MessageTree. It is a type-level allowance for an absent key,
+// never a value deepMerge writes.
+type MessageValue = string | MessageTree | readonly MessageValue[] | undefined;
 type MessageTree = { [key: string]: MessageValue };
 
 // Explicit type predicate: arrays are treated as leaf values (never merged
