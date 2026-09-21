@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Instagram, Send, Music2, type LucideIcon } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { SOCIALS, type SocialLink } from "@/content/brand";
+import {
+  MANAGER_TELEGRAM_HREF,
+  REVIEWS_CHANNEL_HREF,
+  SOCIALS,
+  type SocialLink,
+} from "@/content/brand";
 import { site } from "@/content/site";
 import { Button } from "@/components/ui/button";
 
@@ -76,12 +81,31 @@ export default async function ContactPage() {
       </div>
 
       {/*
-        Task 7 adds two more rows here: the manager's Telegram
-        (label t("managerLabel"), href MANAGER_TELEGRAM_HREF) and the
-        reviews channel (label t("reviewsLabel"), href REVIEWS_CHANNEL_HREF).
-        Both constants are introduced in that task — do not hardcode either
-        handle or URL in the meantime.
+        Manager Telegram and the reviews channel (G23 §6/§5). Distinct from
+        the SOCIALS grid above: `telegram` there is the shop CHANNEL
+        (t.me/mirox_shop, broadcasts); this is the manager who answers, plus
+        the separate reviews channel — neither is a SOCIALS entry.
       */}
+      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <a
+          href={MANAGER_TELEGRAM_HREF}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-card border-border hover-lift flex items-center gap-4 rounded-2xl border p-6 transition-colors"
+        >
+          <Send className="h-6 w-6 shrink-0" aria-hidden="true" />
+          <span className="font-semibold">{t("managerLabel")}</span>
+        </a>
+        <a
+          href={REVIEWS_CHANNEL_HREF}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-card border-border hover-lift flex items-center gap-4 rounded-2xl border p-6 transition-colors"
+        >
+          <Send className="h-6 w-6 shrink-0" aria-hidden="true" />
+          <span className="font-semibold">{t("reviewsLabel")}</span>
+        </a>
+      </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <section className="bg-card border-border rounded-[20px] border p-7">

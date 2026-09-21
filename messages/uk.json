@@ -2036,7 +2036,8 @@
         "email": "Електронна пошта",
         "fallbackSeller": "Продавець",
         "fallbackBody": "Mirox Shop — інтернет-магазин одягу. Зв'язатися з нами можна через форму зворотного зв'язку або в Telegram.",
-        "fallbackCta": "Форма зворотного зв'язку"
+        "fallbackCta": "Форма зворотного зв'язку",
+        "fallbackTelegram": "Написати в Telegram"
       }
     }
   }

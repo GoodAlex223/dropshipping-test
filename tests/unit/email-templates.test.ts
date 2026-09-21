@@ -69,8 +69,17 @@ describe("emails content module", () => {
     expect(emails.newsletter.cta).toBe("ПІДТВЕРДИТИ ПІДПИСКУ");
   });
 
-  it("exposes instagram and telegram while the WhatsApp number is pending", () => {
-    expect(emails.order.contacts.map((s) => s.platform)).toEqual(["instagram", "telegram"]);
+  it("leads with the manager, then exposes instagram and the shop-channel telegram while the WhatsApp number is pending (G23 §6)", () => {
+    // Two "telegram" entries by design: the manager (index 0) and the shop
+    // CHANNEL (index 2, from SOCIALS) are distinct handles — see the module
+    // doc comment above `contacts`.
+    expect(emails.order.contacts.map((s) => s.platform)).toEqual([
+      "telegram",
+      "instagram",
+      "telegram",
+    ]);
+    expect(emails.order.contacts[0].href).toBe("https://t.me/mirox_manager");
+    expect(emails.order.contacts[0].label).toBe("Менеджер");
   });
 
   it("appends WhatsApp to order-email contacts once the client number is supplied", async () => {
@@ -81,6 +90,7 @@ describe("emails content module", () => {
     }));
     const { emails: patched } = await import("@/content/emails");
     expect(patched.order.contacts.map((s) => s.platform)).toEqual([
+      "telegram",
       "instagram",
       "telegram",
       "whatsapp",

@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { mockServerIntl } from "../helpers/server-intl";
 import { RETURN_WINDOW_DAYS } from "@/content/legal";
-import { SOCIALS } from "@/content/brand";
+import { MANAGER_TELEGRAM_HREF, REVIEWS_CHANNEL_HREF, SOCIALS } from "@/content/brand";
 import uk from "../../messages/uk.json";
 
 mockServerIntl();
@@ -101,14 +101,17 @@ describe("/contact", () => {
     }
   });
 
-  it("does not hardcode the manager Telegram handle or the reviews-channel URL", async () => {
-    const { container } = render(await ContactPage());
-    const text = container.textContent ?? "";
+  it("links the manager and the reviews channel from the named constants, not a hardcoded handle (Task 7)", async () => {
+    render(await ContactPage());
 
-    // Task 7 introduces MANAGER_TELEGRAM_HREF / REVIEWS_CHANNEL_HREF; this
-    // task must not anticipate them with a literal handle or link.
-    expect(text).not.toContain("mirox_manager");
-    expect(container.querySelectorAll('a[href*="t.me/mirox_manager"]')).toHaveLength(0);
+    expect(screen.getByRole("link", { name: uk.pages.contact.managerLabel })).toHaveAttribute(
+      "href",
+      MANAGER_TELEGRAM_HREF
+    );
+    expect(screen.getByRole("link", { name: uk.pages.contact.reviewsLabel })).toHaveAttribute(
+      "href",
+      REVIEWS_CHANNEL_HREF
+    );
   });
 });
 

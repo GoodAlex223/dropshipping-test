@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { MANAGER_TELEGRAM_HREF } from "@/content/brand";
 import { LEGAL_ENTITY } from "@/content/legal";
 
 /**
@@ -43,9 +44,19 @@ export function SellerRequisites() {
             <span className="text-foreground font-semibold">{t("fallbackSeller")}: </span>
             {t("fallbackBody")}
           </p>
-          <Link href="/feedback" className="text-sm font-semibold underline underline-offset-4">
-            {t("fallbackCta")}
-          </Link>
+          <div className="flex flex-wrap gap-x-5 gap-y-2">
+            <Link href="/feedback" className="text-sm font-semibold underline underline-offset-4">
+              {t("fallbackCta")}
+            </Link>
+            <a
+              href={MANAGER_TELEGRAM_HREF}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-semibold underline underline-offset-4"
+            >
+              {t("fallbackTelegram")}
+            </a>
+          </div>
         </div>
       )}
     </section>
