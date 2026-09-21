@@ -170,4 +170,4 @@ Candidates for close-out extraction (minimum 2):
 - [x] WEEKLY.md: G22 member checkbox + deviation note, Summary-Table status → `✅ PR #N`, Monday Daily-Schedule entry, the Parallel Work 🟠 stale-CSS bullet → resolved, and "G22 is an owner action" under Dependencies / risks → corrected
 - [x] G19 design spec (frozen — a superseded note, not a rewrite, per the G2/G4/G5 precedent): §3's `UNCHANGED` row and §4.2 still send an operator straight to the cache-off redeploy
 - [x] BACKLOG 🟠 [2026-09-12] stale-CSS entry → resolved; DONE.md entry; commit docs; memory (the tailwind/build-cache note + the MEMORY.md 🟠 OPEN line)
-- [ ] After the close-out push: `gh run list --branch main` shows main green
+- [x] After the close-out push: `gh run list --branch main` shows main green — CI run 35606105193 on `f217a63`, all four jobs with every step executed (the Actions Deploy job skipped 7 of 10 steps, the documented no-op). Its docs-only production deploy printed the purge line again and left production on `143491e5ab2efd5e` + `7f7016c66514cf76`.
