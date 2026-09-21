@@ -83,8 +83,9 @@ Central index for all project documentation.
 
 ## Implementation Plans
 
-| Plan | Task | Status | Started |
-| ---- | ---- | ------ | ------- |
+| Plan                                                                                                            | Task                                          | Status      | Started    |
+| --------------------------------------------------------------------------------------------------------------- | --------------------------------------------- | ----------- | ---------- |
+| [2026-09-21_g23-task-055-content-legal-pages.md](planning/plans/2026-09-21_g23-task-055-content-legal-pages.md) | G23 / TASK-055 content, legal & contact pages | In progress | 2026-09-21 |
 
 ### Archived Plans
 
