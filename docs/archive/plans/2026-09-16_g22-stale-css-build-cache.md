@@ -1,9 +1,9 @@
 # G22 — Stale Production CSS: Build-Cache Fix Plan
 
-**Last Updated**: 2026-09-17
-**Task**: G22 (WEEKLY [G22](../WEEKLY.md#g22-production-cache-off-redeploy--smoke-re-verify-solo)) · 🟡 Ops · origin BACKLOG 🟠 🟤 [2026-09-12] G20 close-out (stale CSS, third recurrence)
+**Last Updated**: 2026-09-21
+**Task**: G22 (WEEKLY [G22](../../planning/WEEKLY.md#g22-production-cache-off-redeploy--smoke-re-verify-solo)) · 🟡 Ops · origin BACKLOG 🟠 🟤 [2026-09-12] G20 close-out (stale CSS, third recurrence)
 **Branch**: `chore/g22-cache-off-redeploy` (from `main` @ `2804d66`)
-**Status**: IN PROGRESS
+**Status**: COMPLETE (merged `b1027aa`, production verified 2026-09-21 — V5)
 **Spec**: none — classified **bounded** at brainstorming (2026-09-16): the build script, the smoke check and the runbook all exist. Design approved in chat; this plan is the project-convention record.
 
 > **For agentic workers:** steps use checkbox (`- [ ]`) syntax for tracking. TDD: failing test first, run it red, then implement.
@@ -77,14 +77,14 @@ The seven utilities new in PR #46 and absent from production CSS (from the G20 c
 ## Task 5: PR, merge, production verification
 
 - [x] Open the PR; confirm the CI jobs executed and passed (check-runs). — PR #48; CI on `d7792c4` and `3650d82` (Progress Log)
-- [ ] PR review: one reviewer agent (user-approved 2026-09-17). Fix what holds up, post the response record on the PR, re-confirm CI on the new head.
-- [ ] User go → merge.
-- [ ] Production build log: restore + purge line + compile duration.
-- [ ] `npm run smoke -- --url https://dropshipping-test.vercel.app` exits 0 with the CSS row `CHANGED` (the local baseline holds the stale pair).
-- [ ] Served CSS contains all seven utilities.
-- [ ] 390px `/track`: the footer nav's computed `column-gap` is 24px and `row-gap` 8px; adjacent links are more than 0px apart.
-- [ ] Escalation: production below 7 of 7 with the purge line printed → Task 4's escalation (widen, then stop and report), and pull the "until G22" / "from G22 on" claims from `scripts/vercel-build.sh`, `CLAUDE.md` and the runbook (Step 12, Part 2 step 2).
-- [ ] Record the served chunk hashes and build durations in the Verification Log.
+- [x] PR review: one reviewer agent (user-approved 2026-09-17). Fix what holds up, post the response record on the PR, re-confirm CI on the new head. — 1 important + 6 minor, all text; fixed in `9b3a994`; [response record](https://github.com/GoodAlex223/dropshipping-test/pull/48#issuecomment-5711601044); CI run 35201542225 on `9b3a994`, every step executed
+- [x] User go → merge. — 2026-09-21, merge commit `b1027aa`
+- [x] Production build log: restore + purge line + compile duration. — V5
+- [x] `npm run smoke -- --url https://dropshipping-test.vercel.app` exits 0 with the CSS row `CHANGED` (the local baseline holds the stale pair). — 14/14, exit 0 (V5)
+- [x] Served CSS contains all seven utilities. — 7 of 7 (V5)
+- [x] 390px `/track`: the footer nav's computed `column-gap` is 24px and `row-gap` 8px; adjacent links are more than 0px apart. — 24px / 8px, links 24 px apart (V5)
+- [x] Escalation: production below 7 of 7 with the purge line printed → Task 4's escalation (widen, then stop and report), and pull the "until G22" / "from G22 on" claims from `scripts/vercel-build.sh`, `CLAUDE.md` and the runbook (Step 12, Part 2 step 2). — not needed (V5)
+- [x] Record the served chunk hashes and build durations in the Verification Log. — V5
 
 ---
 
@@ -127,6 +127,17 @@ The Playwright MCP could not launch Chrome here (`Running as root without --no-s
 
 The check fails on stale CSS and passes on the fixed build, so its post-merge reading means something. Five links on two lines in both.
 
+### V5 — Production after the merge (2026-09-21)
+
+- Merge `b1027aa` (PR #48, merge commit) → `dpl_GyKgYJF6vhAV8MSjeCFNAAWrKSWT`, target production, created 12:39:01Z.
+- Log, in order: 12:39:07Z `Restored build cache from previous deployment (2eyC3fTo4BAVWDmyix76tNUEHTci)` — the `2804d66` production build, the one whose cache served the stale pair (Evidence, V1) → 12:39:24Z `▶ vercel-build: clearing the webpack build cache (.next/cache/webpack)` → 12:39:24Z `▶ vercel-build: next build` → `Creating an optimized production build ...` 12:39:26Z → `✓ Compiled successfully` 12:40:08Z = **42 s**, against 12 s on `2804d66` from that same cache. The three next-intl `import(t)` warnings printed again — the cold-compile signature from V3.
+- `✓ migrations applied` (`No pending migrations to apply.`) — the purge left Step 13's line untouched.
+- Served CSS: `143491e5ab2efd5e.css` (28 010 B) + `7f7016c66514cf76.css` (117 043 B) — the pair V3 predicted, at the preview's byte sizes. Utilities: **7 of 7** (0 of 7 in the first chunk, which never held them; 7 of 7 in the second).
+- `npm run smoke -- --url https://dropshipping-test.vercel.app`: exit 0, **14 of 14 PASS**, CSS row `CHANGED — the served CSS differs from the previous run (143491e5ab2efd5e, 7f7016c66514cf76)`.
+- 390px `/track`: `column-gap` `24px`, `row-gap` `8px`, minimum gap between links on a line **24 px** (production before the merge: `normal` / **0 px**, V4), 5 links on 2 lines, document 390 / 390 — no horizontal overflow.
+- The stale `61c0f0682ec37a4c.css` left `/` between 12:41:11Z and 12:41:33Z, about 2.5 minutes after the merge.
+- **The 🟠 [2026-09-12] stale-CSS entry is closed by measurement**, and the fix is proven on the deploy path that matters, not only on previews.
+
 ---
 
 ## Improvements
@@ -148,14 +159,15 @@ Candidates for close-out extraction (minimum 2):
 - 2026-09-16 — Deviation from Global Constraints: **three** pushes preceded the PR, not the two approved — the third, `d7792c4`, carried only this plan's V3 record (a docs-only preview build; nothing reached production).
 - 2026-09-16 — PR [#48](https://github.com/GoodAlex223/dropshipping-test/pull/48) opened; CI green on `d7792c4` with every job executing (Lint & Type Check 10/10 steps, Unit Tests 9/9, Build 9/9, E2E 16/16). No automated review comment posted. Footer check prepared against the live site (V4). Self-review of the whole diff found three wording defects, fixed in one commit: a "three times" claim listing two incidents (`CLAUDE.md`, the test's header comment, the PR body), a doubled conjunction in runbook Part 2 step 2, and the PR #35 incident attributed to the webpack cache in the runbook and the script comment, where only the PR #46 case was measured.
 - 2026-09-17 — Before the review, CI on `3650d82` (run 35162999815) had passed with every step executing: Lint & Type Check 10/10, Unit Tests 9/9, Build 9/9, E2E 16/16. PR review by one reviewer agent (user-approved; ~347k tokens, 100 tool calls, ~29 min, against an estimate of ~150k). It read 16 Vercel build logs and ran 9 guard mutations on copies (the control stayed green, all 8 real mutations went red), and confirmed the mechanism. Result: 0 critical · 1 important · 6 minor, all in text. The important one is a fix-wave miss: `3650d82` said the PR #35 attribution was gone, but the test's header comment still tied PR #35 to the webpack cache, and runbook Step 12 still called that whole history "handled at the source". The "Since …, so …" construction also survived in Part 2 step 2, with a second copy in `CLAUDE.md`. Fixed as a class in one commit: the PR #35 attributions (the test comment, Step 12, and this plan's own Task 3 line); Part 2 step 2 rewritten as one diagnosis order (confirm the symptom → the purge line, with a branch for a missing line → a cache-off redeploy), mirrored in `CLAUDE.md`; Step 12 builds the one-time cutover with the cache off again (user ruling 2026-09-17), since Step 14's smoke run reads `NO-BASELINE` on a new origin and so cannot catch stale CSS there, and its purge-line check moved into Verification; the "exact cache" wording; Task 5 gains the review box and an escalation box; the close-out list gains the surfaces the review found plus a main-CI check; Improvement 1 gains three leads; Improvement 4 is new. Every remark's verdict is in the PR's response record.
+- 2026-09-21 — User go → merged PR #48 as `b1027aa` (merge commit). The production build restored the stale `2804d66` cache, printed the purge line, and compiled cold in 42 s: served CSS 7 of 7, smoke 14/14 exit 0 with `CHANGED`, the 390px footer at 24px / 8px and links 24 px apart (V5). Task 5's escalation was not needed. The booked owner-side dashboard redeploy never had to happen — the merge was the owner action, as the deviation note said it would be.
 
 ---
 
 ## Close-out
 
-- [ ] Extract improvements → BACKLOG.md (🟤) and actionable items → TODO.md
-- [ ] Archive this plan → `docs/archive/plans/` — **four** edits: move the file, move its index row to the archive table, repoint inbound links, fix this file's own outbound relative links (depth changes by one)
-- [ ] WEEKLY.md: G22 member checkbox + deviation note, Summary-Table status → `✅ PR #N`, Monday Daily-Schedule entry, the Parallel Work 🟠 stale-CSS bullet → resolved, and "G22 is an owner action" under Dependencies / risks → corrected
-- [ ] G19 design spec (frozen — a superseded note, not a rewrite, per the G2/G4/G5 precedent): §3's `UNCHANGED` row and §4.2 still send an operator straight to the cache-off redeploy
-- [ ] BACKLOG 🟠 [2026-09-12] stale-CSS entry → resolved; DONE.md entry; commit docs; memory (the tailwind/build-cache note + the MEMORY.md 🟠 OPEN line)
+- [x] Extract improvements → BACKLOG.md (🟤) and actionable items → TODO.md — 4 🟤 under `[2026-09-21] From: G22 close-out`; nothing for TODO.md (all four are backlog-shaped)
+- [x] Archive this plan → `docs/archive/plans/` — **four** edits: move the file, move its index row to the archive table, repoint inbound links, fix this file's own outbound relative links (depth changes by one)
+- [x] WEEKLY.md: G22 member checkbox + deviation note, Summary-Table status → `✅ PR #N`, Monday Daily-Schedule entry, the Parallel Work 🟠 stale-CSS bullet → resolved, and "G22 is an owner action" under Dependencies / risks → corrected
+- [x] G19 design spec (frozen — a superseded note, not a rewrite, per the G2/G4/G5 precedent): §3's `UNCHANGED` row and §4.2 still send an operator straight to the cache-off redeploy
+- [x] BACKLOG 🟠 [2026-09-12] stale-CSS entry → resolved; DONE.md entry; commit docs; memory (the tailwind/build-cache note + the MEMORY.md 🟠 OPEN line)
 - [ ] After the close-out push: `gh run list --branch main` shows main green

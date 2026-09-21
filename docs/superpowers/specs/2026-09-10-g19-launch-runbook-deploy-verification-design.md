@@ -122,6 +122,9 @@ Row 6 resolves to exactly one of:
 
 - **`CHANGED`** — the observed hash set differs from the stored one. Pass. The new set is written back.
 - **`UNCHANGED`** — identical sets. **Fail.** After a CSS/JS-affecting deploy this is the stale-build-cache signature; the runbook's remedy (Part 2) is a cache-off redeploy.
+
+> **Superseded 2026-09-21 (G22, PR #48 `b1027aa`).** The cache-off redeploy is no longer the first move. `scripts/vercel-build.sh` deletes Next's webpack compile cache before every build, so the runbook's Part 2 step 2 now confirms the new rules are really absent from the served CSS, then checks the build log for `▶ vercel-build: clearing the webpack build cache` (a missing line means the build bypassed the script — fix that, not the cache), and only then falls back to a cache-off redeploy.
+
 - **`NO-BASELINE`** — no stored entry for this origin. **Fail**, with a message naming `--allow-missing-baseline` and `--save-baseline`. The set is still written, so the _next_ run is meaningful.
 
 > A fourth outcome, `NO-CSS`, was added during execution — see the superseded note under Decision 2
@@ -159,6 +162,8 @@ Numbered steps in three phases. Every step carries an **owner** (client / owner 
 #### §4.2 Part 2 — every production deploy
 
 Short and repeatable: run the smoke script; if row 6 reports `UNCHANGED` after a CSS/JS-affecting change, redeploy with the build cache off (`VERCEL_FORCE_NO_BUILD_CACHE=1`, or the dashboard's Redeploy with the cache box unchecked) and re-run; a green Actions badge is not evidence of a deploy.
+
+> **Superseded 2026-09-21 (G22, PR #48 `b1027aa`).** Same correction as §3 above: the build script now deletes Next's webpack compile cache before every build, so the runbook checks the served CSS and the build log's purge line first, and treats the cache-off redeploy as the fallback. The one-time domain cutover (Part 1 Step 12) is still built cache-off, because Step 14's smoke run reads `NO-BASELINE` on a brand-new origin and so cannot catch stale CSS there.
 
 #### §4.3 Two corrections to the source entry
 

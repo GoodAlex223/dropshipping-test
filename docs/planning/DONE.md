@@ -2,11 +2,64 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-09-13
+**Last Updated**: 2026-09-21
 
 ---
 
 ## 2026-08 (August)
+
+### [2026-09-21] G22 - Production Cache-Off Redeploy + Smoke Re-verify (WEEKLY solo, 🟡 Ops)
+
+**Plan**: [2026-09-16_g22-stale-css-build-cache.md](../archive/plans/2026-09-16_g22-stale-css-build-cache.md) · **PR**: [#48](https://github.com/GoodAlex223/dropshipping-test/pull/48) merged `b1027aa` · **SP**: 1 planned → ~2 actual
+
+Booked as an owner-side dashboard Redeploy with "Use existing Build Cache" unchecked. At
+brainstorming the user chose a durable repo-side fix instead, since a one-time redeploy would hold
+only until G23 ships new utilities. Classified **bounded** — the build script, the smoke check and the
+runbook all existed — so no design spec was written.
+
+**The fix.** `scripts/vercel-build.sh` deletes `.next/cache/webpack` immediately before `next build`.
+Vercel restores the previous deployment's `.next/cache` on every build, and Next's persistent webpack
+cache inside it kept handing back a CSS module compiled from an older tree, so utilities new in a
+change never reached production. `node_modules` and `.next/cache/eslint` stay cached; CI and local
+builds are untouched (CI restores no `.next` cache, and `npm run build` does not run this script).
+The root cause in Next 14 + Tailwind v4 is **not** identified — this is a workaround with a measured
+before/after, refiled 🟤 [2026-09-21].
+
+**Measured on Vercel, never argued.** Control preview, no purge, restoring production's cache: 8 s
+compile, **0 of 7** new utilities. Fix preview, restoring the cache that stale control left behind:
+purge line printed, 30 s cold compile, **7 of 7**. Production after the merge: restored the stale
+`2804d66` cache, printed the purge line, compiled cold in 42 s (12 s before), **7 of 7**, `npm run
+smoke` 14/14 exit 0 with the CSS row `CHANGED`, and the `/track` footer at 390px back from **0 px**
+between links to **24 px**.
+
+**Key changes**
+
+- `scripts/vercel-build.sh` — delete `.next/cache/webpack` before `next build`
+- `tests/unit/vercel-build.test.ts` (new) — runs the real script with a fake `npx` that records whether the cache exists at the moment `next build` runs
+- `docs/deployment/launch-runbook.md` — Part 2 step 2 became one diagnosis order (served CSS → purge line → cache-off redeploy); Step 12 keeps the one-time cutover deploy cache-off, because Step 14's smoke run reads `NO-BASELINE` on a brand-new origin and cannot catch stale CSS there
+- `CLAUDE.md` — the purge joins the operative-reality build chain and the stale-cache clause
+
+**Learnings**
+
+- **A guard that read the script's text would have passed with the `rm` in the wrong place.** The
+  test runs the real script and records cache state at the moment each command runs. Nine mutations
+  were tried against copies — purge removed, moved after the build, path typo, gated on `VERCEL`,
+  gated inside the `DIRECT_URL` branch, contents-only delete, widened to all of `.next/cache`,
+  changed build arguments — and each turned the right test red while the unmutated control stayed
+  green.
+- **Correct CSS alone is not evidence.** G21's preview chain once refreshed itself, so a build counts
+  only when its log also shows the cache restore, the purge line and a cold compile. The fix build
+  was deliberately started from the cache the stale control had produced, and production from the
+  stale production cache.
+- **A fix wave re-seeds the class it is fixing.** The commit that claimed to remove the PR #35
+  attribution left it standing in the test's header comment and in runbook Step 12, and its rewrite
+  of a "Since …, so …" sentence produced the same construction one clause later, with a second copy
+  in `CLAUDE.md`. The PR review caught it; the repair listed every surface first, then fixed them in
+  one pass.
+- **Docs are Tailwind sources.** `@import "tailwindcss"` with no `source()` scans `**/*` from
+  `process.cwd()`, which reaches 95 files under `docs/`, so a "docs-only" commit is not CSS-neutral.
+  It is both a lead for the unidentified root cause and a caution for any "nothing CSS-affecting
+  changed" argument.
 
 ### [2026-09-12] G20 - Pre-Launch Polish (WEEKLY batch, 🔵 User by steer)
 
