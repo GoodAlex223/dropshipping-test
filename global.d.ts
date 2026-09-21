@@ -24,6 +24,9 @@ type OpaqueSections<T> = {
 declare module "next-intl" {
   interface AppConfig {
     Locale: Locale;
-    Messages: OpaqueSections<typeof uk>;
+    // Scoped to `pages` on purpose: `sections` only ever exists there, and the
+    // rest of the catalog keeps its plain `typeof uk` type so the mapped type
+    // never walks `admin.*`, `account.*` or anything else.
+    Messages: Omit<typeof uk, "pages"> & { pages: OpaqueSections<(typeof uk)["pages"]> };
   }
 }

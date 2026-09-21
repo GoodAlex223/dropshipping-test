@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { mockServerIntl } from "../helpers/server-intl";
+import { RETURN_WINDOW_DAYS } from "@/content/legal";
 import uk from "../../messages/uk.json";
 
 mockServerIntl();
@@ -63,6 +64,14 @@ describe.each(LEGAL_PAGES)("pages.%s", (slug) => {
       for (const paragraph of section.body) {
         expect(paragraph.trim()).not.toBe("");
       }
+      // Same teeth for the optional list: `list: [""]` renders an empty <li>
+      // and would otherwise sail past every assertion above.
+      if ("list" in section && section.list) {
+        expect(section.list.length).toBeGreaterThan(0);
+        for (const item of section.list) {
+          expect(item.trim()).not.toBe("");
+        }
+      }
     }
   });
 
@@ -86,5 +95,42 @@ describe.each(LEGAL_PAGES)("pages.%s", (slug) => {
     // The requisites the client has never supplied. <SellerRequisites/> owns
     // that block and renders its null branch; the prose must never pre-empt it.
     expect(text).not.toMatch(/ЄДРПОУ|РНОКПП/);
+  });
+});
+
+/**
+ * RETURN_WINDOW_DAYS had no production consumer: the copy says «14 днів» as a
+ * literal, because StaticPage reads sections with `t.raw()`, which performs no
+ * ICU interpolation — so the constant cannot be threaded through the catalog.
+ *
+ * This is the tie instead. The constant is imported, so changing it to 30
+ * turns these red and points whoever changed it at the prose they must change
+ * with it. `дн` is the shared prefix of «днів»/«дня»/«день», so the assertion
+ * survives a grammatically different rewrite of the surrounding sentence
+ * without going vacuous on the number itself.
+ */
+describe("the return window in the catalog", () => {
+  const needle = `${RETURN_WINDOW_DAYS} дн`;
+
+  it("is stated in pages.returns", () => {
+    expect(JSON.stringify(uk.pages.returns)).toContain(needle);
+  });
+
+  it("is stated in pages.terms, which summarises the same right", () => {
+    expect(JSON.stringify(uk.pages.terms)).toContain(needle);
+  });
+
+  it("states no OTHER day-count as the return window", () => {
+    // Guard the guard: `toContain` alone would still pass if the copy also
+    // carried a stale «14 днів» next to a new «30 днів». Every day-count that
+    // appears within one clause of «поверн»/«обмін» must be the constant.
+    const windows = new Set(
+      [uk.pages.returns, uk.pages.terms]
+        .flatMap((page) => page.sections)
+        .flatMap((section) => [...section.body, ...(("list" in section && section.list) || [])])
+        .filter((text) => /поверн|обмін/i.test(text))
+        .flatMap((text) => [...text.matchAll(/(\d+)\s+дн/g)].map((m) => Number(m[1])))
+    );
+    expect([...windows]).toEqual([RETURN_WINDOW_DAYS]);
   });
 });
