@@ -2,6 +2,8 @@
 
 Multi-category dropshipping e-commerce website with customer storefront, admin panel, and supplier integrations.
 
+Built by [GoodAlex223](https://goodalex223.github.io).
+
 ---
 
 ## Overview

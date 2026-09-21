@@ -4,6 +4,7 @@ import { BenefitStrip } from "@/components/common/BenefitStrip";
 import { SocialLinks } from "@/components/common/SocialLinks";
 import { NewsletterSignup } from "./NewsletterSignup";
 import { site } from "@/content/site";
+import { DEVELOPER_CREDIT_HREF } from "@/content/brand";
 
 /**
  * Footer link groups. Exported because tests/unit/nav-link-integrity.test.ts
@@ -140,6 +141,17 @@ export function Footer() {
         <div className="container flex flex-wrap items-start justify-between gap-x-6 gap-y-2 py-5 text-[12.5px] lg:items-center">
           <span>
             &copy; {new Date().getFullYear()} {site.name}. {tBrand("tagline")}
+          </span>
+          <span>
+            {t("developerCredit")}{" "}
+            <a
+              href={DEVELOPER_CREDIT_HREF}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground underline underline-offset-4 transition-colors"
+            >
+              GoodAlex223
+            </a>
           </span>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { BRAND_NAME } from "@/content/brand";
+import { BRAND_NAME, DEVELOPER_CREDIT_HREF } from "@/content/brand";
 
 // Base site configuration
 //
@@ -39,7 +39,10 @@ export async function getDefaultMetadata(): Promise<Metadata> {
     },
     description,
     keywords: ["online store", "e-commerce", "shopping", "deals", "products", "fast shipping"],
-    authors: [{ name: siteConfig.name }],
+    // Second entry, not a replacement: the store stays the primary author,
+    // the developer is credited alongside it (Task 9 — part of the verbal
+    // agreement, see src/content/brand.ts's DEVELOPER_CREDIT_HREF doc comment).
+    authors: [{ name: siteConfig.name }, { name: "GoodAlex223", url: DEVELOPER_CREDIT_HREF }],
     creator: siteConfig.name,
     publisher: siteConfig.name,
     formatDetection: {
