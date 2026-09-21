@@ -878,10 +878,24 @@ Repeat for `faq` and `about`.
 In `tests/unit/static-pages.test.tsx`, change the table to cover all six shell pages:
 
 ```tsx
-const SHELL_PAGES = ["terms", "privacy", "returns", "faq", "shipping", "about"] as const;
+/**
+ * Controller ruling R4: a per-page minimum, NOT one global floor. A single
+ * `>= 3` would silently weaken the `>= 5` guarantee Task 4 set on the three
+ * legal pages — and those floors are the substance of the §5.3 item 9 gate,
+ * not a style preference. Raise a number here only when a page genuinely
+ * gains sections.
+ */
+const SHELL_PAGES = {
+  terms: 10,
+  privacy: 8,
+  returns: 6,
+  faq: 8,
+  shipping: 5,
+  about: 3,
+} as const;
 ```
 
-and lower the section-count floor to `>= 3` (the `about` page has four sections, `faq` has more). Keep the per-page equality assertion against the catalog's own count — that is the assertion with teeth; the floor is only a sanity bound.
+Drive the table with `describe.each(Object.entries(SHELL_PAGES))` and assert each page's `sections.length` is `>=` its own minimum. Keep the equality assertion of rendered `<h2>` count against the catalog's own count — that is the assertion with teeth; the minimum is the floor that stops a page being quietly gutted.
 
 - [ ] **Step 6: Run the tests**
 
@@ -1223,7 +1237,7 @@ Create `tests/unit/nav-link-integrity.test.ts`:
 
 ```ts
 import { describe, it, expect } from "vitest";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { SHOP_LINK_GROUPS } from "@/components/common/Footer";
 
@@ -1238,8 +1252,24 @@ import { SHOP_LINK_GROUPS } from "@/components/common/Footer";
 
 const APP_DIR = path.resolve(__dirname, "../../src/app");
 
-/** Header's nav array, mirrored here because Header.tsx is a client module. */
-const HEADER_HREFS = [
+/**
+ * Header hrefs, DERIVED from the source file rather than hand-mirrored.
+ *
+ * Controller ruling R5: Header.tsx is "use client" and importing it drags in
+ * next-auth and zustand, so a direct import is impractical — but a hand-copied
+ * mirror rots silently, leaving this guard green while the header drifts,
+ * which is the exact failure the guard exists to prevent. So: read the file,
+ * extract its href literals, and assert the extracted set covers what we
+ * expect BEFORE walking it.
+ */
+const HEADER_SRC = readFileSync(
+  path.resolve(__dirname, "../../src/components/common/Header.tsx"),
+  "utf8"
+);
+const HEADER_HREFS = [...HEADER_SRC.matchAll(/href=\{?"(\/[^"]*)"/g)].map((m) => m[1]);
+
+/** What the header is expected to link. Update deliberately, with the header. */
+const EXPECTED_HEADER_HREFS = [
   "/products",
   "/products?sort=new",
   "/products?sort=popular",
@@ -1255,13 +1285,21 @@ function routeFileFor(href: string): string {
 
 describe("navigation link integrity", () => {
   const footerHrefs = SHOP_LINK_GROUPS.flatMap((g) => g.links.map((l) => l.href));
-  const allHrefs = [...HEADER_HREFS, ...footerHrefs];
+  const allHrefs = [...EXPECTED_HEADER_HREFS, ...footerHrefs];
 
   it("walks a non-empty, independently counted set of links", () => {
-    // Guard the guard: 5 header + 5 shop + 7 info. A silently emptied
-    // SHOP_LINK_GROUPS would otherwise make every assertion below vacuous.
+    // Guard the guard: 5 shop + 7 info. A silently emptied SHOP_LINK_GROUPS
+    // would otherwise make every assertion below vacuous.
     expect(footerHrefs).toHaveLength(12);
     expect(allHrefs).toHaveLength(17);
+  });
+
+  it("still sees every href the header source actually renders", () => {
+    // R5: fails loudly if the header nav changes without this guard being
+    // updated, instead of drifting green against a stale copy.
+    for (const href of EXPECTED_HEADER_HREFS) {
+      expect(HEADER_HREFS).toContain(href);
+    }
   });
 
   it.each([...new Set(allHrefs)])("%s resolves to a route file", (href) => {
@@ -1283,6 +1321,8 @@ Temporarily add `{ key: "bogus", href: "/definitely-not-a-route" }` to the `info
 
 Run: `npx vitest run tests/unit/nav-link-integrity.test.ts`
 Expected: **FAIL** on `/definitely-not-a-route resolves to a route file`, and also on the length assertion (13 ≠ 12).
+
+Then a third control for ruling R5: temporarily delete the `{ key: "contacts", href: "/contact" }` entry from `Header.tsx`'s `navigation` array and re-run. Expected: **FAIL** on "still sees every href the header source actually renders" — proving the derivation reads the real file rather than a stale copy. Restore it.
 
 Remove the bogus entry and re-run. Expected: all pass.
 
