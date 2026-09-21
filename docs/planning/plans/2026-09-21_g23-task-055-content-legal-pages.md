@@ -81,13 +81,16 @@ Establishes the namespace, keeps it out of the client bundle, and locks that in 
 **Files:**
 
 - Modify: `messages/uk.json` (add a minimal `pages` namespace)
-- Modify: `src/app/layout.tsx` (widen the `admin` strip)
+- Create: `src/i18n/client-namespaces.ts` (the exclusion list, as a dependency-free leaf module)
+- Modify: `src/app/layout.tsx` (import the list; widen the `admin` strip)
 - Create: `tests/unit/client-messages-payload.test.ts`
+
+> **Controller ruling R1 (pre-flight).** The plan originally exported this constant from `src/app/layout.tsx`. It cannot live there: layout.tsx imports `next/font/google` (five font loaders) and `./globals.css`, so a vitest unit test cannot import it at all, which would make the guard below unrunnable. The constant moves to a leaf module — the same isolation `src/i18n/config.ts` already uses.
 
 **Interfaces:**
 
 - Consumes: nothing.
-- Produces: `STOREFRONT_EXCLUDED_NAMESPACES: readonly string[]` exported from `src/app/layout.tsx`; the `messages.pages` namespace root.
+- Produces: `STOREFRONT_EXCLUDED_NAMESPACES: readonly string[]` exported from `src/i18n/client-namespaces.ts`; the `messages.pages` namespace root.
 
 - [ ] **Step 1: Add the namespace root to the catalog**
 
@@ -106,9 +109,9 @@ Insert into `messages/uk.json`, after the `track` namespace (key order is not si
 
 The empty `intro`/`sections` are filled in Task 4. This step exists so the guard in Step 3 has a namespace to assert about.
 
-- [ ] **Step 2: Export the exclusion list from the layout**
+- [ ] **Step 2: Create the exclusion-list module and use it in the layout**
 
-In `src/app/layout.tsx`, replace the inline `admin` filter with a named, exported list. Place the constant above the default export, beside the other module-scope constants:
+Create `src/i18n/client-namespaces.ts`. Keep it dependency-free — it is imported by both the root layout and a unit test:
 
 ```ts
 /**
@@ -128,9 +131,13 @@ In `src/app/layout.tsx`, replace the inline `admin` filter with a named, exporte
 export const STOREFRONT_EXCLUDED_NAMESPACES: readonly string[] = ["admin", "pages"];
 ```
 
-and change the filter body to:
+Then in `src/app/layout.tsx`, import it and replace the inline `admin` filter:
 
 ```ts
+import { STOREFRONT_EXCLUDED_NAMESPACES } from "@/i18n/client-namespaces";
+
+// …
+
 const clientMessages = Object.fromEntries(
   Object.entries(messages).filter(
     ([namespace]) => !STOREFRONT_EXCLUDED_NAMESPACES.includes(namespace)
@@ -145,7 +152,7 @@ Create `tests/unit/client-messages-payload.test.ts`:
 ```ts
 import { describe, it, expect } from "vitest";
 import uk from "../../messages/uk.json";
-import { STOREFRONT_EXCLUDED_NAMESPACES } from "@/app/layout";
+import { STOREFRONT_EXCLUDED_NAMESPACES } from "@/i18n/client-namespaces";
 
 /**
  * The root layout serializes the catalog into NextIntlClientProvider on every
@@ -194,7 +201,7 @@ Expected: 4 passed.
 
 - [ ] **Step 5: Prove the guard has teeth**
 
-Temporarily change the constant in `src/app/layout.tsx` to `["admin"]` and re-run:
+Temporarily change the constant in `src/i18n/client-namespaces.ts` to `["admin"]` and re-run:
 
 Run: `npx vitest run tests/unit/client-messages-payload.test.ts`
 Expected: **FAIL** — "withholds exactly admin and pages" and "does not hand the pages namespace to the client provider" both fail.
@@ -207,7 +214,7 @@ Do not skip this step. A payload guard that passes with the strip removed protec
 
 ```bash
 npm run typecheck
-git add messages/uk.json src/app/layout.tsx tests/unit/client-messages-payload.test.ts
+git add messages/uk.json src/i18n/client-namespaces.ts src/app/layout.tsx tests/unit/client-messages-payload.test.ts
 git commit -m "feat(g23): withhold the pages namespace from the storefront client payload"
 ```
 
@@ -304,21 +311,26 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { screen } from "@testing-library/react";
 import { renderWithIntl } from "../helpers/render-with-intl";
 
+// Controller ruling R3: a `vi.hoisted` box is the mocking mechanism, NOT
+// `vi.spyOn(module, "LEGAL_ENTITY", "get")` — you cannot spy a plain value
+// property on a module already replaced by a factory.
+const box = vi.hoisted(() => ({ entity: null as null | Record<string, string> }));
+
 vi.mock("@/content/legal", () => ({
-  LEGAL_ENTITY: null as unknown,
+  get LEGAL_ENTITY() {
+    return box.entity;
+  },
   RETURN_WINDOW_DAYS: 14,
 }));
 
 import { SellerRequisites } from "@/components/pages/SellerRequisites";
-import * as legal from "@/content/legal";
 
 describe("<SellerRequisites/>", () => {
   beforeEach(() => {
-    vi.mocked(legal, true);
+    box.entity = null;
   });
 
   it("renders the contact fallback when LEGAL_ENTITY is null", () => {
-    vi.spyOn(legal, "LEGAL_ENTITY", "get").mockReturnValue(null);
     renderWithIntl(<SellerRequisites />);
     expect(screen.getByText(/Mirox Shop/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /зворотн/i })).toHaveAttribute("href", "/feedback");
@@ -326,12 +338,12 @@ describe("<SellerRequisites/>", () => {
   });
 
   it("renders the requisites table when LEGAL_ENTITY is filled", () => {
-    vi.spyOn(legal, "LEGAL_ENTITY", "get").mockReturnValue({
+    box.entity = {
       form: "ФОП",
       name: "ФОП Тестенко Тест Тестович",
       edrpou: "1234567890",
       address: "м. Київ, вул. Тестова, 1",
-    });
+    };
     renderWithIntl(<SellerRequisites />);
     expect(screen.getByText("ФОП Тестенко Тест Тестович")).toBeInTheDocument();
     expect(screen.getByText("1234567890")).toBeInTheDocument();
@@ -340,7 +352,7 @@ describe("<SellerRequisites/>", () => {
 });
 ```
 
-If `vi.spyOn` on a module export getter proves awkward under the repo's ESM setup, replace the mock with `vi.mock("@/content/legal", () => ({ LEGAL_ENTITY: mockEntity, RETURN_WINDOW_DAYS: 14 }))` and a `mockEntity` variable declared with `vi.hoisted()`. Either shape is acceptable; both branches must be exercised.
+The `vi.hoisted` box is required, not optional: `vi.mock`'s factory is hoisted above the imports, so a plain `let` would be in the temporal dead zone when the factory runs. Both branches must be exercised — the null branch is the one that ships.
 
 - [ ] **Step 4: Run it and confirm it fails**
 
@@ -519,23 +531,20 @@ import { StaticPage } from "@/components/pages/StaticPage";
  * render that — the standard vitest approach for RSC.
  */
 describe("<StaticPage/>", () => {
-  it("renders the catalog title, intro and every section heading and paragraph", async () => {
+  it("renders the catalog title for a namespace that has no sections yet", async () => {
     const ui = await StaticPage({ namespace: "pages.terms" });
     render(ui);
 
-    // Values come from messages/uk.json, so this asserts against production copy.
+    // The value comes from messages/uk.json, so this asserts against production
+    // copy, not a fixture. Task 1 seeded pages.terms with an empty sections
+    // array, so this also pins the empty-state path: no <h2>, no crash.
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Публічна оферта");
-  });
-
-  it("renders a section's optional list items when present", async () => {
-    const ui = await StaticPage({ namespace: "pages.returns" });
-    render(ui);
-    expect(screen.getAllByRole("heading", { level: 2 }).length).toBeGreaterThan(0);
+    expect(screen.queryAllByRole("heading", { level: 2 })).toHaveLength(0);
   });
 });
 ```
 
-The second case depends on `pages.returns` existing, which Task 4 adds. Until then it fails — that is expected and is why Task 4 re-runs this file.
+**Controller ruling R2 (pre-flight):** the plan originally included a second case asserting on `pages.returns`, which does not exist until Task 4 — committing it here would commit a red test, contradicting this task's own run-then-commit cycle. Section and list rendering are covered by Task 4's sweep instead.
 
 - [ ] **Step 3: Run it and confirm it fails**
 
@@ -623,8 +632,8 @@ export { SellerRequisites } from "./SellerRequisites";
 
 - [ ] **Step 5: Run the first test case and confirm it passes**
 
-Run: `npx vitest run tests/unit/static-pages.test.tsx -t "renders the catalog title"`
-Expected: PASS. (The second case still fails pending Task 4 — that is expected.)
+Run: `npx vitest run tests/unit/static-pages.test.tsx`
+Expected: 1 passed. The whole file must be green before you commit.
 
 - [ ] **Step 6: Typecheck and commit**
 
