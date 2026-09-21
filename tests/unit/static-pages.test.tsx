@@ -30,17 +30,36 @@ describe("<StaticPage/>", () => {
 });
 
 /**
- * The three legal pages are the §5.3 item-9 gate: no Ukrainian payment
- * gateway onboards a merchant without a published public offer and return
- * policy. The floor per page is asserted below against the catalog's own
- * count, not `> 0` — an empty `sections` array would satisfy `> 0` on the
- * rendered side only by also emptying the expectation, which is exactly the
- * failure mode a vacuous guard hides.
+ * All six shell pages. The three legal ones are the §5.3 item-9 gate: no
+ * Ukrainian payment gateway onboards a merchant without a published public
+ * offer and return policy. The floor per page is asserted below against the
+ * catalog's own count, not `> 0` — an empty `sections` array would satisfy
+ * `> 0` on the rendered side only by also emptying the expectation, which is
+ * exactly the failure mode a vacuous guard hides.
+ *
+ * Controller ruling R4: a per-page minimum, NOT one global floor. A single
+ * `>= 3` would silently weaken the `>= 5` guarantee Task 4 set on the three
+ * legal pages — and those floors are the substance of the §5.3 item 9 gate,
+ * not a style preference. Raise a number here only when a page genuinely
+ * gains sections.
  */
-const LEGAL_PAGES = ["terms", "privacy", "returns"] as const;
+const SHELL_PAGES = {
+  terms: 10,
+  privacy: 8,
+  returns: 6,
+  faq: 8,
+  shipping: 5,
+  about: 3,
+} as const;
 
-describe.each(LEGAL_PAGES)("pages.%s", (slug) => {
-  it("renders its title and at least five sections, all non-empty", async () => {
+// Controller ruling R7: `Object.entries` widens the key to `string`, and a
+// widened slug makes the template literal `pages.${slug}` fail StaticPage's
+// typed `namespace` parameter — proved in the Task 3 review. The cast keeps
+// the slug a literal union, which template-literal types distribute over.
+const SHELL_PAGE_ENTRIES = Object.entries(SHELL_PAGES) as [keyof typeof SHELL_PAGES, number][];
+
+describe.each(SHELL_PAGE_ENTRIES)("pages.%s", (slug, minSections) => {
+  it("renders its title and at least its minimum sections, all non-empty", async () => {
     const ui = await StaticPage({ namespace: `pages.${slug}` });
     render(ui);
 
@@ -51,7 +70,7 @@ describe.each(LEGAL_PAGES)("pages.%s", (slug) => {
     // Independently computed: the catalog's own section count, not `> 0`.
     const sections = uk.pages[slug].sections;
     expect(headings).toHaveLength(sections.length);
-    expect(sections.length).toBeGreaterThanOrEqual(5);
+    expect(sections.length).toBeGreaterThanOrEqual(minSections);
 
     for (const heading of headings) {
       expect(heading.textContent?.trim()).not.toBe("");
@@ -125,7 +144,10 @@ describe("the return window in the catalog", () => {
     // carried a stale «14 днів» next to a new «30 днів». Every day-count that
     // appears within one clause of «поверн»/«обмін» must be the constant.
     const windows = new Set(
-      [uk.pages.returns, uk.pages.terms]
+      // Task 5 widened this from the two legal pages to every page that
+      // restates the window: /faq answers it twice and /about summarises it,
+      // and a stale number there is exactly as wrong as one in the offer.
+      [uk.pages.returns, uk.pages.terms, uk.pages.faq, uk.pages.about]
         .flatMap((page) => page.sections)
         .flatMap((section) => [...section.body, ...(("list" in section && section.list) || [])])
         .filter((text) => /поверн|обмін/i.test(text))
