@@ -897,7 +897,24 @@ const SHELL_PAGES = {
 } as const;
 ```
 
-Drive the table with `describe.each(Object.entries(SHELL_PAGES))` and assert each page's `sections.length` is `>=` its own minimum. Keep the equality assertion of rendered `<h2>` count against the catalog's own count — that is the assertion with teeth; the minimum is the floor that stops a page being quietly gutted.
+Drive the table with a **literal-preserving** entries array, then assert each page's `sections.length` is `>=` its own minimum:
+
+```js
+// Controller ruling R7: `Object.entries` widens the key to `string`, and a
+// widened slug makes the template literal `pages.${slug}` fail StaticPage's
+// typed `namespace` parameter — proved in the Task 3 review. The cast keeps
+// the slug a literal union, which template-literal types distribute over.
+const SHELL_PAGE_ENTRIES = Object.entries(SHELL_PAGES) as [
+  keyof typeof SHELL_PAGES,
+  number,
+][];
+
+describe.each(SHELL_PAGE_ENTRIES)("pages.%s", (slug, minSections) => {
+  // `pages.${slug}` typechecks here because `slug` is a literal union.
+});
+```
+
+Keep the equality assertion of rendered `<h2>` count against the catalog's own count — that is the assertion with teeth; the minimum is the floor that stops a page being quietly gutted.
 
 - [ ] **Step 6: Run the tests**
 
