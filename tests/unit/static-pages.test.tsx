@@ -214,6 +214,18 @@ describe.each(SHELL_PAGE_ENTRIES)("pages.%s", (slug, minSections) => {
  * survives a grammatically different rewrite of the surrounding sentence
  * without going vacuous on the number itself.
  */
+/**
+ * Every string anywhere under a catalog node, whatever its shape. The
+ * section-walking above only reaches pages built on <StaticPage/>'s
+ * `sections` contract; this reaches the bespoke ones too.
+ */
+function catalogStrings(node: unknown): string[] {
+  if (typeof node === "string") return [node];
+  if (Array.isArray(node)) return node.flatMap(catalogStrings);
+  if (node && typeof node === "object") return Object.values(node).flatMap(catalogStrings);
+  return [];
+}
+
 describe("the return window in the catalog", () => {
   const needle = `${RETURN_WINDOW_DAYS} дн`;
 
@@ -225,17 +237,28 @@ describe("the return window in the catalog", () => {
     expect(JSON.stringify(uk.pages.terms)).toContain(needle);
   });
 
+  it("is stated in pages.contact, which restates it on its returns card", () => {
+    expect(JSON.stringify(uk.pages.contact)).toContain(needle);
+  });
+
   it("states no OTHER day-count as the return window", () => {
     // Guard the guard: `toContain` alone would still pass if the copy also
     // carried a stale «14 днів» next to a new «30 днів». Every day-count that
     // appears within one clause of «поверн»/«обмін» must be the constant.
     const windows = new Set(
-      // Task 5 widened this from the two legal pages to every page that
-      // restates the window: /faq answers it twice and /about summarises it,
-      // and a stale number there is exactly as wrong as one in the offer.
-      [uk.pages.returns, uk.pages.terms, uk.pages.faq, uk.pages.about]
-        .flatMap((page) => page.sections)
-        .flatMap((section) => [...section.body, ...(("list" in section && section.list) || [])])
+      [
+        // Task 5 widened this from the two legal pages to every page that
+        // restates the window: /faq answers it twice and /about summarises it,
+        // and a stale number there is exactly as wrong as one in the offer.
+        ...[uk.pages.returns, uk.pages.terms, uk.pages.faq, uk.pages.about]
+          .flatMap((page) => page.sections)
+          .flatMap((section) => [...section.body, ...(("list" in section && section.list) || [])]),
+        // /contact is the fifth restatement and the one this walk nearly
+        // missed: it is the bespoke page, so it has no `sections` array at all
+        // and its copy hangs off its own keys. Section-walking it yields
+        // nothing, which is how a stale number there would have drifted green.
+        ...catalogStrings(uk.pages.contact),
+      ]
         .filter((text) => /поверн|обмін/i.test(text))
         .flatMap((text) => [...text.matchAll(/(\d+)\s+дн/g)].map((m) => Number(m[1])))
     );
