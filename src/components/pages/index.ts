@@ -1,0 +1,1 @@
+export { SellerRequisites } from "./SellerRequisites";
