@@ -2,7 +2,7 @@
 
 Central index for all project documentation.
 
-**Last Updated**: 2026-09-16
+**Last Updated**: 2026-09-17
 
 ---
 
@@ -82,8 +82,9 @@ Central index for all project documentation.
 
 ## Implementation Plans
 
-| Plan | Task | Status | Started |
-| ---- | ---- | ------ | ------- |
+| Plan                                                                                              | Task                                      | Status      | Started    |
+| ------------------------------------------------------------------------------------------------- | ----------------------------------------- | ----------- | ---------- |
+| [2026-09-16_g22-stale-css-build-cache.md](planning/plans/2026-09-16_g22-stale-css-build-cache.md) | G22 Stale Production CSS: Build-Cache Fix | IN PROGRESS | 2026-09-17 |
 
 ### Archived Plans
 
@@ -146,7 +147,7 @@ See [archive/README.md](archive/README.md) for more historical plans.
 | Document                                                     | Purpose                                                                                                     | Last Updated |
 | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- | ------------ |
 | [deployment/setup.md](deployment/setup.md)                   | Environment setup                                                                                           | 2026-09-10   |
-| [deployment/launch-runbook.md](deployment/launch-runbook.md) | **Launch runbook** — one-time real-domain cutover checklist + every-deploy checks (invokes `npm run smoke`) | 2026-09-10   |
+| [deployment/launch-runbook.md](deployment/launch-runbook.md) | **Launch runbook** — one-time real-domain cutover checklist + every-deploy checks (invokes `npm run smoke`) | 2026-09-17   |
 
 ### Testing
 
