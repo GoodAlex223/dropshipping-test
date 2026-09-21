@@ -1521,5 +1521,13 @@
       "trackingLink": "Відстежити посилку",
       "checkAnother": "Перевірити інше замовлення"
     }
+  },
+  "pages": {
+    "terms": {
+      "meta": { "title": "Публічна оферта", "description": "Умови продажу товарів у Mirox Shop." },
+      "title": "Публічна оферта",
+      "intro": "",
+      "sections": []
+    }
   }
 }

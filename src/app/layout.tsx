@@ -31,6 +31,7 @@ import {
   serializeJsonLd,
 } from "@/lib/seo";
 import { PRECONNECT_DOMAINS, DNS_PREFETCH_DOMAINS } from "@/components/common/ResourceHints";
+import { STOREFRONT_EXCLUDED_NAMESPACES } from "@/i18n/client-namespaces";
 import "./globals.css";
 
 // Primary sans-serif font (always loaded immediately)
@@ -101,10 +102,14 @@ export default async function RootLayout({
 }>) {
   const locale = await getLocale();
   const messages = await getMessages();
-  // Admin-only strings stay out of the storefront client payload (G13 spec §2);
-  // the (admin) layout re-provides the full catalog in its own nested provider.
+  // Namespaces in STOREFRONT_EXCLUDED_NAMESPACES stay out of the storefront client
+  // payload (G13 spec §2, G23): admin chrome has its own nested provider in the
+  // (admin) layout, and the info/legal pages namespace has no client consumer
+  // (Server Components only) — see src/i18n/client-namespaces.ts.
   const clientMessages = Object.fromEntries(
-    Object.entries(messages).filter(([namespace]) => namespace !== "admin")
+    Object.entries(messages).filter(
+      ([namespace]) => !STOREFRONT_EXCLUDED_NAMESPACES.includes(namespace)
+    )
   ) as typeof messages;
   const organizationJsonLd = getOrganizationJsonLd();
   const websiteJsonLd = getWebsiteJsonLd();
