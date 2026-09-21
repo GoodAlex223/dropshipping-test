@@ -136,10 +136,33 @@ test.describe("Navigation", () => {
   test("footer and header nav links all resolve to a real page (G23 link sweep)", async ({
     page,
   }) => {
-    // Own viewport, not the project default: the header's link-bearing <nav>
-    // is `md:hidden` below the md breakpoint, and this sweep needs it visible
-    // regardless of which Playwright project (mobile or desktop) runs it —
-    // same reasoning as mobile-overflow.spec.ts setting its own viewport.
+    // Explicit timeout. This test does up to 14 sequential page.goto() +
+    // visible-h1 checks after the two count assertions, and measured at
+    // 21-26s warm / 57.9s cold (first `next dev` compile) locally — against
+    // CI's 30s default per-test timeout (playwright.config.ts), that's
+    // near-zero margin even granting CI runs a pre-built app with no
+    // compile-on-first-visit. 120s gives real headroom over the COLD
+    // measurement, not just the warm one, without masking a genuine hang:
+    // each page.goto() is still bounded by its own navigationTimeout (15s
+    // CI / 45s local) and each h1 check by the 5s default expect timeout
+    // (no override in playwright.config.ts), so one stuck page fails on its
+    // own well before this budget is exhausted rather than eating it
+    // silently.
+    test.setTimeout(120_000);
+
+    // Own viewport, not the project default. Header.tsx's desktop <nav> is
+    // `hidden` below the md breakpoint and shown via `md:flex` at md and up
+    // (Header.tsx:314) — pure Tailwind responsive display, no JS/matchMedia
+    // gating. A `display:none` element stays in the DOM, and the plain CSS
+    // `.locator()`/`.evaluateAll()` below still matches it (unlike
+    // `getByRole`, which respects the accessibility tree and would not) —
+    // so headerHrefs.length below would be 5 at ANY viewport; this pin is
+    // not what makes that count correct. It's kept so the sweep exercises
+    // the actual surface a desktop visitor sees rather than leaning on that
+    // DOM-vs-CSS detail, and so the test is deterministic across whichever
+    // Playwright project runs the file (CI: chromium+webkit, both desktop;
+    // local: 5 projects, 2 of them mobile devices) — same reasoning as
+    // mobile-overflow.spec.ts's own explicit viewport.
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto("/");
 
