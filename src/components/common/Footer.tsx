@@ -5,18 +5,37 @@ import { SocialLinks } from "@/components/common/SocialLinks";
 import { NewsletterSignup } from "./NewsletterSignup";
 import { site } from "@/content/site";
 
-// Only routes that actually exist. The mockup's info links ("Shipping &
-// payment", "Returns", "Contacts") point at the TASK-055 pages and 404
-// today — they join when those pages ship. Same rule as TASK-035.
-// `key` (not the label) is the stable identity — `as const` narrows it to
-// the literal union next-intl's typed catalog keys require for
-// `t(\`links.${l.key}\`)` below.
-const shopLinks = [
-  { key: "catalog", href: "/products" },
-  { key: "categories", href: "/categories" },
-  { key: "new", href: "/products?sortBy=createdAt&sortOrder=desc" },
-  { key: "track", href: "/track" },
-  { key: "feedback", href: "/feedback" },
+/**
+ * Footer link groups. Exported because tests/unit/nav-link-integrity.test.ts
+ * asserts every internal href here resolves to a real route file — the
+ * executable form of the no-dead-links rule (user ruling 2026-07-28).
+ *
+ * `key` (not the label) is the stable identity; `as const` narrows it to
+ * the literal union next-intl's typed catalog keys require.
+ */
+export const SHOP_LINK_GROUPS = [
+  {
+    key: "shop",
+    links: [
+      { key: "catalog", href: "/products" },
+      { key: "categories", href: "/categories" },
+      { key: "new", href: "/products?sortBy=createdAt&sortOrder=desc" },
+      { key: "track", href: "/track" },
+      { key: "feedback", href: "/feedback" },
+    ],
+  },
+  {
+    key: "info",
+    links: [
+      { key: "about", href: "/about" },
+      { key: "shipping", href: "/shipping" },
+      { key: "returns", href: "/returns" },
+      { key: "faq", href: "/faq" },
+      { key: "contact", href: "/contact" },
+      { key: "privacy", href: "/privacy" },
+      { key: "terms", href: "/terms" },
+    ],
+  },
 ] as const;
 
 export function Footer() {
@@ -75,29 +94,53 @@ export function Footer() {
         </div>
       </div>
 
+      {/* Link groups band — Магазин / Інформація, added G23 (TASK-055
+          Task 8). Grid, not the copyright row's flex-wrap: twelve links
+          across two labelled columns need their own layout, not another
+          shove into the row the G20 overflow fix already constrains.
+          `grid-cols-1` declared explicitly — implicit grid tracks overflow
+          on mobile in this codebase (recorded lesson). */}
+      <div className="border-border border-t">
+        <div className="container grid grid-cols-1 gap-8 py-10 sm:grid-cols-2 lg:grid-cols-4">
+          {SHOP_LINK_GROUPS.map((group) => (
+            <div key={group.key}>
+              <h3 className="text-foreground text-sm font-semibold">{t(`groups.${group.key}`)}</h3>
+              <nav className="mt-4 flex flex-col gap-2">
+                {group.links.map((l) => (
+                  <Link
+                    key={l.key}
+                    href={l.href}
+                    className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                  >
+                    {t(`links.${l.key}`)}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Copyright row */}
       <div className="border-border text-faint border-t">
-        <div className="container flex flex-col items-start justify-between gap-3 py-5 text-[12.5px] lg:flex-row lg:items-center">
+        {/* flex-wrap, not plain flex: the five UA labels this row used to hold
+            totaled ~380px, which does not fit 358px of container at a 390px
+            viewport, and flex items refuse to shrink below their content — so
+            an unwrapped row pushed the whole DOCUMENT to 396px and every page
+            carrying the footer scrolled sideways by 6px (found by the G20
+            visual gate; guarded by tests/e2e/mobile-overflow.spec.ts).
+            Asymmetric gaps because the row gap only ever applies once
+            wrapping happens, where 24px between stacked lines reads as a gap
+            in the row rather than line spacing. The links themselves moved to
+            the grouped band above (G23/TASK-055 Task 8); this row now holds
+            only the brand line (Task 9 adds the developer credit as its
+            second element), but the wrap/gap fix stays — the same overflow
+            risk applies to any second element sharing the row. Desktop is
+            unchanged: at `lg` the content fits on one line and never wraps. */}
+        <div className="container flex flex-wrap items-start justify-between gap-x-6 gap-y-2 py-5 text-[12.5px] lg:items-center">
           <span>
             &copy; {new Date().getFullYear()} {site.name}. {tBrand("tagline")}
           </span>
-          {/* flex-wrap, not plain flex: the five UA labels total ~380px, which
-              does not fit 358px of container at a 390px viewport, and flex
-              items refuse to shrink below their content — so an unwrapped row
-              pushed the whole DOCUMENT to 396px and every page carrying the
-              footer scrolled sideways by 6px (found by the G20 visual gate;
-              guarded by tests/e2e/mobile-overflow.spec.ts). Asymmetric gaps
-              because the row gap only ever applies once wrapping happens,
-              where 24px between stacked lines reads as a gap in the row
-              rather than line spacing. Desktop is unchanged: at `lg` the
-              content fits on one line and never wraps. */}
-          <nav className="flex flex-wrap gap-x-6 gap-y-2">
-            {shopLinks.map((l) => (
-              <Link key={l.key} href={l.href} className="hover:text-foreground transition-colors">
-                {t(`links.${l.key}`)}
-              </Link>
-            ))}
-          </nav>
         </div>
       </div>
     </footer>

@@ -20,23 +20,26 @@ describe("Footer", () => {
     expect(screen.getByRole("link", { name: /Instagram/ })).toBeInTheDocument();
   });
 
-  it("links only to routes that exist, and still contains real navigation", () => {
+  it("links to every route in both footer groups, now that the info pages exist (G23/TASK-055 Task 8)", () => {
     renderWithIntl(<Footer />);
-    const dead = ["/contact", "/faq", "/shipping", "/returns", "/about", "/privacy", "/terms"];
+    // Previously these seven were asserted absent (TASK-055's info pages
+    // didn't exist yet, same rule as TASK-035). Task 8 is exactly the task
+    // that wires them in via the new "Магазин"/"Інформація" band, so the
+    // assertion flips from exclusion to inclusion. The exhaustive,
+    // independently-counted version of this check lives in
+    // tests/unit/nav-link-integrity.test.ts.
+    const nowLinked = ["/contact", "/faq", "/shipping", "/returns", "/about", "/privacy", "/terms"];
     const links = screen.getAllByRole("link");
     const hrefs = links
       .map((link) => link.getAttribute("href"))
       .filter((href): href is string => href !== null);
 
-    // Guard against a vacuous pass: a footer with zero (or gutted) links would
-    // trivially satisfy "contains none of the dead routes" below. Assert the
-    // real links we expect to survive the rewrite are actually there.
     expect(hrefs.length).toBeGreaterThan(0);
     expect(hrefs).toContain("/products");
     expect(hrefs).toContain("/categories");
 
-    for (const route of dead) {
-      expect(hrefs).not.toContain(route);
+    for (const route of nowLinked) {
+      expect(hrefs).toContain(route);
     }
   });
 
