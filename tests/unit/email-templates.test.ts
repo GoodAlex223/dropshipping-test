@@ -80,6 +80,10 @@ describe("emails content module", () => {
     ]);
     expect(emails.order.contacts[0].href).toBe("https://t.me/mirox_manager");
     expect(emails.order.contacts[0].label).toBe("Менеджер");
+    // Pins the OTHER "telegram" entry too — with two entries sharing that
+    // platform value, index 2 is easy to get subtly wrong later (e.g. if
+    // SOCIALS' order ever changes) without this assertion catching it.
+    expect(emails.order.contacts[2].href).toBe("https://t.me/mirox_shop");
   });
 
   it("appends WhatsApp to order-email contacts once the client number is supplied", async () => {
