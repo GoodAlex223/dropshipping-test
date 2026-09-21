@@ -1,6 +1,6 @@
 # TODO
 
-**Last Updated**: 2026-09-16
+**Last Updated**: 2026-09-21
 
 Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-shop-program-design.md) · Current week: [WEEKLY.md](WEEKLY.md)
 
@@ -182,7 +182,11 @@ verify that out-of-tree work landed. Kept separate from the in-tree spawned task
 #### [TASK-055] Content & legal pages
 
 **Priority**: 🟠 High
-**Status**: 📋 Planned — **UNBLOCKED 2026-09-16**: the client delegated the copy (TASK-056 item 15, blanket delegation) — we draft all 7 pages ourselves (AI-drafted, client reviews before publish); `/contact` ships with the TG channel, reviews channel `t.me/mirox_vidgyk`, manager `@mirox_manager` and the feedback form, no phone/address unless supplied; brand posture per TASK-056 row 14 (no third-party brand names, no authenticity claim). Ready to schedule as its own WEEKLY group
+**Status**: 🚧 **Built 2026-09-21 (WEEKLY G23) — awaiting the client review round.** All seven routes are live on `feat/task-055-content-legal-pages`, drafted by us under the client's 2026-09-16 blanket delegation (TASK-056 item 15); `/contact` ships with the TG channel, reviews channel `t.me/mirox_vidgyk`, manager `@mirox_manager` and the feedback form, no phone/address (none supplied); brand posture per TASK-056 row 14 (no third-party brand names, no authenticity claim). Review package handed over: [reference/2026-09-21-task-055-copy-for-client.md](../reference/2026-09-21-task-055-copy-for-client.md) — **publish on the client's OK, or after three working days of silence**.
+
+**⚠️ Outstanding after G23 — the seller's requisites (client-owed, not blocked on us).** Legal form (ФОП/ТОВ), full registered name, ЄДРПОУ/РНОКПП and registered address were never supplied (TASK-056 row 4 asked; the 2026-09-16 reply delegated the _copy_, not the _facts_). `LEGAL_ENTITY` in `src/content/legal.ts` stays `null` by design and `<SellerRequisites/>` renders its honest fallback branch in production, so `/terms`, `/privacy` and `/returns` publish without them — nothing is placeholder or invented. Filling the constant is a four-line change with no rework. Payments decision **§5.0 Gate 0** is the real consequence: **no Ukrainian gateway can be connected at all until the client registers a ФОП or ТОВ**, so this also gates TASK-048 independently of anything G23 could reach.
+
+**✅ §5.3 item 9 — the "published" half is now satisfied.** The public offer (`/terms`) and return policy (`/returns`) are published, as is the privacy policy; the Ukrainian-language site version has been live since TASK-039. The item's remaining halves (legal form, business bank account, and the rest of the §5.3 checklist) stay open and are client-owed. Four legal points were deliberately left unguessed and are put to the client in the review package: no liability cap (offer §8), no hard refund-deadline figure (returns §5), refund-by-bank-transfer assumed but unconfirmed, and the КМУ non-returnable-goods clause omitted for lack of a verifiable current list.
 **Effort**: M
 **Dependencies**: [TASK-035]
 
@@ -192,9 +196,9 @@ verify that out-of-tree work landed. Kept separate from the in-tree spawned task
 
 **Acceptance Criteria**:
 
-- [ ] All seven routes exist and render real, client/lawyer-approved copy (no lorem ipsum placeholders)
-- [ ] Public offer/terms, privacy policy, and return policy specifically reviewed against §5.3's onboarding checklist before TASK-048 depends on them
-- [ ] `Footer.tsx`'s `shopLinks` restored to link to these pages once live, and its "removed links" comment updated
+- [x] All seven routes exist and render real copy, no lorem ipsum placeholders (G23, 2026-09-21). «Approved» is satisfied by the client's 2026-09-16 blanket delegation, which is what authorised us to originate the copy at all; the read-it-and-tell-us-what-to-change round is AC 2 below.
+- [ ] Public offer/terms, privacy policy, and return policy specifically reviewed against §5.3's onboarding checklist before TASK-048 depends on them — **stays open**: the copy is written against §5.3 and the three statutes, and the item-9 "published" half is done, but the client has not yet responded to the review package and the checklist's legal-form/banking items are theirs to close. Closes when the client replies or the three-working-day silence window expires (from 2026-09-21).
+- [x] `Footer.tsx`'s `shopLinks` restored to link to these pages once live, and its "removed links" comment updated (G23 Task 8 — replaced by `SHOP_LINK_GROUPS`, two labelled groups, with `tests/unit/nav-link-integrity.test.ts` turning the 2026-07-28 no-dead-links ruling into a test)
 
 #### [TASK-056] Client content inventory
 

@@ -32,6 +32,24 @@ Every task's requirements implicitly include this section.
 - **Commits:** conventional (`feat:`, `test:`, `docs:`), scoped `(g23)` where useful. Pre-commit runs eslint + prettier via lint-staged.
 - **Code fences in this plan are tagged `js`, not `ts` — deliberately (controller ruling R6).** `tests/unit/plan-snippets.test.ts` (from G20) diffs every ` ```ts ` fence in an active plan against the file its preceding line names, line by line. This plan's fences are target-state **specifications**: they contain elision markers (`// …`) and top-level indentation for code that lives inside a function, so they can never match by construction — the guard would be red for the whole execution, and a permanently red suite masks new failures. That guard's own documentation offers this exact escape ("tag an illustrative block as something other than `ts`"). Do not retag them back. **Consequence to be aware of:** this plan gets no automated drift protection, so if a fix round or a PR review changes code this plan quotes, the plan's copy goes stale silently. Task 11 carries a manual reconciliation step for that.
 
+> **Reconciliation run 2026-09-21 (Task 11 Step 4) — the check the guard would have run.** All 30
+> `js` fences (plus the untagged `public/humans.txt` block, which matched) were extracted and
+> diffed against the file each one names. **Five had really drifted
+> and were rewritten to match the shipped code:** `tests/helpers/server-intl.ts` (gained the
+> import-elision warning on `mockServerIntl`), `src/components/pages/StaticPage.tsx` (`namespace`
+> is `CatalogNamespace`, not `string` — a bare `string` widens past every `getTranslations`
+> overload and fails `tsc`; this is also what forced ruling R7's cast),
+> `src/app/(shop)/terms/page.tsx` (import order), Task 5's `SHELL_PAGE_ENTRIES` (prettier fits it
+> on one line), and **`tests/unit/nav-link-integrity.test.ts`, which two fix rounds rewrote almost
+> entirely** — the plan's `href=` regex cannot match `navigation`'s `href:` object properties, so it
+> extracted nothing, and the subset check it specified was blind to an _added_ nav entry (proved
+> live at 16/16 green with a bogus entry inserted). Step 5's control list gained the missing
+> addition control. **Three more diverge by the plan's own design, not by drift** —
+> `SellerRequisites.tsx` and `src/components/pages/index.ts` are extended by later tasks (7 and 9)
+> in prose rather than in a second fence, and Tasks 3–4's `static-pages.test.tsx` fences are
+> intermediate states Task 5 explicitly supersedes. One cosmetic comment re-wrap in
+> `SHOP_LINK_GROUPS` was left alone. Everything else matched byte-for-byte.
+
 - **Every guard must be proved red before it is trusted.** Tasks that add a guard include an explicit "break it and watch it fail" step. A guard that passes both before and after the change it protects is testing the wrong property.
 
 ---
@@ -490,6 +508,11 @@ function getPath(obj: unknown, path: string): unknown {
  *
  * Call at module scope, BEFORE importing the component under test — vi.mock is
  * hoisted, and this wraps it.
+ *
+ * The call looks like a no-op because Vitest hoists the `vi.mock` out of this
+ * function body — but the call is what anchors the import of this module, and
+ * TS import-elision drops an import whose only binding is never used, taking
+ * the mock with it. Do not remove the call.
  */
 export function mockServerIntl() {
   vi.mock("next-intl/server", () => ({
@@ -559,6 +582,7 @@ Create `src/components/pages/StaticPage.tsx`:
 
 ```js
 import type { ReactNode } from "react";
+import type { Messages, NamespaceKeys, NestedKeyOf } from "next-intl";
 import { getTranslations } from "next-intl/server";
 
 /** One section of an info page. `list` is optional; most sections are prose only. */
@@ -568,9 +592,17 @@ export type PageSection = {
   list?: string[];
 };
 
+// next-intl 4.13.6's `getTranslations` overloads require a namespace typed
+// against the catalog (`global.d.ts`'s `AppConfig.Messages` augmentation), not
+// a plain `string` — a bare `string` widens past every overload and fails
+// `tsc --noEmit`. This is the catalog-wide namespace-key type; StaticPage is
+// only ever called with a `pages.*` path, but there's no narrower exported
+// type for "just the pages subtree" short of hand-rolling one.
+type CatalogNamespace = NamespaceKeys<Messages, NestedKeyOf<Messages>>;
+
 interface StaticPageProps {
   /** Full catalog path, e.g. "pages.terms". */
-  namespace: string;
+  namespace: CatalogNamespace;
   /** Rendered after the sections — used to mount <SellerRequisites/>. */
   children?: ReactNode;
 }
@@ -718,7 +750,7 @@ Required sections, in this order. Each `heading` is exact; each bullet is a poin
 ```js
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { StaticPage, SellerRequisites } from "@/components/pages";
+import { SellerRequisites, StaticPage } from "@/components/pages";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("pages.terms.meta");
@@ -904,10 +936,7 @@ Drive the table with a **literal-preserving** entries array, then assert each pa
 // widened slug makes the template literal `pages.${slug}` fail StaticPage's
 // typed `namespace` parameter — proved in the Task 3 review. The cast keeps
 // the slug a literal union, which template-literal types distribute over.
-const SHELL_PAGE_ENTRIES = Object.entries(SHELL_PAGES) as [
-  keyof typeof SHELL_PAGES,
-  number,
-][];
+const SHELL_PAGE_ENTRIES = Object.entries(SHELL_PAGES) as [keyof typeof SHELL_PAGES, number][];
 
 describe.each(SHELL_PAGE_ENTRIES)("pages.%s", (slug, minSections) => {
   // `pages.${slug}` typechecks here because `slug` is a literal union.
@@ -1271,6 +1300,22 @@ import { SHOP_LINK_GROUPS } from "@/components/common/Footer";
 
 const APP_DIR = path.resolve(__dirname, "../../src/app");
 
+const HEADER_SRC = readFileSync(
+  path.resolve(__dirname, "../../src/components/common/Header.tsx"),
+  "utf8"
+);
+
+//
+// DEVIATION FROM THE TASK-8 BRIEF, recorded here rather than silently: the
+// brief's regex was `/href=\{?"(\/[^"]*)"/g`, which only matches a JSX
+// literal (`href="..."` / `href={"..."}`). `navigation`'s entries are
+// object-literal properties (`href: "/products"`, colon not equals), so the
+// brief's regex cannot see `/products`, `/products?sort=new`,
+// `/products?sort=popular` or `/contact` at all — confirmed by running the
+// brief's version before this fix, which fails at its own Step 4. Extraction
+// below uses the colon form instead.
+//
+
 /**
  * Header hrefs, DERIVED from the source file rather than hand-mirrored.
  *
@@ -1278,23 +1323,66 @@ const APP_DIR = path.resolve(__dirname, "../../src/app");
  * next-auth and zustand, so a direct import is impractical — but a hand-copied
  * mirror rots silently, leaving this guard green while the header drifts,
  * which is the exact failure the guard exists to prevent. So: read the file,
- * extract its href literals, and assert the extracted set covers what we
- * expect BEFORE walking it.
+ * extract its href literals, and assert the extracted set EQUALS what we
+ * expect before walking it.
+ *
+ * Fix-round-1 (code review finding, "Important"): a **subset** check
+ * (`EXPECTED ⊆ extracted`) catches a removed or edited `navigation` entry but
+ * not an ADDED one — an appended entry pointing at a page that doesn't exist
+ * would simply enlarge the extracted set, the subset check would still hold,
+ * and the new href would never reach the route-file assertions below (they
+ * only walk `NAV_EXPECTED_HREFS`, not whatever the file happens to contain).
+ * That was proved live: inserting a bogus `navigation` entry left the old
+ * version of this test at 16/16 green. Fixed by slicing the `navigation =
+ * [...] as const;` block out of the source FIRST, extracting hrefs from that
+ * slice only, and asserting SET EQUALITY (both directions) against
+ * `NAV_EXPECTED_HREFS`. An addition now fails until `NAV_EXPECTED_HREFS` is
+ * updated to match — at which point the new href joins `allHrefs` below and
+ * gets route-file-checked for real.
  */
-const HEADER_SRC = readFileSync(
-  path.resolve(__dirname, "../../src/components/common/Header.tsx"),
-  "utf8"
-);
-const HEADER_HREFS = [...HEADER_SRC.matchAll(/href=\{?"(\/[^"]*)"/g)].map((m) => m[1]);
+const NAV_BLOCK_MATCH = HEADER_SRC.match(/const navigation = \[([\s\S]*?)\] as const;/);
+if (!NAV_BLOCK_MATCH) {
+  throw new Error(
+    "Could not find `const navigation = [...] as const;` in Header.tsx — the derivation this guard depends on has moved or been renamed; update the regex above."
+  );
+}
+const NAV_BLOCK = NAV_BLOCK_MATCH[1];
 
-/** What the header is expected to link. Update deliberately, with the header. */
-const EXPECTED_HEADER_HREFS = [
+/**
+ * Extracted from the sliced `navigation` block only — plain string-literal
+ * `href: "..."` properties.
+ *
+ * Known blind spot, written down rather than left implicit (per the
+ * derivation's whole point: no silent drift): a template-literal or computed
+ * `href` inside `navigation` — e.g. `href: \`/foo/${bar}\`` or
+ * `href: SOME_CONSTANT` — would match neither this regex nor plausibly
+ * `NAV_EXPECTED_HREFS` below, so it would silently vanish from extraction on
+ * both sides and never be checked at all, rather than failing loudly. All
+ * four current `navigation` entries are plain string literals; if that ever
+ * changes, this derivation needs a matching update, not just the
+ * expectation list.
+ */
+const NAV_HREFS = [...NAV_BLOCK.matchAll(/href:\s*"(\/[^"]*)"/g)].map((m) => m[1]);
+
+/**
+ * What `navigation` is expected to contain — checked for SET EQUALITY, not
+ * subset, against `NAV_HREFS` above. Update deliberately, with the header.
+ */
+const NAV_EXPECTED_HREFS = [
   "/products",
   "/products?sort=new",
   "/products?sort=popular",
   "/contact",
-  "/categories",
 ];
+
+/**
+ * The desktop nav also renders a standalone `/categories` `<Link>` OUTSIDE
+ * the `navigation` array (see Header.tsx's own G12 comment: folding it into
+ * `navigation` would duplicate the mobile sheet's separate «Категорії»
+ * entry, since that array feeds both). It isn't part of the sliced block
+ * above, so it's asserted present against the full file, separately.
+ */
+const HAS_CATEGORIES_LINK = /href="\/categories"/.test(HEADER_SRC);
 
 function routeFileFor(href: string): string {
   const pathname = href.split("?")[0].replace(/\/$/, "") || "/";
@@ -1304,21 +1392,27 @@ function routeFileFor(href: string): string {
 
 describe("navigation link integrity", () => {
   const footerHrefs = SHOP_LINK_GROUPS.flatMap((g) => g.links.map((l) => l.href));
-  const allHrefs = [...EXPECTED_HEADER_HREFS, ...footerHrefs];
+  const allHrefs = [...NAV_EXPECTED_HREFS, "/categories", ...footerHrefs];
 
   it("walks a non-empty, independently counted set of links", () => {
-    // Guard the guard: 5 shop + 7 info. A silently emptied SHOP_LINK_GROUPS
-    // would otherwise make every assertion below vacuous.
+    // Guard the guard: 4 nav + /categories + 5 shop + 7 info. A silently
+    // emptied SHOP_LINK_GROUPS or NAV_EXPECTED_HREFS would otherwise make
+    // every assertion below vacuous.
     expect(footerHrefs).toHaveLength(12);
     expect(allHrefs).toHaveLength(17);
   });
 
-  it("still sees every href the header source actually renders", () => {
-    // R5: fails loudly if the header nav changes without this guard being
-    // updated, instead of drifting green against a stale copy.
-    for (const href of EXPECTED_HEADER_HREFS) {
-      expect(HEADER_HREFS).toContain(href);
-    }
+  it("navigation's real hrefs match the expectation list exactly — additions fail here too", () => {
+    // Set equality, both directions, sorted so element order can't mask a
+    // mismatch: removing/editing an entry shrinks or changes NAV_HREFS
+    // (already caught before this fix); ADDING one grows NAV_HREFS past
+    // NAV_EXPECTED_HREFS, which this equality check now also catches — that
+    // was the gap the old subset check left open.
+    expect([...NAV_HREFS].sort()).toEqual([...NAV_EXPECTED_HREFS].sort());
+  });
+
+  it("still sees the standalone /categories link outside the navigation array", () => {
+    expect(HAS_CATEGORIES_LINK).toBe(true);
   });
 
   it.each([...new Set(allHrefs)])("%s resolves to a route file", (href) => {
@@ -1341,7 +1435,9 @@ Temporarily add `{ key: "bogus", href: "/definitely-not-a-route" }` to the `info
 Run: `npx vitest run tests/unit/nav-link-integrity.test.ts`
 Expected: **FAIL** on `/definitely-not-a-route resolves to a route file`, and also on the length assertion (13 ≠ 12).
 
-Then a third control for ruling R5: temporarily delete the `{ key: "contacts", href: "/contact" }` entry from `Header.tsx`'s `navigation` array and re-run. Expected: **FAIL** on "still sees every href the header source actually renders" — proving the derivation reads the real file rather than a stale copy. Restore it.
+Then a third control for ruling R5: temporarily delete the `{ key: "contacts", href: "/contact" }` entry from `Header.tsx`'s `navigation` array and re-run. Expected: **FAIL** on "navigation's real hrefs match the expectation list exactly" — proving the derivation reads the real file rather than a stale copy. Restore it.
+
+A fourth control, added by the fix round that produced the snippet above: temporarily **add** `{ key: "bogus", href: "/definitely-not-a-route" }` to `Header.tsx`'s `navigation` array and re-run. Expected: **FAIL** on the same case. Run this one; the subset check the plan originally specified passed it 16/16 green, which is exactly the blind spot the set-equality rewrite closes. Restore it.
 
 Remove the bogus entry and re-run. Expected: all pass.
 
