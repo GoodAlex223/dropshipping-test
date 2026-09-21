@@ -30,6 +30,8 @@ Every task's requirements implicitly include this section.
 - **Declare `grid-cols-1` explicitly** on any grid. Implicit tracks overflow on mobile.
 - **Tailwind v4 in this container:** arbitrary values containing nested commas silently do not compile, and a bare `@media` inside `@layer utilities` is dropped in production builds. Neither is needed here — avoid both.
 - **Commits:** conventional (`feat:`, `test:`, `docs:`), scoped `(g23)` where useful. Pre-commit runs eslint + prettier via lint-staged.
+- **Code fences in this plan are tagged `js`, not `ts` — deliberately (controller ruling R6).** `tests/unit/plan-snippets.test.ts` (from G20) diffs every ` ```ts ` fence in an active plan against the file its preceding line names, line by line. This plan's fences are target-state **specifications**: they contain elision markers (`// …`) and top-level indentation for code that lives inside a function, so they can never match by construction — the guard would be red for the whole execution, and a permanently red suite masks new failures. That guard's own documentation offers this exact escape ("tag an illustrative block as something other than `ts`"). Do not retag them back. **Consequence to be aware of:** this plan gets no automated drift protection, so if a fix round or a PR review changes code this plan quotes, the plan's copy goes stale silently. Task 11 carries a manual reconciliation step for that.
+
 - **Every guard must be proved red before it is trusted.** Tasks that add a guard include an explicit "break it and watch it fail" step. A guard that passes both before and after the change it protects is testing the wrong property.
 
 ---
@@ -113,7 +115,7 @@ The empty `intro`/`sections` are filled in Task 4. This step exists so the guard
 
 Create `src/i18n/client-namespaces.ts`. Keep it dependency-free — it is imported by both the root layout and a unit test:
 
-```ts
+```js
 /**
  * Namespaces deliberately withheld from the storefront's client payload.
  *
@@ -133,7 +135,7 @@ export const STOREFRONT_EXCLUDED_NAMESPACES: readonly string[] = ["admin", "page
 
 Then in `src/app/layout.tsx`, import it and replace the inline `admin` filter:
 
-```ts
+```js
 import { STOREFRONT_EXCLUDED_NAMESPACES } from "@/i18n/client-namespaces";
 
 // …
@@ -149,7 +151,7 @@ const clientMessages = Object.fromEntries(
 
 Create `tests/unit/client-messages-payload.test.ts`:
 
-```ts
+```js
 import { describe, it, expect } from "vitest";
 import uk from "../../messages/uk.json";
 import { STOREFRONT_EXCLUDED_NAMESPACES } from "@/i18n/client-namespaces";
@@ -261,7 +263,7 @@ Into `messages/uk.json` under `pages`, add a sibling to `terms`:
 
 - [ ] **Step 2: Write `src/content/legal.ts`**
 
-```ts
+```js
 /**
  * Legal-entity configuration for the public offer, privacy policy and return
  * policy (G23 spec §3).
@@ -306,7 +308,7 @@ export const RETURN_WINDOW_DAYS = 14;
 
 Create `tests/unit/seller-requisites.test.tsx`:
 
-```tsx
+```js
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { screen } from "@testing-library/react";
 import { renderWithIntl } from "../helpers/render-with-intl";
@@ -363,7 +365,7 @@ Expected: FAIL — cannot resolve `@/components/pages/SellerRequisites`.
 
 Create `src/components/pages/SellerRequisites.tsx`. It is **not** `"use client"` — the `pages` namespace is server-only (Task 1).
 
-```tsx
+```js
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { LEGAL_ENTITY } from "@/content/legal";
@@ -421,7 +423,7 @@ export function SellerRequisites() {
 
 Create `src/components/pages/index.ts`:
 
-```ts
+```js
 export { SellerRequisites } from "./SellerRequisites";
 ```
 
@@ -461,7 +463,7 @@ git commit -m "feat(g23): null-gated LEGAL_ENTITY config and SellerRequisites bl
 
 Create `tests/helpers/server-intl.ts`. This generalizes the mock `tests/unit/seo.test.ts` wrote inline, adding `t.raw` support, so the seven page tests do not each re-derive it.
 
-```ts
+```js
 import { vi } from "vitest";
 import uk from "../../messages/uk.json";
 
@@ -516,7 +518,7 @@ export function mockServerIntl() {
 
 Create `tests/unit/static-pages.test.tsx`:
 
-```tsx
+```js
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { mockServerIntl } from "../helpers/server-intl";
@@ -555,7 +557,7 @@ Expected: FAIL — cannot resolve `@/components/pages/StaticPage`.
 
 Create `src/components/pages/StaticPage.tsx`:
 
-```tsx
+```js
 import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
 
@@ -625,7 +627,7 @@ export async function StaticPage({ namespace, children }: StaticPageProps) {
 
 Add to `src/components/pages/index.ts`:
 
-```ts
+```js
 export { StaticPage, type PageSection } from "./StaticPage";
 export { SellerRequisites } from "./SellerRequisites";
 ```
@@ -713,7 +715,7 @@ Required sections, in this order. Each `heading` is exact; each bullet is a poin
 
 `src/app/(shop)/terms/page.tsx` — the other two are identical but for the namespace, and `/faq` etc. in Task 5 omit `<SellerRequisites/>`:
 
-```tsx
+```js
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { StaticPage, SellerRequisites } from "@/components/pages";
@@ -740,7 +742,7 @@ Repeat for `privacy` and `returns`, substituting the namespace in both the metad
 
 Replace the second case in `tests/unit/static-pages.test.tsx` with a table-driven sweep:
 
-```tsx
+```js
 const LEGAL_PAGES = ["terms", "privacy", "returns"] as const;
 
 describe.each(LEGAL_PAGES)("pages.%s", (slug) => {
@@ -856,7 +858,7 @@ Eight to ten entries, each a `section` whose `heading` is the question and whose
 
 Same shape as Task 4 Step 4, without the `<SellerRequisites/>` child:
 
-```tsx
+```js
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { StaticPage } from "@/components/pages";
@@ -877,7 +879,7 @@ Repeat for `faq` and `about`.
 
 In `tests/unit/static-pages.test.tsx`, change the table to cover all six shell pages:
 
-```tsx
+```js
 /**
  * Controller ruling R4: a per-page minimum, NOT one global floor. A single
  * `>= 3` would silently weaken the `>= 5` guarantee Task 4 set on the three
@@ -959,7 +961,7 @@ The `delivery.items` and `returns.items` lists are **summaries** of `/shipping` 
 
 - [ ] **Step 3: Write the test**
 
-```tsx
+```js
 import { SOCIALS } from "@/content/brand";
 import ContactPage from "@/app/(shop)/contact/page";
 
@@ -1041,7 +1043,7 @@ One handle, three surfaces. Today `/contact` does not exist, and checkout and th
 
 Append to `src/content/brand.ts` (which must stay import-free — these are plain strings, so the contract holds):
 
-```ts
+```js
 /**
  * Manager handle. VERIFIED 2026-09-16 (TASK-056 row 4) — the handle the
  * client's own reply names. Distinct from SOCIALS' `telegram`, which is the
@@ -1070,7 +1072,7 @@ export const DEVELOPER_CREDIT_HREF = "https://goodalex223.github.io";
 
 Create `tests/unit/manager-contact.test.ts`:
 
-```ts
+```js
 import { describe, it, expect } from "vitest";
 import { MANAGER_TELEGRAM_HREF, REVIEWS_CHANNEL_HREF, WHATSAPP_HREF } from "@/content/brand";
 import { checkout } from "@/content/checkout";
@@ -1108,7 +1110,7 @@ Expected: FAIL — `checkout.contacts.manager` is undefined.
 
 In `src/content/checkout.ts`, import `MANAGER_TELEGRAM_HREF` and add to `contacts`:
 
-```ts
+```js
   contacts: {
     manager: MANAGER_TELEGRAM_HREF,
     instagram: site.socials.find((s) => s.platform === "instagram")?.href ?? null,
@@ -1119,7 +1121,7 @@ In `src/content/checkout.ts`, import `MANAGER_TELEGRAM_HREF` and add to `contact
 
 In `src/content/emails.ts`, prepend the manager to the order contact list, keeping the existing WhatsApp gate untouched:
 
-```ts
+```js
     contacts: [
       { platform: "telegram" as const, label: "Менеджер", href: MANAGER_TELEGRAM_HREF },
       ...SOCIALS.filter((s) => s.platform === "instagram" || s.platform === "telegram"),
@@ -1173,7 +1175,7 @@ The guard is the point of this task: it turns the no-dead-links rule from a conv
 
 In `Header.tsx`, append to `navigation` (the array feeds both the desktop nav and the mobile sheet, so this is the whole change):
 
-```ts
+```js
 const navigation = [
   { key: "catalog", href: "/products" },
   { key: "new", href: "/products?sort=new" },
@@ -1190,7 +1192,7 @@ Only «Контакти» joins the header (spec §7). Design spec §4's six-ite
 
 Replace the flat `shopLinks` with two named groups, exported so the guard can read them:
 
-```ts
+```js
 /**
  * Footer link groups. Exported because tests/unit/nav-link-integrity.test.ts
  * asserts every internal href here resolves to a real route file — the
@@ -1235,7 +1237,7 @@ Add the catalog keys: `footer.groups.shop` / `footer.groups.info`, and `footer.l
 
 Create `tests/unit/nav-link-integrity.test.ts`:
 
-```ts
+```js
 import { describe, it, expect } from "vitest";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
@@ -1366,7 +1368,7 @@ Part of the verbal agreement — the site is built in exchange for this credit, 
 
 In the copyright row — which Task 8 left holding only the brand line — add a second element. The row is already `flex-wrap` with `gap-x-6 gap-y-2` (the G20 fix), so at 390px this becomes its own wrapped line:
 
-```tsx
+```js
 <span>
   {t("developerCredit")}{" "}
   <a
@@ -1386,7 +1388,7 @@ Catalog: `"developerCredit": "Розроблено —"`. The handle itself is n
 
 In `getDefaultMetadata()` in `src/lib/seo.ts`, the `authors` field currently names the store. Add the developer as a second author entry rather than replacing the store:
 
-```ts
+```js
     authors: [{ name: siteConfig.name }, { name: "GoodAlex223", url: DEVELOPER_CREDIT_HREF }],
 ```
 
@@ -1394,7 +1396,7 @@ In `getDefaultMetadata()` in `src/lib/seo.ts`, the `authors` field currently nam
 
 Task 5 drafted «Хто зробив цей сайт» as plain text. Now make the mention a link. `StaticPage` renders `body` paragraphs as plain strings, so rather than teach the shell about rich text for one sentence, render the credit as `children` of `<StaticPage>` on the about page:
 
-```tsx
+```js
 export default function AboutPage() {
   return (
     <StaticPage namespace="pages.about">
@@ -1428,7 +1430,7 @@ A short line near the top of `README.md` naming the developer and linking the si
 
 - [ ] **Step 6: Write the test**
 
-```tsx
+```js
 describe("developer credit", () => {
   it("renders once in the footer, linking the developer site", () => {
     renderWithIntl(<Footer />);
@@ -1467,7 +1469,7 @@ git commit -m "feat(g23): add the developer credit to the footer, about page, hu
 
 Append to `staticPages` in `src/app/sitemap.ts`, keeping the existing object shape:
 
-```ts
+```js
     ...(
       [
         ["/contact", 0.5],
@@ -1490,7 +1492,7 @@ Append to `staticPages` in `src/app/sitemap.ts`, keeping the existing object sha
 
 In `tests/e2e/mobile-overflow.spec.ts`, extend `PAGES`. Update the array's explanatory comment to say why the new routes are there — the footer restructure is the G20 bug class and these are the pages that carry the new band:
 
-```ts
+```js
 const PAGES = [
   "/",
   "/products",
@@ -1557,16 +1559,20 @@ Add a row to `docs/README.md`'s table and confirm the index's own `**Last Update
 
 Tick AC 1 and AC 3. Leave AC 2 open until the client responds or the silence window closes. Record that the seller requisites remain outstanding and that §5.3 item 9's "published" half is now satisfied.
 
-- [ ] **Step 4: Update CLAUDE.md**
+- [ ] **Step 4: Reconcile this plan's code snippets with what actually shipped**
+
+Ruling R6 removed this plan from `plan-snippets.test.ts`'s automated drift check, so do it by hand once: walk the plan's `js` fences and compare each against the file it names. Where a fix round or a review changed the shipped code, update the plan's snippet to match. This is the check the guard would have run.
+
+- [ ] **Step 5: Update CLAUDE.md**
 
 Two additions: the `pages` namespace under the i18n pattern (noting it is server-only and stripped from the client payload alongside `admin`), and `src/content/legal.ts` in the `content/` file list.
 
-- [ ] **Step 5: Run the docs guard**
+- [ ] **Step 6: Run the docs guard**
 
 Run: `npx vitest run tests/unit/docs-freshness.test.ts`
 Expected: all pass. If it fails on a date or a missing index row, fix the doc — not the test.
 
-- [ ] **Step 6: Full verification before the PR**
+- [ ] **Step 7: Full verification before the PR**
 
 ```bash
 npm run typecheck && npm run lint && npm run format:check && npm run test:run
@@ -1574,7 +1580,7 @@ npm run typecheck && npm run lint && npm run format:check && npm run test:run
 
 All four must pass. Then push and open the PR.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 8: Commit**
 
 ```bash
 git add docs CLAUDE.md
