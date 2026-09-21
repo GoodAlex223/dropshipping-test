@@ -23,10 +23,13 @@ export function deepMerge<T extends MessageTree>(base: T, override: MessageTree)
       out[key] = value;
     } else if (isMessageTree(value) && isMessageTree(current)) {
       out[key] = deepMerge(current, value);
+    } else if (Array.isArray(value) && Array.isArray(current)) {
+      // Arrays are leaf values, not merged element-by-element — a matching
+      // pair replaces wholesale, the same way a matching pair of strings does.
+      out[key] = value;
     }
-    // shape mismatch (incl. arrays, which are treated as leaf values, not
-    // merged element-by-element) or key absent in base: keep base (uk is the
-    // schema)
+    // shape mismatch (e.g. array over string/object, or vice versa) or key
+    // absent in base: keep base (uk is the schema)
   }
   return out as T;
 }
