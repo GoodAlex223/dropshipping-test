@@ -132,4 +132,65 @@ test.describe("Navigation", () => {
       await expect(sheet.getByRole("link", { name: "Категорії", exact: true })).toBeVisible();
     }
   });
+
+  test("footer and header nav links all resolve to a real page (G23 link sweep)", async ({
+    page,
+  }) => {
+    // Own viewport, not the project default: the header's link-bearing <nav>
+    // is `md:hidden` below the md breakpoint, and this sweep needs it visible
+    // regardless of which Playwright project (mobile or desktop) runs it —
+    // same reasoning as mobile-overflow.spec.ts setting its own viewport.
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/");
+
+    const getInternalHrefs = (locator: ReturnType<typeof page.locator>) =>
+      locator.evaluateAll((els) =>
+        Array.from(
+          new Set(
+            (els as HTMLAnchorElement[])
+              .map((el) => el.getAttribute("href"))
+              .filter((href): href is string => !!href)
+          )
+        )
+      );
+
+    const footerHrefs = await getInternalHrefs(page.locator('footer a[href^="/"]'));
+
+    // Footer.tsx's SHOP_LINK_GROUPS: 5 «Магазин» links + 7 «Інформація»
+    // links = 12. Asserted BEFORE the loop below — a selector that silently
+    // matches zero elements would otherwise let this whole sweep pass having
+    // visited no pages at all, the exact vacuity class this plan's other
+    // guards (mobile-overflow.spec.ts, nav-link-integrity.test.ts) already
+    // exist to catch.
+    expect(footerHrefs.length).toBe(12);
+
+    // Header.tsx's desktop <nav> (`hidden md:flex`, visible at this 1280px
+    // viewport): the 4-item `navigation` array (Каталог /products, Новинки
+    // /products?sort=new, Бестселери /products?sort=popular, Контакти
+    // /contact) plus the standalone «Категорії» /categories link (G12) = 5.
+    // The isAdmin-gated /admin link is excluded — this test never signs in.
+    // The mobile menu's <nav> (same component tree, inside <SheetContent>)
+    // does NOT double-count it: shadcn's Sheet wraps it in Radix's
+    // SheetPortal, which (a) renders to document.body by default, outside
+    // the <header> DOM subtree entirely, and (b) wraps it in Presence with
+    // `present={context.open}` and no forceMount, so while mobileMenuOpen is
+    // false (its default, never toggled in this test) it isn't in the DOM at
+    // all — confirmed against the installed @radix-ui/react-dialog@1.1.15 /
+    // @radix-ui/react-portal source, not assumed.
+    const headerHrefs = await getInternalHrefs(
+      page.getByRole("banner").locator('nav a[href^="/"]')
+    );
+    expect(headerHrefs.length).toBe(5);
+
+    const allHrefs = Array.from(new Set([...footerHrefs, ...headerHrefs]));
+
+    for (const href of allHrefs) {
+      const response = await page.goto(href);
+      expect(response?.status(), `${href} did not respond with 200`).toBe(200);
+      await expect(
+        page.getByRole("heading", { level: 1 }).first(),
+        `${href} has no visible h1`
+      ).toBeVisible();
+    }
+  });
 });

@@ -47,6 +47,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
       priority: 0.3,
     },
+    ...(
+      [
+        ["/contact", 0.5],
+        ["/about", 0.5],
+        ["/shipping", 0.3],
+        ["/returns", 0.3],
+        ["/faq", 0.3],
+        ["/privacy", 0.3],
+        ["/terms", 0.3],
+      ] as const
+    ).map(([path, priority]) => ({
+      url: `${baseUrl}${path}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority,
+    })),
   ];
 
   // Try to fetch dynamic pages, with fallback if database unavailable

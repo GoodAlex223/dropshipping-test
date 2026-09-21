@@ -28,8 +28,29 @@ const MOBILE = { width: 390, height: 844 };
  * homepage has the rail and the hero, /cart and /track are near-empty, and
  * /feedback is a form. If only one regresses it is that page; if all of them
  * do it is shared chrome.
+ *
+ * The seven /contact, /about, /shipping, /returns, /faq, /privacy, /terms
+ * routes were added in G23 (TASK-055 Task 10): the footer gained a new
+ * banded link-groups section in Task 8 (SHOP_LINK_GROUPS, Footer.tsx) to
+ * carry them, which is the same "shared chrome, twelve links, narrow
+ * viewport" bug class this spec exists to catch — the routes themselves are
+ * plain text pages, but the grid band linking to them is new shared markup
+ * on every page, so it gets the same treatment as the earlier footer fix.
  */
-const PAGES = ["/", "/products", "/cart", "/track", "/feedback"];
+const PAGES = [
+  "/",
+  "/products",
+  "/cart",
+  "/track",
+  "/feedback",
+  "/contact",
+  "/about",
+  "/shipping",
+  "/returns",
+  "/faq",
+  "/privacy",
+  "/terms",
+];
 
 for (const path of PAGES) {
   test(`${path} does not scroll horizontally at ${MOBILE.width}px`, async ({ page }) => {
