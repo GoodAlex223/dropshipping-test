@@ -2,11 +2,13 @@ import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { mockServerIntl } from "../helpers/server-intl";
 import { RETURN_WINDOW_DAYS } from "@/content/legal";
+import { SOCIALS } from "@/content/brand";
 import uk from "../../messages/uk.json";
 
 mockServerIntl();
 
 import { StaticPage } from "@/components/pages/StaticPage";
+import ContactPage from "@/app/(shop)/contact/page";
 
 /**
  * StaticPage is an async Server Component. React 18 + RTL cannot render one
@@ -26,6 +28,87 @@ describe("<StaticPage/>", () => {
     // StaticPage; it is simply unreachable from the catalog today.
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Публічна оферта");
     expect(screen.getByText(uk.pages.terms.intro)).toBeInTheDocument();
+  });
+});
+
+/**
+ * `/contact` is the seventh info page and the only bespoke one (G23 spec
+ * §5) — it doesn't go through <StaticPage/>'s `sections` shape, so it gets
+ * its own describe block instead of joining SHELL_PAGES below, whose
+ * assertions are shaped around that shell.
+ */
+describe("/contact", () => {
+  it("renders every social link from SOCIALS, not hardcoded handles", async () => {
+    const ui = await ContactPage();
+    render(ui);
+
+    for (const social of SOCIALS) {
+      expect(screen.getByRole("link", { name: new RegExp(social.label, "i") })).toHaveAttribute(
+        "href",
+        social.href
+      );
+    }
+  });
+
+  it("links out to the full shipping and returns pages", async () => {
+    render(await ContactPage());
+
+    expect(screen.getByRole("link", { name: /докладніше про доставку/i })).toHaveAttribute(
+      "href",
+      "/shipping"
+    );
+    expect(screen.getByRole("link", { name: /умови повернення/i })).toHaveAttribute(
+      "href",
+      "/returns"
+    );
+  });
+
+  it("links to the feedback form", async () => {
+    render(await ContactPage());
+
+    expect(screen.getByRole("link", { name: uk.pages.contact.form.cta })).toHaveAttribute(
+      "href",
+      "/feedback"
+    );
+  });
+
+  it("renders the OLX and Instagram claims as configured, never fabricated", async () => {
+    render(await ContactPage());
+
+    // site.claims.olxSales / instagramOrders are both set today, so both
+    // stat values must render. If either claim is ever nulled out, this
+    // assertion is the one that has to change with it — see the null-gate
+    // test below for the branch that must never render a zero/placeholder.
+    expect(screen.getByText("300+")).toBeInTheDocument();
+    expect(screen.getByText("100+")).toBeInTheDocument();
+  });
+
+  it("renders no phone number, address, or entity identifiers", async () => {
+    const { container } = render(await ContactPage());
+    const text = container.textContent ?? "";
+
+    expect(text).not.toMatch(/\+380/);
+    expect(text).not.toMatch(/ЄДРПОУ|РНОКПП/);
+    for (const forbidden of [
+      "Palm Angels",
+      "Polo Ralph Lauren",
+      "Lacoste",
+      "оригінал",
+      "репліка",
+      "Укрпошта",
+    ]) {
+      expect(text).not.toContain(forbidden);
+    }
+  });
+
+  it("does not hardcode the manager Telegram handle or the reviews-channel URL", async () => {
+    const { container } = render(await ContactPage());
+    const text = container.textContent ?? "";
+
+    // Task 7 introduces MANAGER_TELEGRAM_HREF / REVIEWS_CHANNEL_HREF; this
+    // task must not anticipate them with a literal handle or link.
+    expect(text).not.toContain("mirox_manager");
+    expect(container.querySelectorAll('a[href*="t.me/mirox_manager"]')).toHaveLength(0);
   });
 });
 
