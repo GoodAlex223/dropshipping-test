@@ -43,7 +43,7 @@ describe("Footer", () => {
     }
   });
 
-  it("uses the Ukrainian copyright-row link labels", () => {
+  it("uses the Ukrainian «Магазин» group's link labels", () => {
     renderWithIntl(<Footer />);
     expect(screen.getByRole("link", { name: "Каталог" })).toHaveAttribute("href", "/products");
     expect(screen.getByRole("link", { name: "Категорії" })).toHaveAttribute("href", "/categories");
