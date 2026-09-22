@@ -9,7 +9,7 @@ import { useSession } from "next-auth/react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { Loader2, ShoppingBag, Lock, Instagram, Send, MessageCircle } from "lucide-react";
+import { Loader2, ShoppingBag, Lock } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -27,6 +27,7 @@ import { checkoutSchema, type CheckoutInput } from "@/lib/validations";
 import { DELIVERY_METHODS, DEFAULT_DELIVERY_METHOD_ID } from "@/lib/shipping";
 import { formatPrice } from "@/lib/format";
 import { checkout } from "@/content/checkout";
+import { CheckoutContactLinks } from "@/components/checkout";
 import { trackBeginCheckout, trackAddShippingInfo, trackAddPaymentInfo } from "@/lib/analytics";
 
 type CheckoutStep = "information" | "shipping" | "payment";
@@ -497,38 +498,7 @@ export default function CheckoutPage() {
                     ) : (
                       <p className="text-muted-foreground">{t("payment.prepay.offer")}</p>
                     )}
-                    <div className="mt-3 flex items-center gap-4">
-                      {checkout.contacts.instagram && (
-                        <a
-                          href={checkout.contacts.instagram}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-foreground hover:text-muted-foreground flex items-center gap-1.5 text-[13px] font-bold transition-colors"
-                        >
-                          <Instagram className="h-4 w-4" /> Instagram
-                        </a>
-                      )}
-                      {checkout.contacts.whatsapp && (
-                        <a
-                          href={checkout.contacts.whatsapp}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-foreground hover:text-muted-foreground flex items-center gap-1.5 text-[13px] font-bold transition-colors"
-                        >
-                          <MessageCircle className="h-4 w-4" /> WhatsApp
-                        </a>
-                      )}
-                      {checkout.contacts.telegram && (
-                        <a
-                          href={checkout.contacts.telegram}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-foreground hover:text-muted-foreground flex items-center gap-1.5 text-[13px] font-bold transition-colors"
-                        >
-                          <Send className="h-4 w-4" /> Telegram
-                        </a>
-                      )}
-                    </div>
+                    <CheckoutContactLinks contacts={checkout.contacts} />
                   </div>
 
                   {error && (

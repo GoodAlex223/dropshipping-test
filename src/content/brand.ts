@@ -88,3 +88,26 @@ export const SOCIALS: SocialLink[] = [
  * (PR #29 review ruling). Fill with the real number to light both up.
  */
 export const WHATSAPP_HREF: string | null = null;
+
+/**
+ * Manager handle. VERIFIED 2026-09-16 (TASK-056 row 4) — the handle the
+ * client's own reply names. Distinct from SOCIALS' `telegram`, which is the
+ * shop CHANNEL (t.me/mirox_shop): the channel broadcasts, the manager answers.
+ *
+ * Deliberately NOT placed in the WHATSAPP_HREF slot (G23 spec §6): a Telegram
+ * URL under a WhatsApp label would be a small untruth on checkout and on the
+ * order e-mail. WHATSAPP_HREF stays null until a real number arrives.
+ */
+export const MANAGER_TELEGRAM_HREF = "https://t.me/mirox_manager";
+
+/** Reviews channel. VERIFIED 2026-09-16 (TASK-056 row 16) — shown on /contact only, per that row. */
+export const REVIEWS_CHANNEL_HREF = "https://t.me/mirox_vidgyk";
+
+/**
+ * The developer's site, carrying every contact method (URL supplied by the
+ * user 2026-09-16). Part of the verbal agreement: the site is built in
+ * exchange for this credit, portfolio use and client reviews. E-mail is
+ * deliberately NOT rendered anywhere on the storefront — harvestable, and it
+ * already lives on the linked site.
+ */
+export const DEVELOPER_CREDIT_HREF = "https://goodalex223.github.io";

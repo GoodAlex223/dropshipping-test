@@ -30,7 +30,7 @@ describe("Header", () => {
     expect(screen.getAllByAltText("Mirox Shop").length).toBeGreaterThan(0);
   });
 
-  it("renders the three resolvable Ukrainian nav links (and none to unbuilt pages)", () => {
+  it("renders the four resolvable Ukrainian nav links (and none to unbuilt pages)", () => {
     renderWithIntl(<Header />);
     expect(screen.getByRole("link", { name: "Каталог" })).toHaveAttribute("href", "/products");
     expect(screen.getByRole("link", { name: "Новинки" })).toHaveAttribute(
@@ -41,8 +41,14 @@ describe("Header", () => {
       "href",
       "/products?sort=popular"
     );
+    // «Контакти» joined the header nav in G23 (TASK-055 Task 8) — the /contact
+    // page it links to now exists. Design spec §4's six-item nav is
+    // deliberately NOT followed in full (§7 of the design doc): «Про нас» and
+    // «Доставка» stay footer-only to keep the desktop nav inside the `md`
+    // breakpoint for 768–1023px tablets.
+    expect(screen.getByRole("link", { name: "Контакти" })).toHaveAttribute("href", "/contact");
     expect(screen.getByRole("link", { name: "Категорії" })).toHaveAttribute("href", "/categories");
-    for (const dead of ["Про нас", "Доставка", "Контакти"]) {
+    for (const dead of ["Про нас", "Доставка"]) {
       expect(screen.queryByRole("link", { name: dead })).not.toBeInTheDocument();
     }
   });

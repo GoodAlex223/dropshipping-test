@@ -1,4 +1,4 @@
-import { BRAND_NAME, SOCIALS, WHATSAPP_HREF } from "./brand";
+import { BRAND_NAME, MANAGER_TELEGRAM_HREF, SOCIALS, WHATSAPP_HREF } from "./brand";
 
 /**
  * Transactional email copy (spec 2026-08-10-g5-transactional-emails-design.md
@@ -40,11 +40,14 @@ export const emails = {
     /** Guest orders have no account page — this CTA opens /track prefilled (G18). */
     guestCta: "СТАТУС ЗАМОВЛЕННЯ",
     /**
-     * Manager channels for the contact block — mirrors checkout.contacts:
-     * instagram/telegram now, WhatsApp appended once the client supplies the
+     * Manager channels for the contact block — mirrors checkout.contacts.
+     * The manager (MANAGER_TELEGRAM_HREF, G23 §6) leads the list, distinct
+     * from SOCIALS' telegram entry below, which is the shop CHANNEL, not the
+     * manager who answers; WhatsApp is appended once the client supplies the
      * number (user gate ruling 2026-08-10).
      */
     contacts: [
+      { platform: "telegram" as const, label: "Менеджер", href: MANAGER_TELEGRAM_HREF },
       ...SOCIALS.filter((s) => s.platform === "instagram" || s.platform === "telegram"),
       ...(WHATSAPP_HREF
         ? [{ platform: "whatsapp" as const, label: "WhatsApp", href: WHATSAPP_HREF }]

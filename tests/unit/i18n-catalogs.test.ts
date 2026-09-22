@@ -60,9 +60,11 @@ describe("message catalogs", () => {
   it("ru covers every uk key (full draft — Task 9 flips this to hard)", () => {
     const ruKeys = new Set(leaves(ru as Tree).map(([k]) => k));
     // admin.* is UA-only by decision (G13, 2026-08-16): RU deep-merge falls back to UA — see docs/superpowers/specs/2026-08-16-g13-admin-translation-design.md
+    // pages.* is UA-only by the same decision (G23): the seven info/legal pages
+    // get no ru.json keys — see docs/superpowers/specs/2026-09-21-g23-task-055-content-legal-pages-design.md §4
     const missing = leaves(uk as Tree)
       .map(([k]) => k)
-      .filter((k) => !k.startsWith("admin."))
+      .filter((k) => !k.startsWith("admin.") && !k.startsWith("pages."))
       .filter((k) => !ruKeys.has(k));
     expect(missing).toEqual([]);
   });

@@ -1,5 +1,5 @@
 import { site } from "./site";
-import { WHATSAPP_HREF } from "./brand";
+import { MANAGER_TELEGRAM_HREF, WHATSAPP_HREF } from "./brand";
 
 /**
  * Checkout config (spec 2026-08-06-g2-checkout-restyle-cod-design.md §2/§6/§8).
@@ -20,13 +20,16 @@ export const checkout = {
     },
   },
   /**
-   * Manager contact links. whatsapp is single-sourced from brand.ts
-   * (WHATSAPP_HREF, CLIENT-SUPPLIED, PENDING TASK-056): null hides the link —
-   * unlike site.ts's socials there is no real handle to fall back on, and a
-   * zero-filled wa.me number would render as a clickable dead link (PR #29 review).
-   * Fill with the real number to light it up.
+   * Manager contact links. manager is single-sourced from brand.ts
+   * (MANAGER_TELEGRAM_HREF, G23 §6) — distinct from telegram below, which is
+   * the shop CHANNEL, not the manager who answers. whatsapp is single-sourced
+   * from brand.ts (WHATSAPP_HREF, CLIENT-SUPPLIED, PENDING TASK-056): null
+   * hides the link — unlike site.ts's socials there is no real handle to fall
+   * back on, and a zero-filled wa.me number would render as a clickable dead
+   * link (PR #29 review). Fill with the real number to light it up.
    */
   contacts: {
+    manager: MANAGER_TELEGRAM_HREF,
     instagram: site.socials.find((s) => s.platform === "instagram")?.href ?? null,
     telegram: site.socials.find((s) => s.platform === "telegram")?.href ?? null,
     whatsapp: WHATSAPP_HREF,

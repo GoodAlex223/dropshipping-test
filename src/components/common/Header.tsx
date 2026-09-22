@@ -48,6 +48,7 @@ const navigation = [
   { key: "catalog", href: "/products" },
   { key: "new", href: "/products?sort=new" },
   { key: "bestsellers", href: "/products?sort=popular" },
+  { key: "contacts", href: "/contact" },
 ] as const;
 
 export function Header() {
