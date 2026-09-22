@@ -1,7 +1,7 @@
 # G23 / TASK-055 — Content, Legal & Contact Pages Plan
 
-**Last Updated**: 2026-09-21
-**Task**: G23 (WEEKLY [G23](../WEEKLY.md#g23-task-055-content-legal--contact-pages-batch)) · TODO [TASK-055] content & legal pages, UNBLOCKED 2026-09-16 by the client's blanket delegation (TASK-056 row 15) + two promoted BACKLOG entries (🔵 [2026-09-16] developer credit → member 5; 🟤 [2026-09-16] manager link → member 3, subsumed with a recorded deviation)
+**Last Updated**: 2026-09-22
+**Task**: G23 (WEEKLY [G23](../../planning/WEEKLY.md#g23-task-055-content-legal--contact-pages-batch)) · TODO [TASK-055] content & legal pages, UNBLOCKED 2026-09-16 by the client's blanket delegation (TASK-056 row 15) + two promoted BACKLOG entries (🔵 [2026-09-16] developer credit → member 5; 🟤 [2026-09-16] manager link → member 3, subsumed with a recorded deviation)
 **Branch**: `feat/task-055-content-legal-pages` (from `main` @ `c779b6b`)
 **Status**: In progress
 **Spec**: [2026-09-21-g23-task-055-content-legal-pages-design.md](../../superpowers/specs/2026-09-21-g23-task-055-content-legal-pages-design.md) — the plan argues from the spec; executors read both. Section references below (§3, §4, …) are to it.

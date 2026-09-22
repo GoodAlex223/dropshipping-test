@@ -1,6 +1,6 @@
 # TODO
 
-**Last Updated**: 2026-09-21
+**Last Updated**: 2026-09-22
 
 Program spec: [Mirox Shop Program Design](../superpowers/specs/2026-07-14-mirox-shop-program-design.md) · Current week: [WEEKLY.md](WEEKLY.md)
 
@@ -182,7 +182,7 @@ verify that out-of-tree work landed. Kept separate from the in-tree spawned task
 #### [TASK-055] Content & legal pages
 
 **Priority**: 🟠 High
-**Status**: 🚧 **Built 2026-09-21 (WEEKLY G23) — awaiting the client review round.** All seven routes are live on `feat/task-055-content-legal-pages`, drafted by us under the client's 2026-09-16 blanket delegation (TASK-056 item 15); `/contact` ships with the TG channel, reviews channel `t.me/mirox_vidgyk`, manager `@mirox_manager` and the feedback form, no phone/address (none supplied); brand posture per TASK-056 row 14 (no third-party brand names, no authenticity claim). Review package handed over: [reference/2026-09-21-task-055-copy-for-client.md](../reference/2026-09-21-task-055-copy-for-client.md) — **publish on the client's OK, or after three working days of silence**.
+**Status**: 🚧 **Shipped 2026-09-22 (WEEKLY G23, PR [#49](https://github.com/GoodAlex223/dropshipping-test/pull/49) merged `3800888`) — awaiting the client review round.** All seven routes are on `main`, drafted by us under the client's 2026-09-16 blanket delegation (TASK-056 item 15); `/contact` ships with the TG channel, reviews channel `t.me/mirox_vidgyk`, manager `@mirox_manager` and the feedback form, no phone/address (none supplied); brand posture per TASK-056 row 14 (no third-party brand names, no authenticity claim). Review package handed over: [reference/2026-09-21-task-055-copy-for-client.md](../reference/2026-09-21-task-055-copy-for-client.md) — **publish on the client's OK, or after three working days of silence**.
 
 **⚠️ Outstanding after G23 — the seller's requisites (client-owed, not blocked on us).** Legal form (ФОП/ТОВ), full registered name, ЄДРПОУ/РНОКПП and registered address were never supplied (TASK-056 row 4 asked; the 2026-09-16 reply delegated the _copy_, not the _facts_). `LEGAL_ENTITY` in `src/content/legal.ts` stays `null` by design and `<SellerRequisites/>` renders its honest fallback branch in production, so `/terms`, `/privacy` and `/returns` publish without them — nothing is placeholder or invented. Filling the constant is a four-line change with no rework. Payments decision **§5.0 Gate 0** is the real consequence: **no Ukrainian gateway can be connected at all until the client registers a ФОП or ТОВ**, so this also gates TASK-048 independently of anything G23 could reach.
 

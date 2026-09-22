@@ -2,11 +2,73 @@
 
 Completed tasks with implementation details and learnings.
 
-**Last Updated**: 2026-09-21
+**Last Updated**: 2026-09-22
 
 ---
 
 ## 2026-08 (August)
+
+### [2026-09-22] G23 - TASK-055 Content, Legal & Contact Pages (WEEKLY batch, 🔵 User, 🏆 Weekly Challenge)
+
+**Plan**: [2026-09-21_g23-task-055-content-legal-pages.md](../archive/plans/2026-09-21_g23-task-055-content-legal-pages.md) · **Spec**: [2026-09-21-g23-task-055-content-legal-pages-design.md](../superpowers/specs/2026-09-21-g23-task-055-content-legal-pages-design.md) · **PR**: [#49](https://github.com/GoodAlex223/dropshipping-test/pull/49) merged `3800888` · **SP**: 10 planned → ~11 actual (the `plan-snippets` incompatibility and two copy-correction fix waves were unplanned)
+
+The seven routes the storefront chrome had pointed at since TASK-035 without their existing: `/contact`,
+`/about`, `/faq`, `/shipping`, `/returns`, `/privacy`, `/terms`. Three of them — public offer, privacy
+policy, return policy — are payment-gateway onboarding prerequisites (§5.3 item 9), so **that item's
+"published" half is now satisfied** and TASK-048 loses one of its blockers. The copy is ours: the
+client's 2026-09-16 delegation gave us the _copy_ to draft, not the _facts_. Run as a full SDD cycle —
+brainstorm → spec → plan → 11 subagent-driven tasks, each with its own review-and-fix loop.
+
+**Six pages, one shell.** `StaticPage` is an async Server Component reading `sections` via `t.raw()`;
+`/contact` is hand-built because it renders live links and the feedback form. 46 sections of UA prose
+in a new `pages` catalog namespace, UA-only by the same decision as `admin`.
+
+**The prose never reaches the browser.** The root layout serializes the catalog into the client
+provider on _every_ storefront page, so `pages` joined `admin` on the exclusion list — now
+`STOREFRONT_EXCLUDED_NAMESPACES` in a dependency-free leaf module, because `layout.tsx` imports
+`next/font/google` and no unit test can import it. Measured: catalog minus `admin` alone is 76,855
+bytes; minus both, 29,068 — **47,787 bytes kept off the homepage, every PDP and the cart**.
+
+**Legal prose asserts things about the system, and nothing typechecks prose.** Three statements we
+wrote passed review once and were still false: delivery «визначається тарифами перевізника» when
+`shipping.ts` sets three _fixed_ prices; cookies described as storing the cart when `cart.store.ts`
+uses zustand `persist` → localStorage; e-mail marked «(за наявності)» when `validations/index.ts:107`
+requires it. All three were caught against source, and the final review added a fourth — `/privacy` §8
+had omitted the `og_<order>` grant cookie. This is the group's main lesson.
+
+**A latent bug found on the way.** `deepMerge` in `src/i18n/merge.ts` silently discarded every RU
+array — both branches rejected arrays, so the key fell through to "keep base". No RU array had ever
+existed, so nothing had exercised it.
+
+**Verification.** CI run `35714614047`: **86 E2E tests, chromium + webkit, all passed, no flakes**,
+plus 97 unit files / 1201 tests. Measured against the Vercel preview build (not a local one — this
+container's prod CSS is corrupted by a stray `NODE_ENV`): seven routes 200, h1 7/7 and **46/46**
+section headings matching the catalog, and `scrollWidth == clientWidth == 390` on every route.
+
+**Key changes**
+
+- `src/app/(shop)/{contact,about,faq,shipping,returns,privacy,terms}/page.tsx` (new) — seven routes, no params, no DB, no forms
+- `src/components/pages/` (new) — `StaticPage`, `SellerRequisites`, `DeveloperCredit`
+- `src/content/legal.ts` (new) — `LegalEntity`, null-gated `LEGAL_ENTITY`, `RETURN_WINDOW_DAYS`
+- `src/i18n/client-namespaces.ts` (new) — the exclusion list, import-free by contract
+- `src/i18n/merge.ts` — array-replace branch (the latent RU bug)
+- `src/content/brand.ts` — `MANAGER_TELEGRAM_HREF`, `REVIEWS_CHANNEL_HREF`, `DEVELOPER_CREDIT_HREF`
+- `src/components/checkout/CheckoutContactLinks.tsx` (new) — extracted so the manager link had a render site; without it the catalog data was dead
+- `src/components/common/{Header,Footer}.tsx` — one nav entry, two-group footer band, developer credit
+- 8 new test files — 41 call sites → **64 executed cases**; every guard proved red by mutation first
+- `docs/reference/2026-09-21-task-055-copy-for-client.md` (new) — the 624-line UA review package
+
+**Deviation on the record.** BACKLOG 🟤 [2026-09-16] proposed putting the manager Telegram link _in
+the WhatsApp slot_. It did not: `WHATSAPP_HREF` stays `null` and the manager got its own named slot.
+A Telegram URL under a WhatsApp label is untrue on checkout and on a transactional e-mail. That entry
+is now closed citing this; the PR review caught that the closure had been skipped.
+
+**Still open, deliberately**
+
+- **Nobody has read the Ukrainian copy.** The client round-trip is TASK-055 AC 2 — publish on their OK or after three working days of silence (from 2026-09-21). No test substitutes for that read.
+- **`LEGAL_ENTITY` is `null`.** The pages identify the seller by trade name only — short of ЗУ «Про електронну комерцію» ст. 7. A supported production state by design, because a fabricated ЄДРПОУ is worse than an absent one. Client-owed, and §5.0 Gate 0 blocks any gateway regardless.
+- **Four legal points left unguessed**, all put to the client: no liability cap, no hard refund deadline, unconfirmed refund-by-bank-transfer, omitted КМУ non-returnable-goods clause.
+- **The cart drawer still carries the falsehood `/terms` just lost** — «За тарифами Нової Пошти» against three fixed prices. Filed 🟤; worth closing before the copy is published.
 
 ### [2026-09-21] G22 - Production Cache-Off Redeploy + Smoke Re-verify (WEEKLY solo, 🟡 Ops)
 
